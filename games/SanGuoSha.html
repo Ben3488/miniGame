@@ -669,7 +669,7 @@
             qun: { name: '群', colors: ['#4c1d95', '#f0abfc'], glow: '#d8b4fe' }
         };
 
-        HEROES.forEach(hero => { hero.img = `../assets/SanGuoSha/heroes/${hero.name}.png`; });
+        HEROES.forEach(hero => { hero.img = `../assets/SanGuoSha/heroes/${hero.id}.png`; });
 
         const SUIT_ENG = { '♠': 'spade', '♥': 'heart', '♣': 'club', '♦': 'diamond' };
         const CARD_ENG = {
@@ -3879,7 +3879,7 @@
                 el.className = 'hero-select-card';
                 
                 // Use avatar image for selection screen
-                let avatarImg = `../assets/SanGuoSha/heroes_avatar/${h.name}.png`;
+                let avatarImg = `../assets/SanGuoSha/heroes_avatar/${h.id}.png`;
                 el.style.backgroundImage = `url('${avatarImg}')`;
                 el.style.backgroundSize = 'cover';
                 el.style.backgroundPosition = 'center';
