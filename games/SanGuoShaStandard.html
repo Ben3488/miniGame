@@ -112,7 +112,7 @@
         #p0 .hero-section { display: flex; align-items: center; gap: 20px; }
         #p0 .hand-section { 
             display: flex; gap: 12px; flex: 1; margin: 0 24px; 
-            overflow-x: auto; padding-bottom: 12px; align-items: flex-end; height: 240px;
+            overflow-x: auto; padding: 0 16px 12px; align-items: flex-end; height: 240px;
             scrollbar-width: thin;
             scrollbar-color: var(--theme-border) transparent;
         }
@@ -129,6 +129,12 @@
         #p1 { top: 45%; left: 16px; transform: translateY(-50%); }
         #p2 { top: 16px; left: 50%; transform: translateX(-50%); flex-direction: row; gap: 20px;}
         #p3 { top: 45%; right: 16px; transform: translateY(-50%); }
+        #p1 .hero-card,
+        #p3 .hero-card,
+        .ai-player.side-player .hero-card {
+            width: 140px;
+            height: 196px;
+        }
         
         .ai-equip { font-size: 0.8rem; color: #d6d3d1; text-align: center; margin-top: 10px; display: flex; flex-direction: column; gap: 4px; width: 100%; }
         .ai-equip-item { background: rgba(12, 10, 9, 0.6); border: 1px solid rgba(255,255,255,0.15); padding: 4px 8px; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -175,7 +181,42 @@
             font-size: 0.9rem;
         }
 
-        .name-tag { font-weight: bold; text-align: center; margin-bottom: 6px; text-shadow: 0 2px 4px black; color: #f5f5f4; }
+        .name-tag {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 6px;
+            text-shadow: 0 2px 4px black;
+            color: #f5f5f4;
+        }
+        .hero-card .name-tag {
+            position: absolute;
+            top: -32px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: calc(100% + 16px);
+            max-width: 180px;
+            margin: 0;
+            padding: 4px 10px;
+            border: 1px solid rgba(245, 158, 11, 0.45);
+            border-radius: 999px;
+            background: rgba(12, 10, 9, 0.86);
+            color: #fff7d6;
+            font-size: 0.95rem;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 12;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.45);
+        }
+        #p0 .hero-card .name-tag {
+            top: -36px;
+            font-size: 1.05rem;
+            max-width: 210px;
+        }
+        .player-area > .name-tag {
+            display: none;
+        }
 
         /* Cards */
         .card {
@@ -640,12 +681,12 @@
         <div class="player-area" id="p0" onclick="Engine.onPlayerClick(0)">
             <div class="hero-section">
                 <div class="hero-card" id="hero0" onmouseenter="UI.showHeroInfoPanel(0)" onmouseleave="UI.hideCardInfoPanel()">
+                    <div class="name-tag" id="name0">玩家</div>
                     <div id="heroName0">?</div>
                     <div class="role-icon" id="role0" style="width:45px; height:45px; font-size:1.5rem; left:-20px;">主</div>
                     <div class="hp-bar" id="hp0"></div>
                 </div>
                 <div style="text-align:center;">
-                    <div class="name-tag" id="name0" style="font-size:1.2rem;">玩家</div>
                     <button class="btn" id="btnSkill" style="display:none; margin-top:10px; font-size: 0.9rem; padding: 5px 10px;" onclick="Engine.onSkillClick()">發動技能</button>
                 </div>
             </div>
@@ -1064,7 +1105,8 @@
             qun: { name: '群', colors: ['#4c1d95', '#f0abfc'], glow: '#d8b4fe' }
         };
 
-        HEROES.forEach(hero => { hero.img = `../assets/SanGuoSha/heroes/${hero.id}.png`; });
+        const STANDARD_HEROES = HEROES.filter(hero => hero.exp === 'standard');
+        STANDARD_HEROES.forEach(hero => { hero.img = `../assets/SanGuoSha/heroes/${hero.id}.png`; });
 
         const SUIT_ENG = { '♠': 'spade', '♥': 'heart', '♣': 'club', '♦': 'diamond' };
         const CARD_ENG = {
@@ -1362,7 +1404,7 @@
                     roles.sort(() => Math.random() - 0.5);
                 }
 
-                let availableHeroes = HEROES.filter(h => h.id !== humanHero.id).sort(() => Math.random() - 0.5);
+                let availableHeroes = STANDARD_HEROES.filter(h => h.id !== humanHero.id).sort(() => Math.random() - 0.5);
                 
                 for(let i=0; i<numPlayers; i++) {
                     let hero = (i === 0) ? humanHero : availableHeroes.pop();
@@ -4771,7 +4813,7 @@
                 for(let i=1; i<=aiCount; i++) {
                     let pos = positions[i-1];
                     let div = document.createElement('div');
-                    div.className = 'player-area ai-player';
+                    div.className = `player-area ai-player ${pos.left || pos.right ? 'side-player' : 'top-player'}`;
                     div.id = `p${i}`;
                     div.onclick = () => Engine.onPlayerClick(i);
                     
@@ -4797,6 +4839,7 @@
                     div.innerHTML = `
                         <div class="name-tag" id="name${i}">電腦${i}</div>
                         <div class="hero-card" id="hero${i}" onmouseenter="UI.showHeroInfoPanel(${i})" onmouseleave="UI.hideCardInfoPanel()">
+                            <div class="name-tag" id="heroLabel${i}">電腦${i}</div>
                             <div id="heroName${i}">?</div>
                             <div class="role-icon role-unknown" id="role${i}">?</div>
                             <div class="hand-count" id="h${i}">0</div>
@@ -4899,7 +4942,8 @@
                     let el = document.getElementById(`p${i}`);
                     
                     // Reset class names and apply faction styles
-                    el.className = `player-area ${i === 0 ? '' : 'ai-player'}`;
+                    let sideClass = (i !== 0 && el.style.top !== '10px') ? ' side-player' : (i !== 0 ? ' top-player' : '');
+                    el.className = `player-area ${i === 0 ? '' : 'ai-player'}${sideClass}`;
                     if(p.hero.faction) {
                         el.classList.add(`faction-${p.hero.faction}`);
                     }
@@ -4961,7 +5005,8 @@
                     if (p.flags.tuntian) {
                         nameText += ` [🌾田:${p.flags.tuntian}]`;
                     }
-                    document.getElementById(`name${i}`).innerText = nameText;
+                    let labelEl = document.getElementById(`heroLabel${i}`) || document.getElementById(`name${i}`);
+                    if (labelEl) labelEl.innerText = nameText;
 
                     if(i !== 0) {
                         let jHTML = p.judges.map(j => `<div class="ai-equip-item" style="border-color:#eab308; color:#eab308;">判定: ${j.name}</div>`).join('');
@@ -5115,14 +5160,7 @@
             if(!grid) return;
             grid.innerHTML = '';
             
-            let allowGod = document.getElementById('expGod') ? document.getElementById('expGod').checked : true;
-            let allowBreakthrough = document.getElementById('expBreakthrough') ? document.getElementById('expBreakthrough').checked : true;
-            let allowSP = document.getElementById('expSP') ? document.getElementById('expSP').checked : true;
-            
-            HEROES.forEach(h => {
-                if(h.exp === 'god' && !allowGod) return;
-                if(h.exp === 'breakthrough' && !allowBreakthrough) return;
-                if(h.exp === 'sp' && !allowSP) return;
+            STANDARD_HEROES.forEach(h => {
                 
                 let el = document.createElement('div');
                 el.className = 'hero-select-card';
