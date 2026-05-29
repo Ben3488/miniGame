@@ -1,305 +1,861 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>卡卡頌 Carcassonne</title>
+  <title>卡卡頌 Carcassonne - 完善版</title>
   <style>
-    :root { --bg:#102018; --panel:#17261d; --line:#36533f; --gold:#f6d365; --green:#83b86f; --blue:#68a6d9; --red:#d66b5f; --muted:#b9c6b8; }
-    * { box-sizing: border-box; }
-    body { margin:0; min-height:100vh; background:linear-gradient(135deg,#101914,#26371f); color:#f6f4df; font-family: "Segoe UI", "Noto Sans TC", sans-serif; }
-    .top { height:64px; display:flex; align-items:center; justify-content:space-between; padding:0 22px; background:rgba(10,18,13,.9); border-bottom:1px solid #2d442f; position:sticky; top:0; z-index:5; }
-    a { color:#f6f4df; text-decoration:none; }
-    h1 { margin:0; font-size:22px; color:var(--gold); letter-spacing:0; }
-    .badge { border:1px solid #6f8f51; color:#d7f0a3; padding:5px 10px; border-radius:16px; font-size:13px; }
-    .app { display:grid; grid-template-columns: 310px 1fr 280px; gap:16px; padding:16px; }
-    .panel { background:rgba(23,38,29,.92); border:1px solid var(--line); border-radius:8px; padding:14px; box-shadow:0 14px 30px rgba(0,0,0,.28); }
-    .panel h2 { margin:0 0 10px; font-size:16px; color:var(--gold); }
-    .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-    button, select { border:1px solid #6e8c54; background:#264224; color:#f6f4df; border-radius:6px; padding:9px 12px; font-weight:700; cursor:pointer; }
-    button:hover { background:#31562d; }
-    button:disabled { opacity:.45; cursor:not-allowed; }
-    .score { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    .player { padding:10px; border-radius:7px; background:#101b14; border:1px solid #314a35; }
-    .player.active { outline:2px solid var(--gold); }
-    .num { font-size:28px; color:var(--gold); font-weight:800; }
-    .tile-preview { width:126px; height:126px; margin:10px auto; }
-    .board-wrap { overflow:auto; border-radius:8px; background:#20351f; border:1px solid #496a39; height:calc(100vh - 100px); padding:18px; }
-    .board { display:grid; grid-template-columns:repeat(11,76px); grid-template-rows:repeat(11,76px); gap:3px; width:max-content; margin:auto; }
-    .cell { width:76px; height:76px; border-radius:5px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.07); display:grid; place-items:center; position:relative; }
-    .cell.legal { background:rgba(246,211,101,.18); border-color:var(--gold); cursor:pointer; }
-    .cell.occupied { background:#244021; }
-    .tile { width:72px; height:72px; border-radius:5px; position:relative; overflow:hidden; background:#8abf69; border:2px solid #e9d599; box-shadow:0 3px 8px rgba(0,0,0,.35); }
-    .edge { position:absolute; background:#d8d0a7; }
-    .n,.s { left:26px; width:20px; height:30px; }
-    .n { top:-2px; } .s { bottom:-2px; }
-    .e,.w { top:26px; height:20px; width:30px; }
-    .e { right:-2px; } .w { left:-2px; }
-    .city { background:#a94838; border:2px solid #71271d; }
-    .road { background:#d8d0a7; }
-    .field { background:#84b96c; }
-    .center { position:absolute; inset:22px; border-radius:50%; display:grid; place-items:center; font-size:18px; color:#4c341a; font-weight:800; }
-    .center.city { border-radius:6px; background:#a94838; color:#fee6b0; }
-    .center.cloister { background:#f4e8bc; border:2px solid #8b6d37; }
-    .meeple { position:absolute; left:28px; top:28px; width:16px; height:20px; background:#2563eb; border-radius:8px 8px 5px 5px; box-shadow:0 0 0 2px #101010; z-index:2; }
-    .meeple.ai { background:#dc2626; }
-    .log { height:220px; overflow:auto; font-size:13px; line-height:1.5; color:#d8e4ce; background:#101b14; border-radius:6px; padding:10px; }
-    .help { color:var(--muted); font-size:13px; line-height:1.55; }
-    @media (max-width: 980px) { .app { grid-template-columns:1fr; } .board-wrap { height:62vh; } }
+    :root {
+      --bg: #102018;
+      --panel: #17261d;
+      --line: #36533f;
+      --gold: #f6d365;
+      --green: #83b86f;
+      --blue: #68a6d9;
+      --red: #d66b5f;
+      --muted: #b9c6b8;
+      --board-size: 35;
+      /* 動態網格大小 */
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #101914, #26371f);
+      color: #f6f4df;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      overflow: hidden;
+    }
+
+    .top {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      background: rgba(10, 18, 13, .9);
+      border-bottom: 1px solid #2d442f;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #f6f4df;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      padding: 6px 14px 6px 8px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: all 0.25s ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: var(--gold);
+      border-color: var(--gold);
+      transform: translateX(-2px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      color: var(--gold);
+      letter-spacing: 0;
+    }
+
+    .badge {
+      border: 1px solid #6f8f51;
+      color: #d7f0a3;
+      padding: 5px 10px;
+      border-radius: 16px;
+      font-size: 13px;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 310px 1fr 280px;
+      gap: 16px;
+      padding: 16px;
+      height: calc(100vh - 64px);
+    }
+
+    .panel {
+      background: rgba(23, 38, 29, .92);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, .28);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      color: var(--gold);
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    button,
+    select {
+      border: 1px solid #6e8c54;
+      background: #264224;
+      color: #f6f4df;
+      border-radius: 6px;
+      padding: 9px 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #31562d;
+    }
+
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .score {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .player {
+      padding: 10px;
+      border-radius: 7px;
+      background: #101b14;
+      border: 1px solid #314a35;
+      transition: 0.2s;
+    }
+
+    .player.active {
+      outline: 2px solid var(--gold);
+      background: #1a2c1e;
+    }
+
+    .num {
+      font-size: 28px;
+      color: var(--gold);
+      font-weight: 800;
+    }
+
+    .tile-preview {
+      width: 126px;
+      height: 126px;
+      margin: 10px auto;
+    }
+
+    .board-wrap {
+      overflow: auto;
+      border-radius: 8px;
+      background: #20351f;
+      border: 1px solid #496a39;
+      height: 100%;
+      padding: 18px;
+      position: relative;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(var(--board-size), 76px);
+      grid-template-rows: repeat(var(--board-size), 76px);
+      gap: 3px;
+      width: max-content;
+      margin: auto;
+    }
+
+    .cell {
+      width: 76px;
+      height: 76px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, .03);
+      border: 1px dashed rgba(255, 255, 255, .08);
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+
+    .cell.legal {
+      background: rgba(246, 211, 101, .15);
+      border: 1px solid var(--gold);
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .cell.legal:hover {
+      background: rgba(246, 211, 101, .3);
+    }
+
+    .cell.occupied {
+      background: transparent;
+      border-style: solid;
+      border-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .tile {
+      width: 74px;
+      height: 74px;
+      border-radius: 5px;
+      position: relative;
+      overflow: hidden;
+      background: #8abf69;
+      border: 2px solid #e9d599;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, .35);
+    }
+
+    .edge {
+      position: absolute;
+      background: #d8d0a7;
+    }
+
+    .n,
+    .s {
+      left: 27px;
+      width: 16px;
+      height: 32px;
+    }
+
+    .n {
+      top: -2px;
+    }
+
+    .s {
+      bottom: -2px;
+    }
+
+    .e,
+    .w {
+      top: 27px;
+      height: 16px;
+      width: 32px;
+    }
+
+    .e {
+      right: -2px;
+    }
+
+    .w {
+      left: -2px;
+    }
+
+    .city {
+      background: #a94838;
+      border: 2px solid #71271d;
+    }
+
+    .road {
+      background: #d8d0a7;
+    }
+
+    .field {
+      background: #84b96c;
+    }
+
+    .center {
+      position: absolute;
+      inset: 20px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      color: #4c341a;
+      font-weight: 800;
+      z-index: 1;
+    }
+
+    .center.city {
+      border-radius: 6px;
+      background: #a94838;
+      color: #fee6b0;
+      inset: 14px;
+    }
+
+    .center.cloister {
+      background: #f4e8bc;
+      border: 2px solid #8b6d37;
+      inset: 18px;
+    }
+
+    /* 米寶定位優化：根據選擇的地形給予不同的視覺偏移 */
+    .meeple {
+      position: absolute;
+      width: 16px;
+      height: 20px;
+      background: #2563eb;
+      border-radius: 8px 8px 5px 5px;
+      box-shadow: 0 0 0 2px #101010;
+      z-index: 3;
+      transition: 0.3s;
+    }
+
+    .meeple.ai {
+      background: #dc2626;
+    }
+
+    .meeple.road {
+      top: 46px;
+      left: 27px;
+    }
+
+    /* 道路偏下 */
+    .meeple.city {
+      top: 8px;
+      left: 27px;
+    }
+
+    /* 城市偏上 */
+    .meeple.cloister {
+      top: 27px;
+      left: 27px;
+    }
+
+    /* 修道院置中 */
+    .meeple.field {
+      top: 52px;
+      left: 8px;
+    }
+
+    /* 農田偏左下角 */
+
+    .log {
+      flex-grow: 1;
+      overflow-y: auto;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #d8e4ce;
+      background: #101b14;
+      border-radius: 6px;
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    .log div {
+      border-bottom: 1px solid #1a2e21;
+      padding: 4px 0;
+    }
+
+    .help {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 980px) {
+      .app {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+
+      .board-wrap {
+        height: 60vh;
+      }
+    }
   </style>
 </head>
+
 <body>
   <div class="top">
-    <a href="../index.html">← 返回大廳</a>
+    <a href="../index.html" class="back-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      返回大廳
+    </a>
     <h1>卡卡頌 Carcassonne</h1>
-    <div class="badge">可完成單機版</div>
+    <div class="badge">已完善版 (v2.0)</div>
   </div>
   <div class="app">
     <aside class="panel">
-      <h2>回合</h2>
+      <h2>回合控制</h2>
       <div id="turnText" class="help"></div>
       <div id="preview" class="tile-preview"></div>
       <div class="row">
-        <button id="rotateBtn">旋轉</button>
-        <select id="meepleSelect">
-          <option value="">不放米寶</option>
-          <option value="road">道路</option>
-          <option value="city">城市</option>
-          <option value="cloister">修道院</option>
-          <option value="field">農田</option>
+        <button id="rotateBtn">順時針旋轉</button>
+      </div>
+      <div class="row">
+        <select id="meepleSelect" style="width: 100%;">
+          <option value="">(放置後不放米寶)</option>
+          <option value="road">佔領道路</option>
+          <option value="city">佔領城市</option>
+          <option value="cloister">佔領修道院</option>
+          <option value="field">佔領農田 (農夫)</option>
         </select>
       </div>
-      <p class="help">黃色格代表合法位置。放置後若選擇米寶，會嘗試放在該板塊的指定地形；完成道路/城市/修道院會立刻計分並回收米寶。</p>
+      <p class="help">1. 點擊「旋轉」調整板塊方向。<br>2. 選擇你要放置的米寶類型 (若不想放可選不放)。<br>3. 點擊圖板上黃色高光區域確認放置。<br>⚠️ 注意：已被人佔領的地形無法再次放置米寶。
+      </p>
       <div class="row">
-        <button id="newBtn">新局</button>
-        <button id="hintBtn">提示</button>
+        <button id="newBtn">重新開始</button>
+        <button id="hintBtn">顯示提示</button>
       </div>
     </aside>
-    <main class="board-wrap"><div id="board" class="board"></div></main>
+    <main class="board-wrap" id="boardWrap">
+      <div id="board" class="board"></div>
+    </main>
     <aside class="panel">
-      <h2>分數</h2>
+      <h2>分數面板</h2>
       <div class="score">
-        <div id="p0" class="player"><b>你</b><div class="num" id="s0">0</div><div>米寶 <span id="m0">7</span></div></div>
-        <div id="p1" class="player"><b>AI</b><div class="num" id="s1">0</div><div>米寶 <span id="m1">7</span></div></div>
+        <div id="p0" class="player"><b>你 (藍)</b>
+          <div class="num" id="s0">0</div>
+          <div>米寶 <span id="m0">7</span></div>
+        </div>
+        <div id="p1" class="player"><b>AI (紅)</b>
+          <div class="num" id="s1">0</div>
+          <div>米寶 <span id="m1">7</span></div>
+        </div>
       </div>
-      <p class="help">牌堆：<span id="deckCount"></span> 張</p>
-      <h2>紀錄</h2>
+      <p class="help" style="margin: 0;">剩餘牌堆：<span id="deckCount"></span> 張</p>
       <div id="log" class="log"></div>
     </aside>
   </div>
   <script>
-    const SIZE = 11, MID = 5;
-    const D = ['N','E','S','W'];
+    // 擴充棋盤大小以容納所有 72 張卡牌的延伸
+    const SIZE = 35, MID = 17;
+    const D = ['N', 'E', 'S', 'W'];
+
+    // 定義完整標準版的數量分布 (總共 72 張)
     const baseTiles = [
-      {name:'起始城路', edges:{N:'F',E:'R',S:'R',W:'C'}, center:'field', count:1},
-      {name:'直路', edges:{N:'R',E:'F',S:'R',W:'F'}, center:'field', count:5},
-      {name:'彎路', edges:{N:'R',E:'R',S:'F',W:'F'}, center:'field', count:6},
-      {name:'十字路', edges:{N:'R',E:'R',S:'R',W:'R'}, center:'field', count:4},
-      {name:'城市邊', edges:{N:'C',E:'F',S:'F',W:'F'}, center:'field', count:5},
-      {name:'城市角', edges:{N:'C',E:'C',S:'F',W:'F'}, center:'city', count:4},
-      {name:'城市三邊', edges:{N:'C',E:'C',S:'C',W:'F'}, center:'city', count:3},
-      {name:'完整城市', edges:{N:'C',E:'C',S:'C',W:'C'}, center:'city', count:2},
-      {name:'修道院', edges:{N:'F',E:'F',S:'F',W:'F'}, center:'cloister', count:4},
-      {name:'修道院路', edges:{N:'R',E:'F',S:'F',W:'F'}, center:'cloister', count:2},
-      {name:'田野', edges:{N:'F',E:'F',S:'F',W:'F'}, center:'field', count:4}
+      { name: '起始城路', edges: { N: 'C', E: 'R', S: 'F', W: 'R' }, center: 'road', count: 1 },
+      { name: '直路', edges: { N: 'F', E: 'R', S: 'F', W: 'R' }, center: 'road', count: 8 },
+      { name: '彎路', edges: { N: 'F', E: 'F', S: 'R', W: 'R' }, center: 'road', count: 9 },
+      { name: '十字路', edges: { N: 'R', E: 'R', S: 'R', W: 'R' }, center: 'road', count: 1 },
+      { name: '丁字路', edges: { N: 'F', E: 'R', S: 'R', W: 'R' }, center: 'road', count: 4 },
+      { name: '城市邊', edges: { N: 'C', E: 'F', S: 'F', W: 'F' }, center: 'field', count: 5 },
+      { name: '城市邊帶直路', edges: { N: 'C', E: 'R', S: 'F', W: 'R' }, center: 'road', count: 3 },
+      { name: '城市邊帶彎路', edges: { N: 'C', E: 'F', S: 'R', W: 'R' }, center: 'road', count: 3 },
+      { name: '城市邊帶左彎', edges: { N: 'C', E: 'R', S: 'R', W: 'F' }, center: 'road', count: 3 },
+      { name: '城市角', edges: { N: 'C', E: 'C', S: 'F', W: 'F' }, center: 'city', count: 5 },
+      { name: '城市角帶路', edges: { N: 'C', E: 'C', S: 'R', W: 'R' }, center: 'city', count: 5 },
+      { name: '長城市', edges: { N: 'C', E: 'F', S: 'C', W: 'F' }, center: 'city', count: 3 },
+      { name: '城市三邊', edges: { N: 'C', E: 'C', S: 'F', W: 'C' }, center: 'city', count: 3 },
+      { name: '城市三邊帶路', edges: { N: 'C', E: 'C', S: 'R', W: 'C' }, center: 'city', count: 3 },
+      { name: '完整城市', edges: { N: 'C', E: 'C', S: 'C', W: 'C' }, center: 'city', count: 1 },
+      { name: '修道院', edges: { N: 'F', E: 'F', S: 'F', W: 'F' }, center: 'cloister', count: 4 },
+      { name: '修道院帶路', edges: { N: 'F', E: 'F', S: 'R', W: 'F' }, center: 'cloister', count: 2 }
     ];
+
     let board, deck, current, turn, gameOver, players;
 
     const $ = id => document.getElementById(id);
     const clone = o => JSON.parse(JSON.stringify(o));
-    const key = (r,c) => `${r},${c}`;
+    const key = (r, c) => `${r},${c}`;
 
-    function makeDeck(){
+    function makeDeck() {
       const out = [];
-      baseTiles.forEach(t => { for(let i=0;i<t.count;i++) out.push({...clone(t), id: `${t.name}-${i}`, rot:0}); });
-      return out.sort(() => Math.random() - .5);
+      baseTiles.forEach(t => {
+        // 扣除一張起始版作為預設
+        let count = t.name === '起始城路' ? 0 : t.count;
+        for (let i = 0; i < count; i++) out.push({ ...clone(t), id: `${t.name}-${i}`, rot: 0 });
+      });
+      return out.sort(() => Math.random() - .5); // 洗牌
     }
-    function rotateTile(t){
+
+    function rotateTile(t) {
       const e = t.edges;
-      t.edges = {N:e.W,E:e.N,S:e.E,W:e.S};
+      t.edges = { N: e.W, E: e.N, S: e.E, W: e.S };
       t.rot = (t.rot + 90) % 360;
     }
-    function tileHtml(t, meeple){
-      if(!t) return '<div class="help">牌堆已空</div>';
+
+    function tileHtml(t, meeple) {
+      if (!t) return '<div class="help" style="text-align:center;">牌堆已空</div>';
       const cls = v => v === 'C' ? 'city' : v === 'R' ? 'road' : 'field';
-      return `<div class="tile" title="${t.name}">
+
+      // 修道院與城市的置中圖案顯示
+      let centerContent = '';
+      let centerClass = '';
+      if (t.center === 'cloister') { centerClass = 'cloister'; centerContent = '⛪'; }
+      else if (t.center === 'city' || Object.values(t.edges).filter(e => e === 'C').length >= 3) { centerClass = 'city'; centerContent = '城'; }
+
+      return `<div class="tile" style="transform: rotate(${t.rot}deg)">
         <div class="edge n ${cls(t.edges.N)}"></div><div class="edge e ${cls(t.edges.E)}"></div>
         <div class="edge s ${cls(t.edges.S)}"></div><div class="edge w ${cls(t.edges.W)}"></div>
-        <div class="center ${t.center === 'city' ? 'city' : t.center === 'cloister' ? 'cloister' : ''}">${t.center === 'cloister' ? '⛪' : t.center === 'city' ? '城' : ''}</div>
-        ${meeple ? `<div class="meeple ${meeple.player ? 'ai' : ''}"></div>` : ''}
+        <div class="center ${centerClass}" style="transform: rotate(-${t.rot}deg)">${centerContent}</div>
+        ${meeple ? `<div class="meeple ${meeple.player === 1 ? 'ai' : ''} ${meeple.type}" style="transform: rotate(-${t.rot}deg)"></div>` : ''}
       </div>`;
     }
-    function neighbor(r,c,d){ return d==='N'?[r-1,c]:d==='E'?[r,c+1]:d==='S'?[r+1,c]:[r,c-1]; }
-    function opp(d){ return {N:'S',E:'W',S:'N',W:'E'}[d]; }
-    function inBounds(r,c){ return r>=0 && c>=0 && r<SIZE && c<SIZE; }
-    function canPlace(t,r,c){
-      if(!inBounds(r,c) || board[key(r,c)]) return false;
+
+    function neighbor(r, c, d) { return d === 'N' ? [r - 1, c] : d === 'E' ? [r, c + 1] : d === 'S' ? [r + 1, c] : [r, c - 1]; }
+    function opp(d) { return { N: 'S', E: 'W', S: 'N', W: 'E' }[d]; }
+    function inBounds(r, c) { return r >= 0 && c >= 0 && r < SIZE && c < SIZE; }
+
+    function canPlace(t, r, c) {
+      if (!inBounds(r, c) || board[key(r, c)]) return false;
       let touches = false;
-      for(const d of D){
-        const [nr,nc] = neighbor(r,c,d), nt = board[key(nr,nc)]?.tile;
-        if(nt){ touches = true; if(nt.edges[opp(d)] !== t.edges[d]) return false; }
+      for (const d of D) {
+        const [nr, nc] = neighbor(r, c, d), nt = board[key(nr, nc)]?.tile;
+        if (nt) {
+          touches = true;
+          // 檢查邊緣是否對應 (如道路接道路，城市接城市)
+          if (nt.edges[opp(d)] !== t.edges[d]) return false;
+        }
       }
       return touches;
     }
-    function legalPlacements(t){
+
+    function legalPlacements(t) {
       const out = [];
-      for(let rot=0; rot<4; rot++){
-        for(let r=0;r<SIZE;r++) for(let c=0;c<SIZE;c++) if(canPlace(t,r,c)) out.push({r,c,rot});
-        rotateTile(t);
+      const testTile = clone(t);
+      for (let rot = 0; rot < 4; rot++) {
+        for (let r = 0; r < SIZE; r++) {
+          for (let c = 0; c < SIZE; c++) {
+            if (canPlace(testTile, r, c)) out.push({ r, c, rot });
+          }
+        }
+        rotateTile(testTile);
       }
       return out;
     }
-    function canMeeple(type){
-      if(!type || players[turn].meeples <= 0) return false;
-      if(type === 'field') return true;
+
+    function canMeeple(type) {
+      if (!type || players[turn].meeples <= 0) return false;
       return true;
     }
-    function place(r,c){
-      if(gameOver || turn !== 0 || !current || !canPlace(current,r,c)) return;
-      const mType = $('meepleSelect').value;
-      commitPlace(r,c,mType);
-      setTimeout(aiTurn, 450);
+
+    // ⭐ 重點修正：檢查放置米寶的地形是否已經被佔領
+    function isFeatureOccupied(r, c, tile, type) {
+      if (!type || type === 'field' || type === 'cloister') return false; // 農夫在此簡化版允許共享，修道院各算各的
+
+      // 模擬放置板塊 (不放米寶)
+      board[key(r, c)] = { tile: clone(tile), meeple: null };
+      const feature = collectFeature(r, c, type);
+      const occupied = feature.meeples.length > 0;
+
+      // 復原圖板狀態
+      delete board[key(r, c)];
+      return occupied;
     }
-    function commitPlace(r,c,mType){
-      const meeple = canMeeple(mType) ? {player:turn,type:mType} : null;
-      if(meeple) players[turn].meeples--;
-      board[key(r,c)] = {tile: clone(current), meeple};
-      log(`${players[turn].name} 放置 ${current.name}${meeple ? ' 並放米寶' : ''}`);
-      scoreAfterPlace(r,c);
+
+    function place(r, c) {
+      if (gameOver || turn !== 0 || !current || !canPlace(current, r, c)) return;
+      let mType = $('meepleSelect').value;
+
+      // 違規檢查：地形是否已被佔領
+      if (mType === 'road' || mType === 'city') {
+        // 檢查當前選擇的邊緣中是否包含該地形
+        const hasFeature = Object.values(current.edges).includes(mType === 'road' ? 'R' : 'C') || current.center === mType;
+        if (!hasFeature) {
+          alert(`這張板塊沒有合適的 ${mType === 'city' ? '城市' : '道路'} 可以放置！\n請選擇其他地形或不放米寶。`);
+          return;
+        }
+        if (isFeatureOccupied(r, c, current, mType)) {
+          alert(`違規動作：該相連地形區塊已經有米寶佔領了！\n請更改右側米寶選項，或放置在其他位置。`);
+          return;
+        }
+      } else if (mType === 'cloister' && current.center !== 'cloister') {
+        alert('這張板塊沒有修道院！'); return;
+      }
+
+      commitPlace(r, c, mType);
+
+      // 自動重置米寶選擇，優化體驗
+      $('meepleSelect').value = "";
+
+      if (!gameOver) setTimeout(aiTurn, 600);
+    }
+
+    function commitPlace(r, c, mType) {
+      const meeple = canMeeple(mType) ? { player: turn, type: mType } : null;
+      if (meeple) players[turn].meeples--;
+      board[key(r, c)] = { tile: clone(current), meeple };
+
+      let typeStr = meeple ? (mType === 'city' ? '城市' : mType === 'road' ? '道路' : mType === 'cloister' ? '修道院' : '農夫') : '不放米寶';
+      log(`👤 <b style="color:${turn === 0 ? '#68a6d9' : '#d66b5f'}">${players[turn].name}</b> 放置了板塊 [${typeStr}]`);
+
+      scoreAfterPlace(r, c);
       drawNext();
       turn = 1 - turn;
       render();
-      if(!current) finishGame();
+      if (!current) finishGame();
     }
-    function sameFeature(cell,type,d){
+
+    function sameFeature(cell, type, d) {
       const t = cell.tile;
-      if(type === 'city') return t.edges[d] === 'C' || t.center === 'city';
-      if(type === 'road') return t.edges[d] === 'R';
+      if (type === 'city') return t.edges[d] === 'C' || t.center === 'city';
+      if (type === 'road') return t.edges[d] === 'R' || t.center === 'road';
       return false;
     }
-    function collectFeature(sr,sc,type){
-      const seen = new Set(), q = [[sr,sc]], tiles = [], meeples = [], open = 0;
-      while(q.length){
-        const [r,c] = q.pop(), k = key(r,c); if(seen.has(k)) continue;
-        const cell = board[k]; if(!cell) continue;
+
+    function collectFeature(sr, sc, type) {
+      const seen = new Set(), q = [[sr, sc]], tiles = [], meeples = [];
+      let openEdges = 0;
+
+      while (q.length) {
+        const [r, c] = q.pop(), k = key(r, c);
+        if (seen.has(k)) continue;
+
+        const cell = board[k];
+        if (!cell) continue;
+
         seen.add(k); tiles.push(cell);
-        if(cell.meeple && cell.meeple.type === type) meeples.push(cell);
-        for(const d of D){
-          if(!sameFeature(cell,type,d)) continue;
-          const [nr,nc] = neighbor(r,c,d), ncell = board[key(nr,nc)];
-          if(!ncell) open++;
-          else if(sameFeature(ncell,type,opp(d))) q.push([nr,nc]);
-          else open++;
+        if (cell.meeple && cell.meeple.type === type) meeples.push(cell);
+
+        for (const d of D) {
+          if (!sameFeature(cell, type, d)) continue;
+          const [nr, nc] = neighbor(r, c, d);
+          const ncell = board[key(nr, nc)];
+
+          if (!ncell) {
+            openEdges++; // 碰到空地，地形尚未封閉
+          } else if (sameFeature(ncell, type, opp(d))) {
+            q.push([nr, nc]); // 繼續搜索相連板塊
+          } else {
+            openEdges++; // 雖然有板塊但邊界不匹配 (防呆保護)
+          }
         }
       }
-      return {tiles, meeples, complete: open === 0};
+      return { tiles, meeples, complete: openEdges === 0 };
     }
-    function scoreFeature(feature,type,final=false){
-      if(feature.meeples.length === 0) return;
+
+    function scoreFeature(feature, type, final = false) {
+      if (feature.meeples.length === 0) return;
+
+      // 計算分數：城市完成 2分/塊，殘局 1分/塊；道路皆為 1分/塊
       let points = type === 'city' ? feature.tiles.length * (feature.complete ? 2 : 1) : feature.tiles.length;
-      if(type === 'road' && !feature.complete && final) points = feature.tiles.length;
-      if(!feature.complete && !final) return;
-      const counts = [0,0];
+
+      if (!feature.complete && !final) return; // 尚未完成且非遊戲結束，不計分
+
+      // 結算最高兵力
+      const counts = [0, 0];
       feature.meeples.forEach(c => counts[c.meeple.player]++);
       const max = Math.max(...counts);
-      counts.forEach((n,i) => { if(n === max && n > 0) players[i].score += points; });
-      feature.meeples.forEach(c => { players[c.meeple.player].meeples++; c.meeple = null; });
-      log(`${type === 'city' ? '城市' : '道路'}${feature.complete ? '完成' : '殘局'}：${points} 分`);
+
+      counts.forEach((n, i) => {
+        if (n === max && n > 0) players[i].score += points;
+      });
+
+      // 回收米寶
+      feature.meeples.forEach(c => {
+        players[c.meeple.player].meeples++;
+        c.meeple = null;
+      });
+
+      log(`⭐ ${type === 'city' ? '城市' : '道路'} ${feature.complete ? '完成' : '殘局結算'}：獲得 <b>${points}</b> 分`);
     }
-    function scoreCloister(r,c,final=false){
-      const cell = board[key(r,c)];
-      if(!cell?.meeple || cell.meeple.type !== 'cloister') return;
-      let n = 1;
-      for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++) if((dr||dc) && board[key(r+dr,c+dc)]) n++;
-      if(n === 9 || final){
+
+    function scoreCloister(r, c, final = false) {
+      const cell = board[key(r, c)];
+      if (!cell?.meeple || cell.meeple.type !== 'cloister') return;
+
+      let n = 1; // 包含自己
+      for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+          if ((dr || dc) && board[key(r + dr, c + dc)]) n++;
+        }
+      }
+
+      if (n === 9 || final) {
         players[cell.meeple.player].score += n;
         players[cell.meeple.player].meeples++;
         cell.meeple = null;
-        log(`修道院${n === 9 ? '完成' : '殘局'}：${n} 分`);
+        log(`⛪ 修道院 ${n === 9 ? '完成' : '殘局結算'}：獲得 <b>${n}</b> 分`);
       }
     }
-    function scoreAfterPlace(r,c){
-      const cell = board[key(r,c)];
-      ['road','city'].forEach(type => {
-        if((type==='road' && Object.values(cell.tile.edges).includes('R')) || (type==='city' && (Object.values(cell.tile.edges).includes('C') || cell.tile.center==='city'))){
-          scoreFeature(collectFeature(r,c,type), type);
+
+    function scoreAfterPlace(r, c) {
+      const cell = board[key(r, c)];
+
+      // 觸發道路與城市的計分檢查
+      ['road', 'city'].forEach(type => {
+        if ((type === 'road' && Object.values(cell.tile.edges).includes('R')) ||
+          (type === 'city' && (Object.values(cell.tile.edges).includes('C') || cell.tile.center === 'city'))) {
+          scoreFeature(collectFeature(r, c, type), type);
         }
       });
-      for(let rr=r-1; rr<=r+1; rr++) for(let cc=c-1; cc<=c+1; cc++) scoreCloister(rr,cc);
+
+      // 檢查周圍 3x3 九宮格內的修道院是否因此完成
+      for (let rr = r - 1; rr <= r + 1; rr++) {
+        for (let cc = c - 1; cc <= c + 1; cc++) {
+          scoreCloister(rr, cc);
+        }
+      }
     }
-    function drawNext(){
+
+    function drawNext() {
       current = deck.pop() || null;
-      if(current && legalPlacements(current).length === 0) drawNext();
+      if (current && legalPlacements(current).length === 0) {
+        log(`⚠️ 抽到的板塊無合法位置，自動棄牌。`);
+        drawNext(); // 遞迴抽下一張
+      }
     }
-    function aiTurn(){
-      if(gameOver || turn !== 1 || !current) return;
+
+    // ⭐ 重點修正：AI 決策優化，避免違規與亂放
+    function aiTurn() {
+      if (gameOver || turn !== 1 || !current) return;
+
       const moves = legalPlacements(current);
-      if(!moves.length){ drawNext(); turn=0; render(); return; }
-      const mv = moves[Math.floor(Math.random()*Math.min(8,moves.length))];
-      for(let i=0;i<mv.rot;i++) rotateTile(current);
-      const mType = players[1].meeples > 0 && Math.random() < .35 ? (current.center === 'cloister' ? 'cloister' : Object.values(current.edges).includes('C') ? 'city' : Object.values(current.edges).includes('R') ? 'road' : '') : '';
-      commitPlace(mv.r,mv.c,mType);
+      if (!moves.length) {
+        drawNext(); turn = 0; render(); return;
+      }
+
+      // 隨機選一個合法位置
+      const mv = moves[Math.floor(Math.random() * moves.length)];
+      for (let i = 0; i < mv.rot; i++) rotateTile(current);
+
+      let mType = '';
+      if (players[1].meeples > 0) {
+        // AI 傾向判斷邏輯
+        if (current.center === 'cloister') {
+          mType = 'cloister';
+        } else if (Object.values(current.edges).includes('C') && !isFeatureOccupied(mv.r, mv.c, current, 'city')) {
+          // 50% 機率佔領未被佔領的城市
+          if (Math.random() < 0.5) mType = 'city';
+        } else if (Object.values(current.edges).includes('R') && !isFeatureOccupied(mv.r, mv.c, current, 'road')) {
+          // 30% 機率佔領未被佔領的道路
+          if (Math.random() < 0.3) mType = 'road';
+        }
+      }
+
+      commitPlace(mv.r, mv.c, mType);
     }
-    function finishGame(){
-      if(gameOver) return;
+
+    function finishGame() {
+      if (gameOver) return;
       gameOver = true;
       const done = new Set();
-      Object.entries(board).forEach(([k,cell]) => {
-        const [r,c] = k.split(',').map(Number);
-        if(cell.meeple?.type === 'cloister') scoreCloister(r,c,true);
-        ['road','city'].forEach(type => {
-          if(cell.meeple?.type === type && !done.has(k+type)){
-            const f = collectFeature(r,c,type);
-            f.tiles.forEach((_,idx) => done.add(keyOfFeature(f,idx)+type));
-            scoreFeature(f,type,true);
+
+      log(`<hr><b>【遊戲結束，進行殘局結算】</b>`);
+      Object.entries(board).forEach(([k, cell]) => {
+        const [r, c] = k.split(',').map(Number);
+
+        // 結算未完成的修道院
+        if (cell.meeple?.type === 'cloister') scoreCloister(r, c, true);
+
+        // 結算未完成的道路與城市
+        ['road', 'city'].forEach(type => {
+          if (cell.meeple?.type === type && !done.has(k + type)) {
+            const f = collectFeature(r, c, type);
+            f.tiles.forEach((_, idx) => done.add(keyOfFeature(f, idx) + type));
+            scoreFeature(f, type, true);
           }
         });
-        if(cell.meeple?.type === 'field'){ players[cell.meeple.player].score += 3; players[cell.meeple.player].meeples++; cell.meeple = null; }
+
+        // 簡易版農夫計分 (正式版為看周圍完成的城市數，此處簡化為每個農夫保底 3 分)
+        if (cell.meeple?.type === 'field') {
+          players[cell.meeple.player].score += 3;
+          players[cell.meeple.player].meeples++;
+          cell.meeple = null;
+          log(`🌾 農夫殘局結算：獲得 <b>3</b> 分`);
+        }
       });
-      log(`遊戲結束。${players[0].score >= players[1].score ? '你勝出' : 'AI 勝出'}。`);
+
+      const p0 = players[0].score, p1 = players[1].score;
+      let resultStr = p0 > p1 ? '🎉 恭喜你獲得最終勝利！' : p0 < p1 ? '😭 AI 獲得勝利，再接再厲！' : '🤝 雙方平手！';
+      log(`<b>結算完畢！你的分數：${p0} / AI分數：${p1}。<br>${resultStr}</b>`);
+
       render();
     }
-    function keyOfFeature(f,i){
-      for(const [k,v] of Object.entries(board)) if(v === f.tiles[i]) return k;
+
+    function keyOfFeature(f, i) {
+      for (const [k, v] of Object.entries(board)) if (v === f.tiles[i]) return k;
       return '';
     }
-    function render(){
+
+    function render() {
       $('preview').innerHTML = tileHtml(current);
-      $('turnText').innerHTML = gameOver ? '遊戲結束' : `現在輪到：<b>${players[turn].name}</b>`;
+      $('turnText').innerHTML = gameOver ? '遊戲結束' : `現在輪到：<b style="color:${turn === 0 ? '#68a6d9' : '#d66b5f'}">${players[turn].name}</b>`;
       $('s0').textContent = players[0].score; $('s1').textContent = players[1].score;
       $('m0').textContent = players[0].meeples; $('m1').textContent = players[1].meeples;
       $('deckCount').textContent = deck.length;
-      $('p0').classList.toggle('active', turn===0 && !gameOver); $('p1').classList.toggle('active', turn===1 && !gameOver);
-      const legal = current && turn === 0 ? new Set(legalPlacements(current).map(m => key(m.r,m.c))) : new Set();
+
+      $('p0').classList.toggle('active', turn === 0 && !gameOver);
+      $('p1').classList.toggle('active', turn === 1 && !gameOver);
+
+      // 計算當前旋轉狀態下合法的黃色網格
+      const legal = new Set();
+      if (current && turn === 0 && !gameOver) {
+        for (let r = 0; r < SIZE; r++) {
+          for (let c = 0; c < SIZE; c++) {
+            if (canPlace(current, r, c)) {
+              legal.add(key(r, c));
+            }
+          }
+        }
+      }
+
       $('board').innerHTML = '';
-      for(let r=0;r<SIZE;r++) for(let c=0;c<SIZE;c++){
-        const cell = document.createElement('div'), b = board[key(r,c)];
-        cell.className = `cell ${b?'occupied':''} ${legal.has(key(r,c))?'legal':''}`;
-        cell.innerHTML = b ? tileHtml(b.tile,b.meeple) : '';
-        cell.onclick = () => place(r,c);
-        $('board').appendChild(cell);
+      for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+          const b = board[key(r, c)];
+          const isLegal = legal.has(key(r, c));
+
+          if (!b && !isLegal) continue; // 為了效能，只渲染有板塊或合法的格子 (可選，但保持網格較美觀)
+
+          const cell = document.createElement('div');
+          cell.className = `cell ${b ? 'occupied' : ''} ${isLegal ? 'legal' : ''}`;
+          cell.style.gridRow = r + 1;
+          cell.style.gridColumn = c + 1;
+          cell.innerHTML = b ? tileHtml(b.tile, b.meeple) : '';
+
+          if (isLegal) cell.onclick = () => place(r, c);
+
+          $('board').appendChild(cell);
+        }
       }
     }
-    function log(msg){ const el=$('log'); el.innerHTML = `<div>${msg}</div>` + el.innerHTML; }
-    function newGame(){
-      board = {}; deck = makeDeck(); players = [{name:'你', score:0, meeples:7},{name:'AI', score:0, meeples:7}]; turn=0; gameOver=false;
-      const start = deck.findIndex(t => t.name === '起始城路');
-      const tile = deck.splice(start,1)[0];
-      board[key(MID,MID)] = {tile, meeple:null};
+
+    function log(msg) {
+      const el = $('log');
+      el.innerHTML = `<div>${msg}</div>` + el.innerHTML;
+    }
+
+    function centerBoard() {
+      setTimeout(() => {
+        const wrap = $('boardWrap');
+        const boardElem = $('board');
+        // 自動捲動至最中央
+        wrap.scrollLeft = (boardElem.scrollWidth - wrap.clientWidth) / 2;
+        wrap.scrollTop = (boardElem.scrollHeight - wrap.clientHeight) / 2;
+      }, 50);
+    }
+
+    function newGame() {
+      board = {};
+      deck = makeDeck();
+      players = [{ name: '玩家', score: 0, meeples: 7 }, { name: 'AI', score: 0, meeples: 7 }];
+      turn = 0;
+      gameOver = false;
+
+      // 設定起始板塊
+      const startTile = { name: '起始城路', edges: { N: 'C', E: 'R', S: 'F', W: 'R' }, center: 'road', rot: 0 };
+      board[key(MID, MID)] = { tile: startTile, meeple: null };
+
       drawNext();
       $('log').innerHTML = '';
-      log('新局開始。');
+      log('🎮 <b>新局開始，預設起始板塊已放置於中央。</b>');
       render();
+      centerBoard();
     }
-    $('rotateBtn').onclick = () => { if(current && turn===0){ rotateTile(current); render(); } };
+
+    $('rotateBtn').onclick = () => { if (current && turn === 0 && !gameOver) { rotateTile(current); render(); } };
     $('newBtn').onclick = newGame;
     $('hintBtn').onclick = () => {
-      if(!current) return;
+      if (!current || gameOver || turn !== 0) return;
       const moves = legalPlacements(current);
-      log(moves.length ? `目前有 ${moves.length} 個合法放置方式。` : '此板塊無合法位置，會自動跳過。');
+      log(moves.length ? `💡 提示：此板塊在所有旋轉角度下，共有 ${moves.length} 個合法放置位置。` : '此板塊無合法位置。');
     };
+
+    // 啟動遊戲
     newGame();
   </script>
 </body>
-</html>
 
+</html>
