@@ -1,229 +1,733 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>矮人礦坑 Saboteur</title>
   <style>
-    :root { --bg:#1c1917; --panel:#292524; --line:#57534e; --gold:#facc15; --bad:#ef4444; --muted:#d6d3d1; }
-    * { box-sizing:border-box; }
-    body { margin:0; min-height:100vh; background:radial-gradient(circle at center,#3a3027,#0c0a09); color:#f5f5f4; font-family:"Segoe UI","Noto Sans TC",sans-serif; }
-    .top { height:64px; display:flex; align-items:center; justify-content:space-between; padding:0 22px; background:rgba(28,25,23,.94); border-bottom:1px solid #5a4214; position:sticky; top:0; z-index:5; }
-    a { color:#f5f5f4; text-decoration:none; }
-    h1 { margin:0; color:var(--gold); font-size:22px; }
-    .badge { border:1px solid #ca8a04; color:#fde68a; border-radius:16px; padding:5px 10px; font-size:13px; }
-    .app { display:grid; grid-template-columns:280px 1fr 310px; gap:16px; padding:16px; }
-    .panel { background:rgba(41,37,36,.94); border:1px solid var(--line); border-radius:8px; padding:14px; box-shadow:0 14px 30px rgba(0,0,0,.34); }
-    .panel h2 { margin:0 0 10px; font-size:16px; color:var(--gold); }
-    .board-wrap { overflow:auto; background:#17120e; border:1px solid #5a4214; border-radius:8px; padding:14px; }
-    .board { display:grid; grid-template-columns:repeat(9,76px); grid-template-rows:repeat(5,106px); gap:8px; width:max-content; margin:auto; }
-    .cell { width:76px; height:106px; border-radius:7px; background:rgba(255,255,255,.05); border:1px dashed #57534e; display:grid; place-items:center; cursor:pointer; }
-    .cell.legal { border-color:var(--gold); background:rgba(250,204,21,.12); }
-    .card { width:70px; height:100px; border-radius:7px; background:#44403c; border:2px solid #78716c; position:relative; display:grid; place-items:center; color:#f5f5f4; font-weight:900; box-shadow:0 5px 10px rgba(0,0,0,.35); user-select:none; }
-    .card.goal { background:#1f2937; color:#fde68a; }
-    .card.gold { background:#854d0e; border-color:#facc15; color:#fef3c7; }
-    .card.rock { background:#3f3f46; color:#d4d4d8; }
-    .pathline { position:absolute; background:#c7b58a; border-radius:8px; }
-    .pn,.ps { width:14px; height:52px; left:28px; } .pn{top:0}.ps{bottom:0}
-    .pe,.pw { width:38px; height:14px; top:43px; } .pe{right:0}.pw{left:0}
-    .hub { width:22px; height:22px; border-radius:50%; background:#c7b58a; position:absolute; left:24px; top:39px; }
-    .blocked { position:absolute; inset:34px 18px; background:#0c0a09; color:#ef4444; border-radius:5px; display:grid; place-items:center; z-index:2; }
-    .hand { display:flex; flex-wrap:wrap; gap:8px; padding:10px; min-height:120px; background:rgba(0,0,0,.22); border-radius:8px; }
-    .hand .card { cursor:pointer; }
-    .hand .selected { outline:3px solid var(--gold); transform:translateY(-10px); }
-    button { border:1px solid #a16207; background:#ca8a04; color:#1c1917; border-radius:6px; padding:9px 12px; font-weight:900; cursor:pointer; }
-    button:hover { background:#eab308; } button:disabled { opacity:.45; cursor:not-allowed; }
-    .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:8px 0; }
-    .role { display:grid; place-items:center; min-height:120px; background:#1c1917; border:1px solid #57534e; border-radius:8px; font-size:44px; }
-    .role b { font-size:18px; color:#facc15; }
-    .stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    .stats div { background:#1c1917; border:1px solid #57534e; border-radius:7px; padding:10px; }
-    .log { height:260px; overflow:auto; background:#1c1917; border-radius:6px; padding:10px; font-size:13px; line-height:1.5; color:#e7e5e4; }
-    .help { color:var(--muted); font-size:13px; line-height:1.55; }
-    @media(max-width:1050px){ .app{grid-template-columns:1fr}.board{transform:scale(.82);transform-origin:top left;height:650px} }
+    :root {
+      --bg: #1c1917;
+      --panel: #292524;
+      --line: #57534e;
+      --gold: #facc15;
+      --bad: #ef4444;
+      --muted: #d6d3d1;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at center, #3a3027, #0c0a09);
+      color: #f5f5f4;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+    }
+
+    .top {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      background: rgba(28, 25, 23, .94);
+      border-bottom: 1px solid #5a4214;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #f5f5f4;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 14px;
+      border-radius: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateX(-2px);
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--gold);
+      font-size: 22px;
+    }
+
+    .badge {
+      border: 1px solid #ca8a04;
+      color: #fde68a;
+      border-radius: 16px;
+      padding: 5px 10px;
+      font-size: 13px;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 280px 1fr 310px;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .panel {
+      background: rgba(41, 37, 36, .94);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, .34);
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      color: var(--gold);
+    }
+
+    .board-wrap {
+      overflow: auto;
+      background: #17120e;
+      border: 1px solid #5a4214;
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(9, 76px);
+      grid-template-rows: repeat(5, 106px);
+      gap: 8px;
+      width: max-content;
+      margin: auto;
+    }
+
+    .cell {
+      width: 76px;
+      height: 106px;
+      border-radius: 7px;
+      background: rgba(255, 255, 255, .05);
+      border: 1px dashed #57534e;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .cell:hover {
+      background: rgba(255, 255, 255, .1);
+    }
+
+    .cell.legal {
+      border-color: var(--gold);
+      background: rgba(250, 204, 21, .15);
+    }
+
+    .card {
+      width: 70px;
+      height: 100px;
+      border-radius: 7px;
+      background: #44403c;
+      border: 2px solid #78716c;
+      position: relative;
+      display: grid;
+      place-items: center;
+      color: #f5f5f4;
+      font-weight: 900;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, .35);
+      user-select: none;
+      transition: transform 0.2s;
+    }
+
+    .card.goal {
+      background: #1f2937;
+      color: #fde68a;
+    }
+
+    .card.gold {
+      background: #854d0e;
+      border-color: #facc15;
+      color: #fef3c7;
+    }
+
+    .card.rock {
+      background: #3f3f46;
+      color: #d4d4d8;
+    }
+
+    .pathline {
+      position: absolute;
+      background: #c7b58a;
+      border-radius: 8px;
+    }
+
+    .pn,
+    .ps {
+      width: 14px;
+      height: 52px;
+      left: 26px;
+    }
+
+    .pn {
+      top: 0
+    }
+
+    .ps {
+      bottom: 0
+    }
+
+    .pe,
+    .pw {
+      width: 38px;
+      height: 14px;
+      top: 41px;
+    }
+
+    .pe {
+      right: 0
+    }
+
+    .pw {
+      left: 0
+    }
+
+    .hub {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #c7b58a;
+      position: absolute;
+      left: 22px;
+      top: 37px;
+    }
+
+    .blocked {
+      position: absolute;
+      inset: 25px 15px;
+      background: rgba(12, 10, 9, 0.85);
+      color: #ef4444;
+      border-radius: 5px;
+      display: grid;
+      place-items: center;
+      z-index: 2;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .hand {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px;
+      min-height: 120px;
+      background: rgba(0, 0, 0, .22);
+      border-radius: 8px;
+    }
+
+    .hand .card {
+      cursor: pointer;
+    }
+
+    .hand .selected {
+      outline: 3px solid var(--gold);
+      transform: translateY(-8px);
+      border-color: transparent;
+    }
+
+    button {
+      border: 1px solid #a16207;
+      background: #ca8a04;
+      color: #1c1917;
+      border-radius: 6px;
+      padding: 9px 12px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #eab308;
+    }
+
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 8px 0;
+    }
+
+    .role {
+      display: grid;
+      place-items: center;
+      min-height: 120px;
+      background: #1c1917;
+      border: 1px solid #57534e;
+      border-radius: 8px;
+      font-size: 44px;
+      text-align: center;
+    }
+
+    .role b {
+      font-size: 18px;
+      color: #facc15;
+      display: block;
+      margin-top: 5px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .stats div {
+      background: #1c1917;
+      border: 1px solid #57534e;
+      border-radius: 7px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .log {
+      height: 260px;
+      overflow: auto;
+      background: #1c1917;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #e7e5e4;
+    }
+
+    .log div {
+      padding: 3px 0;
+      border-bottom: 1px solid #333;
+    }
+
+    .help {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 10px;
+      border-radius: 6px;
+    }
+
+    @media(max-width:1050px) {
+      .app {
+        grid-template-columns: 1fr
+      }
+
+      .board {
+        transform: scale(.82);
+        transform-origin: top left;
+        height: 650px
+      }
+    }
   </style>
 </head>
+
 <body>
-  <div class="top"><a href="../index.html">← 返回大廳</a><h1>矮人礦坑 Saboteur</h1><div class="badge">可完成單機版</div></div>
+  <div class="top"><a href="../index.html" class="back-btn">← 返回大廳</a>
+    <h1>矮人礦坑 Saboteur</h1>
+    <div class="badge">可完成單機版</div>
+  </div>
   <div class="app">
     <aside class="panel">
       <h2>你的身分</h2>
       <div class="role" id="roleBox"></div>
-      <p class="help">好矮人要把起點連到金礦；壞矮人要拖到牌堆與手牌耗盡。工具被破壞時不能放路徑，需先修理。</p>
-      <div class="row"><button id="discardBtn">棄牌抽牌</button><button id="newBtn">新局</button></div>
-      <h2>狀態</h2>
+      <div class="help">
+        <b>【操作提示】</b><br>
+        • 點擊手牌可<b>選取</b>。<br>
+        • 再次點擊已選取的道路卡可<b>旋轉方向</b>。<br>
+        • 選取行動卡後會自動判斷是否發動。<br>
+        • 選擇卡牌後，點擊「棄牌抽牌」可跳過回合。
+      </div>
+      <div class="row" style="margin-top:12px;"><button id="discardBtn">棄牌抽牌</button><button id="newBtn">重新開局</button>
+      </div>
+      <h2 style="margin-top:16px;">狀態</h2>
       <div class="stats">
-        <div>牌堆<br><b id="deckCount"></b></div>
-        <div>回合<br><b id="turnText"></b></div>
-        <div>你的工具<br><b id="toolText"></b></div>
-        <div>AI 手牌<br><b id="aiHand"></b></div>
+        <div>牌堆剩餘<br><b id="deckCount" style="color:var(--gold);font-size:18px;"></b></div>
+        <div>目前回合<br><b id="turnText" style="color:var(--gold);font-size:18px;"></b></div>
+        <div>你的工具<br><b id="toolText" style="font-size:18px;"></b></div>
+        <div>AI 工具<br><b id="aiToolText" style="font-size:18px;"></b></div>
       </div>
     </aside>
     <main>
-      <div class="board-wrap"><div id="board" class="board"></div></div>
-      <div class="panel" style="margin-top:12px"><h2>手牌</h2><div id="hand" class="hand"></div></div>
+      <div class="board-wrap">
+        <div id="board" class="board"></div>
+      </div>
+      <div class="panel" style="margin-top:12px">
+        <h2>你的手牌 (AI 手牌數: <span id="aiHand" style="color:var(--gold)"></span>)</h2>
+        <div id="hand" class="hand"></div>
+      </div>
     </main>
     <aside class="panel">
-      <h2>紀錄</h2>
+      <h2>遊戲紀錄</h2>
       <div id="log" class="log"></div>
     </aside>
   </div>
   <script>
-    const ROWS=5, COLS=9, START='2,0', GOALS=['0,8','2,8','4,8'];
-    const DIRS=['N','E','S','W'];
-    const OPP={N:'S',E:'W',S:'N',W:'E'};
+    const ROWS = 5, COLS = 9, START = '2,0', GOALS = ['0,8', '2,8', '4,8'];
+    const DIRS = ['N', 'E', 'S', 'W'];
+    const OPP = { N: 'S', E: 'W', S: 'N', W: 'E' };
     let deck, board, hands, roles, tools, turn, selected, gameOver, goldGoal;
-    const $=id=>document.getElementById(id), key=(r,c)=>`${r},${c}`;
-    function shuffle(a){ return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]); }
-    function card(type, name, conn={}){ return {id:Math.random().toString(36).slice(2), type, name, conn}; }
-    function makeDeck(){
-      const specs=[
-        ['直路',{N:1,S:1},7],['橫路',{E:1,W:1},7],['彎路NE',{N:1,E:1},5],['彎路ES',{E:1,S:1},5],['彎路SW',{S:1,W:1},5],['彎路WN',{W:1,N:1},5],
-        ['三岔',{N:1,E:1,W:1},4],['三岔',{N:1,E:1,S:1},4],['十字',{N:1,E:1,S:1,W:1},5],['死路',{N:1},4]
+
+    const $ = id => document.getElementById(id), key = (r, c) => `${r},${c}`;
+    function shuffle(a) { return a.map(v => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map(x => x[1]); }
+
+    // 加入 dead 屬性以正確渲染死路
+    function card(type, name, conn = {}, dead = false) { return { id: Math.random().toString(36).slice(2), type, name, conn, dead }; }
+
+    function makeDeck() {
+      const specs = [
+        ['直路', { N: 1, S: 1 }, 6, false], ['橫路', { E: 1, W: 1 }, 6, false],
+        ['彎路NE', { N: 1, E: 1 }, 4, false], ['彎路ES', { E: 1, S: 1 }, 4, false], ['彎路SW', { S: 1, W: 1 }, 4, false], ['彎路WN', { W: 1, N: 1 }, 4, false],
+        ['三岔T', { N: 1, E: 1, W: 1 }, 4, false], ['三岔倒T', { E: 1, S: 1, W: 1 }, 4, false], ['三岔右', { N: 1, E: 1, S: 1 }, 4, false], ['三岔左', { N: 1, S: 1, W: 1 }, 4, false],
+        ['十字', { N: 1, E: 1, S: 1, W: 1 }, 5, false],
+        ['死路直', { N: 1 }, 2, true], ['死路橫', { E: 1 }, 2, true], ['死路十字', { N: 1, E: 1, S: 1, W: 1 }, 3, true]
       ];
-      const out=[]; specs.forEach(([n,c,k])=>{ for(let i=0;i<k;i++) out.push(card('path',n,c)); });
-      for(let i=0;i<5;i++) out.push(card('break','破壞工具'));
-      for(let i=0;i<6;i++) out.push(card('fix','修理工具'));
-      for(let i=0;i<4;i++) out.push(card('map','地圖探查'));
-      for(let i=0;i<3;i++) out.push(card('rockfall','塌方'));
+      const out = [];
+      specs.forEach(([n, c, k, d]) => { for (let i = 0; i < k; i++) out.push(card('path', n, c, d)); });
+      for (let i = 0; i < 5; i++) out.push(card('break', '破壞工具'));
+      for (let i = 0; i < 5; i++) out.push(card('fix', '修理工具'));
+      for (let i = 0; i < 4; i++) out.push(card('map', '地圖探查'));
+      for (let i = 0; i < 3; i++) out.push(card('rockfall', '塌方'));
       return shuffle(out);
     }
-    function newGame(){
-      deck=makeDeck(); board={}; hands=[[],[]]; roles=[Math.random()<.75?'good':'bad','good']; if(roles[0]==='good' && Math.random()<.45) roles[1]='bad';
-      tools=[true,true]; turn=0; selected=null; gameOver=false; goldGoal=GOALS[Math.floor(Math.random()*GOALS.length)];
-      board[START]=card('start','起點',{E:1}); GOALS.forEach(g=>board[g]=card('goal','未知'));
-      draw(0,6); draw(1,6); $('log').innerHTML=''; log('新局開始。'); render();
+
+    // 卡牌旋轉邏輯
+    function rotateCard(c) {
+      if (!c.conn) return;
+      const newConn = {};
+      if (c.conn.N) newConn.S = 1;
+      if (c.conn.S) newConn.N = 1;
+      if (c.conn.E) newConn.W = 1;
+      if (c.conn.W) newConn.E = 1;
+      c.conn = newConn;
     }
-    function draw(pid,n=1){ for(let i=0;i<n && deck.length;i++) hands[pid].push(deck.pop()); }
-    function cardHtml(c, small=false){
-      if(c.type==='goal') return `<div class="card goal">?</div>`;
-      if(c.type==='gold') return `<div class="card gold">金礦</div>`;
-      if(c.type==='rock') return `<div class="card rock">石頭</div>`;
-      if(c.type!=='path' && c.type!=='start') return `<div class="card">${c.name}</div>`;
-      return `<div class="card">${DIRS.map(d=>c.conn[d]?`<span class="pathline p${d.toLowerCase()}"></span>`:'').join('')}<span class="hub"></span>${c.dead?'<span class="blocked">X</span>':''}</div>`;
+
+    function newGame() {
+      deck = makeDeck(); board = {}; hands = [[], []];
+      // 75% 機率玩家是好矮人，AI則自動分配
+      roles = [Math.random() < .75 ? 'good' : 'bad', 'good'];
+      if (roles[0] === 'good' && Math.random() < .5) roles[1] = 'bad';
+      if (roles[0] === 'bad') roles[1] = 'good';
+
+      tools = [true, true]; turn = 0; selected = null; gameOver = false;
+      goldGoal = GOALS[Math.floor(Math.random() * GOALS.length)];
+
+      board[START] = card('start', '起點', { N: 1, E: 1, S: 1, W: 1 }); // 起點通常是十字
+      GOALS.forEach(g => board[g] = card('goal', '未知'));
+
+      draw(0, 6); draw(1, 6);
+      $('log').innerHTML = ''; log('🎲 新局開始！'); render();
     }
-    function inBounds(r,c){ return r>=0&&c>=0&&r<ROWS&&c<COLS; }
-    function neighbor(r,c,d){ return d==='N'?[r-1,c]:d==='E'?[r,c+1]:d==='S'?[r+1,c]:[r,c-1]; }
-    function connectedToStart(targetKey){
-      const seen=new Set(), q=[START];
-      while(q.length){
-        const k=q.pop(); if(seen.has(k)) continue; seen.add(k);
-        const [r,c]=k.split(',').map(Number), cell=board[k]; if(!cell?.conn) continue;
-        for(const d of DIRS){
-          if(!cell.conn[d]) continue;
-          const [nr,nc]=neighbor(r,c,d), nk=key(nr,nc), n=board[nk];
-          if(n?.conn?.[OPP[d]]) q.push(nk);
+
+    function draw(pid, n = 1) {
+      for (let i = 0; i < n && deck.length; i++) hands[pid].push(deck.pop());
+    }
+
+    function cardHtml(c) {
+      if (c.type === 'goal') return `<div class="card goal">?</div>`;
+      if (c.type !== 'path' && c.type !== 'start' && c.type !== 'gold' && c.type !== 'rock') return `<div class="card">${c.name}</div>`;
+
+      const lines = DIRS.map(d => c.conn && c.conn[d] ? `<span class="pathline p${d.toLowerCase()}"></span>` : '').join('');
+      let cls = 'card';
+      if (c.type === 'gold') cls += ' gold';
+      if (c.type === 'rock') cls += ' rock';
+      
+      let content = '';
+      if (c.type === 'start') content = `<span style="z-index:2;position:relative;color:#facc15;font-weight:900">起點</span>`;
+      else if (c.type === 'gold') content = `<span style="z-index:2;position:relative;font-weight:900">金礦</span>`;
+      else if (c.type === 'rock') content = `<span style="z-index:2;position:relative;font-weight:900">石頭</span>`;
+
+      return `<div class="${cls}">${lines}<span class="hub"></span>${content}${c.dead ? '<span class="blocked">X</span>' : ''}</div>`;
+    }
+
+    function inBounds(r, c) { return r >= 0 && c >= 0 && r < ROWS && c < COLS; }
+    function neighbor(r, c, d) { return d === 'N' ? [r - 1, c] : d === 'E' ? [r, c + 1] : d === 'S' ? [r + 1, c] : [r, c - 1]; }
+
+    // BFS 尋找是否連回起點，並且路徑沒有被「死路(dead)」中斷
+    function connectedToStart(targetKey) {
+      const seen = new Set(), q = [START];
+      while (q.length) {
+        const k = q.pop();
+        if (seen.has(k)) continue;
+        seen.add(k);
+        const [r, c] = k.split(',').map(Number), cell = board[k];
+
+        if (!cell?.conn) continue;
+        if (cell.dead && k !== targetKey) continue; // 死路會截斷後續延伸，但它本身算連通
+
+        for (const d of DIRS) {
+          if (!cell.conn[d]) continue;
+          const [nr, nc] = neighbor(r, c, d), nk = key(nr, nc), n = board[nk];
+          if (n?.conn?.[OPP[d]]) q.push(nk);
         }
       }
       return seen.has(targetKey);
     }
-    function legalPath(c,r,cx){
-      const k=key(r,cx); if(board[k] || !tools[turn]) return false;
-      let touching=false, openToNetwork=false;
-      for(const d of DIRS){
-        const [nr,nc]=neighbor(r,cx,d), nk=key(nr,nc), n=board[nk];
-        if(!inBounds(nr,nc)) { if(c.conn[d]) return false; continue; }
-        if(n?.type==='goal') continue;
-        if(n?.conn){
-          if(c.conn[d] !== n.conn[OPP[d]]) return false;
-          if(c.conn[d]) { touching=true; if(connectedToStart(nk)) openToNetwork=true; }
+
+    // 嚴格檢驗放置邏輯：邊緣必須吻合，且必須接上主網路
+    function legalPath(c, r, cx) {
+      const k = key(r, cx);
+      if (board[k] || !tools[turn]) return false;
+
+      let touchesNetwork = false;
+      let hasNeighbor = false;
+
+      for (const d of DIRS) {
+        const [nr, nc] = neighbor(r, cx, d);
+        if (!inBounds(nr, nc)) continue;
+
+        const nk = key(nr, nc), n = board[nk];
+        if (n && n.type !== 'goal') {
+          hasNeighbor = true;
+          if (n.conn) {
+            const myEdge = !!c.conn[d];
+            const theirEdge = !!n.conn[OPP[d]];
+            // 邊緣必須吻合 (有路對有路，沒路對沒路)
+            if (myEdge !== theirEdge) return false;
+            // 如果成功接上路，檢查鄰居是否在主網路上
+            if (myEdge && theirEdge && connectedToStart(nk) && !n.dead) {
+              touchesNetwork = true;
+            }
+          }
         }
       }
-      return touching && openToNetwork;
+      return hasNeighbor && touchesNetwork;
     }
-    function playOnCell(r,c){
-      if(turn!==0 || gameOver || !selected) return;
-      const hand=hands[0], card=hand.find(x=>x.id===selected); if(!card) return;
-      if(card.type==='path'){
-        if(!legalPath(card,r,c)){ log('這張路徑不能放在此處。'); return; }
-        board[key(r,c)] = card; removeSelected(); revealAdjacentGoals(r,c); draw(0); endPlayerTurn();
-      } else if(card.type==='rockfall'){
-        const k=key(r,c); if(board[k]?.type==='path'){ delete board[k]; removeSelected(); draw(0); log('你使用塌方移除一張路徑。'); endPlayerTurn(); }
-      } else if(card.type==='map'){
-        const k=key(r,c); if(GOALS.includes(k)){ log(k===goldGoal?'地圖顯示：這裡是金礦。':'地圖顯示：這裡只是石頭。'); removeSelected(); draw(0); endPlayerTurn(); }
+
+    function playOnCell(r, c) {
+      if (turn !== 0 || gameOver || !selected) return;
+      const hand = hands[0], cd = hand.find(x => x.id === selected);
+      if (!cd) return;
+
+      const k = key(r, c);
+
+      if (cd.type === 'path') {
+        if (!legalPath(cd, r, c)) { log('❌ 道路邊緣不吻合，或未連接到起點網路！'); return; }
+        board[k] = cd;
+        log('你放置了一張道路。');
+        removeSelected(); draw(0); revealAdjacentGoals(r, c); endPlayerTurn();
+      } else if (cd.type === 'rockfall') {
+        if (board[k]?.type === 'path' && board[k]?.type !== 'start') {
+          delete board[k];
+          log('💥 你使用塌方移除了一張道路。');
+          removeSelected(); draw(0); endPlayerTurn();
+        } else {
+          log('塌方只能使用在已放置的道路上！'); return;
+        }
+      } else if (cd.type === 'map') {
+        if (GOALS.includes(k) && board[k]?.type === 'goal') {
+          log(k === goldGoal ? '🗺️ 地圖顯示：該目標是【金礦】！' : '🗺️ 地圖顯示：該目標只是【石頭】。');
+          removeSelected(); draw(0); endPlayerTurn();
+        } else {
+          log('地圖只能使用在未知的目標卡上！'); return;
+        }
       }
       render(); checkEnd();
     }
-    function playAction(){
-      if(turn!==0 || !selected) return;
-      const c=hands[0].find(x=>x.id===selected); if(!c) return;
-      if(c.type==='break'){ tools[1]=false; removeSelected(); draw(0); log('你破壞 AI 的工具。'); endPlayerTurn(); }
-      if(c.type==='fix'){ tools[0]=true; removeSelected(); draw(0); log('你修好自己的工具。'); endPlayerTurn(); }
-      render();
+
+    function handleActionCard(c) {
+      if (c.type === 'break') {
+        if (!tools[1]) { log('AI 的工具已經是損壞狀態。'); return; }
+        tools[1] = false; log('🔨 你破壞了 AI 的工具。');
+      } else if (c.type === 'fix') {
+        if (tools[0]) { log('你的工具完好無損，不需修理。'); return; }
+        tools[0] = true; log('🔧 你修好了自己的工具。');
+      }
+      removeSelected(); draw(0); endPlayerTurn(); render();
     }
-    function removeSelected(){ hands[0]=hands[0].filter(c=>c.id!==selected); selected=null; }
-    function revealAdjacentGoals(r,c){
-      for(const d of DIRS){
-        const [nr,nc]=neighbor(r,c,d), k=key(nr,nc);
-        if(GOALS.includes(k) && board[k]?.type==='goal' && connectedToStart(key(r,c))){
-          board[k]=card(k===goldGoal?'gold':'rock', k===goldGoal?'金礦':'石頭');
-          log(k===goldGoal?'道路抵達金礦，好矮人勝利！':'探到石頭目標。');
-          if(k===goldGoal) gameOver=true;
+
+    function removeSelected() { hands[0] = hands[0].filter(c => c.id !== selected); selected = null; }
+
+    function revealAdjacentGoals(r, c) {
+      // 只有當新放的牌本身連通，且不是死路，才檢查周圍目標
+      if (board[key(r, c)]?.dead) return;
+
+      for (const d of DIRS) {
+        const [nr, nc] = neighbor(r, c, d), k = key(nr, nc);
+        if (GOALS.includes(k) && board[k]?.type === 'goal' && board[key(r, c)].conn[d] && connectedToStart(key(r, c))) {
+          board[k] = card(k === goldGoal ? 'gold' : 'rock', k === goldGoal ? '金礦' : '石頭', { N: 1, E: 1, S: 1, W: 1 });
+          log(k === goldGoal ? '🏆 道路抵達金礦！好矮人獲得勝利！' : '⛏️ 探到石頭，繼續挖吧。');
+          if (k === goldGoal) gameOver = true;
         }
       }
     }
-    function discard(){
-      if(turn!==0 || !selected || gameOver) return;
-      removeSelected(); draw(0); log('你棄掉一張牌並抽牌。'); endPlayerTurn(); render();
+
+    function discard() {
+      if (turn !== 0 || !selected || gameOver) return;
+      removeSelected(); draw(0); log('♻️ 你棄掉了一張牌。'); endPlayerTurn(); render();
     }
-    function endPlayerTurn(){ if(!gameOver) setTimeout(aiTurn,500); }
-    function aiTurn(){
-      if(gameOver) return; turn=1; render();
-      const hand=hands[1]; let played=false;
-      if(!tools[1]){
-        const f=hand.find(c=>c.type==='fix'); if(f){ hands[1]=hand.filter(c=>c.id!==f.id); tools[1]=true; draw(1); log('AI 修理工具。'); played=true; }
+
+    function endPlayerTurn() { if (!gameOver) setTimeout(aiTurn, 700); }
+
+    function aiTurn() {
+      if (gameOver) return;
+      turn = 1; render();
+      const hand = hands[1]; let played = false;
+
+      // 1. AI 優先修工具
+      if (!tools[1]) {
+        const f = hand.find(c => c.type === 'fix');
+        if (f) { hands[1] = hand.filter(c => c.id !== f.id); tools[1] = true; draw(1); log('🔧 AI 修理了自己的工具。'); played = true; }
       }
-      if(!played && roles[1]==='bad'){
-        const b=hand.find(c=>c.type==='break'); if(b){ hands[1]=hand.filter(c=>c.id!==b.id); tools[0]=false; draw(1); log('AI 破壞了你的工具。'); played=true; }
+
+      // 2. 壞矮人 AI 破壞玩家工具
+      if (!played && roles[1] === 'bad' && tools[0]) {
+        const b = hand.find(c => c.type === 'break');
+        if (b) { hands[1] = hand.filter(c => c.id !== b.id); tools[0] = false; draw(1); log('🔨 AI 破壞了你的工具！'); played = true; }
       }
-      if(!played && tools[1]){
-        const move=findAiPathMove();
-        if(move){ board[key(move.r,move.c)] = move.card; hands[1]=hands[1].filter(c=>c.id!==move.card.id); draw(1); log('AI 放置路徑。'); revealAdjacentGoals(move.r,move.c); played=true; }
+
+      // 3. 放置道路 (AI 會嘗試旋轉)
+      if (!played && tools[1]) {
+        const move = findAiPathMove();
+        if (move) {
+          board[key(move.r, move.c)] = move.card;
+          hands[1] = hands[1].filter(c => c.id !== move.card.id);
+          draw(1); log('AI 放置了一張道路。');
+          revealAdjacentGoals(move.r, move.c); played = true;
+        }
       }
-      if(!played){ hands[1].shift(); draw(1); log('AI 棄牌。'); }
+
+      // 4. 無牌可出則棄牌
+      if (!played && hand.length > 0) {
+        hands[1].shift(); draw(1); log('♻️ AI 棄了一張牌。');
+      }
+
       checkEnd();
-      if(!gameOver){ turn=0; log('輪到你。'); render(); }
+      if (!gameOver) { turn = 0; log('--- 換你出牌 ---'); render(); }
     }
-    function findAiPathMove(){
-      const paths=hands[1].filter(c=>c.type==='path');
-      const cells=[]; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(!board[key(r,c)]) cells.push({r,c});
-      const sorted=cells.sort((a,b)=>Math.abs(a.r-2)+Math.abs(a.c-8)-Math.abs(b.r-2)-Math.abs(b.c-8));
-      for(const cell of sorted) for(const p of paths) if(legalPathFor(p,cell.r,cell.c,1)) return {...cell,card:p};
+
+    function findAiPathMove() {
+      const paths = hands[1].filter(c => c.type === 'path');
+      const cells = [];
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if (!board[key(r, c)]) cells.push({ r, c });
+
+      // 壞矮人往邊緣放，好矮人往金礦放
+      const isBad = roles[1] === 'bad';
+      const sorted = cells.sort((a, b) => {
+        const distA = Math.abs(a.r - 2) + Math.abs(a.c - 8);
+        const distB = Math.abs(b.r - 2) + Math.abs(b.c - 8);
+        return isBad ? distB - distA : distA - distB;
+      });
+
+      for (const cell of sorted) {
+        for (const p of paths) {
+          // AI 測試 2 個旋轉方向
+          for (let i = 0; i < 2; i++) {
+            if (legalPathFor(p, cell.r, cell.c, 1)) return { ...cell, card: p };
+            rotateCard(p);
+          }
+        }
+      }
       return null;
     }
-    function legalPathFor(c,r,cx,pid){
-      const old=turn; turn=pid; const ok=legalPath(c,r,cx); turn=old; return ok;
+
+    function legalPathFor(c, r, cx, pid) {
+      const old = turn; turn = pid; const ok = legalPath(c, r, cx); turn = old; return ok;
     }
-    function checkEnd(){
-      if(gameOver){ render(); return; }
-      if(deck.length===0 && hands[0].length===0 && hands[1].length===0){ gameOver=true; log('牌已耗盡，壞矮人勝利！'); render(); }
-    }
-    function render(){
-      $('roleBox').innerHTML = `${roles[0]==='good'?'⛏️':'💣'}<br><b>${roles[0]==='good'?'好矮人':'壞矮人'}</b>`;
-      $('deckCount').textContent=deck.length; $('turnText').textContent=gameOver?'結束':turn===0?'你':'AI';
-      $('toolText').textContent=tools[0]?'正常':'損壞'; $('aiHand').textContent=hands[1].length;
-      $('discardBtn').disabled=turn!==0||!selected||gameOver;
-      renderBoard(); renderHand();
-    }
-    function renderBoard(){
-      $('board').innerHTML='';
-      const sel=hands[0].find(c=>c.id===selected);
-      for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
-        const k=key(r,c), d=document.createElement('div'); d.className='cell';
-        if(sel?.type==='path' && turn===0 && legalPath(sel,r,c)) d.classList.add('legal');
-        d.innerHTML=board[k]?cardHtml(board[k]):'';
-        d.onclick=()=>playOnCell(r,c);
-        $('board').appendChild(d);
+
+    function checkEnd() {
+      if (gameOver) { render(); return; }
+      if (deck.length === 0 && hands[0].length === 0 && hands[1].length === 0) {
+        gameOver = true; log('💣 牌堆與手牌耗盡，壞矮人獲得勝利！'); render();
       }
     }
-    function renderHand(){
-      $('hand').innerHTML='';
-      hands[0].forEach(c=>{ const wrap=document.createElement('div'); wrap.innerHTML=cardHtml(c); const el=wrap.firstChild; el.classList.toggle('selected',selected===c.id); el.onclick=()=>{ if(turn!==0||gameOver)return; selected=selected===c.id?null:c.id; render(); if(['break','fix'].includes(c.type)) playAction(); }; $('hand').appendChild(el); });
+
+    function render() {
+      $('roleBox').innerHTML = `${roles[0] === 'good' ? '⛏️' : '💣'}<b>${roles[0] === 'good' ? '好矮人 (找金礦)' : '壞矮人 (搞破壞)'}</b>`;
+      $('deckCount').textContent = deck.length;
+      $('turnText').textContent = gameOver ? '遊戲結束' : turn === 0 ? '你的回合' : 'AI 回合';
+      $('toolText').textContent = tools[0] ? '🟢 正常' : '🔴 損壞';
+      $('toolText').style.color = tools[0] ? '#4ade80' : '#ef4444';
+      $('aiToolText').textContent = tools[1] ? '🟢 正常' : '🔴 損壞';
+      $('aiHand').textContent = hands[1].length;
+      $('discardBtn').disabled = turn !== 0 || !selected || gameOver;
+
+      renderBoard(); renderHand();
     }
-    function log(msg){ $('log').innerHTML = `<div>${msg}</div>` + $('log').innerHTML; }
-    $('discardBtn').onclick=discard; $('newBtn').onclick=newGame;
+
+    function renderBoard() {
+      $('board').innerHTML = '';
+      const sel = hands[0].find(c => c.id === selected);
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const k = key(r, c), d = document.createElement('div');
+          d.className = 'cell';
+          if (sel?.type === 'path' && turn === 0 && legalPath(sel, r, c)) d.classList.add('legal');
+          d.innerHTML = board[k] ? cardHtml(board[k]) : '';
+          d.onclick = () => playOnCell(r, c);
+          $('board').appendChild(d);
+        }
+      }
+    }
+
+    function renderHand() {
+      $('hand').innerHTML = '';
+      hands[0].forEach(c => {
+        const wrap = document.createElement('div');
+        wrap.innerHTML = cardHtml(c);
+        const el = wrap.firstChild;
+        el.classList.toggle('selected', selected === c.id);
+
+        el.onclick = () => {
+          if (turn !== 0 || gameOver) return;
+
+          if (selected === c.id) {
+            // 如果再次點擊已選擇的卡片，且為道路卡，則旋轉方向
+            if (c.type === 'path') {
+              rotateCard(c);
+              render();
+            } else {
+              selected = null; // 取消選取
+              render();
+            }
+          } else {
+            selected = c.id;
+            // 若是行動卡，點擊選取後自動判定是否執行
+            if (c.type === 'break' || c.type === 'fix') {
+              handleActionCard(c);
+            } else {
+              render();
+            }
+          }
+        };
+        $('hand').appendChild(el);
+      });
+    }
+
+    function log(msg) {
+      const d = new Date();
+      const time = `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+      $('log').innerHTML = `<div><span style="color:#78716c">[${time}]</span> ${msg}</div>` + $('log').innerHTML;
+    }
+
+    $('discardBtn').onclick = discard;
+    $('newBtn').onclick = newGame;
+
     newGame();
   </script>
 </body>
-</html>
 
+</html>
