@@ -1360,7 +1360,69 @@
                     wrap.style.display = (mode === '1v1') ? 'none' : 'block';
                 }
                 this.validateDeckTest();
-                window.renderLobbyHeroes();
+                // --- Drag to Scroll for Player's Hand Cards ---
+        (function() {
+            const hand = document.getElementById('hand0');
+            if (!hand) return;
+
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+            let isDragging = false;
+            let wasDragging = false;
+
+            hand.addEventListener('mousedown', (e) => {
+                isDown = true;
+                startX = e.pageX - hand.offsetLeft;
+                scrollLeft = hand.scrollLeft;
+                isDragging = false;
+                wasDragging = false;
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                const x = e.pageX - hand.offsetLeft;
+                const walk = x - startX;
+                
+                if (Math.abs(walk) > 5) {
+                    if (!isDragging) {
+                        isDragging = true;
+                        wasDragging = true;
+                        hand.classList.add('dragging-active');
+                    }
+                    hand.scrollLeft = scrollLeft - walk;
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                if (isDown) {
+                    isDown = false;
+                    hand.classList.remove('dragging-active');
+                    setTimeout(() => {
+                        wasDragging = false;
+                    }, 50); // small delay to block click events
+                }
+            });
+
+            // Prevent card selection click when dragging
+            hand.addEventListener('click', (e) => {
+                if (wasDragging) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    wasDragging = false;
+                }
+            }, true); // Capture phase is critical!
+
+            // Add support for vertical mouse wheel scrolling to scroll horizontally
+            hand.addEventListener('wheel', (e) => {
+                if (e.deltaY !== 0) {
+                    e.preventDefault();
+                    hand.scrollLeft += e.deltaY;
+                }
+            });
+        })();
+
+        window.renderLobbyHeroes();
             }
 
             validateDeckTest() {
@@ -5180,6 +5242,68 @@
             });
         };
         
+        // --- Drag to Scroll for Player's Hand Cards ---
+        (function() {
+            const hand = document.getElementById('hand0');
+            if (!hand) return;
+
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+            let isDragging = false;
+            let wasDragging = false;
+
+            hand.addEventListener('mousedown', (e) => {
+                isDown = true;
+                startX = e.pageX - hand.offsetLeft;
+                scrollLeft = hand.scrollLeft;
+                isDragging = false;
+                wasDragging = false;
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                const x = e.pageX - hand.offsetLeft;
+                const walk = x - startX;
+                
+                if (Math.abs(walk) > 5) {
+                    if (!isDragging) {
+                        isDragging = true;
+                        wasDragging = true;
+                        hand.classList.add('dragging-active');
+                    }
+                    hand.scrollLeft = scrollLeft - walk;
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                if (isDown) {
+                    isDown = false;
+                    hand.classList.remove('dragging-active');
+                    setTimeout(() => {
+                        wasDragging = false;
+                    }, 50); // small delay to block click events
+                }
+            });
+
+            // Prevent card selection click when dragging
+            hand.addEventListener('click', (e) => {
+                if (wasDragging) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    wasDragging = false;
+                }
+            }, true); // Capture phase is critical!
+
+            // Add support for vertical mouse wheel scrolling to scroll horizontally
+            hand.addEventListener('wheel', (e) => {
+                if (e.deltaY !== 0) {
+                    e.preventDefault();
+                    hand.scrollLeft += e.deltaY;
+                }
+            });
+        })();
+
         window.renderLobbyHeroes();
 
     </script>
