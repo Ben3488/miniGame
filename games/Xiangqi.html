@@ -1,0 +1,838 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>極致象棋 Xiangqi</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-color: #e5e7eb;
+            --board-wood: #d9b891;
+            --board-frame: #957351;
+            --line-color: #7b5937;
+            --red-color: #c93922; 
+            --black-color: #212529;
+            --text-dark: #1f2937;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at center, #f3f4f6, #d1d5db);
+            font-family: 'Outfit', 'Noto Serif TC', sans-serif;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0 0 0.5rem 0;
+            letter-spacing: 2px;
+            font-family: 'Noto Serif TC', serif;
+            color: var(--text-dark);
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .status {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            font-weight: 700;
+            padding: 8px 25px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .status.red-turn {
+            color: var(--red-color);
+        }
+
+        .status.black-turn {
+            color: var(--black-color);
+        }
+
+        /* Board Frame matching image */
+        .board-container {
+            position: relative;
+            background-color: var(--board-wood);
+            background-image: url('../assets/common/board_bg.png');
+            background-size: cover;
+            background-position: center;
+            border: 16px solid var(--board-frame);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 
+                0 20px 40px -10px rgba(0,0,0,0.4),
+                inset 0 0 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .board {
+            position: relative;
+            width: 540px; /* 9 cols * 60 */
+            height: 600px; /* 10 rows * 60 */
+            display: grid;
+            grid-template-columns: repeat(9, 60px);
+            grid-template-rows: repeat(10, 60px);
+        }
+
+        /* SVG Grid Lines */
+        .grid-svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .svg-line {
+            stroke: var(--line-color);
+            stroke-width: 1.5px;
+            stroke-linecap: square;
+        }
+
+        .outer-line {
+            stroke: var(--line-color);
+            stroke-width: 3px;
+            fill: none;
+        }
+        
+        /* Cross marks for Cannons/Pawns */
+        .mark-line {
+            stroke: var(--line-color);
+            stroke-width: 1.5px;
+        }
+
+        .river-text {
+            fill: var(--line-color);
+            font-family: 'Noto Serif TC', serif;
+            font-size: 42px;
+            font-weight: 500;
+            opacity: 0.7;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            letter-spacing: 15px;
+        }
+
+        .cell {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        /* Pieces matching image */
+        .piece {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #fdfdfd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 700;
+            font-size: 26px;
+            box-shadow: 2px 4px 6px rgba(0,0,0,0.25), inset -2px -4px 6px rgba(0,0,0,0.05);
+            position: relative;
+            z-index: 20;
+            transition: transform 0.2s, box-shadow 0.2s;
+            user-select: none;
+        }
+
+        .piece.red {
+            color: var(--red-color);
+            border: 2px solid var(--red-color);
+        }
+
+        .piece.black {
+            color: var(--black-color);
+            border: 2px solid var(--black-color);
+        }
+
+        .piece:hover {
+            transform: scale(1.1);
+            box-shadow: 3px 6px 10px rgba(0,0,0,0.3);
+        }
+
+        .cell.selected .piece {
+            box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.8);
+            transform: scale(1.1);
+        }
+
+        .cell.valid-move::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background-color: rgba(56, 189, 248, 0.8);
+            border-radius: 50%;
+            z-index: 15;
+        }
+
+        .cell.valid-capture::after {
+            content: '';
+            position: absolute;
+            width: 46px;
+            height: 46px;
+            border: 3px solid rgba(239, 68, 68, 0.9);
+            border-radius: 50%;
+            z-index: 15;
+            background-color: transparent;
+        }
+
+        .controls {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            background: var(--board-frame);
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Outfit', 'Noto Serif TC', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: #7a5e42;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn.active {
+            background: #5d4732;
+            box-shadow: inset 0 3px 5px rgba(0,0,0,0.3);
+        }
+
+        /* Winning modal */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .modal.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            transform: scale(0.8);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal h2 {
+            font-size: 2.5rem;
+            margin: 0 0 1.5rem 0;
+            color: var(--text-dark);
+            font-family: 'Noto Serif TC', serif;
+        }
+        
+        .modal.red-win h2 { color: var(--red-color); }
+        .modal.black-win h2 { color: var(--black-color); }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="mode-selector">
+            <button class="btn active" id="btn-pve" onclick="setMode('pve')">玩家 vs 電腦 (AI)</button>
+            <button class="btn" id="btn-pvp" onclick="setMode('pvp')">玩家 vs 玩家</button>
+            <button class="btn" onclick="initGame()">重新開始</button>
+            <a href="../index.html" class="btn">返回選單</a>
+        </div>
+        <div class="status red-turn" id="status" style="display: inline-block; font-size: 1.2rem; margin-top: 15px; background: transparent; border: none; box-shadow: none;">輪到您 (紅方) 行動</div>
+    </div>
+    
+    <div class="board-container">
+        <div class="board" id="board">
+            <svg class="grid-svg" width="540" height="600">
+                <!-- River Text -->
+                <text x="165" y="305" class="river-text">楚 河</text>
+                <text x="375" y="305" class="river-text">漢 界</text>
+                
+                <!-- Outer Border -->
+                <rect x="30" y="30" width="480" height="540" class="outer-line" />
+                
+                <!-- Horizontal Lines -->
+                <line x1="30" y1="90" x2="510" y2="90" class="svg-line" />
+                <line x1="30" y1="150" x2="510" y2="150" class="svg-line" />
+                <line x1="30" y1="210" x2="510" y2="210" class="svg-line" />
+                <line x1="30" y1="270" x2="510" y2="270" class="svg-line" />
+                <line x1="30" y1="330" x2="510" y2="330" class="svg-line" />
+                <line x1="30" y1="390" x2="510" y2="390" class="svg-line" />
+                <line x1="30" y1="450" x2="510" y2="450" class="svg-line" />
+                <line x1="30" y1="510" x2="510" y2="510" class="svg-line" />
+
+                <!-- Vertical Lines (Top Half) -->
+                <line x1="90" y1="30" x2="90" y2="270" class="svg-line" />
+                <line x1="150" y1="30" x2="150" y2="270" class="svg-line" />
+                <line x1="210" y1="30" x2="210" y2="270" class="svg-line" />
+                <line x1="270" y1="30" x2="270" y2="270" class="svg-line" />
+                <line x1="330" y1="30" x2="330" y2="270" class="svg-line" />
+                <line x1="390" y1="30" x2="390" y2="270" class="svg-line" />
+                <line x1="450" y1="30" x2="450" y2="270" class="svg-line" />
+
+                <!-- Vertical Lines (Bottom Half) -->
+                <line x1="90" y1="330" x2="90" y2="570" class="svg-line" />
+                <line x1="150" y1="330" x2="150" y2="570" class="svg-line" />
+                <line x1="210" y1="330" x2="210" y2="570" class="svg-line" />
+                <line x1="270" y1="330" x2="270" y2="570" class="svg-line" />
+                <line x1="330" y1="330" x2="330" y2="570" class="svg-line" />
+                <line x1="390" y1="330" x2="390" y2="570" class="svg-line" />
+                <line x1="450" y1="330" x2="450" y2="570" class="svg-line" />
+
+                <!-- Palaces -->
+                <!-- Top Palace -->
+                <line x1="210" y1="30" x2="330" y2="150" class="svg-line" />
+                <line x1="330" y1="30" x2="210" y2="150" class="svg-line" />
+                <!-- Bottom Palace -->
+                <line x1="210" y1="450" x2="330" y2="570" class="svg-line" />
+                <line x1="330" y1="450" x2="210" y2="570" class="svg-line" />
+                
+                <!-- Helper function in JS will add marks -->
+            </svg>
+            <!-- Cells generated here -->
+        </div>
+    </div>
+
+    <div class="modal" id="winModal">
+        <div class="modal-content">
+            <h2 id="winMessage">紅方獲勝！</h2>
+            <button class="btn" onclick="initGame()">再來一局</button>
+        </div>
+    </div>
+
+    <script>
+        // Draw standard marks for cannons and pawns
+        function drawMarks() {
+            const svg = document.querySelector('.grid-svg');
+            const markPositions = [
+                // Cannons
+                {r: 2, c: 1}, {r: 2, c: 7},
+                {r: 7, c: 1}, {r: 7, c: 7},
+                // Pawns (Top)
+                {r: 3, c: 0}, {r: 3, c: 2}, {r: 3, c: 4}, {r: 3, c: 6}, {r: 3, c: 8},
+                // Pawns (Bottom)
+                {r: 6, c: 0}, {r: 6, c: 2}, {r: 6, c: 4}, {r: 6, c: 6}, {r: 6, c: 8}
+            ];
+
+            const gap = 5;
+            const len = 10;
+
+            markPositions.forEach(pos => {
+                const cx = pos.c * 60 + 30;
+                const cy = pos.r * 60 + 30;
+
+                // Left marks
+                if (pos.c > 0) {
+                    // Top Left
+                    svg.innerHTML += `<path d="M ${cx - gap - len} ${cy - gap} L ${cx - gap} ${cy - gap} L ${cx - gap} ${cy - gap - len}" class="mark-line" fill="none"/>`;
+                    // Bottom Left
+                    svg.innerHTML += `<path d="M ${cx - gap - len} ${cy + gap} L ${cx - gap} ${cy + gap} L ${cx - gap} ${cy + gap + len}" class="mark-line" fill="none"/>`;
+                }
+                // Right marks
+                if (pos.c < 8) {
+                    // Top Right
+                    svg.innerHTML += `<path d="M ${cx + gap + len} ${cy - gap} L ${cx + gap} ${cy - gap} L ${cx + gap} ${cy - gap - len}" class="mark-line" fill="none"/>`;
+                    // Bottom Right
+                    svg.innerHTML += `<path d="M ${cx + gap + len} ${cy + gap} L ${cx + gap} ${cy + gap} L ${cx + gap} ${cy + gap + len}" class="mark-line" fill="none"/>`;
+                }
+            });
+        }
+        drawMarks();
+
+        // Constants & Setup
+        const ROWS = 10;
+        const COLS = 9;
+        
+        const PIECE_TYPES = {
+            'k': { val: 10000, name: ['將', '帥'] },
+            'a': { val: 200, name: ['士', '仕'] },
+            'e': { val: 200, name: ['象', '相'] },
+            'h': { val: 400, name: ['馬', '傌'] },
+            'r': { val: 900, name: ['車', '俥'] },
+            'c': { val: 450, name: ['炮', '炮'] },
+            'p': { val: 100, name: ['卒', '兵'] }
+        };
+
+        const INITIAL_BOARD = [
+            ['r', 'h', 'e', 'a', 'k', 'a', 'e', 'h', 'r'],
+            ['', '', '', '', '', '', '', '', ''],
+            ['', 'c', '', '', '', '', '', 'c', ''],
+            ['p', '', 'p', '', 'p', '', 'p', '', 'p'],
+            ['', '', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', '', ''],
+            ['P', '', 'P', '', 'P', '', 'P', '', 'P'],
+            ['', 'C', '', '', '', '', '', 'C', ''],
+            ['', '', '', '', '', '', '', '', ''],
+            ['R', 'H', 'E', 'A', 'K', 'A', 'E', 'H', 'R']
+        ];
+
+        let board = [];
+        let currentTurn = 'red';
+        let gameMode = 'pve';
+        let selectedCell = null;
+        let validMoves = [];
+        let gameActive = true;
+        let isAITurn = false;
+
+        const boardElement = document.getElementById('board');
+        const statusElement = document.getElementById('status');
+        const winModal = document.getElementById('winModal');
+        const winMessage = document.getElementById('winMessage');
+
+        function setMode(mode) {
+            gameMode = mode;
+            document.getElementById('btn-pvp').classList.toggle('active', mode === 'pvp');
+            document.getElementById('btn-pve').classList.toggle('active', mode === 'pve');
+            initGame();
+        }
+
+        function initGame() {
+            board = [];
+            currentTurn = 'red';
+            gameActive = true;
+            selectedCell = null;
+            validMoves = [];
+            isAITurn = false;
+            
+            // Clear pieces
+            Array.from(boardElement.querySelectorAll('.cell')).forEach(c => c.remove());
+            winModal.classList.remove('show');
+            updateStatus();
+
+            for (let r = 0; r < ROWS; r++) {
+                board[r] = [];
+                for (let c = 0; c < COLS; c++) {
+                    const char = INITIAL_BOARD[r][c];
+                    if (char) {
+                        const isRed = char === char.toUpperCase();
+                        board[r][c] = {
+                            type: char.toLowerCase(),
+                            color: isRed ? 'red' : 'black'
+                        };
+                    } else {
+                        board[r][c] = null;
+                    }
+
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.r = r;
+                    cell.dataset.c = c;
+                    cell.addEventListener('click', () => handleCellClick(r, c));
+                    boardElement.appendChild(cell);
+                }
+            }
+            renderPieces();
+        }
+
+        function renderPieces() {
+            const cells = boardElement.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                cell.innerHTML = '';
+                cell.classList.remove('selected', 'valid-move', 'valid-capture');
+                const r = parseInt(cell.dataset.r);
+                const c = parseInt(cell.dataset.c);
+                const piece = board[r][c];
+
+                if (piece) {
+                    const el = document.createElement('div');
+                    el.className = `piece ${piece.color}`;
+                    el.textContent = PIECE_TYPES[piece.type].name[piece.color === 'red' ? 1 : 0];
+                    cell.appendChild(el);
+                }
+
+                if (selectedCell && selectedCell.r === r && selectedCell.c === c) {
+                    cell.classList.add('selected');
+                }
+
+                const moveIndex = validMoves.findIndex(m => m.r === r && m.c === c);
+                if (moveIndex !== -1) {
+                    if (piece) {
+                        cell.classList.add('valid-capture');
+                    } else {
+                        cell.classList.add('valid-move');
+                    }
+                }
+            });
+        }
+
+        function handleCellClick(r, c) {
+            if (!gameActive || isAITurn) return;
+
+            const clickedPiece = board[r][c];
+
+            if (validMoves.some(m => m.r === r && m.c === c)) {
+                executeMove(selectedCell.r, selectedCell.c, r, c);
+                return;
+            }
+
+            if (clickedPiece && clickedPiece.color === currentTurn) {
+                selectedCell = { r, c };
+                validMoves = getValidMoves(r, c, board, currentTurn);
+                renderPieces();
+            } else {
+                selectedCell = null;
+                validMoves = [];
+                renderPieces();
+            }
+        }
+
+        function executeMove(fromR, fromC, toR, toC) {
+            const piece = board[fromR][fromC];
+            const targetPiece = board[toR][toC];
+            
+            board[toR][toC] = piece;
+            board[fromR][fromC] = null;
+            
+            selectedCell = null;
+            validMoves = [];
+            
+            renderPieces();
+
+            if (targetPiece && targetPiece.type === 'k') {
+                gameOver(currentTurn);
+                return;
+            }
+
+            currentTurn = currentTurn === 'red' ? 'black' : 'red';
+            updateStatus();
+
+            if (gameActive && gameMode === 'pve' && currentTurn === 'black') {
+                isAITurn = true;
+                statusElement.textContent = "電腦思考中...";
+                setTimeout(makeAIMove, 100);
+            }
+        }
+
+        function getValidMoves(r, c, state, turnColor) {
+            const piece = state[r][c];
+            if (!piece || piece.color !== turnColor) return [];
+
+            let moves = [];
+            const isRed = piece.color === 'red';
+
+            switch (piece.type) {
+                case 'k':
+                    [[0,1],[1,0],[0,-1],[-1,0]].forEach(dir => {
+                        const nr = r + dir[0], nc = c + dir[1];
+                        if (nc >= 3 && nc <= 5) {
+                            if (isRed && nr >= 7 && nr <= 9) moves.push({r: nr, c: nc});
+                            if (!isRed && nr >= 0 && nr <= 2) moves.push({r: nr, c: nc});
+                        }
+                    });
+                    for (let dr = (isRed ? -1 : 1); isRed ? (r + dr >= 0) : (r + dr < ROWS); isRed ? dr-- : dr++) {
+                        const nr = r + dr;
+                        const target = state[nr][c];
+                        if (target) {
+                            if (target.type === 'k' && target.color !== piece.color) {
+                                moves.push({r: nr, c: c});
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                case 'a':
+                    [[1,1],[1,-1],[-1,1],[-1,-1]].forEach(dir => {
+                        const nr = r + dir[0], nc = c + dir[1];
+                        if (nc >= 3 && nc <= 5) {
+                            if (isRed && nr >= 7 && nr <= 9) moves.push({r: nr, c: nc});
+                            if (!isRed && nr >= 0 && nr <= 2) moves.push({r: nr, c: nc});
+                        }
+                    });
+                    break;
+                case 'e':
+                    [[2,2],[2,-2],[-2,2],[-2,-2]].forEach(dir => {
+                        const nr = r + dir[0], nc = c + dir[1];
+                        const er = r + dir[0]/2, ec = c + dir[1]/2;
+                        if (nc >= 0 && nc < COLS && (isRed ? (nr >= 5 && nr <= 9) : (nr >= 0 && nr <= 4))) {
+                            if (!state[er][ec]) moves.push({r: nr, c: nc});
+                        }
+                    });
+                    break;
+                case 'h':
+                    [[-2,-1],[-2,1],[2,-1],[2,1],[-1,-2],[1,-2],[-1,2],[1,2]].forEach(dir => {
+                        const nr = r + dir[0], nc = c + dir[1];
+                        const br = r + (Math.abs(dir[0]) === 2 ? dir[0]/2 : 0);
+                        const bc = c + (Math.abs(dir[1]) === 2 ? dir[1]/2 : 0);
+                        if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS) {
+                            if (!state[br][bc]) moves.push({r: nr, c: nc});
+                        }
+                    });
+                    break;
+                case 'r':
+                    [[0,1],[1,0],[0,-1],[-1,0]].forEach(dir => {
+                        let nr = r + dir[0], nc = c + dir[1];
+                        while (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS) {
+                            if (!state[nr][nc]) {
+                                moves.push({r: nr, c: nc});
+                            } else {
+                                if (state[nr][nc].color !== turnColor) moves.push({r: nr, c: nc});
+                                break;
+                            }
+                            nr += dir[0]; nc += dir[1];
+                        }
+                    });
+                    break;
+                case 'c':
+                    [[0,1],[1,0],[0,-1],[-1,0]].forEach(dir => {
+                        let nr = r + dir[0], nc = c + dir[1];
+                        let jump = false;
+                        while (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS) {
+                            if (!state[nr][nc]) {
+                                if (!jump) moves.push({r: nr, c: nc});
+                            } else {
+                                if (!jump) {
+                                    jump = true;
+                                } else {
+                                    if (state[nr][nc].color !== turnColor) moves.push({r: nr, c: nc});
+                                    break;
+                                }
+                            }
+                            nr += dir[0]; nc += dir[1];
+                        }
+                    });
+                    break;
+                case 'p':
+                    const fwd = isRed ? -1 : 1;
+                    const crossed = isRed ? r <= 4 : r >= 5;
+                    if (r + fwd >= 0 && r + fwd < ROWS) moves.push({r: r + fwd, c: c});
+                    if (crossed) {
+                        if (c - 1 >= 0) moves.push({r: r, c: c - 1});
+                        if (c + 1 < COLS) moves.push({r: r, c: c + 1});
+                    }
+                    break;
+            }
+
+            return moves.filter(m => !state[m.r][m.c] || state[m.r][m.c].color !== turnColor);
+        }
+
+        function getAllMoves(state, color) {
+            let allMoves = [];
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    if (state[r][c] && state[r][c].color === color) {
+                        const moves = getValidMoves(r, c, state, color);
+                        moves.forEach(m => allMoves.push({from: {r,c}, to: m}));
+                    }
+                }
+            }
+            return allMoves;
+        }
+
+        function evaluateBoard(state) {
+            let score = 0;
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    const p = state[r][c];
+                    if (p) {
+                        let val = PIECE_TYPES[p.type].val;
+                        if (p.type === 'p') {
+                            const crossed = p.color === 'red' ? r <= 4 : r >= 5;
+                            if (crossed) val += 100;
+                        }
+                        score += p.color === 'black' ? val : -val;
+                    }
+                }
+            }
+            return score;
+        }
+
+        function makeAIMove() {
+            if (!gameActive) return;
+
+            let bestScore = -Infinity;
+            let bestMoves = [];
+            const moves = getAllMoves(board, 'black');
+            moves.sort(() => Math.random() - 0.5);
+
+            for (let move of moves) {
+                const targetPiece = board[move.to.r][move.to.c];
+                board[move.to.r][move.to.c] = board[move.from.r][move.from.c];
+                board[move.from.r][move.from.c] = null;
+
+                if (targetPiece && targetPiece.type === 'k') {
+                    board[move.from.r][move.from.c] = board[move.to.r][move.to.c];
+                    board[move.to.r][move.to.c] = targetPiece;
+                    executeMove(move.from.r, move.from.c, move.to.r, move.to.c);
+                    return;
+                }
+
+                let score = minimax(board, 2, -Infinity, Infinity, false);
+
+                board[move.from.r][move.from.c] = board[move.to.r][move.to.c];
+                board[move.to.r][move.to.c] = targetPiece;
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMoves = [move];
+                } else if (score === bestScore) {
+                    bestMoves.push(move);
+                }
+            }
+
+            if (bestMoves.length > 0) {
+                const move = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+                executeMove(move.from.r, move.from.c, move.to.r, move.to.c);
+            }
+            isAITurn = false;
+        }
+
+        function minimax(state, depth, alpha, beta, isMaximizing) {
+            if (depth === 0) return evaluateBoard(state);
+
+            const color = isMaximizing ? 'black' : 'red';
+            const moves = getAllMoves(state, color);
+
+            if (isMaximizing) {
+                let maxEval = -Infinity;
+                for (let move of moves) {
+                    const targetPiece = state[move.to.r][move.to.c];
+                    state[move.to.r][move.to.c] = state[move.from.r][move.from.c];
+                    state[move.from.r][move.from.c] = null;
+                    
+                    if (targetPiece && targetPiece.type === 'k') {
+                        state[move.from.r][move.from.c] = state[move.to.r][move.to.c];
+                        state[move.to.r][move.to.c] = targetPiece;
+                        return 100000;
+                    }
+
+                    let ev = minimax(state, depth - 1, alpha, beta, false);
+
+                    state[move.from.r][move.from.c] = state[move.to.r][move.to.c];
+                    state[move.to.r][move.to.c] = targetPiece;
+
+                    maxEval = Math.max(maxEval, ev);
+                    alpha = Math.max(alpha, ev);
+                    if (beta <= alpha) break;
+                }
+                return maxEval;
+            } else {
+                let minEval = Infinity;
+                for (let move of moves) {
+                    const targetPiece = state[move.to.r][move.to.c];
+                    state[move.to.r][move.to.c] = state[move.from.r][move.from.c];
+                    state[move.from.r][move.from.c] = null;
+
+                    if (targetPiece && targetPiece.type === 'k') {
+                        state[move.from.r][move.from.c] = state[move.to.r][move.to.c];
+                        state[move.to.r][move.to.c] = targetPiece;
+                        return -100000;
+                    }
+
+                    let ev = minimax(state, depth - 1, alpha, beta, true);
+
+                    state[move.from.r][move.from.c] = state[move.to.r][move.to.c];
+                    state[move.to.r][move.to.c] = targetPiece;
+
+                    minEval = Math.min(minEval, ev);
+                    beta = Math.min(beta, ev);
+                    if (beta <= alpha) break;
+                }
+                return minEval;
+            }
+        }
+
+        function updateStatus() {
+            if (currentTurn === 'red') {
+                statusElement.textContent = "輪到您 (紅方) 行動";
+                statusElement.className = "status red-turn";
+            } else {
+                if (gameMode === 'pve') {
+                    statusElement.textContent = "電腦思考中...";
+                } else {
+                    statusElement.textContent = "黑方回合";
+                }
+                statusElement.className = "status black-turn";
+            }
+        }
+
+        function gameOver(winner) {
+            gameActive = false;
+            setTimeout(() => {
+                if (winner === 'red') {
+                    winMessage.textContent = "紅方獲勝！";
+                    winModal.classList.add('red-win');
+                } else {
+                    winMessage.textContent = gameMode === 'pve' ? "電腦 (黑方) 獲勝！" : "黑方獲勝！";
+                    winModal.classList.add('black-win');
+                }
+                winModal.classList.add('show');
+            }, 500);
+        }
+
+        initGame();
+
+        // Responsive scaling for mobile
+        function resizeBoard() {
+            const container = document.querySelector('.board-container');
+            const targetWidth = 620; // 540 board + padding + borders + safe margin
+            if (window.innerWidth < targetWidth) {
+                const scale = window.innerWidth / targetWidth;
+                container.style.transform = `scale(${scale})`;
+                container.style.transformOrigin = 'top center';
+                container.style.marginBottom = `-${container.offsetHeight * (1 - scale)}px`;
+            } else {
+                container.style.transform = 'none';
+                container.style.marginBottom = '0';
+            }
+        }
+        window.addEventListener('resize', resizeBoard);
+        resizeBoard();
+    </script>
+</body>
+</html>
+

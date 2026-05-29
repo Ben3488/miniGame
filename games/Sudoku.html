@@ -1,0 +1,1228 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>數獨 - Game Center</title>
+    <!-- Use FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+
+        :root {
+            --bg-color: #ffffff;
+            --text-main: #344861;
+            --text-light: #7a8fa6;
+            --board-border: #344861;
+            --cell-border: #c3d0df;
+            --cell-bg: #ffffff;
+            --cell-bg-selected: #bbdefb;
+            --cell-bg-related: #e2ebf3;
+            --cell-bg-same-num: #c3d0df;
+            --cell-text-fixed: #344861;
+            --cell-text-input: #0052cc;
+            --cell-text-error: #e53935;
+            --cell-bg-error: #fce4e4;
+            
+            --btn-bg: #f3f6fa;
+            --btn-bg-hover: #e2ebf3;
+            --btn-text: #0052cc;
+            --action-btn-bg: #e2ebf3;
+            --action-btn-text: #0052cc;
+            --primary-bg: #5c7cba;
+            --primary-hover: #4a6599;
+            --primary-text: #ffffff;
+            --cage-border: #7a8fa6;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Roboto', 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .back-btn {
+            align-self: flex-start;
+            text-decoration: none;
+            color: var(--primary-text);
+            background-color: var(--primary-bg);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .back-btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .selectors-wrapper {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .mode-selector, .difficulty-selector {
+            display: flex;
+            gap: 15px;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .mode-selector {
+            border-right: 2px solid var(--cell-border);
+            padding-right: 20px;
+        }
+
+        .diff-option {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .diff-option.active {
+            color: var(--primary-bg);
+            font-weight: 700;
+        }
+
+        .diff-option:hover {
+            color: var(--text-main);
+        }
+
+        .score-display {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .info-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1.4rem;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            padding: 0;
+        }
+        .info-btn:hover {
+            color: var(--primary-bg);
+        }
+
+        /* Main Game Area */
+        .game-area {
+            display: flex;
+            gap: 40px;
+            width: 100%;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* Board Container */
+        .board-container {
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .sudoku-board {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            grid-template-rows: repeat(9, 1fr);
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border: 2px solid var(--board-border);
+            background-color: var(--board-border);
+            gap: 1px;
+        }
+
+        .cell {
+            background-color: var(--cell-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 400;
+            cursor: pointer;
+            user-select: none;
+            color: var(--cell-text-input);
+            position: relative;
+        }
+
+        .cell.fixed {
+            color: var(--cell-text-fixed);
+        }
+
+        /* Cell Background States */
+        .cell.related {
+            background-color: var(--cell-bg-related);
+        }
+        .cell.same-num {
+            background-color: var(--cell-bg-same-num);
+        }
+        .cell.selected {
+            background-color: var(--cell-bg-selected);
+        }
+        .cell.error-bg {
+            background-color: var(--cell-bg-error);
+        }
+        .cell.error-text {
+            color: var(--cell-text-error);
+        }
+
+        /* 3x3 Grid Borders */
+        .cell:nth-child(3n) {
+            border-right: 2px solid var(--board-border);
+        }
+        .cell:nth-child(9n) {
+            border-right: none;
+        }
+        .row-group-end {
+            border-bottom: 2px solid var(--board-border) !important;
+        }
+
+        /* Killer Sudoku Cages */
+        .cage-layer {
+            position: absolute;
+            top: 2px; left: 2px; right: 2px; bottom: 2px;
+            pointer-events: none;
+            border: 0 dashed #344861; /* 使用較深且銳利的顏色，與主邊框同色系 */
+            opacity: 0.8; /* 稍微柔和化，避免過於刺眼 */
+            z-index: 1;
+        }
+        .cage-top .cage-layer { border-top-width: 1px; top: 1px; }
+        .cage-bottom .cage-layer { border-bottom-width: 1px; bottom: 1px; }
+        .cage-left .cage-layer { border-left-width: 1px; left: 1px; }
+        .cage-right .cage-layer { border-right-width: 1px; right: 1px; }
+
+        .cage-sum {
+            position: absolute;
+            top: 3px;
+            left: 4px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-main);
+            line-height: 1;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .mode-killer .cell {
+            color: var(--cell-text-input); /* User inputs are always blue in killer */
+        }
+        
+        .mode-killer .cell.fixed {
+            /* Fix for killer mode: no fixed numbers visually */
+            display: none; 
+        }
+
+        /* Notes (Pencil marks) */
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            width: 100%;
+            height: 100%;
+            padding: 2px;
+            box-sizing: border-box;
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        .note-num {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            color: var(--text-light);
+            line-height: 1;
+        }
+
+        /* Right Panel */
+        .side-panel {
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .stat-block {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .stat-val {
+            color: var(--text-main);
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .timer-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pause-btn {
+            background: var(--action-btn-bg);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .pause-btn:hover {
+            background: #d0dbe7;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .action-btn-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+        }
+
+        .action-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background-color: var(--action-btn-bg);
+            border: none;
+            color: var(--action-btn-text);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .action-btn:hover {
+            background-color: #d0dbe7;
+        }
+        
+        .action-btn.active {
+            background-color: var(--primary-bg);
+            color: white;
+        }
+
+        .badge {
+            position: absolute;
+            top: -2px;
+            right: -5px;
+            background-color: var(--text-light);
+            color: white;
+            font-size: 0.6rem;
+            font-weight: bold;
+            padding: 2px 5px;
+            border-radius: 10px;
+            border: 2px solid var(--bg-color);
+        }
+        
+        .badge.count {
+            background-color: var(--primary-bg);
+        }
+
+        /* Numpad */
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .num-btn {
+            background-color: var(--btn-bg);
+            border: none;
+            border-radius: 8px;
+            aspect-ratio: 1.2 / 1;
+            font-size: 2.2rem;
+            color: var(--btn-text);
+            font-family: 'Roboto', sans-serif;
+            font-weight: 400;
+            cursor: pointer;
+            transition: background-color 0.1s;
+        }
+
+        .num-btn:hover {
+            background-color: var(--btn-bg-hover);
+        }
+        .num-btn:active {
+            transform: scale(0.97);
+        }
+
+        .new-game-btn {
+            width: 100%;
+            padding: 18px;
+            background-color: var(--primary-bg);
+            color: var(--primary-text);
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-family: inherit;
+        }
+
+        .new-game-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Modal Overlay */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .modal h2 {
+            margin-top: 0;
+            color: var(--text-main);
+            font-size: 1.8rem;
+        }
+
+        .modal p {
+            color: var(--text-light);
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .modal-text-left {
+            text-align: left;
+            margin-bottom: 25px;
+            color: var(--text-main);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        .modal-text-left ul {
+            padding-left: 20px;
+            margin-top: 10px;
+            margin-bottom: 0;
+        }
+
+        .modal .new-game-btn {
+            width: auto;
+            padding: 12px 30px;
+        }
+
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            .side-panel {
+                width: 100%;
+                max-width: 500px;
+            }
+            .cell {
+                font-size: 1.5rem;
+            }
+            .selectors-wrapper {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .mode-selector {
+                border-right: none;
+                border-bottom: 2px solid var(--cell-border);
+                padding-right: 0;
+                padding-bottom: 10px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="../index.html" class="back-btn">
+        <i class="fa-solid fa-arrow-left"></i> 返回選單
+    </a>
+
+    <div class="container">
+        <div class="top-bar">
+            <div class="selectors-wrapper">
+                <div class="mode-selector" id="modeSelector">
+                    <span class="diff-option active" data-mode="classic">經典</span>
+                    <span class="diff-option" data-mode="killer">殺手</span>
+                </div>
+                <div class="difficulty-selector" id="diffSelector">
+                    <span class="diff-option active" data-diff="簡單">簡單</span>
+                    <span class="diff-option" data-diff="中等">中等</span>
+                    <span class="diff-option" data-diff="困難">困難</span>
+                    <span class="diff-option" data-diff="專家">專家</span>
+                    <span class="diff-option" data-diff="老手">老手</span>
+                    <span class="diff-option" data-diff="極限">極限</span>
+                </div>
+            </div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <button class="info-btn" id="infoBtn" title="遊戲說明"><i class="fa-solid fa-circle-question"></i></button>
+                <div class="score-display">0</div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="board-container">
+                <div id="board" class="sudoku-board">
+                    <!-- Board generated by JS -->
+                </div>
+            </div>
+
+            <div class="side-panel">
+                <div class="stats-bar">
+                    <div class="stat-block">
+                        <span>錯誤</span>
+                        <span class="stat-val" id="mistakesDisplay">0/3</span>
+                    </div>
+                    <div class="stat-block" style="align-items: flex-end;">
+                        <span>時間</span>
+                        <div class="timer-row">
+                            <span class="stat-val" id="timerDisplay">00:00</span>
+                            <button class="pause-btn" id="pauseBtn"><i class="fa-solid fa-pause"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <div class="action-btn-wrapper">
+                        <button class="action-btn" id="undoBtn"><i class="fa-solid fa-rotate-left"></i></button>
+                    </div>
+                    <div class="action-btn-wrapper">
+                        <button class="action-btn" id="eraseBtn"><i class="fa-solid fa-eraser"></i></button>
+                    </div>
+                    <div class="action-btn-wrapper">
+                        <button class="action-btn" id="notesBtn">
+                            <i class="fa-solid fa-pencil"></i>
+                            <span class="badge" id="notesBadge">OFF</span>
+                        </button>
+                    </div>
+                    <div class="action-btn-wrapper">
+                        <button class="action-btn" id="hintBtn">
+                            <i class="fa-regular fa-lightbulb"></i>
+                            <span class="badge count" id="hintsBadge">3</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="numpad" id="numpad">
+                    <!-- Numbers 1-9 -->
+                </div>
+
+                <button class="new-game-btn" id="newGameBtn">新遊戲</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="modalOverlay">
+        <div class="modal">
+            <h2 id="modalTitle">遊戲結束</h2>
+            <p id="modalMsg">你已經達到 3 次錯誤上限。</p>
+            <button class="new-game-btn" id="modalBtn">重新開始</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="infoOverlay">
+        <div class="modal">
+            <h2 id="infoTitle">遊戲說明</h2>
+            <div class="modal-text-left" id="infoContent">
+                <!-- Content injected via JS -->
+            </div>
+            <button class="new-game-btn" id="closeInfoBtn">了解</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const boardEl = document.getElementById('board');
+        const numpadEl = document.getElementById('numpad');
+        const diffSelector = document.getElementById('diffSelector');
+        const modeSelector = document.getElementById('modeSelector');
+        const mistakesDisplay = document.getElementById('mistakesDisplay');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const undoBtn = document.getElementById('undoBtn');
+        const eraseBtn = document.getElementById('eraseBtn');
+        const notesBtn = document.getElementById('notesBtn');
+        const hintBtn = document.getElementById('hintBtn');
+        const newGameBtn = document.getElementById('newGameBtn');
+        const notesBadge = document.getElementById('notesBadge');
+        const hintsBadge = document.getElementById('hintsBadge');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMsg = document.getElementById('modalMsg');
+        const modalBtn = document.getElementById('modalBtn');
+        const infoBtn = document.getElementById('infoBtn');
+        const infoOverlay = document.getElementById('infoOverlay');
+        const closeInfoBtn = document.getElementById('closeInfoBtn');
+        const infoContent = document.getElementById('infoContent');
+        const infoTitle = document.getElementById('infoTitle');
+
+        // Game State
+        let selectedCell = null;
+        let boardState = []; // 9x9 array of values
+        let notesState = []; // 9x9 array of sets containing notes
+        let initialBoard = [];
+        let solution = [];
+        let undoStack = []; // Array of actions
+        
+        let gameMode = 'classic'; // 'classic' or 'killer'
+        let cages = []; // [{id, cells:[{r,c}], sum, root:{r,c}}]
+        let cellCageMap = []; // 9x9 array mapping cell to cage id
+
+        let difficulty = '簡單';
+        let mistakes = 0;
+        const MAX_MISTAKES = 3;
+        let hintsLeft = 3;
+        let notesMode = false;
+        
+        let timer = 0;
+        let timerInterval = null;
+        let isPaused = false;
+        let isGameOver = false;
+
+        // Proper Sudoku Generation functions
+        function generateValidBoard() {
+            let b = Array.from({length: 9}, () => Array(9).fill(0));
+            fillBoard(b);
+            return b;
+        }
+
+        function fillBoard(b) {
+            for (let i = 0; i < 81; i++) {
+                let row = Math.floor(i / 9);
+                let col = i % 9;
+                if (b[row][col] === 0) {
+                    let nums = [1,2,3,4,5,6,7,8,9];
+                    shuffleArray(nums);
+                    for (let n of nums) {
+                        if (isValid(b, row, col, n)) {
+                            b[row][col] = n;
+                            if (fillBoard(b)) return true;
+                            b[row][col] = 0;
+                        }
+                    }
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function isValid(b, row, col, num) {
+            for (let i = 0; i < 9; i++) {
+                if (b[row][i] === num) return false;
+                if (b[i][col] === num) return false;
+            }
+            let startRow = Math.floor(row / 3) * 3;
+            let startCol = Math.floor(col / 3) * 3;
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    if (b[startRow + i][startCol + j] === num) return false;
+                }
+            }
+            return true;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function getDifficultyCells() {
+            switch(difficulty) {
+                case '簡單': return 35;
+                case '中等': return 45;
+                case '困難': return 52;
+                case '專家': return 58;
+                case '老手': return 62;
+                case '極限': return 66;
+                default: return 40;
+            }
+        }
+
+        function generateCages() {
+            cages = [];
+            cellCageMap = Array.from({length: 9}, () => Array(9).fill(-1));
+            let unassigned = new Set();
+            
+            for (let r = 0; r < 9; r++) {
+                for (let c = 0; c < 9; c++) {
+                    unassigned.add(`${r},${c}`);
+                }
+            }
+            
+            let cageIdCounter = 0;
+            while(unassigned.size > 0) {
+                let startKey = Array.from(unassigned)[Math.floor(Math.random() * unassigned.size)];
+                let [sr, sc] = startKey.split(',').map(Number);
+                
+                let targetSize = Math.floor(Math.random() * 4) + 2; // 2 to 5 cells
+                let currentCage = [{r: sr, c: sc}];
+                unassigned.delete(startKey);
+                cellCageMap[sr][sc] = cageIdCounter;
+                
+                while(currentCage.length < targetSize) {
+                    let neighbors = [];
+                    for (let cell of currentCage) {
+                        let dr = [-1, 1, 0, 0];
+                        let dc = [0, 0, -1, 1];
+                        for (let i = 0; i < 4; i++) {
+                            let nr = cell.r + dr[i];
+                            let nc = cell.c + dc[i];
+                            if (nr >= 0 && nr < 9 && nc >= 0 && nc < 9 && cellCageMap[nr][nc] === -1) {
+                                neighbors.push({r: nr, c: nc});
+                            }
+                        }
+                    }
+                    if (neighbors.length === 0) break;
+                    
+                    let nextCell = neighbors[Math.floor(Math.random() * neighbors.length)];
+                    currentCage.push(nextCell);
+                    cellCageMap[nextCell.r][nextCell.c] = cageIdCounter;
+                    unassigned.delete(`${nextCell.r},${nextCell.c}`);
+                }
+                
+                let sum = 0;
+                let rootCell = currentCage[0];
+                for (let cell of currentCage) {
+                    sum += solution[cell.r][cell.c];
+                    if (cell.r < rootCell.r || (cell.r === rootCell.r && cell.c < rootCell.c)) {
+                        rootCell = cell;
+                    }
+                }
+                
+                cages.push({
+                    id: cageIdCounter,
+                    cells: currentCage,
+                    sum: sum,
+                    root: rootCell
+                });
+                cageIdCounter++;
+            }
+        }
+
+        function generatePuzzle() {
+            solution = generateValidBoard();
+            
+            if (gameMode === 'classic') {
+                initialBoard = JSON.parse(JSON.stringify(solution));
+                let cellsToRemove = getDifficultyCells();
+                while(cellsToRemove > 0) {
+                    let r = Math.floor(Math.random() * 9);
+                    let c = Math.floor(Math.random() * 9);
+                    if (initialBoard[r][c] !== 0) {
+                        initialBoard[r][c] = 0;
+                        cellsToRemove--;
+                    }
+                }
+            } else { // Killer mode
+                initialBoard = Array.from({length: 9}, () => Array(9).fill(0));
+                generateCages();
+            }
+
+            boardState = JSON.parse(JSON.stringify(initialBoard));
+            notesState = Array.from({length: 9}, () => Array.from({length: 9}, () => new Set()));
+        }
+
+        function initUI() {
+            // Numpad
+            numpadEl.innerHTML = '';
+            for (let i = 1; i <= 9; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'num-btn';
+                btn.textContent = i;
+                btn.addEventListener('click', () => inputNumber(i));
+                numpadEl.appendChild(btn);
+            }
+
+            // Selectors
+            document.querySelectorAll('.difficulty-selector .diff-option').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    document.querySelectorAll('.difficulty-selector .diff-option').forEach(opt => opt.classList.remove('active'));
+                    e.target.classList.add('active');
+                    difficulty = e.target.dataset.diff;
+                    startNewGame();
+                });
+            });
+
+            document.querySelectorAll('.mode-selector .diff-option').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    document.querySelectorAll('.mode-selector .diff-option').forEach(opt => opt.classList.remove('active'));
+                    e.target.classList.add('active');
+                    gameMode = e.target.dataset.mode;
+                    startNewGame();
+                });
+            });
+
+            // Buttons
+            newGameBtn.addEventListener('click', startNewGame);
+            modalBtn.addEventListener('click', () => {
+                modalOverlay.classList.remove('active');
+                startNewGame();
+            });
+            undoBtn.addEventListener('click', performUndo);
+            eraseBtn.addEventListener('click', () => inputNumber(0));
+            notesBtn.addEventListener('click', toggleNotes);
+            hintBtn.addEventListener('click', useHint);
+            pauseBtn.addEventListener('click', togglePause);
+
+            // Info Dialog
+            const rulesClassic = `
+                <strong>標準數獨規則：</strong><br>
+                <ul>
+                    <li>將數字 1-9 填入空格中。</li>
+                    <li>每一行、每一列都必須包含 1-9 的數字，且不能重複。</li>
+                    <li>每一個粗線劃分的 3x3 九宮格內，也必須包含 1-9 的數字，且不能重複。</li>
+                    <li>超過三次填錯數字，遊戲即結束。</li>
+                </ul>
+            `;
+
+            const rulesKiller = `
+                <strong>殺手數獨規則：</strong><br>
+                除了必須符合標準數獨的規則外，加入以下限制：
+                <ul>
+                    <li>盤面被虛線劃分成多個「區塊」。</li>
+                    <li>每個區塊左上角的數字，代表該區塊內所有數字的「總和」。</li>
+                    <li>在同一個虛線區塊內，數字<strong>不能重複</strong>。</li>
+                    <li>所有格子初始皆為空白，需依賴總和推理來完成盤面。</li>
+                </ul>
+            `;
+
+            infoBtn.addEventListener('click', () => {
+                infoTitle.textContent = gameMode === 'killer' ? '殺手數獨 說明' : '經典數獨 說明';
+                infoContent.innerHTML = gameMode === 'killer' ? rulesKiller : rulesClassic;
+                infoOverlay.classList.add('active');
+            });
+
+            closeInfoBtn.addEventListener('click', () => {
+                infoOverlay.classList.remove('active');
+            });
+
+            // Keyboard
+            document.addEventListener('keydown', handleKeyboard);
+        }
+
+        function createBoard() {
+            boardEl.innerHTML = '';
+            boardEl.className = 'sudoku-board ' + (gameMode === 'killer' ? 'mode-killer' : '');
+            
+            for (let r = 0; r < 9; r++) {
+                for (let c = 0; c < 9; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    if (r === 2 || r === 5) cell.classList.add('row-group-end');
+                    cell.dataset.r = r;
+                    cell.dataset.c = c;
+                    
+                    // Add cage layers for killer mode
+                    if (gameMode === 'killer') {
+                        let cid = cellCageMap[r][c];
+                        let cage = cages.find(cg => cg.id === cid);
+                        
+                        // Check boundaries
+                        if (r === 0 || cellCageMap[r-1][c] !== cid) cell.classList.add('cage-top');
+                        if (r === 8 || cellCageMap[r+1][c] !== cid) cell.classList.add('cage-bottom');
+                        if (c === 0 || cellCageMap[r][c-1] !== cid) cell.classList.add('cage-left');
+                        if (c === 8 || cellCageMap[r][c+1] !== cid) cell.classList.add('cage-right');
+                        
+                        const cageLayer = document.createElement('div');
+                        cageLayer.className = 'cage-layer';
+                        cell.appendChild(cageLayer);
+                        
+                        // Add sum text to root cell
+                        if (cage.root.r === r && cage.root.c === c) {
+                            const sumEl = document.createElement('div');
+                            sumEl.className = 'cage-sum';
+                            sumEl.textContent = cage.sum;
+                            cell.appendChild(sumEl);
+                        }
+                    }
+
+                    const textContainer = document.createElement('span');
+                    textContainer.className = 'cell-text';
+                    cell.appendChild(textContainer);
+
+                    cell.addEventListener('click', () => selectCell(r, c));
+                    boardEl.appendChild(cell);
+                }
+            }
+            updateBoardUI();
+        }
+
+        function updateBoardUI() {
+            for (let r = 0; r < 9; r++) {
+                for (let c = 0; c < 9; c++) {
+                    const cell = getCellEl(r, c);
+                    const textContainer = cell.querySelector('.cell-text') || cell;
+                    
+                    // Reset text classes
+                    cell.classList.remove('error-text', 'error-bg', 'fixed');
+                    textContainer.innerHTML = ''; 
+                    
+                    // Remove old notes grid if exists
+                    const oldNotes = cell.querySelector('.notes-grid');
+                    if (oldNotes) oldNotes.remove();
+
+                    if (initialBoard[r][c] !== 0) {
+                        textContainer.textContent = initialBoard[r][c];
+                        cell.classList.add('fixed');
+                    } else if (boardState[r][c] !== 0) {
+                        textContainer.textContent = boardState[r][c];
+                        // check if error
+                        if (boardState[r][c] !== solution[r][c]) {
+                            cell.classList.add('error-text', 'error-bg');
+                        }
+                    } else {
+                        // Render notes
+                        if (notesState[r][c].size > 0) {
+                            const grid = document.createElement('div');
+                            grid.className = 'notes-grid';
+                            for (let i = 1; i <= 9; i++) {
+                                const num = document.createElement('div');
+                                num.className = 'note-num';
+                                if (notesState[r][c].has(i)) num.textContent = i;
+                                grid.appendChild(num);
+                            }
+                            cell.appendChild(grid);
+                        }
+                    }
+                }
+            }
+            applyHighlights();
+        }
+
+        function getCellEl(r, c) {
+            return boardEl.children[r * 9 + c];
+        }
+
+        function selectCell(r, c) {
+            if (isPaused || isGameOver) return;
+            selectedCell = { r, c };
+            applyHighlights();
+        }
+
+        function applyHighlights() {
+            // Remove previous highlights
+            document.querySelectorAll('.cell').forEach(el => {
+                el.classList.remove('selected', 'related', 'same-num');
+            });
+
+            if (!selectedCell) return;
+            const {r, c} = selectedCell;
+            
+            // Highlight selected
+            const selEl = getCellEl(r, c);
+            selEl.classList.add('selected');
+
+            // Highlight related (row, col, box, and cage in killer mode)
+            const boxR = Math.floor(r / 3) * 3;
+            const boxC = Math.floor(c / 3) * 3;
+            let cid = gameMode === 'killer' ? cellCageMap[r][c] : -1;
+
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    if (i === r && j === c) continue;
+                    
+                    if (i === r || j === c || (i >= boxR && i < boxR + 3 && j >= boxC && j < boxC + 3) || (gameMode === 'killer' && cellCageMap[i][j] === cid)) {
+                        getCellEl(i, j).classList.add('related');
+                    }
+                }
+            }
+
+            // Highlight same numbers
+            let selVal = boardState[r][c];
+            if (selVal === 0 && initialBoard[r][c] !== 0) selVal = initialBoard[r][c];
+            
+            if (selVal !== 0) {
+                for (let i = 0; i < 9; i++) {
+                    for (let j = 0; j < 9; j++) {
+                        if (i === r && j === c) continue;
+                        let val = boardState[i][j] || initialBoard[i][j];
+                        if (val === selVal) {
+                            getCellEl(i, j).classList.add('same-num');
+                        }
+                    }
+                }
+            }
+        }
+
+        function inputNumber(num) {
+            if (!selectedCell || isPaused || isGameOver) return;
+            const {r, c} = selectedCell;
+            
+            if (initialBoard[r][c] !== 0) return; // Cannot edit fixed
+
+            if (notesMode && num !== 0) {
+                // Toggle note
+                let oldNotes = new Set(notesState[r][c]);
+                if (notesState[r][c].has(num)) {
+                    notesState[r][c].delete(num);
+                } else {
+                    notesState[r][c].add(num);
+                }
+                undoStack.push({r, c, type: 'note', oldVal: oldNotes, newVal: new Set(notesState[r][c])});
+                // clear board state if entering notes
+                if (boardState[r][c] !== 0) {
+                    boardState[r][c] = 0;
+                }
+                updateBoardUI();
+                return;
+            }
+
+            // Normal input
+            let oldVal = boardState[r][c];
+            if (oldVal === num) num = 0; // Toggle off if same number
+            
+            undoStack.push({r, c, type: 'val', oldVal, newVal: num});
+            boardState[r][c] = num;
+            
+            // Check mistake
+            if (num !== 0 && num !== solution[r][c]) {
+                mistakes++;
+                mistakesDisplay.textContent = `${mistakes}/${MAX_MISTAKES}`;
+                if (mistakes >= MAX_MISTAKES) {
+                    endGame(false);
+                }
+            } else if (num !== 0 && num === solution[r][c]) {
+                // Clear related notes when placing correct number
+                clearRelatedNotes(r, c, num);
+            }
+
+            updateBoardUI();
+            checkWin();
+        }
+
+        function clearRelatedNotes(r, c, num) {
+            const boxR = Math.floor(r / 3) * 3;
+            const boxC = Math.floor(c / 3) * 3;
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    if (i === r || j === c || (i >= boxR && i < boxR + 3 && j >= boxC && j < boxC + 3)) {
+                        notesState[i][j].delete(num);
+                    }
+                }
+            }
+        }
+
+        function performUndo() {
+            if (undoStack.length === 0 || isPaused || isGameOver) return;
+            const action = undoStack.pop();
+            if (action.type === 'val') {
+                boardState[action.r][action.c] = action.oldVal;
+            } else if (action.type === 'note') {
+                notesState[action.r][action.c] = action.oldVal;
+            }
+            updateBoardUI();
+        }
+
+        function toggleNotes() {
+            if (isPaused || isGameOver) return;
+            notesMode = !notesMode;
+            if (notesMode) {
+                notesBtn.classList.add('active');
+                notesBadge.textContent = 'ON';
+                notesBadge.style.backgroundColor = 'var(--primary-bg)';
+            } else {
+                notesBtn.classList.remove('active');
+                notesBadge.textContent = 'OFF';
+                notesBadge.style.backgroundColor = 'var(--text-light)';
+            }
+        }
+
+        function useHint() {
+            if (!selectedCell || isPaused || isGameOver || hintsLeft <= 0) return;
+            const {r, c} = selectedCell;
+            if (initialBoard[r][c] !== 0 || boardState[r][c] === solution[r][c]) return;
+
+            hintsLeft--;
+            hintsBadge.textContent = hintsLeft;
+            
+            undoStack.push({r, c, type: 'val', oldVal: boardState[r][c], newVal: solution[r][c]});
+            boardState[r][c] = solution[r][c];
+            clearRelatedNotes(r, c, solution[r][c]);
+            
+            updateBoardUI();
+            checkWin();
+        }
+
+        function checkWin() {
+            for (let r = 0; r < 9; r++) {
+                for (let c = 0; c < 9; c++) {
+                    if (boardState[r][c] === 0 && initialBoard[r][c] === 0) return; // not full
+                    if (boardState[r][c] !== 0 && boardState[r][c] !== solution[r][c]) return; // has error
+                }
+            }
+            endGame(true);
+        }
+
+        function endGame(isWin) {
+            isGameOver = true;
+            stopTimer();
+            modalOverlay.classList.add('active');
+            if (isWin) {
+                modalTitle.textContent = '恭喜獲勝！';
+                modalTitle.style.color = '#0052cc';
+                modalMsg.textContent = `你完成了 ${gameMode === 'killer' ? '殺手模式' : '經典模式'} - ${difficulty}，耗時 ${formatTime(timer)}。`;
+            } else {
+                modalTitle.textContent = '遊戲結束';
+                modalTitle.style.color = 'var(--cell-text-error)';
+                modalMsg.textContent = `你已經達到 ${MAX_MISTAKES} 次錯誤上限。`;
+            }
+        }
+
+        // Timer
+        function startTimer() {
+            stopTimer();
+            timerInterval = setInterval(() => {
+                if (!isPaused && !isGameOver) {
+                    timer++;
+                    timerDisplay.textContent = formatTime(timer);
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function togglePause() {
+            if (isGameOver) return;
+            isPaused = !isPaused;
+            if (isPaused) {
+                pauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+                boardEl.style.opacity = '0.1';
+            } else {
+                pauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                boardEl.style.opacity = '1';
+            }
+        }
+
+        function handleKeyboard(e) {
+            if (!selectedCell || isPaused || isGameOver) return;
+            const key = e.key;
+            if (key >= '1' && key <= '9') {
+                inputNumber(parseInt(key));
+            } else if (key === 'Backspace' || key === 'Delete' || key === '0') {
+                inputNumber(0);
+            } else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+                e.preventDefault();
+                let {r, c} = selectedCell;
+                if (key === 'ArrowUp' && r > 0) r--;
+                if (key === 'ArrowDown' && r < 8) r++;
+                if (key === 'ArrowLeft' && c > 0) c--;
+                if (key === 'ArrowRight' && c < 8) c++;
+                selectCell(r, c);
+            }
+        }
+
+        function startNewGame() {
+            mistakes = 0;
+            mistakesDisplay.textContent = `0/${MAX_MISTAKES}`;
+            hintsLeft = 3;
+            hintsBadge.textContent = hintsLeft;
+            timer = 0;
+            timerDisplay.textContent = '00:00';
+            isPaused = false;
+            isGameOver = false;
+            selectedCell = null;
+            undoStack = [];
+            
+            pauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+            boardEl.style.opacity = '1';
+
+            generatePuzzle();
+            createBoard();
+            startTimer();
+        }
+
+        // Initialize
+        initUI();
+        startNewGame();
+
+    </script>
+</body>
+</html>
+
