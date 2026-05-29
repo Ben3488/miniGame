@@ -1089,7 +1089,7 @@
 
             // --- SP Heroes ---
             { id: 'sp_zhao_yun', name: 'SP趙雲', hp: 4, faction: 'qun', exp: 'sp', skills: ['龍膽', '衝陣'], desc: '【龍膽】你可以【殺】當【閃】、【閃】當【殺】使用或打出。<br>【衝陣】當你發動【龍膽】使用或打出一張牌時，你可以獲得對方一張手牌。' },
-            { id: 'sp_guan_yu', name: 'SP關羽', hp: 4, faction: 'wei', exp: 'sp', skills: ['單騎'], desc: '【單騎】覺醒技，準備階段，若你的手牌數大於體力值且你沒有馬，你減少1點體力上限，然後獲得【馬術】和【怒斬】。' }
+            { id: 'sp_guan_yu', name: 'SP關羽', hp: 4, faction: 'wei', exp: 'sp', skills: ['武聖', '單騎'], desc: '【單騎】覺醒技，準備階段，若你的手牌數大於體力值且你沒有馬，你減少1點體力上限，然後獲得【馬術】和【怒斬】。' }
         ];
         const FACTION_MAP = {
             wei: { name: '魏', colors: ['#1e3a8a', '#93c5fd'], glow: '#60a5fa' },
@@ -1419,6 +1419,11 @@
                         hand: [], equips: { weapon: null, armor: null, defMount: null, offMount: null, treasure: null },
                         judges: [], isDead: false, flags: { usedSha: 0, skipPlay: false, usedZhiHeng: false, usedQingNang: false }
                     };
+                    if (hero.skills.includes('化身')) {
+                        playerObj.huashenSkills = [this.getRandomHuashenSkill(), this.getRandomHuashenSkill()];
+                        playerObj.activeHuashen = playerObj.huashenSkills[0];
+                        playerObj.hero = Object.assign({}, hero, { skills: [...hero.skills, playerObj.activeHuashen] });
+                    }
                     
                     let self = this;
                     Object.defineProperty(playerObj, 'hp', {
@@ -1499,6 +1504,54 @@
                             await this.drawCards(player, 1, '發動【連營】摸了');
                         }
                     }, 50);
+                }
+            }
+
+            getRandomHuashenSkill(excludeList = []) {
+                const HUASHEN_POOL = [
+                    '奸雄', '反饋', '剛烈', '突襲', '裸衣', '天妒', '遺計', '傾國', '洛神',
+                    '仁德', '武聖', '咆哮', '龍膽', '鐵騎', '集智', '奇才',
+                    '制衡', '奇襲', '克己', '英姿', '連營', '梟姬',
+                    '無雙', '閉月', '急救', '青囊', '亂擊', '耀武', '完殺'
+                ];
+                let pool = HUASHEN_POOL.filter(s => !excludeList.includes(s));
+                if (pool.length === 0) pool = HUASHEN_POOL;
+                return pool[Math.floor(Math.random() * pool.length)];
+            }
+
+            async triggerHuashen(p, phaseLabel) {
+                if (!p.huashenSkills || p.huashenSkills.length === 0) return;
+                
+                let use = false;
+                if (p.id === 0) {
+                    use = await this.askForSkill(p, '化身', `【化身】(${phaseLabel})：是否更換當前化身技能？(當前：${p.activeHuashen}，候選：${p.huashenSkills.join(', ')})`);
+                } else {
+                    use = Math.random() > 0.5;
+                }
+                
+                if (use) {
+                    let newSkill = p.activeHuashen;
+                    if (p.id === 0) {
+                        let otherSkills = p.huashenSkills.filter(s => s !== p.activeHuashen);
+                        if (otherSkills.length === 1) {
+                            newSkill = otherSkills[0];
+                        } else if (otherSkills.length > 1) {
+                            let opt = await this.askForSkill(p, '選擇化身', `確定=化身為【${otherSkills[0]}】，取消=選擇【${otherSkills[1]}】`);
+                            newSkill = opt ? otherSkills[0] : otherSkills[1];
+                        }
+                    } else {
+                        let otherSkills = p.huashenSkills.filter(s => s !== p.activeHuashen);
+                        newSkill = otherSkills[Math.floor(Math.random() * otherSkills.length)] || p.activeHuashen;
+                    }
+                    
+                    if (newSkill !== p.activeHuashen) {
+                        p.hero.skills = p.hero.skills.filter(s => s !== p.activeHuashen);
+                        p.activeHuashen = newSkill;
+                        p.hero.skills.push(p.activeHuashen);
+                        this.log(`【${p.hero.name}】發動【化身】，當前化身技能切換為：【${p.activeHuashen}】！`);
+                        UI.updateAll();
+                        await this.sleep(800);
+                    }
                 }
             }
 
@@ -1961,6 +2014,25 @@
                     return;
                 }
 
+                // Zuo Ci: 化身 (Turn Start)
+                if (p.hero.skills.includes('化身') && !p.isDead) {
+                    await this.triggerHuashen(p, '回合開始');
+                }
+
+                // Jie Zhang Fei: 替身
+                if (p.hero.skills.includes('替身') && !p.flags.usedTiShen && p.hp < p.maxHp && !p.isDead) {
+                    let use = await this.askForSkill(p, '替身', `是否發動限定技【替身】摸 ${p.maxHp - p.hp} 張牌並回復1點體力？`);
+                    if (use) {
+                        p.flags.usedTiShen = true;
+                        let lostHp = p.maxHp - p.hp;
+                        this.log(`【${p.hero.name}】發動限定技【替身】！`);
+                        await this.drawCards(p, lostHp, '發動【替身】');
+                        p.hp++;
+                        this.log(`【${p.hero.name}】回復了 1 點體力！`);
+                        UI.updateAll(); await this.sleep(1000);
+                    }
+                }
+
                 // --- Awakening Skills & Start-of-turn Skills ---
                 // 1. 鄧艾: 鑿險
                 if (p.hero.skills.includes('屯田') && !p.flags.zaoxianAwakened && (p.flags.tuntian || 0) >= 3) {
@@ -2015,14 +2087,14 @@
                     }
                 }
 
-                if (p.hero.id === 'sp_guan_yu' && !p.flags.awakened) {
+                if (p.hero.skills.includes('單騎') && !p.flags.awakened) {
                     if (p.hand.length > p.hp && !p.equips.defMount && !p.equips.offMount) {
                         p.flags.awakened = true;
                         p.maxHp--;
                         if (p.hp > p.maxHp) p.hp = p.maxHp;
                         p.hero.skills.push('馬術');
-                        p.hero.skills.push('武聖');
-                        this.log(`【SP關羽】發動【單騎】覺醒！失去1點體力上限，獲得【馬術】和【武聖】！`);
+                        p.hero.skills.push('怒斬');
+                        this.log(`【SP關羽】發動【單騎】覺醒！失去1點體力上限，獲得【馬術】和【怒斬】！`);
                         UI.updateAll(); await this.sleep(1000);
                     }
                 }
@@ -2275,6 +2347,11 @@
                 this.currentPhase = '棄牌';
                 UI.updateAll();
                 await this.triggerHook('onPhaseStart', { player: p, phase: 'discard' });
+
+                // Zuo Ci: 化身 (Turn End)
+                if (p.hero.skills.includes('化身') && !p.isDead) {
+                    await this.triggerHuashen(p, '回合結束');
+                }
                 let limit = p.hp;
                 if(p.hero.skills.includes('克己') && p.flags.usedSha === 0) limit = p.maxHp;
                 if(p.hero.skills.includes('血裔') && p.role === ROLE.LORD) {
@@ -2411,6 +2488,16 @@
             async resolveAttack(source, target, card) {
                 UI.showActiveCard(source, card);
                 UI.showSlashEffect(source, target);
+                // Chong Zhen active trigger
+                if (source.hero.skills.includes('衝陣') && card.name === '閃' && target.hand.length > 0) {
+                    let use = await this.askForSkill(source, '衝陣', `是否發動【衝陣】獲得【${target.hero.name}】的一張手牌？`);
+                    if (use) {
+                        let stolen = target.hand.splice(Math.floor(Math.random() * target.hand.length), 1)[0];
+                        source.hand.push(stolen);
+                        this.log(`【${source.hero.name}】發動【衝陣】獲得了【${target.hero.name}】的一張手牌！`);
+                        UI.updateAll(); await this.sleep(600);
+                    }
+                }
                 let isHit = false;
                 let females = ['zhen_ji', 'huang_yue_ying', 'da_qiao', 'sun_shang_xiang', 'diao_chan', 'jie_da_qiao'];
                 let srcIsFemale = females.includes(source.hero.id);
@@ -2609,6 +2696,15 @@
                             dodgePlayed = await this.askForCard(target, ['閃'], 1, `【${source.hero.name}】對你出殺，請打出 1 張閃！`, true);
                             if (dodgePlayed) {
                                 await this.onPlayDodge(target, source);
+                                if (target.hero.skills.includes('衝陣') && dodgePlayed[0].name === '殺' && source.hand.length > 0) {
+                                    let use = await this.askForSkill(target, '衝陣', `是否發動【衝陣】獲得【${source.hero.name}】的一張手牌？`);
+                                    if (use) {
+                                        let stolen = source.hand.splice(Math.floor(Math.random() * source.hand.length), 1)[0];
+                                        target.hand.push(stolen);
+                                        this.log(`【${target.hero.name}】發動【衝陣】獲得了【${source.hero.name}】的一張手牌！`);
+                                        UI.updateAll(); await this.sleep(600);
+                                    }
+                                }
                             }
                         }
                     }
@@ -2669,6 +2765,10 @@
                     }
 
                     let amount = 1 + (source.flags.luoYi ? 1 : 0) + (source.flags.drunk ? 1 : 0);
+                    if (source.hero.skills.includes('怒斬') && attackCard.color === COLOR.RED && attackCard.type === 'trick') {
+                        amount++;
+                        this.log(`【${source.hero.name}】發動【怒斬】，由錦囊牌轉化的【殺】傷害+1！`);
+                    }
                     if (source.flags.drunk) {
                         source.flags.drunk = false;
                         this.log(`【${source.hero.name}】的【酒】生效，傷害+1！`);
@@ -2723,6 +2823,12 @@
                 }
 
                 // 1. AI Hero Active Skills BEFORE playing cards
+                if (p.hero.skills.includes('亂武') && !p.flags.usedLuanWu) {
+                    p.flags.usedLuanWu = true;
+                    this.log(`【${p.hero.name}】發動限定技【亂武】！`);
+                    UI.updateAll(); await this.sleep(1200);
+                    await this.performLuanWu(p);
+                }
                 if (p.hero.skills.includes('苦肉') && p.hp > 1) {
                     p.hp--;
                     this.log(`【${p.hero.name}】發動【苦肉】流失1點體力！`);
@@ -2818,6 +2924,24 @@
                     }
                 }
                 
+                // Huang Tian Lord skill for Qun AI players
+                let lord = this.getLivingPlayers().find(o => o.role === ROLE.LORD);
+                if (lord && lord.hero.skills.includes('黃天') && p.hero.faction === 'qun' && p.id !== lord.id) {
+                    let htCardIdx = p.hand.findIndex(c => c.name === '閃電');
+                    if (htCardIdx === -1) {
+                        let shans = p.hand.filter(c => c.name === '閃');
+                        if (shans.length > 1) {
+                            htCardIdx = p.hand.findIndex(c => c.name === '閃');
+                        }
+                    }
+                    if (htCardIdx !== -1) {
+                        let card = p.hand.splice(htCardIdx, 1)[0];
+                        lord.hand.push(card);
+                        this.log(`【${p.hero.name}】對主公【${lord.hero.name}】發動主公技【黃天】並給予其一張【${card.name}】！`);
+                        UI.updateAll(); await this.sleep(800);
+                    }
+                }
+
                 // 2. Play cards from hand
                 for(let i=p.hand.length-1; i>=0; i--) {
                     if (p.isDead) break;
@@ -2908,7 +3032,10 @@
                 if(canSha) {
                     let idx = p.hand.findIndex(c => c.name === '殺' || (p.hero.skills.includes('龍膽') && c.name === '閃') || (p.hero.skills.includes('武聖') && c.color === COLOR.RED) || (p.hero.skills.includes('武神') && c.suit === SUIT.HEART));
                     if(idx !== -1) {
-                        enemies = enemies.filter(o => this.getDistance(p.id, o.id) <= this.getAttackRange(p));
+                        let card = p.hand[idx];
+                        let noRangeLimit = p.hero.skills.includes('怒斬') && card.color === COLOR.RED && card.type === 'equip';
+                        let range = noRangeLimit ? 999 : this.getAttackRange(p);
+                        enemies = enemies.filter(o => this.getDistance(p.id, o.id) <= range);
                         if(enemies.length > 0) {
                             let target = enemies[0];
                             let card = p.hand.splice(idx,1)[0];
@@ -3185,6 +3312,10 @@
                     if(skillName === '好施') return true;
                     if(skillName === '歸心') return true;
                     if(skillName === '朱雀羽扇') return true;
+                    if(skillName === '替身') return true;
+                    if(skillName === '衝陣') return true;
+                    if(skillName === '化身') return true;
+                    if(skillName === '選擇化身') return true;
                     return false;
                 }
             }
@@ -3362,6 +3493,12 @@
                 if(target.hero.skills.includes('新生')) {
                     for (let d = 0; d < amount; d++) {
                         await this.drawCards(target, 1, '發動【新生】摸了');
+                        if (target.huashenSkills) {
+                            let newSkill = this.getRandomHuashenSkill(target.huashenSkills);
+                            target.huashenSkills.push(newSkill);
+                            this.log(`【${target.hero.name}】發動【新生】獲得了新的化身技能：【${newSkill}】！`);
+                            UI.updateAll();
+                        }
                     }
                 }
                 
@@ -3509,6 +3646,12 @@
                 }
                 let activeSkills = [];
                 if(p.hero.skills.includes('仁德')) activeSkills.push('仁德');
+                let lord = this.getLivingPlayers().find(o => o.role === ROLE.LORD);
+                if (lord && lord.hero.skills.includes('黃天') && p.hero.faction === 'qun' && p.id !== lord.id) {
+                    if (p.hand.some(c => c.name === '閃' || c.name === '閃電')) {
+                        activeSkills.push('黃天');
+                    }
+                }
                 if(p.hero.skills.includes('制衡') && !p.flags.usedZhiHeng) activeSkills.push('制衡');
                 if(p.hero.skills.includes('苦肉')) activeSkills.push('苦肉');
                 if(p.hero.skills.includes('青囊') && !p.flags.usedQingNang) activeSkills.push('青囊');
@@ -3519,6 +3662,7 @@
                 if(p.hero.skills.includes('國色')) activeSkills.push('國色');
                 if(p.hero.skills.includes('亂擊')) activeSkills.push('亂擊');
                 if(p.hero.skills.includes('驅虎') && !p.flags.usedQuHu) activeSkills.push('驅虎');
+                if(p.hero.skills.includes('亂武') && !p.flags.usedLuanWu) activeSkills.push('亂武');
                 if(p.hero.skills.includes('締盟') && !p.flags.usedDiMeng) activeSkills.push('締盟');
                 if(p.hero.skills.includes('神憤') && (p.flags.wrath || 0) >= 6) activeSkills.push('神憤');
                 if(p.hero.skills.includes('義絕') && !p.flags.usedYiJue) activeSkills.push('義絕');
@@ -3584,6 +3728,23 @@
                         if(target.hp < target.maxHp) target.hp++;
                         this.log(`【青囊】令【${target.hero.name}】回復1點體力`);
                         UI.updateAll(); await this.sleep(800);
+                    }
+                    if(this.state !== 'GAME_OVER') { this.state = 'PLAYING'; UI.updateAll(); }
+                }
+                else if(skill === '黃天') {
+                    let cards = await this.askForCard(p, ['閃', '閃電'], 1, '請選擇要給出的一張【閃】或【閃電】發動【黃天】', true);
+                    if (cards && cards.length === 1) {
+                        let card = cards[0];
+                        let discardIdx = this.discardPile.findIndex(c => c.id === card.id);
+                        if(discardIdx !== -1) this.discardPile.splice(discardIdx, 1);
+                        
+                        let lord = this.getLivingPlayers().find(o => o.role === ROLE.LORD);
+                        if (lord) {
+                            lord.hand.push(card);
+                            this.log(`【${p.hero.name}】發動主公技【黃天】給予主公【${lord.hero.name}】一張【${card.name}】！`);
+                            UI.updateAll();
+                            await this.sleep(800);
+                        }
                     }
                     if(this.state !== 'GAME_OVER') { this.state = 'PLAYING'; UI.updateAll(); }
                 }
@@ -3888,6 +4049,17 @@
                     this.log('請選擇一名體力值大於你的角色進行拼點');
                     UI.updateAll();
                 }
+                else if(skill === '亂武') {
+                    p.flags.usedLuanWu = true;
+                    this.state = 'WAITING';
+                    UI.updateAll();
+                    await this.performLuanWu(p);
+                    if(this.state !== 'GAME_OVER') {
+                        this.state = 'PLAYING';
+                        this.log('請出牌或結束回合');
+                        UI.updateAll();
+                    }
+                }
                 else if(skill === '締盟') {
                     this.state = 'TARGETING';
                     this.pendingAction = {
@@ -4001,6 +4173,7 @@
                         if(isSha) {
                             let attackRange = this.getAttackRange(p);
                             if(p.hero.skills.includes('武神') && this.pendingAction.card.suit === SUIT.HEART) attackRange = 999;
+                            if(p.hero.skills.includes('怒斬') && this.pendingAction.card.color === COLOR.RED && this.pendingAction.card.type === 'equip') attackRange = 999;
                             if(dist > attackRange) { this.log("距離過遠！"); return; }
                         }
                         if(cardName === '樂不思蜀' && this.players[targetIdx].judges.some(j => j.name === '樂不思蜀')) { this.log("已存在此判定牌！"); return; }
@@ -4262,6 +4435,15 @@
                                     await this.dealDamage(source, target, 1, card);
                                 } else {
                                     await this.onPlayDodge(target, source);
+                                    if (target.hero.skills.includes('衝陣') && ok[0].name === '殺' && source.hand.length > 0) {
+                                        let use = await this.askForSkill(target, '衝陣', `是否發動【衝陣】獲得【${source.hero.name}】的一張手牌？`);
+                                        if (use) {
+                                            let stolen = source.hand.splice(Math.floor(Math.random() * source.hand.length), 1)[0];
+                                            target.hand.push(stolen);
+                                            this.log(`【${target.hero.name}】發動【衝陣】獲得了【${source.hero.name}】的一張手牌！`);
+                                            UI.updateAll(); await this.sleep(600);
+                                        }
+                                    }
                                 }
                             }
                         } else {
@@ -4454,13 +4636,25 @@
                 while(!attacker.isDead && !defender.isDead) {
                     let need = defender.hero.skills.includes('無雙') ? 2 : 1;
                     let ok = true;
+                    let playedCards = [];
                     for(let i=0; i<need; i++) {
-                        if(!await this.askForCard(attacker, ['殺'], 1, `【決鬥】請打出殺`, true)) { ok = false; break; }
+                        let cardRes = await this.askForCard(attacker, ['殺'], 1, `【決鬥】請打出殺`, true);
+                        if(!cardRes) { ok = false; break; }
+                        playedCards.push(cardRes[0]);
                     }
                     if(!ok) {
                         let amount = 1 + (defender.flags.luoYi ? 1 : 0);
                         await this.dealDamage(defender, attacker, amount, card);
                         return;
+                    }
+                    if (attacker.hero.skills.includes('衝陣') && playedCards.some(c => c.name === '閃') && defender.hand.length > 0) {
+                        let use = await this.askForSkill(attacker, '衝陣', `是否發動【衝陣】獲得【${defender.hero.name}】的一張手牌？`);
+                        if (use) {
+                            let stolen = defender.hand.splice(Math.floor(Math.random() * defender.hand.length), 1)[0];
+                            attacker.hand.push(stolen);
+                            this.log(`【${attacker.hero.name}】發動【衝陣】獲得了【${defender.hero.name}】的一張手牌！`);
+                            UI.updateAll(); await this.sleep(600);
+                        }
                     }
                     [attacker, defender] = [defender, attacker];
                 }
@@ -4992,7 +5186,7 @@
                 document.getElementById('eqTreasure0').innerText = '寶物: ' + (eq.treasure ? eq.treasure.name : '無');
 
                 document.getElementById('btnEndTurn').style.display = (Engine.state === 'PLAYING' && Engine.currentPlayerIdx === 0) ? 'inline-block' : 'none';
-                let activeSkillNames = ['仁德', '制衡', '苦肉', '青囊', '結姻', '離間', '反間', '奇襲', '國色', '亂擊', '驅虎', '締盟', '神憤', '義絕'];
+                let activeSkillNames = ['仁德', '制衡', '苦肉', '青囊', '結姻', '離間', '反間', '奇襲', '國色', '亂擊', '驅虎', '締盟', '神憤', '義絕', '亂武'];
                 let hasActiveSkills = p0 && (p0.hero.skills.some(s => activeSkillNames.includes(s)) || (p0.equips.weapon && p0.equips.weapon.name === '丈八蛇矛'));
                 document.getElementById('btnSkill').style.display = (Engine.state === 'PLAYING' && Engine.currentPlayerIdx === 0 && hasActiveSkills) ? 'inline-block' : 'none';
                 

@@ -1240,7 +1240,7 @@
 
             // --- SP Heroes ---
             { id: 'sp_zhao_yun', name: 'SP趙雲', hp: 4, faction: 'qun', exp: 'sp', skills: ['龍膽', '衝陣'], desc: '【龍膽】你可以【殺】當【閃】、【閃】當【殺】使用或打出。<br>【衝陣】當你發動【龍膽】使用或打出一張牌時，你可以獲得對方一張手牌。' },
-            { id: 'sp_guan_yu', name: 'SP關羽', hp: 4, faction: 'wei', exp: 'sp', skills: ['單騎'], desc: '【單騎】覺醒技，準備階段，若你的手牌數大於體力值且你沒有馬，你減少1點體力上限，然後獲得【馬術】和【怒斬】。' }
+            { id: 'sp_guan_yu', name: 'SP關羽', hp: 4, faction: 'wei', exp: 'sp', skills: ['武聖', '單騎'], desc: '【單騎】覺醒技，準備階段，若你的手牌數大於體力值且你沒有馬，你減少1點體力上限，然後獲得【馬術】和【怒斬】。' }
         ];
         const FACTION_MAP = {
             wei: { name: '魏', colors: ['#1e3a8a', '#93c5fd'], glow: '#60a5fa' },
@@ -2220,14 +2220,14 @@
                     }
                 }
 
-                if (p.hero.id === 'sp_guan_yu' && !p.flags.awakened) {
+                if (p.hero.skills.includes('單騎') && !p.flags.awakened) {
                     if (p.hand.length > p.hp && !p.equips.defMount && !p.equips.offMount) {
                         p.flags.awakened = true;
                         p.maxHp--;
                         if (p.hp > p.maxHp) p.hp = p.maxHp;
                         p.hero.skills.push('馬術');
-                        p.hero.skills.push('武聖');
-                        this.log(`【SP關羽】發動【單騎】覺醒！失去1點體力上限，獲得【馬術】和【武聖】！`);
+                        p.hero.skills.push('怒斬');
+                        this.log(`【SP關羽】發動【單騎】覺醒！失去1點體力上限，獲得【馬術】和【怒斬】！`);
                         UI.updateAll(); await this.sleep(1000);
                     }
                 }
@@ -2898,6 +2898,10 @@
                     }
 
                     let amount = 1 + (source.flags.luoYi ? 1 : 0) + (source.flags.drunk ? 1 : 0);
+                    if (source.hero.skills.includes('怒斬') && attackCard.color === COLOR.RED && attackCard.type === 'trick') {
+                        amount++;
+                        this.log(`【${source.hero.name}】發動【怒斬】，由錦囊牌轉化的【殺】傷害+1！`);
+                    }
                     if (source.flags.drunk) {
                         source.flags.drunk = false;
                         this.log(`【${source.hero.name}】的【酒】生效，傷害+1！`);
@@ -2952,6 +2956,12 @@
                 }
 
                 // 1. AI Hero Active Skills BEFORE playing cards
+                if (p.hero.skills.includes('亂武') && !p.flags.usedLuanWu) {
+                    p.flags.usedLuanWu = true;
+                    this.log(`【${p.hero.name}】發動限定技【亂武】！`);
+                    UI.updateAll(); await this.sleep(1200);
+                    await this.performLuanWu(p);
+                }
                 if (p.hero.skills.includes('苦肉') && p.hp > 1) {
                     p.hp--;
                     this.log(`【${p.hero.name}】發動【苦肉】流失1點體力！`);
@@ -3173,7 +3183,10 @@
                 if(canSha) {
                     let idx = p.hand.findIndex(c => c.name === '殺' || (p.hero.skills.includes('龍膽') && c.name === '閃') || (p.hero.skills.includes('武聖') && c.color === COLOR.RED) || (p.hero.skills.includes('武神') && c.suit === SUIT.HEART));
                     if(idx !== -1) {
-                        enemies = enemies.filter(o => this.getDistance(p.id, o.id) <= this.getAttackRange(p));
+                        let card = p.hand[idx];
+                        let noRangeLimit = p.hero.skills.includes('怒斬') && card.color === COLOR.RED && card.type === 'equip';
+                        let range = noRangeLimit ? 999 : this.getAttackRange(p);
+                        enemies = enemies.filter(o => this.getDistance(p.id, o.id) <= range);
                         if(enemies.length > 0) {
                             let target = enemies[0];
                             let card = p.hand.splice(idx,1)[0];
@@ -3809,6 +3822,7 @@
                 if(p.hero.skills.includes('國色')) activeSkills.push('國色');
                 if(p.hero.skills.includes('亂擊')) activeSkills.push('亂擊');
                 if(p.hero.skills.includes('驅虎') && !p.flags.usedQuHu) activeSkills.push('驅虎');
+                if(p.hero.skills.includes('亂武') && !p.flags.usedLuanWu) activeSkills.push('亂武');
                 if(p.hero.skills.includes('締盟') && !p.flags.usedDiMeng) activeSkills.push('締盟');
                 if(p.hero.skills.includes('神憤') && (p.flags.wrath || 0) >= 6) activeSkills.push('神憤');
                 if(p.hero.skills.includes('義絕') && !p.flags.usedYiJue) activeSkills.push('義絕');
@@ -4195,6 +4209,17 @@
                     this.log('請選擇一名體力值大於你的角色進行拼點');
                     UI.updateAll();
                 }
+                else if(skill === '亂武') {
+                    p.flags.usedLuanWu = true;
+                    this.state = 'WAITING';
+                    UI.updateAll();
+                    await this.performLuanWu(p);
+                    if(this.state !== 'GAME_OVER') {
+                        this.state = 'PLAYING';
+                        this.log('請出牌或結束回合');
+                        UI.updateAll();
+                    }
+                }
                 else if(skill === '締盟') {
                     this.state = 'TARGETING';
                     this.pendingAction = {
@@ -4308,6 +4333,7 @@
                         if(isSha) {
                             let attackRange = this.getAttackRange(p);
                             if(p.hero.skills.includes('武神') && this.pendingAction.card.suit === SUIT.HEART) attackRange = 999;
+                            if(p.hero.skills.includes('怒斬') && this.pendingAction.card.color === COLOR.RED && this.pendingAction.card.type === 'equip') attackRange = 999;
                             if(dist > attackRange) { this.log("距離過遠！"); return; }
                         }
                         if(cardName === '樂不思蜀' && this.players[targetIdx].judges.some(j => j.name === '樂不思蜀')) { this.log("已存在此判定牌！"); return; }
@@ -5757,7 +5783,7 @@
                 updateEquipSlot('eqTreasure0', '寶物', 'treasure');
 
                 document.getElementById('btnEndTurn').style.display = (Engine.state === 'PLAYING' && Engine.currentPlayerIdx === 0) ? 'inline-block' : 'none';
-                let activeSkillNames = ['仁德', '制衡', '苦肉', '青囊', '結姻', '離間', '反間', '奇襲', '國色', '亂擊', '驅虎', '締盟', '神憤', '義絕'];
+                let activeSkillNames = ['仁德', '制衡', '苦肉', '青囊', '結姻', '離間', '反間', '奇襲', '國色', '亂擊', '驅虎', '締盟', '神憤', '義絕', '亂武'];
                 let hasActiveSkills = p0 && (p0.hero.skills.some(s => activeSkillNames.includes(s)) || (p0.equips.weapon && p0.equips.weapon.name === '丈八蛇矛'));
                 document.getElementById('btnSkill').style.display = (Engine.state === 'PLAYING' && Engine.currentPlayerIdx === 0 && hasActiveSkills) ? 'inline-block' : 'none';
                 
