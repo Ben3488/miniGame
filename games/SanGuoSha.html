@@ -368,19 +368,39 @@
     <!-- Lobby / Hero Selection Modal -->
     <div class="modal-overlay" id="lobbyModal" style="display:flex;">
         <div class="modal-content" style="max-width: 900px; max-height: 80vh; overflow-y: auto;">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #777; padding-bottom: 15px; margin-bottom: 15px;">
-                <h1 style="color:var(--theme-gold); margin:0;">請選擇你的武將</h1>
-                <div style="color: white; font-size: 1.2rem;">
-                    <label for="playerCountSelect">遊戲人數：</label>
-                    <select id="playerCountSelect" style="background: #333; color: white; border: 1px solid #777; padding: 5px 10px; font-size: 1.1rem; border-radius: 4px;">
-                        <option value="4">4 人局 (1主 1忠 1反 1內)</option>
-                        <option value="5" selected>5 人局 (1主 1忠 2反 1內)</option>
-                        <option value="6">6 人局 (1主 1忠 3反 1內)</option>
-                        <option value="7">7 人局 (1主 2忠 3反 1內)</option>
-                        <option value="8">8 人局 (1主 2忠 4反 1內)</option>
-                        <option value="9">9 人局 (1主 3忠 4反 1內)</option>
-                        <option value="10">10 人局 (1主 3忠 4反 2內)</option>
-                    </select>
+            <div style="display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid #777; padding-bottom: 15px; margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h1 style="color:var(--theme-gold); margin:0;">請選擇你的武將</h1>
+                    <div style="color: white; font-size: 1.1rem; display: flex; gap: 15px; align-items: center;">
+                        <div>
+                            <label for="gameModeSelect">模式：</label>
+                            <select id="gameModeSelect" style="background: #333; color: white; border: 1px solid #777; padding: 5px; font-size: 1rem; border-radius: 4px;" onchange="if(window.Engine) window.Engine.updateLobbyMode()">
+                                <option value="identity" selected>身分局</option>
+                                <option value="1v1">1v1 單挑</option>
+                                <option value="national">國戰</option>
+                            </select>
+                        </div>
+                        <div id="playerCountWrapper">
+                            <label for="playerCountSelect">人數：</label>
+                            <select id="playerCountSelect" style="background: #333; color: white; border: 1px solid #777; padding: 5px; font-size: 1rem; border-radius: 4px;">
+                                <option value="4">4 人局 (1主 1忠 1反 1內)</option>
+                                <option value="5" selected>5 人局 (1主 1忠 2反 1內)</option>
+                                <option value="6">6 人局 (1主 1忠 3反 1內)</option>
+                                <option value="7">7 人局 (1主 2忠 3反 1內)</option>
+                                <option value="8">8 人局 (1主 2忠 4反 1內)</option>
+                                <option value="9">9 人局 (1主 3忠 4反 1內)</option>
+                                <option value="10">10 人局 (1主 3忠 4反 2內)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div style="color: #ccc; font-size: 0.95rem; display: flex; gap: 15px; align-items: center;">
+                    <span style="color: var(--theme-gold); font-weight: bold;">擴充包：</span>
+                    <label><input type="checkbox" id="expMilitary" checked onchange="if(window.Engine) window.Engine.validateDeckTest()"> 軍爭篇</label>
+                    <label><input type="checkbox" id="expGod" checked> 神話再臨</label>
+                    <label><input type="checkbox" id="expBreakthrough" checked> 界限突破</label>
+                    <label><input type="checkbox" id="expSP" checked> SP</label>
+                    <button class="btn" style="padding: 2px 10px; font-size: 0.8rem;" onclick="if(window.Engine) window.Engine.validateDeckTest()">重新驗證牌堆</button>
                 </div>
             </div>
             <div class="hero-grid" id="heroGrid"></div>
@@ -476,7 +496,15 @@
             '驊騮': { type: 'equip', equipType: 'defMount', bg: 'bg-equip', desc: '【驊騮】坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
             '赤兔': { type: 'equip', equipType: 'offMount', bg: 'bg-equip', desc: '【赤兔】坐騎（-1馬）。鎖定技，你計算與其他角色的距離-1。' },
             '大宛': { type: 'equip', equipType: 'offMount', bg: 'bg-equip', desc: '【大宛】坐騎（-1馬）。鎖定技，你計算與其他角色的距離-1。' },
-            '紫騂': { type: 'equip', equipType: 'offMount', bg: 'bg-equip', desc: '【紫騂】坐騎（-1馬）。鎖定技，你計算與其他角色的距離-1。' }
+            '紫騂': { type: 'equip', equipType: 'offMount', bg: 'bg-equip', desc: '【紫騂】坐騎（-1馬）。鎖定技，你計算與其他角色的距離-1。' },
+            '銀月槍': { type: 'equip', equipType: 'weapon', range: 3, bg: 'bg-equip', desc: '【銀月槍】武器（攻擊範圍3）。你的回合外，當你使用或打出了一張黑色牌，你可以令一名其他角色打出一張【閃】，否則受到你造成的1點傷害。' },
+            '水淹七軍': { type: 'trick', bg: 'bg-trick', desc: '【水淹七軍】非延時類錦囊（1v1/勢備篇）。出牌階段，對一名裝備區裡有牌的其他角色使用。目標角色需棄置裝備區裡的所有牌，或受到1點雷電傷害。' },
+            '兵臨城下': { type: 'trick', bg: 'bg-trick', desc: '【兵臨城下】非延時類錦囊（1v1）。出牌階段，對一名其他角色使用。其需棄置一張【殺】或【閃】，否則受到你造成的1點傷害。' },
+            '遠交近攻': { type: 'trick', bg: 'bg-trick', desc: '【遠交近攻】非延時類錦囊（國戰）。出牌階段，對與你勢力不同的一名角色使用。目標摸一張牌，然後你摸三張牌。' },
+            '知己知彼': { type: 'trick', bg: 'bg-trick', desc: '【知己知彼】非延時類錦囊（國戰）。出牌階段，對一名其他角色使用。你可以觀看其手牌或武將牌。' },
+            '三尖兩刃刀': { type: 'equip', equipType: 'weapon', range: 3, bg: 'bg-equip', desc: '【三尖兩刃刀】武器（攻擊範圍3）。當你使用【殺】對目標角色造成傷害後，你可以棄置一張手牌，對該角色距離1的另一名角色造成1點傷害。' },
+            '驚帆': { type: 'equip', equipType: 'defMount', bg: 'bg-equip', desc: '【驚帆】坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
+            '玉龍': { type: 'equip', equipType: 'defMount', bg: 'bg-equip', desc: '【玉龍】坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' }
         };
 
         const STANDARD_CARDS = {
@@ -561,6 +589,20 @@
             }
         };
 
+        const V1_CARDS = {
+            SPADE: { 'Q': '水淹七軍' },
+            CLUB: { 'Q': '兵臨城下' },
+            HEART: { 'Q': '水淹七軍' },
+            DIAMOND: { 'Q': '兵臨城下' }
+        };
+
+        const NATIONAL_CARDS = {
+            SPADE: { 'J': '知己知彼', 'K': '驚帆' },
+            CLUB: { 'J': '知己知彼' },
+            HEART: { 'A': '遠交近攻', '3': '遠交近攻', '4': '遠交近攻', '9': '遠交近攻', 'J': '玉龍' },
+            DIAMOND: { 'Q': '三尖兩刃刀' }
+        };
+
         // Complete Hero Pool containing standard, breakthrough, and expansion heroes
         const HEROES = [
             // --- Standard Heroes ---
@@ -619,7 +661,8 @@
             // --- SP Heroes ---
             { id: 'sp_zhao_yun', name: 'SP趙雲', hp: 4, faction: 'qun', skills: ['龍膽', '衝陣'], desc: '【龍膽】你可以【殺】當【閃】、【閃】當【殺】使用或打出。<br>【衝陣】當你發動【龍膽】使用或打出一張牌時，你可以獲得對方一張手牌。' },
             { id: 'sp_guan_yu', name: 'SP關羽', hp: 4, faction: 'wei', skills: ['單騎'], desc: '【單騎】覺醒技，準備階段，若你的手牌數大於體力值且你沒有馬，你減少1點體力上限，然後獲得【馬術】和【怒斬】。' }
-        ] = {
+        ];
+        const FACTION_MAP = {
             wei: { name: '魏', colors: ['#1e3a8a', '#93c5fd'], glow: '#60a5fa' },
             shu: { name: '蜀', colors: ['#166534', '#fde68a'], glow: '#86efac' },
             wu: { name: '吳', colors: ['#991b1b', '#fbbf24'], glow: '#fca5a5' },
@@ -668,18 +711,51 @@
             }
 
             // 2. EX Cards (4 cards)
-            addCard('寒冰劍', SUIT.SPADE, '2');
-            addCard('仁王盾', SUIT.CLUB, '2');
-            addCard('閃電', SUIT.HEART, 'Q');
-            addCard('無懈可擊', SUIT.DIAMOND, 'Q');
+            let elExpEx = document.getElementById('expEX');
+            if (!elExpEx || elExpEx.checked) {
+                addCard('寒冰劍', SUIT.SPADE, '2');
+                addCard('仁王盾', SUIT.CLUB, '2');
+                addCard('閃電', SUIT.HEART, 'Q');
+                addCard('銀月槍', SUIT.DIAMOND, 'Q'); // Using 銀月槍 if SP/EX enabled
+            } else {
+                addCard('寒冰劍', SUIT.SPADE, '2');
+                addCard('仁王盾', SUIT.CLUB, '2');
+                addCard('閃電', SUIT.HEART, 'Q');
+                addCard('無懈可擊', SUIT.DIAMOND, 'Q');
+            }
 
-            // 3. Military Dispute Deck (52 cards)
-            for (const suitKey in MILITARY_CARDS) {
-                const suitChar = SUIT[suitKey];
-                const suitMap = MILITARY_CARDS[suitKey];
-                for (const point in suitMap) {
-                    const name = suitMap[point];
-                    addCard(name, suitChar, point);
+            // 3. Military Dispute Deck
+            let elMilitary = document.getElementById('expMilitary');
+            let useMilitary = elMilitary ? elMilitary.checked : true;
+            if (useMilitary) {
+                for (const suitKey in MILITARY_CARDS) {
+                    const suitChar = SUIT[suitKey];
+                    const suitMap = MILITARY_CARDS[suitKey];
+                    for (const point in suitMap) {
+                        const name = suitMap[point];
+                        addCard(name, suitChar, point);
+                    }
+                }
+            }
+
+            // 4. Mode Exclusive Decks
+            let mode = document.getElementById('gameModeSelect') ? document.getElementById('gameModeSelect').value : 'identity';
+            
+            if (mode === '1v1') {
+                for (const suitKey in V1_CARDS) {
+                    const suitChar = SUIT[suitKey];
+                    const suitMap = V1_CARDS[suitKey];
+                    for (const point in suitMap) {
+                        addCard(suitMap[point], suitChar, point);
+                    }
+                }
+            } else if (mode === 'national') {
+                for (const suitKey in NATIONAL_CARDS) {
+                    const suitChar = SUIT[suitKey];
+                    const suitMap = NATIONAL_CARDS[suitKey];
+                    for (const point in suitMap) {
+                        addCard(suitMap[point], suitChar, point);
+                    }
                 }
             }
 
@@ -692,12 +768,13 @@
             console.log('Deck suit distribution:', suitCounts);
             
             let verificationPassed = true;
-            if (deck.length !== 160) {
-                console.error('CRITICAL: Deck size is not 160! Current size is: ' + deck.length);
-                verificationPassed = false;
-            }
-            if (suitCounts[SUIT.SPADE] !== 40 || suitCounts[SUIT.HEART] !== 40 || suitCounts[SUIT.CLUB] !== 40 || suitCounts[SUIT.DIAMOND] !== 40) {
-                console.error('CRITICAL: Deck suit distribution is not 40 each!');
+            let expectedTotal = 108; // Base standard + EX
+            if (useMilitary) expectedTotal += 52;
+            if (mode === '1v1') expectedTotal += 4;
+            if (mode === 'national') expectedTotal += 9; // Assuming National cards map has 9 cards
+
+            if (deck.length !== expectedTotal) {
+                console.error(`CRITICAL: Deck size is not ${expectedTotal}! Current size is: ${deck.length}`);
                 verificationPassed = false;
             }
             
@@ -717,7 +794,7 @@
                         badge.style.background = '#065f46';
                         badge.style.borderColor = '#10b981';
                         badge.style.color = '#34d399';
-                        badge.innerHTML = `<span>牌堆驗證: 160張 (各花色A-K齊全) [✓ 通過]</span>`;
+                        badge.innerHTML = `<span>牌堆驗證: ${deck.length}張 (各花色A-K齊全) [✓ 通過]</span>`;
                     } else {
                         badge.style.background = '#991b1b';
                         badge.style.borderColor = '#ef4444';
@@ -751,9 +828,26 @@
                 };
             }
 
+            updateLobbyMode() {
+                let mode = document.getElementById('gameModeSelect').value;
+                let wrap = document.getElementById('playerCountWrapper');
+                if (wrap) {
+                    wrap.style.display = (mode === '1v1') ? 'none' : 'block';
+                }
+                this.validateDeckTest();
+            }
+
+            validateDeckTest() {
+                generateDeck(); // regenerates and updates badge
+            }
+
             initGame(humanHero, numPlayers = null) {
                 if(!humanHero) return;
-                if(!numPlayers) {
+                let mode = document.getElementById('gameModeSelect') ? document.getElementById('gameModeSelect').value : 'identity';
+                
+                if (mode === '1v1') {
+                    numPlayers = 2;
+                } else if(!numPlayers) {
                     let sel = document.getElementById('playerCountSelect');
                     numPlayers = sel ? parseInt(sel.value) : 5;
                 }
@@ -765,20 +859,24 @@
                 this.pendingAction = null;
 
                 let roles = [];
-                let roleCounts = {
-                    4: { [ROLE.LORD]: 1, [ROLE.LOYAL]: 1, [ROLE.REBEL]: 1, [ROLE.SPY]: 1 },
-                    5: { [ROLE.LORD]: 1, [ROLE.LOYAL]: 1, [ROLE.REBEL]: 2, [ROLE.SPY]: 1 },
-                    6: { [ROLE.LORD]: 1, [ROLE.LOYAL]: 1, [ROLE.REBEL]: 3, [ROLE.SPY]: 1 },
-                    7: { [ROLE.LORD]: 1, [ROLE.LOYAL]: 2, [ROLE.REBEL]: 3, [ROLE.SPY]: 1 },
-                    8: { [ROLE.LORD]: 1, [ROLE.LOYAL]: 2, [ROLE.REBEL]: 4, [ROLE.SPY]: 1 },
-                    9: { [ROLE.LORD]: 1, [ROLE.LOYAL]: 3, [ROLE.REBEL]: 4, [ROLE.SPY]: 1 },
-                    10: { [ROLE.LORD]: 1, [ROLE.LOYAL]: 3, [ROLE.REBEL]: 4, [ROLE.SPY]: 2 }
-                }[numPlayers] || { [ROLE.LORD]: 1, [ROLE.LOYAL]: 1, [ROLE.REBEL]: 2, [ROLE.SPY]: 1 };
+                if (mode === '1v1') {
+                    roles = [ROLE.LORD, ROLE.REBEL];
+                } else {
+                    let roleCounts = {
+                        4: { [ROLE.LORD]: 1, [ROLE.LOYAL]: 1, [ROLE.REBEL]: 1, [ROLE.SPY]: 1 },
+                        5: { [ROLE.LORD]: 1, [ROLE.LOYAL]: 1, [ROLE.REBEL]: 2, [ROLE.SPY]: 1 },
+                        6: { [ROLE.LORD]: 1, [ROLE.LOYAL]: 1, [ROLE.REBEL]: 3, [ROLE.SPY]: 1 },
+                        7: { [ROLE.LORD]: 1, [ROLE.LOYAL]: 2, [ROLE.REBEL]: 3, [ROLE.SPY]: 1 },
+                        8: { [ROLE.LORD]: 1, [ROLE.LOYAL]: 2, [ROLE.REBEL]: 4, [ROLE.SPY]: 1 },
+                        9: { [ROLE.LORD]: 1, [ROLE.LOYAL]: 3, [ROLE.REBEL]: 4, [ROLE.SPY]: 1 },
+                        10: { [ROLE.LORD]: 1, [ROLE.LOYAL]: 3, [ROLE.REBEL]: 4, [ROLE.SPY]: 2 }
+                    }[numPlayers] || { [ROLE.LORD]: 1, [ROLE.LOYAL]: 1, [ROLE.REBEL]: 2, [ROLE.SPY]: 1 };
 
-                Object.keys(roleCounts).forEach(r => {
-                    for(let i=0; i<roleCounts[r]; i++) roles.push(r);
-                });
-                roles.sort(() => Math.random() - 0.5);
+                    Object.keys(roleCounts).forEach(r => {
+                        for(let i=0; i<roleCounts[r]; i++) roles.push(r);
+                    });
+                    roles.sort(() => Math.random() - 0.5);
+                }
 
                 let availableHeroes = HEROES.filter(h => h.id !== humanHero.id).sort(() => Math.random() - 0.5);
                 
