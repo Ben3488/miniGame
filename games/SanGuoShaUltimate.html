@@ -41,16 +41,27 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
         }
         .back-btn { 
-            color: #d6d3d1; 
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--theme-gold); 
             text-decoration: none; 
             font-size: 1rem; 
-            font-weight: 700;
-            transition: color 0.2s;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
-        .back-btn:hover { color: var(--theme-gold); }
+        .back-btn:hover { 
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.1));
+            border-color: var(--theme-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            color: #fff;
+        }
         .game-title { 
             background: linear-gradient(to right, #ffe17d, #f59e0b);
             -webkit-background-clip: text;
@@ -168,69 +179,73 @@
 
         /* Cards */
         .card {
-            width: 100px; 
-            height: 140px; 
-            background: #e5e7eb; border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 2px solid #4b5563;
+            width: 112px; 
+            height: 156px; 
+            background: #e5e7eb; border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6); border: 2px solid #3f3f46;
             position: relative; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             color: black; flex-shrink: 0;
             background-image: url('../assets/SanGuoSha/backgrounds/card_back.png');
             background-size: cover;
         }
-        .card.face-up { background-image: none; background: linear-gradient(to bottom, #f9fafb 0%, #f3f4f6 100%); }
+        .card.face-up { background-image: none; background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); }
         .card:hover:not(.disabled) { 
-            transform: translateY(-16px) scale(1.05); 
-            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            transform: translateY(-16px) scale(1.08); 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.7);
             border-color: var(--theme-gold);
+            z-index: 50;
         }
         .card.selected { 
-            transform: translateY(-24px) scale(1.05); 
-            box-shadow: var(--glow-gold), 0 10px 25px rgba(0,0,0,0.6); 
+            transform: translateY(-24px) scale(1.08); 
+            box-shadow: var(--glow-gold), 0 10px 25px rgba(245,158,11,0.6); 
             border-color: var(--theme-gold); 
+            z-index: 60;
         }
         .card.disabled { filter: grayscale(100%); pointer-events: none; opacity: 0.45; }
         
         .card-illustration {
             position: absolute;
-            top: 6px;
-            left: 6px;
-            right: 6px;
+            top: 4px;
+            left: 4px;
+            right: 4px;
             bottom: 24px;
             background-size: cover;
             background-position: center;
-            border-radius: 5px;
-            border: 1px solid rgba(120, 53, 15, 0.2);
+            border-radius: 6px;
+            border: 1px solid rgba(0, 0, 0, 0.15);
             opacity: 0.95;
             z-index: 1;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
         }
         
         .card-title {
-            font-size: 1.1rem;
+            font-size: 1.25rem;
             font-weight: 900;
             position: absolute;
             top: 10px;
-            left: 10px;
+            left: 8px;
             writing-mode: vertical-rl;
-            text-shadow: 0px 0px 4px white, 0px 0px 2px white;
+            text-shadow: 1px 1px 3px rgba(255,255,255,1), -1px -1px 3px rgba(255,255,255,1);
             z-index: 10;
             letter-spacing: 2px;
+            font-family: "Noto Serif TC", serif;
         }
-        .card-suit { font-size: 1.1rem; font-weight: bold; position: absolute; top: 6px; right: 6px; z-index: 10; text-shadow: 0px 0px 3px white; }
-        .card-point { font-size: 1.1rem; font-weight: bold; position: absolute; top: 22px; right: 6px; z-index: 10; text-shadow: 0px 0px 3px white; }
-        .suit-red { color: #ef4444; }
-        .suit-black { color: #111827; }
+        .card-suit { font-size: 1.1rem; font-weight: 900; position: absolute; top: 6px; right: 8px; z-index: 10; text-shadow: 0px 0px 4px rgba(255,255,255,0.9); }
+        .card-point { font-size: 1.15rem; font-weight: 900; position: absolute; top: 22px; right: 8px; z-index: 10; text-shadow: 0px 0px 4px rgba(255,255,255,0.9); }
+        .suit-red { color: #dc2626; }
+        .suit-black { color: #1c1917; }
         .card-desc {
-            font-size: 0.65rem;
+            font-size: 0.75rem;
             position: absolute;
             bottom: 4px;
-            left: 6px;
-            right: 6px;
+            left: 4px;
+            right: 4px;
             text-align: center;
-            line-height: 1.2;
-            color: #f5f5f4;
-            background: rgba(12, 10, 9, 0.85);
+            line-height: 1.3;
+            color: #fdfbfb;
+            background: linear-gradient(90deg, rgba(28,25,23,0) 0%, rgba(28,25,23,0.85) 15%, rgba(28,25,23,0.85) 85%, rgba(28,25,23,0) 100%);
             padding: 2px 0;
-            border-radius: 0 0 4px 4px;
+            border-radius: 0 0 6px 6px;
             font-weight: bold;
             z-index: 10;
         }
@@ -293,10 +308,10 @@
         
         /* Card Info Panel */
         .card-info-panel {
-            position: absolute; right: 24px; bottom: 240px; width: 260px;
+            position: fixed; right: 24px; bottom: 240px; width: 260px;
             background: rgba(24, 18, 15, 0.95); border: 1px solid var(--theme-gold);
             border-radius: 12px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            display: none; z-index: 90; pointer-events: none;
+            display: none; z-index: 500; pointer-events: none;
             backdrop-filter: blur(8px); transition: opacity 0.3s;
         }
         .cip-title { color: var(--theme-gold); font-size: 1.25rem; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 6px;}
@@ -325,7 +340,7 @@
         <!-- Player 0 (Bottom - Human) -->
         <div class="player-area" id="p0" onclick="Engine.onPlayerClick(0)">
             <div class="hero-section">
-                <div class="hero-card" id="hero0" onclick="UI.showHeroInfo(0); event.stopPropagation();">
+                <div class="hero-card" id="hero0" onmouseenter="UI.showHeroInfoPanel(0)" onmouseleave="UI.hideCardInfoPanel()">
                     <div id="heroName0">?</div>
                     <div class="role-icon" id="role0" style="width:45px; height:45px; font-size:1.5rem; left:-20px;">主</div>
                     <div class="hp-bar" id="hp0"></div>
@@ -659,8 +674,8 @@
             { id: 'shen_zhao_yun', name: '神趙雲', hp: 2, faction: 'qun', exp: 'god', skills: ['絕境', '龍魂'], desc: '【絕境】鎖定技，你的手牌上限始終為2；每當你受到或回復1點體力後，或你進入或脫離瀕死狀態時，若你的手牌數小於2，你摸牌至2張。<br>【龍魂】你可以將同花色的牌按以下規則使用或打出：紅桃當【桃】；方塊當火【殺】；梅花當【閃】；黑桃當【無懈可擊】。' },
 
             // --- SP Heroes ---
-            { id: 'sp_zhao_yun', name: 'SP趙雲', hp: 4, faction: 'qun', skills: ['龍膽', '衝陣'], desc: '【龍膽】你可以【殺】當【閃】、【閃】當【殺】使用或打出。<br>【衝陣】當你發動【龍膽】使用或打出一張牌時，你可以獲得對方一張手牌。' },
-            { id: 'sp_guan_yu', name: 'SP關羽', hp: 4, faction: 'wei', skills: ['單騎'], desc: '【單騎】覺醒技，準備階段，若你的手牌數大於體力值且你沒有馬，你減少1點體力上限，然後獲得【馬術】和【怒斬】。' }
+            { id: 'sp_zhao_yun', name: 'SP趙雲', hp: 4, faction: 'qun', exp: 'sp', skills: ['龍膽', '衝陣'], desc: '【龍膽】你可以【殺】當【閃】、【閃】當【殺】使用或打出。<br>【衝陣】當你發動【龍膽】使用或打出一張牌時，你可以獲得對方一張手牌。' },
+            { id: 'sp_guan_yu', name: 'SP關羽', hp: 4, faction: 'wei', exp: 'sp', skills: ['單騎'], desc: '【單騎】覺醒技，準備階段，若你的手牌數大於體力值且你沒有馬，你減少1點體力上限，然後獲得【馬術】和【怒斬】。' }
         ];
         const FACTION_MAP = {
             wei: { name: '魏', colors: ['#1e3a8a', '#93c5fd'], glow: '#60a5fa' },
@@ -705,7 +720,7 @@
                 
                 const suitEng = SUIT_ENG[suit] || '';
                 const cardEng = CARD_ENG[name] || '';
-                let imgPath = `../assets/SanGuoSha/cards/${name}.png`;
+                let imgPath = `../assets/SanGuoSha/cards/${cardEng}.png`;
                 if (isMilitary) {
                     imgPath = `../assets/SanGuoSha/cards/${suitEng}_${point}_${cardEng}.png`;
                 }
@@ -2795,7 +2810,7 @@
                             color: card.color,
                             bg: 'bg-trick',
                             desc: CARD_META['過河拆橋'].desc,
-                            img: `../assets/SanGuoSha/cards/過河拆橋.png`
+                            img: `../assets/SanGuoSha/cards/dismantle.png`
                         };
                         this.state = 'TARGETING';
                         this.pendingAction = { type: 'USE_CARD', card: virtualQixi, maxTargets: 1 };
@@ -2822,7 +2837,7 @@
                             color: card.color,
                             bg: 'bg-delay_trick',
                             desc: CARD_META['樂不思蜀'].desc,
-                            img: `../assets/SanGuoSha/cards/樂不思蜀.png`
+                            img: `../assets/SanGuoSha/cards/indulgence.png`
                         };
                         this.state = 'TARGETING';
                         this.pendingAction = { type: 'USE_CARD', card: virtualGuose, maxTargets: 1 };
@@ -2853,7 +2868,7 @@
                                 color: c1.color,
                                 bg: 'bg-trick',
                                 desc: CARD_META['萬箭齊發'].desc,
-                                img: `../assets/SanGuoSha/cards/萬箭齊發.png`
+                                img: `../assets/SanGuoSha/cards/arrows.png`
                             };
                             this.state = 'WAITING';
                             UI.updateAll();
@@ -2897,7 +2912,7 @@
                             bg: 'bg-sha',
                             desc: CARD_META['殺'].desc,
                             damageType: 'normal',
-                            img: `../assets/SanGuoSha/cards/殺.png`
+                            img: `../assets/SanGuoSha/cards/sha.png`
                         };
                         this.state = 'TARGETING';
                         this.pendingAction = { type: 'USE_CARD', card: virtualSha, maxTargets: 1 };
@@ -3642,7 +3657,7 @@
                     
                     div.innerHTML = `
                         <div class="name-tag" id="name${i}">電腦${i}</div>
-                        <div class="hero-card" id="hero${i}" onclick="UI.showHeroInfo(${i}); event.stopPropagation();">
+                        <div class="hero-card" id="hero${i}" onmouseenter="UI.showHeroInfoPanel(${i})" onmouseleave="UI.hideCardInfoPanel()">
                             <div id="heroName${i}">?</div>
                             <div class="role-icon role-unknown" id="role${i}">?</div>
                             <div class="hand-count" id="h${i}">0</div>
@@ -3668,6 +3683,18 @@
             },
             hideCardInfoPanel: function() {
                 document.getElementById('cardInfoPanel').style.display = 'none';
+            },
+            showHeroInfoPanel: function(idx) {
+                if(Engine.players.length === 0) return;
+                let p = Engine.players[idx];
+                document.getElementById('cipTitle').innerText = p.hero.name;
+                document.getElementById('cipDesc').innerHTML = p.hero.desc || '無技能說明';
+                document.getElementById('cardInfoPanel').style.display = 'block';
+            },
+            showLobbyHeroInfoPanel: function(hero) {
+                document.getElementById('cipTitle').innerText = hero.name;
+                document.getElementById('cipDesc').innerHTML = hero.desc || '無技能說明';
+                document.getElementById('cardInfoPanel').style.display = 'block';
             },
             showHeroInfo: function(idx) {
                 if(Engine.players.length === 0) return;
@@ -3887,6 +3914,8 @@
                 el.title = h.name;
                 el.innerHTML = `<div class="hero-select-name" style="background: rgba(0,0,0,0.6); padding: 2px 0; border-radius: 0 0 4px 4px; width: 100%; text-align: center; position: absolute; bottom: 0; left: 0; box-sizing: border-box;">${h.name}</div>`;
                 el.onclick = () => { Engine.initGame(h); };
+                el.onmouseenter = () => { UI.showLobbyHeroInfoPanel(h); };
+                el.onmouseleave = () => { UI.hideCardInfoPanel(); };
                 grid.appendChild(el);
             });
         };
@@ -3894,5 +3923,8 @@
         window.renderLobbyHeroes();
 
     </script>
+
+    
+    <script src="../assets/SanGuoSha/backgrounds/random_bg.js"></script>
 </body>
 </html>
