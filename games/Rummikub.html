@@ -1,50 +1,299 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>拉密 Rummikub</title>
   <style>
-    :root { --bg:#101827; --panel:#1f2937; --line:#334155; --blue:#3b82f6; --gold:#facc15; --muted:#cbd5e1; }
-    * { box-sizing:border-box; }
-    body { margin:0; min-height:100vh; background:linear-gradient(135deg,#0f172a,#182c4f); color:#f8fafc; font-family:"Segoe UI","Noto Sans TC",sans-serif; }
-    .top { height:64px; display:flex; align-items:center; justify-content:space-between; padding:0 22px; background:rgba(15,23,42,.92); border-bottom:1px solid #334155; position:sticky; top:0; z-index:5; }
-    a { color:#f8fafc; text-decoration:none; }
-    h1 { margin:0; color:#93c5fd; font-size:22px; }
-    .badge { border:1px solid #3b82f6; color:#bfdbfe; border-radius:16px; padding:5px 10px; font-size:13px; }
-    .app { display:grid; grid-template-columns:280px 1fr; gap:16px; padding:16px; }
-    .panel { background:rgba(31,41,55,.93); border:1px solid var(--line); border-radius:8px; padding:14px; box-shadow:0 14px 30px rgba(0,0,0,.28); }
-    .panel h2 { margin:0 0 10px; font-size:16px; color:#93c5fd; }
-    .table { min-height:42vh; background:#0b5138; border:1px solid #2e7d5e; border-radius:8px; padding:14px; box-shadow:inset 0 0 30px rgba(0,0,0,.3); }
-    .sets { display:flex; flex-direction:column; gap:10px; }
-    .meld { min-height:70px; background:rgba(0,0,0,.18); border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:8px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
-    .meld-label { min-width:72px; color:#d1fae5; font-size:13px; }
-    .rack-area { margin-top:14px; background:linear-gradient(#7c3f14,#451a03); border-radius:8px; padding:12px; }
-    .rack { min-height:160px; display:flex; flex-wrap:wrap; gap:6px; padding:10px; background:rgba(0,0,0,.22); border-radius:6px; align-content:flex-start; }
-    .tile { width:48px; height:70px; background:#fafaf9; border-radius:6px; box-shadow:2px 4px 8px rgba(0,0,0,.4), inset -2px -2px 5px rgba(0,0,0,.1); color:#111827; font-size:28px; font-weight:900; display:grid; place-items:center; cursor:pointer; position:relative; user-select:none; }
-    .tile.selected { transform:translateY(-12px); outline:3px solid var(--gold); }
-    .tile.black { color:#111827; } .tile.blue { color:#2563eb; } .tile.red { color:#dc2626; } .tile.orange { color:#ea580c; } .tile.joker { color:#be123c; }
-    .tile::after { content:""; position:absolute; bottom:7px; width:24px; height:3px; border-radius:3px; background:currentColor; }
-    .tile.joker::after { display:none; }
-    button { border:1px solid #4069aa; background:#2563eb; color:white; border-radius:6px; padding:9px 12px; font-weight:800; cursor:pointer; }
-    button:hover { background:#1d4ed8; } button:disabled { opacity:.45; cursor:not-allowed; }
-    .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:8px 0; }
-    .stat { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    .stat div { background:#111827; border:1px solid #475569; border-radius:7px; padding:10px; }
-    .num { color:var(--gold); font-size:26px; font-weight:900; }
-    .log { height:260px; overflow:auto; background:#111827; border-radius:6px; padding:10px; font-size:13px; line-height:1.5; color:#dbeafe; }
-    .help { color:var(--muted); font-size:13px; line-height:1.55; }
-    @media (max-width:900px){ .app{grid-template-columns:1fr}.tile{width:42px;height:62px;font-size:24px} }
+    :root {
+      --bg: #101827;
+      --panel: #1f2937;
+      --line: #334155;
+      --blue: #3b82f6;
+      --gold: #facc15;
+      --muted: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a, #182c4f);
+      color: #f8fafc;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+    }
+
+    .top {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      background: rgba(15, 23, 42, .92);
+      border-bottom: 1px solid #334155;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    a {
+      color: #f8fafc;
+      text-decoration: none;
+    }
+
+    h1 {
+      margin: 0;
+      color: #93c5fd;
+      font-size: 22px;
+    }
+
+    .badge {
+      border: 1px solid #3b82f6;
+      color: #bfdbfe;
+      border-radius: 16px;
+      padding: 5px 10px;
+      font-size: 13px;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .panel {
+      background: rgba(31, 41, 55, .93);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, .28);
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      color: #93c5fd;
+    }
+
+    .table {
+      min-height: 42vh;
+      background: #0b5138;
+      border: 1px solid #2e7d5e;
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, .3);
+      transition: all 0.3s;
+    }
+
+    .sets {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .meld {
+      min-height: 70px;
+      background: rgba(0, 0, 0, .18);
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 8px;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      transition: all 0.2s;
+      cursor: default;
+    }
+
+    .meld-label {
+      min-width: 72px;
+      color: #d1fae5;
+      font-size: 13px;
+      pointer-events: none;
+    }
+
+    /* Hover effects for appending to sets */
+    .can-append .meld {
+      cursor: pointer;
+      box-shadow: inset 0 0 15px rgba(59, 130, 246, 0.1);
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .can-append .meld:hover {
+      background: rgba(59, 130, 246, 0.25);
+      outline: 2px solid var(--blue);
+      transform: translateX(5px);
+    }
+
+    .rack-area {
+      margin-top: 14px;
+      background: linear-gradient(#7c3f14, #451a03);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .rack {
+      min-height: 160px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 10px;
+      background: rgba(0, 0, 0, .22);
+      border-radius: 6px;
+      align-content: flex-start;
+    }
+
+    .tile {
+      width: 48px;
+      height: 70px;
+      background: #fafaf9;
+      border-radius: 6px;
+      box-shadow: 2px 4px 8px rgba(0, 0, 0, .4), inset -2px -2px 5px rgba(0, 0, 0, .1);
+      color: #111827;
+      font-size: 28px;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      position: relative;
+      user-select: none;
+      transition: transform 0.1s;
+    }
+
+    .tile.selected {
+      transform: translateY(-12px);
+      outline: 3px solid var(--gold);
+    }
+
+    .tile.black {
+      color: #111827;
+    }
+
+    .tile.blue {
+      color: #2563eb;
+    }
+
+    .tile.red {
+      color: #dc2626;
+    }
+
+    .tile.orange {
+      color: #ea580c;
+    }
+
+    .tile.joker {
+      color: #be123c;
+    }
+
+    .tile::after {
+      content: "";
+      position: absolute;
+      bottom: 7px;
+      width: 24px;
+      height: 3px;
+      border-radius: 3px;
+      background: currentColor;
+    }
+
+    .tile.joker::after {
+      display: none;
+    }
+
+    button {
+      border: 1px solid #4069aa;
+      background: #2563eb;
+      color: white;
+      border-radius: 6px;
+      padding: 9px 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover:not(:disabled) {
+      background: #1d4ed8;
+    }
+
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 8px 0;
+    }
+
+    .stat {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .stat div {
+      background: #111827;
+      border: 1px solid #475569;
+      border-radius: 7px;
+      padding: 10px;
+    }
+
+    .num {
+      color: var(--gold);
+      font-size: 26px;
+      font-weight: 900;
+    }
+
+    .log {
+      height: 260px;
+      overflow: auto;
+      background: #111827;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #dbeafe;
+    }
+
+    .help {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    @media (max-width:900px) {
+      .app {
+        grid-template-columns: 1fr
+      }
+
+      .tile {
+        width: 42px;
+        height: 62px;
+        font-size: 24px
+      }
+    }
   </style>
 </head>
+
 <body>
-  <div class="top"><a href="../index.html">← 返回大廳</a><h1>拉密 Rummikub</h1><div class="badge">可完成單機版</div></div>
+  <div class="top"><a href="../index.html">← 返回大廳</a>
+    <h1>拉密 Rummikub</h1>
+    <div class="badge">完整單機版</div>
+  </div>
   <div class="app">
     <aside class="panel">
       <h2>操作</h2>
       <div id="turnText" class="help"></div>
       <div class="row">
-        <button id="playBtn">打出選牌</button>
+        <button id="playBtn">打出新牌組</button>
+        <button id="undoBtn">復原</button>
         <button id="drawBtn">抽牌</button>
         <button id="endBtn">結束回合</button>
       </div>
@@ -53,147 +302,432 @@
         <button id="sortColorBtn">顏色排序</button>
         <button id="newBtn">新局</button>
       </div>
-      <p class="help">合法出牌：同數字不同色 3-4 張，或同色連號 3 張以上。首次出牌總點數需至少 30。鬼牌可補任意數字，但每組仍需能形成合法組合。</p>
+      <p class="help">
+        <strong>玩法：</strong>選取手牌點擊「打出新牌組」。破冰(首出≥30點)後，選取手牌並<strong>點擊桌上牌組</strong>即可接牌。若本回合無出牌，則必須「抽牌」結束回合。</p>
       <h2>狀態</h2>
       <div class="stat">
-        <div>牌池<div class="num" id="poolCount"></div></div>
-        <div>AI 架牌<div class="num" id="aiCount"></div></div>
-        <div>你已破冰<div class="num" id="opened0"></div></div>
-        <div>AI 已破冰<div class="num" id="opened1"></div></div>
+        <div>牌池<div class="num" id="poolCount"></div>
+        </div>
+        <div>AI 架牌<div class="num" id="aiCount"></div>
+        </div>
+        <div>你已破冰<div class="num" id="opened0"></div>
+        </div>
+        <div>AI 已破冰<div class="num" id="opened1"></div>
+        </div>
       </div>
       <h2>紀錄</h2>
       <div id="log" class="log"></div>
     </aside>
     <main>
-      <div class="table"><div id="sets" class="sets"></div></div>
-      <div class="rack-area"><div id="rack" class="rack"></div></div>
+      <div class="table">
+        <div id="sets" class="sets"></div>
+      </div>
+      <div class="rack-area">
+        <div id="rack" class="rack"></div>
+      </div>
     </main>
   </div>
   <script>
-    const COLORS = ['black','blue','red','orange'];
-    const CNAME = {black:'黑',blue:'藍',red:'紅',orange:'橙'};
-    let pool, players, tableSets, turn, selected, gameOver;
+    const COLORS = ['black', 'blue', 'red', 'orange'];
+    const CNAME = { black: '黑', blue: '藍', red: '紅', orange: '橙' };
+    let pool, players, tableSets, turn, selected, gameOver, playedThisTurn, turnPoints, backupState, consecutivePasses;
     const $ = id => document.getElementById(id);
-    function shuffle(a){ return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]); }
-    function makePool(){
-      const out=[]; let id=1;
-      for(let copy=0; copy<2; copy++) for(const color of COLORS) for(let value=1; value<=13; value++) out.push({id:id++,color,value,joker:false});
-      out.push({id:id++,color:'joker',value:0,joker:true},{id:id++,color:'joker',value:0,joker:true});
+
+    function saveState() {
+       backupState = {
+           tiles: players[0].tiles.map(t => ({...t})),
+           tableSets: tableSets.map(s => ({...s, tiles: s.tiles.map(t=>({...t}))})),
+           opened: players[0].opened
+       };
+    }
+    
+    function restoreState() {
+       if (!backupState) return;
+       players[0].tiles = backupState.tiles.map(t => ({...t}));
+       tableSets = backupState.tableSets.map(s => ({...s, tiles: s.tiles.map(t=>({...t}))}));
+       players[0].opened = backupState.opened;
+       playedThisTurn = false;
+       turnPoints = 0;
+       selected = [];
+       render();
+    }
+
+    function shuffle(a) { return a.map(v => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map(x => x[1]); }
+
+    function makePool() {
+      const out = []; let id = 1;
+      for (let copy = 0; copy < 2; copy++) for (const color of COLORS) for (let value = 1; value <= 13; value++) out.push({ id: id++, color, value, joker: false });
+      out.push({ id: id++, color: 'joker', value: 0, joker: true }, { id: id++, color: 'joker', value: 0, joker: true });
       return shuffle(out);
     }
-    function draw(p,n=1){ for(let i=0;i<n && pool.length;i++) p.tiles.push(pool.pop()); }
-    function newPlayer(name){ return {name, tiles:[], opened:false}; }
-    function newGame(){
-      pool=makePool(); players=[newPlayer('你'),newPlayer('AI')]; tableSets=[]; turn=0; selected=[]; gameOver=false;
-      draw(players[0],14); draw(players[1],14); $('log').innerHTML=''; log('新局開始。'); render();
+
+    function draw(p, n = 1) {
+      for (let i = 0; i < n && pool.length; i++) p.tiles.push(pool.pop());
     }
-    function tileText(t){ return t.joker ? '★' : t.value; }
-    function tileEl(t, clickable=true){
-      const d=document.createElement('div'); d.className=`tile ${t.joker?'joker':t.color} ${selected.includes(t.id)?'selected':''}`; d.textContent=tileText(t); d.title=t.joker?'鬼牌':`${CNAME[t.color]} ${t.value}`;
-      if(clickable) d.onclick=()=>{ if(turn!==0||gameOver) return; selected = selected.includes(t.id) ? selected.filter(id=>id!==t.id) : [...selected,t.id]; renderRack(); };
+
+    function newPlayer(name) { return { name, tiles: [], opened: false }; }
+
+    function newGame() {
+      pool = makePool();
+      players = [newPlayer('你'), newPlayer('AI')];
+      tableSets = []; turn = 0; selected = [];
+      gameOver = false; playedThisTurn = false; turnPoints = 0; consecutivePasses = 0;
+      draw(players[0], 14); draw(players[1], 14);
+      $('log').innerHTML = ''; log('新局開始。');
+      saveState();
+      render();
+    }
+
+    function tileText(t) { return t.joker ? '★' : t.value; }
+
+    function tileEl(t, clickable = true) {
+      const d = document.createElement('div');
+      d.className = `tile ${t.joker ? 'joker' : t.color} ${selected.includes(t.id) ? 'selected' : ''}`;
+      d.textContent = tileText(t);
+      d.title = t.joker ? '鬼牌' : `${CNAME[t.color]} ${t.value}`;
+      if (clickable) {
+        d.onclick = () => {
+          if (turn !== 0 || gameOver) return;
+          selected = selected.includes(t.id) ? selected.filter(id => id !== t.id) : [...selected, t.id];
+          renderTable(); // Update table hover state
+          renderRack();
+        };
+      }
       return d;
     }
-    function render(){
-      $('turnText').innerHTML = gameOver ? '遊戲結束' : `${turn===0?'你的':'AI 的'}回合`;
-      $('poolCount').textContent=pool.length; $('aiCount').textContent=players[1].tiles.length;
-      $('opened0').textContent=players[0].opened?'是':'否'; $('opened1').textContent=players[1].opened?'是':'否';
-      $('playBtn').disabled=turn!==0||gameOver; $('drawBtn').disabled=turn!==0||gameOver; $('endBtn').disabled=turn!==0||gameOver;
+
+    function render() {
+      $('turnText').innerHTML = gameOver ? '遊戲結束' : `${turn === 0 ? '你的' : 'AI 的'}回合`;
+      $('poolCount').textContent = pool.length; $('aiCount').textContent = players[1].tiles.length;
+      $('opened0').textContent = players[0].opened ? '是' : '否'; $('opened1').textContent = players[1].opened ? '是' : '否';
+
+      $('playBtn').disabled = turn !== 0 || gameOver;
+      $('undoBtn').disabled = turn !== 0 || gameOver || !playedThisTurn;
+      $('drawBtn').disabled = turn !== 0 || gameOver || playedThisTurn;
+      $('endBtn').disabled = turn !== 0 || gameOver || !playedThisTurn;
+
       renderTable(); renderRack();
     }
-    function renderTable(){
+
+    function renderTable() {
       $('sets').innerHTML = '';
-      tableSets.forEach((set,i)=>{ const m=document.createElement('div'); m.className='meld'; m.innerHTML=`<div class="meld-label">第 ${i+1} 組</div>`; set.tiles.forEach(t=>m.appendChild(tileEl(t,false))); $('sets').appendChild(m); });
-      if(tableSets.length===0) $('sets').innerHTML='<div class="help">桌面尚無組合。</div>';
-    }
-    function renderRack(){
-      $('rack').innerHTML=''; players[0].tiles.forEach(t=>$('rack').appendChild(tileEl(t,true)));
-    }
-    function selectedTiles(){ return players[0].tiles.filter(t=>selected.includes(t.id)); }
-    function setValue(tiles){ return tiles.reduce((a,t)=>a+(t.joker?0:t.value),0); }
-    function validate(tiles){
-      if(tiles.length < 3) return null;
-      const jokers = tiles.filter(t=>t.joker).length, normal = tiles.filter(t=>!t.joker);
-      const sameValue = normal.length && normal.every(t=>t.value===normal[0].value);
-      const distinctColors = new Set(normal.map(t=>t.color)).size === normal.length;
-      if(sameValue && distinctColors && tiles.length <= 4) return {type:'group', points:(normal[0]?.value || 0) * tiles.length};
-      const sameColor = normal.length && normal.every(t=>t.color===normal[0].color);
-      if(sameColor){
-        const vals = normal.map(t=>t.value).sort((a,b)=>a-b);
-        let gaps = 0, dup = false;
-        for(let i=1;i<vals.length;i++){ if(vals[i]===vals[i-1]) dup=true; gaps += vals[i]-vals[i-1]-1; }
-        const min = vals[0] - Math.max(0, jokers - gaps), max = vals[vals.length-1] + Math.max(0, jokers - gaps);
-        if(!dup && gaps <= jokers && min >= 1 && max <= 13) return {type:'run', points:estimateRunPoints(vals,jokers)};
+      tableSets.forEach((set, i) => {
+        const m = document.createElement('div');
+        m.className = 'meld';
+        m.innerHTML = `<div class="meld-label">第 ${i + 1} 組</div>`;
+        set.tiles.forEach(t => m.appendChild(tileEl(t, false)));
+        m.onclick = () => appendToSet(i);
+        $('sets').appendChild(m);
+      });
+      if (tableSets.length === 0) $('sets').innerHTML = '<div class="help">桌面尚無組合。</div>';
+
+      // Update interactive UI for appending
+      if (selected.length > 0 && players[0].opened && turn === 0 && !gameOver) {
+        $('sets').classList.add('can-append');
+      } else {
+        $('sets').classList.remove('can-append');
       }
-      return null;
     }
-    function estimateRunPoints(vals,jokers){
-      if(!vals.length) return 0;
-      let points = vals.reduce((a,b)=>a+b,0), missing = jokers;
-      for(let v=vals[0]; v<=vals[vals.length-1]; v++) if(!vals.includes(v) && missing>0){ points += v; missing--; }
-      let low = vals[0]-1, high = vals[vals.length-1]+1;
-      while(missing>0){ if(low>=1){ points += low--; } else { points += high++; } missing--; }
-      return points;
+
+    function renderRack() {
+      $('rack').innerHTML = '';
+      players[0].tiles.forEach(t => $('rack').appendChild(tileEl(t, true)));
     }
-    function playSelected(){
-      const tiles = selectedTiles(), valid = validate(tiles), p=players[0];
-      if(!valid){ log('這不是合法組合。'); return; }
-      if(!p.opened && valid.points < 30){ log(`首次出牌需要 30 點，目前 ${valid.points} 點。`); return; }
-      p.opened = true;
-      tableSets.push({owner:0, type:valid.type, tiles});
-      players[0].tiles = players[0].tiles.filter(t=>!selected.includes(t.id)); selected=[];
-      log(`你打出 ${valid.type==='group'?'同數組':'順子'}。`);
-      checkWin(); render();
-    }
-    function drawAndEnd(){
-      draw(players[0],1); log('你抽 1 張牌。'); selected=[]; render(); setTimeout(aiTurn,450);
-    }
-    function endTurn(){ selected=[]; render(); setTimeout(aiTurn,450); }
-    function sortValue(){ players[0].tiles.sort((a,b)=>(a.joker-b.joker)||a.value-b.value||COLORS.indexOf(a.color)-COLORS.indexOf(b.color)); renderRack(); }
-    function sortColor(){ players[0].tiles.sort((a,b)=>(a.joker-b.joker)||COLORS.indexOf(a.color)-COLORS.indexOf(b.color)||a.value-b.value); renderRack(); }
-    function findBestSet(p){
-      const tiles=p.tiles;
-      for(let v=1; v<=13; v++){
-        const group = COLORS.map(c=>tiles.find(t=>!t.joker&&t.value===v&&t.color===c)).filter(Boolean);
-        const jokers = tiles.filter(t=>t.joker);
-        if(group.length + jokers.length >= 3) return group.slice(0,Math.min(4,group.length)).concat(jokers.slice(0,Math.max(0,3-group.length)));
-      }
-      for(const c of COLORS){
-        const vals = [...new Set(tiles.filter(t=>!t.joker&&t.color===c).map(t=>t.value))].sort((a,b)=>a-b);
-        for(let i=0;i<vals.length;i++){
-          const run=[tiles.find(t=>!t.joker&&t.color===c&&t.value===vals[i])]; let need=0, last=vals[i];
-          for(let v=vals[i]+1; v<=13 && run.length+need<5; v++){
-            const t=tiles.find(x=>!x.joker&&x.color===c&&x.value===v);
-            if(t){ run.push(t); last=v; } else need++;
-            if(run.length+Math.min(need, tiles.filter(x=>x.joker).length)>=3 && last-vals[i]+1<=run.length+tiles.filter(x=>x.joker).length){
-              return run.concat(tiles.filter(x=>x.joker).slice(0,need));
-            }
+
+    function selectedTiles() { return players[0].tiles.filter(t => selected.includes(t.id)); }
+
+    function validate(tiles) {
+      if (tiles.length < 3) return null;
+      const jokers = tiles.filter(t => t.joker).length;
+      const normal = tiles.filter(t => !t.joker);
+      if (normal.length === 0) return null; // Edge case: all jokers rejected
+
+      const sameValue = normal.every(t => t.value === normal[0].value);
+      const distinctColors = new Set(normal.map(t => t.color)).size === normal.length;
+      if (sameValue && distinctColors && tiles.length <= 4) return { type: 'group', points: (normal[0].value) * tiles.length };
+
+      const sameColor = normal.every(t => t.color === normal[0].color);
+      if (sameColor && tiles.length <= 13) {
+        const vals = normal.map(t => t.value).sort((a, b) => a - b);
+        const hasDup = new Set(vals).size !== vals.length;
+        if (!hasDup) {
+          const span = vals[vals.length - 1] - vals[0] + 1;
+          if (span <= tiles.length) {
+            return { type: 'run', points: estimateRunPoints(vals, tiles.length) };
           }
         }
       }
       return null;
     }
-    function aiTurn(){
-      if(gameOver) return;
-      turn=1; render();
-      const p=players[1], set=findBestSet(p), valid=set&&validate(set);
-      if(valid && (p.opened || valid.points>=30)){
-        p.opened=true; tableSets.push({owner:1,type:valid.type,tiles:set}); p.tiles=p.tiles.filter(t=>!set.some(s=>s.id===t.id));
-        log(`AI 打出 ${valid.type==='group'?'同數組':'順子'}。`);
-      } else { draw(p,1); log('AI 抽 1 張牌。'); }
+
+    function estimateRunPoints(vals, L) {
+      const max_S = Math.min(vals[0], 13 - L + 1);
+      return (L * (2 * max_S + L - 1)) / 2;
+    }
+
+    function playSelected() {
+      const tiles = selectedTiles(), valid = validate(tiles), p = players[0];
+      if (!valid) { log('這不是合法組合。'); return; }
+      
+      if (!p.opened) {
+         turnPoints += valid.points;
+         tableSets.push({ owner: 0, type: valid.type, tiles });
+         p.tiles = p.tiles.filter(t => !selected.includes(t.id));
+         selected = [];
+         playedThisTurn = true;
+         log(`你打出 ${valid.type === 'group' ? '同數組' : '順子'}，獲得 ${valid.points} 點。 (破冰累積: ${turnPoints}/30)`);
+         if (turnPoints >= 30) {
+             p.opened = true;
+             log('成功破冰！');
+         }
+         checkWin(); render();
+      } else {
+         tableSets.push({ owner: 0, type: valid.type, tiles });
+         p.tiles = p.tiles.filter(t => !selected.includes(t.id));
+         selected = [];
+         playedThisTurn = true;
+         log(`你打出 ${valid.type === 'group' ? '同數組' : '順子'}。`);
+         checkWin(); render();
+      }
+    }
+
+    function appendToSet(setIndex) {
+      if (turn !== 0 || gameOver || selected.length === 0) return;
+      const p = players[0];
+      if (!p.opened) {
+        log('必須先破冰（打出總和30點以上的牌組）才能接牌！');
+        return;
+      }
+      const tilesToAdd = selectedTiles();
+      const targetSet = tableSets[setIndex];
+      const combined = [...targetSet.tiles, ...tilesToAdd];
+      const valid = validate(combined);
+
+      if (valid) {
+        targetSet.tiles = combined;
+        targetSet.type = valid.type;
+        p.tiles = p.tiles.filter(t => !selected.includes(t.id));
+        selected = [];
+        playedThisTurn = true;
+        log(`你成功將牌接到了第 ${setIndex + 1} 組。`);
+        checkWin(); render();
+      } else {
+        log('無法接牌，組合不合法！');
+      }
+    }
+
+    function drawAndEnd() {
+      if (pool.length === 0) { 
+          log('牌池已空，你無法抽牌，跳過回合。'); 
+          consecutivePasses++;
+      } else {
+          draw(players[0], 1);
+          log('你抽 1 張牌。');
+          consecutivePasses = 0;
+      }
+      selected = []; playedThisTurn = false; turnPoints = 0; render();
       checkWin();
-      if(!gameOver){ turn=0; log('輪到你。'); render(); }
+      if(!gameOver) setTimeout(aiTurn, 450);
     }
-    function checkWin(){
-      if(players[0].tiles.length===0){ gameOver=true; log('你清空牌架，獲勝！'); }
-      if(players[1].tiles.length===0){ gameOver=true; log('AI 清空牌架，AI 獲勝。'); }
-      if(pool.length===0 && !gameOver){ gameOver=true; const a=scoreLeft(players[0]), b=scoreLeft(players[1]); log(`牌池用完。剩餘點數低者勝：你 ${a} / AI ${b}。`); }
+
+    function endTurn() {
+      if (!players[0].opened && turnPoints > 0 && turnPoints < 30) {
+         log('破冰失敗，總點數不足 30 點！已自動復原操作。');
+         restoreState();
+         return; 
+      }
+      if (playedThisTurn) {
+         consecutivePasses = 0;
+      } else if (pool.length === 0) {
+         consecutivePasses++;
+      }
+      selected = []; playedThisTurn = false; turnPoints = 0; render();
+      checkWin();
+      if(!gameOver) setTimeout(aiTurn, 450);
     }
-    function scoreLeft(p){ return p.tiles.reduce((a,t)=>a+(t.joker?30:t.value),0); }
-    function log(msg){ $('log').innerHTML = `<div>${msg}</div>` + $('log').innerHTML; }
-    $('playBtn').onclick=playSelected; $('drawBtn').onclick=drawAndEnd; $('endBtn').onclick=endTurn;
-    $('sortValueBtn').onclick=sortValue; $('sortColorBtn').onclick=sortColor; $('newBtn').onclick=newGame;
+
+    function sortValue() { players[0].tiles.sort((a, b) => (a.joker - b.joker) || a.value - b.value || COLORS.indexOf(a.color) - COLORS.indexOf(b.color)); renderRack(); }
+    function sortColor() { players[0].tiles.sort((a, b) => (a.joker - b.joker) || COLORS.indexOf(a.color) - COLORS.indexOf(b.color) || a.value - b.value); renderRack(); }
+
+    function findBestSet(p) {
+      let bestSet = null;
+      let bestPoints = 0;
+      const normalTiles = p.tiles.filter(t => !t.joker);
+      const jokers = p.tiles.filter(t => t.joker);
+
+      // 搜尋同數組 (Groups)
+      for (let v = 1; v <= 13; v++) {
+        const availableColors = COLORS.map(c => normalTiles.find(t => t.value === v && t.color === c)).filter(Boolean);
+        for (let size = 3; size <= 4; size++) {
+          for (let j = 0; j <= jokers.length; j++) {
+            if (availableColors.length + j >= size) {
+              const set = availableColors.slice(0, size - j).concat(jokers.slice(0, j));
+              if (set.length === size) {
+                const pts = v * size;
+                if (pts > bestPoints && (p.opened || pts >= 30)) {
+                  bestPoints = pts; bestSet = set;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // 搜尋順子 (Runs)
+      for (const c of COLORS) {
+        const colorTiles = normalTiles.filter(t => t.color === c);
+        const vals = [...new Set(colorTiles.map(t => t.value))].sort((a, b) => a - b);
+        for (let i = 0; i < vals.length; i++) {
+          for (let j = i; j < vals.length; j++) {
+            const subVals = vals.slice(i, j + 1);
+            const span = subVals[subVals.length - 1] - subVals[0] + 1;
+            const missing = span - subVals.length;
+
+            if (missing <= jokers.length) {
+              const remainingJokers = jokers.length - missing;
+              for (let extra = 0; extra <= remainingJokers; extra++) {
+                const totalLength = subVals.length + missing + extra;
+                if (totalLength >= 3 && totalLength <= 13) {
+                  const pts = estimateRunPoints(subVals, totalLength);
+                  if (pts > bestPoints && (p.opened || pts >= 30)) {
+                    bestPoints = pts;
+                    const set = subVals.map(v => colorTiles.find(t => t.value === v));
+                    set.push(...jokers.slice(0, missing + extra));
+                    bestSet = set;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      return bestSet;
+    }
+
+    function aiAppend() {
+      if (!players[1].opened) return false;
+      const p = players[1];
+      for (let i = 0; i < p.tiles.length; i++) {
+        for (let j = 0; j < tableSets.length; j++) {
+          const combined = [...tableSets[j].tiles, p.tiles[i]];
+          const valid = validate(combined);
+          if (valid) {
+            tableSets[j].tiles = combined;
+            tableSets[j].type = valid.type;
+            log(`AI 將 1 張牌接到了第 ${j + 1} 組。`);
+            p.tiles.splice(i, 1);
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function aiTurn() {
+      if (gameOver) return;
+      turn = 1; render();
+      const p = players[1];
+      let played = false;
+
+      // 1. AI 嘗試接牌
+      if (p.opened) {
+        while (aiAppend()) { played = true; if (p.tiles.length === 0) break; }
+      }
+
+      // 2. AI 嘗試出新牌組
+      if (!p.opened) {
+          let tempTiles = p.tiles.map(t=>({...t}));
+          let setsToPlay = [];
+          let totalPts = 0;
+          while(true) {
+              let bestSet = findBestSet({tiles: tempTiles, opened: true});
+              if(bestSet) {
+                  let v = validate(bestSet);
+                  setsToPlay.push({set: bestSet, type: v.type, points: v.points});
+                  totalPts += v.points;
+                  tempTiles = tempTiles.filter(t => !bestSet.some(s => s.id === t.id));
+              } else {
+                  break;
+              }
+          }
+          if (totalPts >= 30) {
+              p.opened = true;
+              setsToPlay.forEach(s => {
+                  tableSets.push({ owner: 1, type: s.type, tiles: s.set });
+                  p.tiles = p.tiles.filter(t => !s.set.some(st => st.id === t.id));
+                  log(`AI 打出新牌組（${s.type === 'group' ? '同數組' : '順子'}）。`);
+              });
+              played = true;
+          }
+      } else {
+          while (p.tiles.length > 0) {
+            const set = findBestSet(p);
+            if (set) {
+              const valid = validate(set);
+              if (valid) {
+                tableSets.push({ owner: 1, type: valid.type, tiles: set });
+                p.tiles = p.tiles.filter(t => !set.some(s => s.id === t.id));
+                log(`AI 打出新牌組（${valid.type === 'group' ? '同數組' : '順子'}）。`);
+                played = true;
+                continue;
+              }
+            }
+            break;
+          }
+      }
+
+      // 3. AI 無牌可出則抽牌
+      if (!played) {
+        if (pool.length > 0) {
+          draw(p, 1); log('AI 抽 1 張牌。');
+          consecutivePasses = 0;
+        } else {
+          log('牌池已空，AI 無法抽牌，跳過回合。');
+          consecutivePasses++;
+        }
+      } else {
+          consecutivePasses = 0;
+      }
+
+      checkWin();
+      if (!gameOver) { 
+          turn = 0; 
+          playedThisTurn = false;
+          turnPoints = 0;
+          saveState(); 
+          log('輪到你。'); 
+          render(); 
+      }
+    }
+
+    function checkWin() {
+      if (players[0].tiles.length === 0) { gameOver = true; log('你清空牌架，獲勝！'); }
+      else if (players[1].tiles.length === 0) { gameOver = true; log('AI 清空牌架，AI 勝出。'); }
+      else if (consecutivePasses >= 2 && !gameOver) {
+        gameOver = true;
+        const a = scoreLeft(players[0]), b = scoreLeft(players[1]);
+        let resultStr = a < b ? '你贏了！' : (b < a ? 'AI 勝出！' : '平手！');
+        log(`雙方皆無法出牌，遊戲結束。你 ${a} / AI ${b}。${resultStr}`);
+      }
+    }
+
+    function scoreLeft(p) { return p.tiles.reduce((a, t) => a + (t.joker ? 30 : t.value), 0); }
+    function log(msg) { $('log').innerHTML = `<div>${msg}</div>` + $('log').innerHTML; }
+
+    $('playBtn').onclick = playSelected;
+    $('undoBtn').onclick = () => {
+       if (turn !== 0 || gameOver || !playedThisTurn) return;
+       restoreState();
+       log('已復原本回合操作。');
+    };
+    $('drawBtn').onclick = drawAndEnd;
+    $('endBtn').onclick = endTurn;
+    $('sortValueBtn').onclick = sortValue;
+    $('sortColorBtn').onclick = sortColor;
+    $('newBtn').onclick = newGame;
+
     newGame();
   </script>
 </body>
-</html>
 
+</html>
