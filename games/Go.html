@@ -1,0 +1,611 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>極致圍棋 Go</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-color: #f0f4f8;
+            --board-wood: #e3c498;
+            --board-frame: #b58d5c;
+            --line-color: #4a3621;
+            --text-dark: #1e293b;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at center, #f8fafc, #e2e8f0);
+            font-family: 'Outfit', 'Noto Serif TC', sans-serif;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0 0 0.5rem 0;
+            letter-spacing: 2px;
+            font-family: 'Noto Serif TC', serif;
+            color: var(--text-dark);
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: var(--board-frame);
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Outfit', 'Noto Serif TC', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn:hover {
+            background: #9c7546;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn.active {
+            background: #7a5833;
+            box-shadow: inset 0 3px 5px rgba(0,0,0,0.3);
+        }
+
+        .status {
+            display: inline-block;
+            font-size: 1.2rem;
+            margin-top: 15px;
+            font-weight: 700;
+            padding: 8px 25px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .status.black-turn { color: #000; }
+        .status.white-turn { color: #64748b; }
+
+        .board-container {
+            position: relative;
+            background-color: var(--board-wood);
+            border: 16px solid var(--board-frame);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 
+                0 20px 40px -10px rgba(0,0,0,0.4),
+                inset 0 0 20px rgba(123, 89, 55, 0.3);
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+            margin-bottom: 2rem;
+        }
+
+        .board {
+            position: relative;
+            width: 570px;
+            height: 570px;
+            display: grid;
+            grid-template-columns: repeat(19, 30px);
+            grid-template-rows: repeat(19, 30px);
+        }
+
+        .grid-svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .cell {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        .cell:hover::before {
+            content: '';
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.15);
+            z-index: 15;
+        }
+
+        .stone {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            position: relative;
+            z-index: 20;
+            box-shadow: 2px 3px 5px rgba(0,0,0,0.4);
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .stone.black {
+            background: radial-gradient(circle at 30% 30%, #555, #111 70%);
+        }
+
+        .stone.white {
+            background: radial-gradient(circle at 30% 30%, #fff, #ddd 70%);
+            border: 1px solid #ccc;
+            box-shadow: 2px 3px 4px rgba(0,0,0,0.2);
+        }
+
+        .stone.last-move::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background-color: rgba(239, 68, 68, 0.8);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        .modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .modal.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            transform: scale(0.8);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal.show .modal-content { transform: scale(1); }
+
+        .modal h2 {
+            font-size: 2.5rem;
+            margin: 0 0 1.5rem 0;
+            color: var(--text-dark);
+            font-family: 'Noto Serif TC', serif;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="mode-selector">
+            <button class="btn active" id="btn-pve" onclick="setMode('pve')">玩家 vs 電腦 (AI)</button>
+            <button class="btn" id="btn-pvp" onclick="setMode('pvp')">玩家 vs 玩家</button>
+            <button class="btn" onclick="passTurn()">虛手 (Pass)</button>
+            <button class="btn" onclick="initGame()">重新開始</button>
+            <a href="../index.html" class="btn">返回選單</a>
+        </div>
+        <div class="status black-turn" id="status">黑方回合</div>
+    </div>
+    
+    <div class="board-container">
+        <div class="board" id="board">
+            <svg class="grid-svg" width="570" height="570"></svg>
+            <!-- Cells generated here -->
+        </div>
+    </div>
+
+    <div class="modal" id="winModal">
+        <div class="modal-content">
+            <h2 id="winMessage">遊戲結束</h2>
+            <button class="btn" onclick="initGame()">再來一局</button>
+        </div>
+    </div>
+
+    <script>
+        function drawGridSVG() {
+            const svg = document.querySelector('.grid-svg');
+            let html = '';
+            for (let i = 0; i < 19; i++) {
+                const pos = 15 + i * 30;
+                html += `<line x1="15" y1="${pos}" x2="555" y2="${pos}" stroke="var(--line-color)" stroke-width="1.5" />`;
+                html += `<line x1="${pos}" y1="15" x2="${pos}" y2="555" stroke="var(--line-color)" stroke-width="1.5" />`;
+            }
+            const hoshi = [3, 9, 15];
+            for (let r of hoshi) {
+                for (let c of hoshi) {
+                    html += `<circle cx="${15 + c * 30}" cy="${15 + r * 30}" r="3.5" fill="var(--line-color)" />`;
+                }
+            }
+            svg.innerHTML = html;
+        }
+
+        const SIZE = 19;
+        const EMPTY = 0;
+        const BLACK = 1;
+        const WHITE = 2;
+        
+        let board = [];
+        let currentTurn = BLACK;
+        let gameMode = 'pve';
+        let gameActive = true;
+        let isAITurn = false;
+        let lastMove = null;
+        let passCount = 0;
+        
+        // Zobrist-like hashing for simple Ko detection
+        let boardHistory = new Set();
+        
+        const boardElement = document.getElementById('board');
+        const statusElement = document.getElementById('status');
+        const winModal = document.getElementById('winModal');
+        const winMessage = document.getElementById('winMessage');
+
+        function setMode(mode) {
+            gameMode = mode;
+            document.getElementById('btn-pvp').classList.toggle('active', mode === 'pvp');
+            document.getElementById('btn-pve').classList.toggle('active', mode === 'pve');
+            initGame();
+        }
+
+        function getBoardString(b) {
+            return b.map(row => row.join('')).join('');
+        }
+
+        function initGame() {
+            board = Array(SIZE).fill().map(() => Array(SIZE).fill(EMPTY));
+            currentTurn = BLACK;
+            gameActive = true;
+            isAITurn = false;
+            lastMove = null;
+            passCount = 0;
+            boardHistory.clear();
+            boardHistory.add(getBoardString(board));
+            
+            // Clear pieces but keep border
+            Array.from(boardElement.querySelectorAll('.cell')).forEach(c => c.remove());
+            winModal.classList.remove('show');
+            updateStatus();
+
+            for (let r = 0; r < SIZE; r++) {
+                for (let c = 0; c < SIZE; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.r = r;
+                    cell.dataset.c = c;
+                    cell.addEventListener('click', () => handleCellClick(r, c));
+                    boardElement.appendChild(cell);
+                }
+            }
+        }
+
+        function renderPieces() {
+            const cells = boardElement.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                const r = parseInt(cell.dataset.r);
+                const c = parseInt(cell.dataset.c);
+                const val = board[r][c];
+                
+                let el = cell.querySelector('.stone');
+
+                if (val === EMPTY) {
+                    if (el) el.remove();
+                } else {
+                    const isLastMove = (lastMove && lastMove.r === r && lastMove.c === c);
+                    const newClass = `stone ${val === BLACK ? 'black' : 'white'} ${isLastMove ? 'last-move' : ''}`.trim();
+                    
+                    if (!el) {
+                        el = document.createElement('div');
+                        el.className = newClass;
+                        cell.appendChild(el);
+                    } else if (el.className !== newClass) {
+                        el.className = newClass;
+                    }
+                }
+            });
+        }
+
+        // Logic functions
+        function getNeighbors(r, c) {
+            const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+            const res = [];
+            for (let d of dirs) {
+                const nr = r + d[0], nc = c + d[1];
+                if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) res.push({r: nr, c: nc});
+            }
+            return res;
+        }
+
+        function findGroup(r, c, b) {
+            const color = b[r][c];
+            if (color === EMPTY) return null;
+            
+            const group = [];
+            const liberties = new Set();
+            const visited = Array(SIZE).fill().map(() => Array(SIZE).fill(false));
+            const queue = [{r, c}];
+            visited[r][c] = true;
+            
+            while (queue.length > 0) {
+                const curr = queue.shift();
+                group.push(curr);
+                
+                for (let n of getNeighbors(curr.r, curr.c)) {
+                    if (b[n.r][n.c] === EMPTY) {
+                        liberties.add(`${n.r},${n.c}`);
+                    } else if (b[n.r][n.c] === color && !visited[n.r][n.c]) {
+                        visited[n.r][n.c] = true;
+                        queue.push(n);
+                    }
+                }
+            }
+            return { group, liberties: liberties.size };
+        }
+
+        function tryMove(r, c, color, testBoard) {
+            if (testBoard[r][c] !== EMPTY) return false;
+            
+            // Clone board for testing
+            const b = testBoard.map(row => [...row]);
+            b[r][c] = color;
+            
+            const oppColor = color === BLACK ? WHITE : BLACK;
+            let capturedAny = false;
+            
+            // Check captures
+            for (let n of getNeighbors(r, c)) {
+                if (b[n.r][n.c] === oppColor) {
+                    const groupInfo = findGroup(n.r, n.c, b);
+                    if (groupInfo.liberties === 0) {
+                        capturedAny = true;
+                        for (let stone of groupInfo.group) {
+                            b[stone.r][stone.c] = EMPTY;
+                        }
+                    }
+                }
+            }
+            
+            // Check suicide
+            const myGroup = findGroup(r, c, b);
+            if (myGroup.liberties === 0) return false; // Invalid: suicide
+            
+            // Check Ko
+            const bStr = getBoardString(b);
+            if (boardHistory.has(bStr)) return false; // Invalid: Ko rule violation
+            
+            return { newBoard: b, captured: capturedAny };
+        }
+
+        function handleCellClick(r, c) {
+            if (!gameActive || isAITurn) return;
+            
+            const moveResult = tryMove(r, c, currentTurn, board);
+            if (moveResult) {
+                board = moveResult.newBoard;
+                boardHistory.add(getBoardString(board));
+                lastMove = {r, c};
+                passCount = 0;
+                finishTurn();
+            }
+        }
+
+        function passTurn() {
+            if (!gameActive || isAITurn) return;
+            passCount++;
+            lastMove = null;
+            if (passCount >= 2) {
+                endGame();
+                return;
+            }
+            finishTurn();
+        }
+
+        function finishTurn() {
+            renderPieces();
+            currentTurn = currentTurn === BLACK ? WHITE : BLACK;
+            updateStatus();
+            
+            if (gameActive && gameMode === 'pve' && currentTurn === WHITE) {
+                isAITurn = true;
+                setTimeout(makeAIMove, 50);
+            }
+        }
+
+        // Basic Heuristic AI for Go
+        function evaluateBoard(b, color) {
+            const oppColor = color === BLACK ? WHITE : BLACK;
+            let score = 0;
+            
+            for (let r = 0; r < SIZE; r++) {
+                for (let c = 0; c < SIZE; c++) {
+                    if (b[r][c] === color) {
+                        score += 10;
+                        const g = findGroup(r, c, b);
+                        if (g.liberties === 1) score -= 50; // Try to save groups in atari
+                        else score += g.liberties * 2;
+                        
+                        // Favor center early on, but standard liberties cover most value
+                        const distToEdge = Math.min(r, c, SIZE-1-r, SIZE-1-c);
+                        if (distToEdge === 3 || distToEdge === 4) score += 2; 
+                    } else if (b[r][c] === oppColor) {
+                        score -= 10;
+                        const g = findGroup(r, c, b);
+                        if (g.liberties === 1) score += 50; // Try to capture
+                        else score -= g.liberties * 2;
+                    }
+                }
+            }
+            return score;
+        }
+
+        function makeAIMove() {
+            if (!gameActive) return;
+            
+            let bestScore = -Infinity;
+            let bestMoves = [];
+            
+            // Limit search space to near existing stones for speed, unless board is empty
+            const hasStones = board.some(row => row.some(cell => cell !== EMPTY));
+            let candidates = [];
+            
+            if (!hasStones) {
+                // First move usually near corner star points
+                candidates.push({r: 3, c: 3}, {r: 15, c: 15}, {r: 3, c: 15}, {r: 15, c: 3});
+            } else {
+                for (let r = 0; r < SIZE; r++) {
+                    for (let c = 0; c < SIZE; c++) {
+                        if (board[r][c] === EMPTY) {
+                            candidates.push({r, c});
+                        }
+                    }
+                }
+            }
+            
+            // Randomize to avoid deterministic loops
+            candidates.sort(() => Math.random() - 0.5);
+            
+            // Try up to 100 random valid moves to save computation on JS
+            let tried = 0;
+            for (let move of candidates) {
+                const moveResult = tryMove(move.r, move.c, WHITE, board);
+                if (moveResult) {
+                    const score = evaluateBoard(moveResult.newBoard, WHITE);
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMoves = [move];
+                    } else if (score === bestScore) {
+                        bestMoves.push(move);
+                    }
+                    tried++;
+                    if (tried > 80) break; 
+                }
+            }
+            
+            if (bestMoves.length > 0) {
+                const move = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+                const moveResult = tryMove(move.r, move.c, WHITE, board);
+                board = moveResult.newBoard;
+                boardHistory.add(getBoardString(board));
+                lastMove = move;
+                passCount = 0;
+            } else {
+                // Pass if no good moves
+                passCount++;
+                lastMove = null;
+            }
+            
+            isAITurn = false;
+            
+            if (passCount >= 2) {
+                endGame();
+            } else {
+                renderPieces();
+                currentTurn = BLACK;
+                updateStatus();
+            }
+        }
+
+        function updateStatus() {
+            if (currentTurn === BLACK) {
+                statusElement.textContent = "黑方回合";
+                statusElement.className = "status black-turn";
+            } else {
+                if (gameMode === 'pve') {
+                    statusElement.textContent = "電腦思考中...";
+                } else {
+                    statusElement.textContent = "白方回合";
+                }
+                statusElement.className = "status white-turn";
+            }
+        }
+
+        function endGame() {
+            gameActive = false;
+            // Simple counting (just stones on board, actual territory counting is too complex for basic JS)
+            let bCount = 0, wCount = 0;
+            for(let r=0; r<SIZE; r++) {
+                for(let c=0; c<SIZE; c++) {
+                    if (board[r][c] === BLACK) bCount++;
+                    if (board[r][c] === WHITE) wCount++;
+                }
+            }
+            
+            setTimeout(() => {
+                let msg = "";
+                if (bCount > wCount + 6.5) msg = "黑方獲勝！";
+                else msg = "白方獲勝！"; // With komi 6.5
+                
+                winMessage.textContent = `遊戲結束！\n黑:${bCount} 白:${wCount+6.5}\n${msg}`;
+                winModal.classList.add('show');
+            }, 500);
+        }
+
+        // Responsive scaling for mobile
+        function resizeBoard() {
+            const container = document.querySelector('.board-container');
+            const targetWidth = 630; // 570 + padding + borders
+            if (window.innerWidth < targetWidth) {
+                const scale = window.innerWidth / targetWidth;
+                container.style.transform = `scale(${scale})`;
+                container.style.transformOrigin = 'top center';
+                container.style.marginBottom = `-${container.offsetHeight * (1 - scale)}px`;
+            } else {
+                container.style.transform = 'none';
+                container.style.marginBottom = '2rem';
+            }
+        }
+        window.addEventListener('resize', resizeBoard);
+        
+        drawGridSVG();
+        initGame();
+        resizeBoard();
+    </script>
+</body>
+</html>
+

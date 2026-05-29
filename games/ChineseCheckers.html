@@ -1,0 +1,1141 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跳棋 - Chinese Checkers</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --bg-color: #080b12;
+            --panel-bg: rgba(16, 24, 39, 0.7);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            
+            --p1-color: #f43f5e; /* Red Neon */
+            --p2-color: #3b82f6; /* Blue Neon */
+            --p3-color: #10b981; /* Green Neon */
+            
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --text-muted: #475569;
+            
+            --accent: #2dd4bf;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(244, 63, 94, 0.03), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.03), transparent 25%),
+                radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.03), transparent 25%);
+            font-family: 'Outfit', 'Noto Serif TC', sans-serif;
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 60px;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--panel-border);
+            background: rgba(8, 11, 18, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .title-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+        }
+
+        .title-icon {
+            font-size: 1.5rem;
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent);
+        }
+
+        .title-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--text-main);
+            background: linear-gradient(to right, #38bdf8, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .back-link {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--panel-border);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Main Container */
+        .container {
+            flex: 1;
+            display: flex;
+            padding: 1.5rem;
+            gap: 1.5rem;
+            height: calc(100vh - 60px);
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            backdrop-filter: blur(16px);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .left-panel {
+            width: 320px;
+            padding: 1.5rem;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .right-panel {
+            width: 320px;
+            padding: 1.5rem;
+            gap: 1.5rem;
+            overflow-y: hidden;
+        }
+
+        .board-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* Headers inside panels */
+        .panel-header {
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding-left: 0.5rem;
+            border-left: 4px solid var(--accent);
+            margin: 0;
+            color: var(--text-main);
+            letter-spacing: 1px;
+        }
+
+        /* Control Groups */
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .control-group > label {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            letter-spacing: 1px;
+        }
+
+        select {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--panel-border);
+            color: var(--text-main);
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        select:focus, select:hover {
+            border-color: var(--text-sub);
+        }
+
+        /* Player Config */
+        .player-config {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.8rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border: 1px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .player-ident {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .player-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .p1 .player-dot { background: var(--p1-color); box-shadow: 0 0 8px var(--p1-color); }
+        .p2 .player-dot { background: var(--p2-color); box-shadow: 0 0 8px var(--p2-color); }
+        .p3 .player-dot { background: var(--p3-color); box-shadow: 0 0 8px var(--p3-color); }
+        
+        .p1 { color: var(--p1-color); }
+        .p2 { color: var(--p2-color); }
+        .p3 { color: var(--p3-color); }
+
+        /* Custom Radio Toggle Switch */
+        .toggle-switch {
+            display: flex;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 2px;
+            position: relative;
+        }
+        
+        .toggle-switch input[type="radio"] {
+            display: none;
+        }
+
+        .toggle-switch label {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            cursor: pointer;
+            border-radius: 18px;
+            transition: all 0.3s;
+            z-index: 1;
+        }
+
+        .toggle-switch input[type="radio"]:checked + label {
+            color: var(--text-main);
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            font-family: 'Outfit', 'Noto Serif TC', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, #0ea5e9, #2dd4bf);
+            color: #0f172a;
+            box-shadow: 0 4px 15px rgba(45, 212, 191, 0.3);
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 212, 191, 0.5);
+        }
+
+        .secondary-btn {
+            background: transparent;
+            border: 1px solid var(--panel-border);
+            color: var(--text-main);
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .icon-btn {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--panel-border);
+            color: var(--text-sub);
+            padding: 0.6rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Instructions */
+        .instructions {
+            margin-top: auto;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            line-height: 1.6;
+        }
+        .instructions ul {
+            margin: 0.5rem 0 0 0;
+            padding-left: 1.2rem;
+        }
+
+        /* Current Turn Card */
+        .current-turn-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--p1-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.1);
+            transition: all 0.5s;
+        }
+
+        .turn-label {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .turn-player {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--p1-color);
+            text-shadow: 0 0 10px rgba(244, 63, 94, 0.5);
+            transition: all 0.5s;
+        }
+
+        /* Stats */
+        .stats-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .stat-box {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-main);
+        }
+
+        .action-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Game Log */
+        .log-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .log-list {
+            flex: 1;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-family: 'JetBrains Mono', 'Noto Serif TC', monospace;
+            font-size: 0.8rem;
+        }
+
+        .log-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .log-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .log-item {
+            padding: 0.6rem;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 2px solid transparent;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .log-item.p1 { border-left-color: var(--p1-color); }
+        .log-item.p2 { border-left-color: var(--p2-color); }
+        .log-item.p3 { border-left-color: var(--p3-color); }
+
+        /* Message Overlay */
+        #message-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(8, 11, 18, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--accent);
+            padding: 3rem;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 50px rgba(45, 212, 191, 0.2);
+            display: none;
+            z-index: 100;
+        }
+
+        #message-title {
+            font-size: 2.5rem;
+            margin: 0 0 1.5rem 0;
+            color: var(--accent);
+            text-shadow: 0 0 15px rgba(45, 212, 191, 0.5);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <a href="../index.html" class="back-link">← 返回主選單</a>
+        <div class="title-container">
+            <span class="title-icon">⬡</span>
+            <span class="title-text">跳棋</span>
+        </div>
+        <div></div> <!-- Spacer -->
+    </div>
+
+    <div class="container">
+        <!-- Left Panel: Settings -->
+        <div class="panel left-panel">
+            <h3 class="panel-header">對局設定</h3>
+            
+            <div class="control-group">
+                <label>遊戲人數</label>
+                <select id="mode-select" onchange="onModeChange()">
+                    <option value="2">2 人對戰 (紅 vs 藍)</option>
+                    <option value="3">3 人對戰 (紅 vs 綠 vs 藍)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>玩家身分配置</label>
+                
+                <div class="player-config" id="config-p1">
+                    <div class="player-ident p1"><div class="player-dot"></div>紅方 (N)</div>
+                    <div class="toggle-switch">
+                        <input type="radio" name="p1-type" id="p1-human" value="human" checked onchange="updatePlayerTypes()">
+                        <label for="p1-human">玩家</label>
+                        <input type="radio" name="p1-type" id="p1-ai" value="ai" onchange="updatePlayerTypes()">
+                        <label for="p1-ai">電腦</label>
+                    </div>
+                </div>
+
+                <div class="player-config" id="config-p2">
+                    <div class="player-ident p2"><div class="player-dot"></div>藍方 (SW)</div>
+                    <div class="toggle-switch">
+                        <input type="radio" name="p2-type" id="p2-human" value="human" onchange="updatePlayerTypes()">
+                        <label for="p2-human">玩家</label>
+                        <input type="radio" name="p2-type" id="p2-ai" value="ai" checked onchange="updatePlayerTypes()">
+                        <label for="p2-ai">電腦</label>
+                    </div>
+                </div>
+
+                <div class="player-config" id="config-p3" style="display: none;">
+                    <div class="player-ident p3"><div class="player-dot"></div>綠方 (SE)</div>
+                    <div class="toggle-switch">
+                        <input type="radio" name="p3-type" id="p3-human" value="human" onchange="updatePlayerTypes()">
+                        <label for="p3-human">玩家</label>
+                        <input type="radio" name="p3-type" id="p3-ai" value="ai" checked onchange="updatePlayerTypes()">
+                        <label for="p3-ai">電腦</label>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn primary-btn" onclick="startGame()">🚀 開始對局</button>
+            <button class="btn secondary-btn" onclick="resetGame()">🔄 重置遊戲</button>
+
+            <div class="instructions">
+                <strong>遊戲操作：</strong>
+                <ul>
+                    <li>點選己方棋子選取，再點選高亮目的地移動。</li>
+                    <li><strong>單步滑動</strong>：移至相鄰空格。</li>
+                    <li><strong>跳躍</strong>：跨過任何顏色棋子降落在直線對面空格，可連續跳躍！</li>
+                    <li>優先將己方 10 顆棋子全部移入對角陣營者獲勝。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Center: Board -->
+        <div class="board-container">
+            <canvas id="gameCanvas" width="800" height="800"></canvas>
+            
+            <div id="message-overlay">
+                <h2 id="message-title">紅方 (N) 獲勝!</h2>
+                <button class="btn primary-btn" onclick="startGame()">再玩一次</button>
+            </div>
+        </div>
+
+        <!-- Right Panel: Status & Log -->
+        <div class="panel right-panel">
+            <div class="current-turn-card" id="turn-card">
+                <div class="turn-label">當前回合</div>
+                <div id="turn-text" class="turn-player">紅方 (N) (玩家)</div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-label">已走步數</div>
+                    <div id="stat-steps" class="stat-value">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">已達陣數</div>
+                    <div id="stat-arrived" class="stat-value">0</div>
+                </div>
+            </div>
+
+            <div class="action-row">
+                <button class="icon-btn" onclick="undoMove()">↩ 上一步</button>
+                <button class="icon-btn" onclick="showHint()">💡 提示最佳步</button>
+            </div>
+
+            <div class="log-container">
+                <h3 class="panel-header" style="font-size: 1rem;">對局日誌</h3>
+                <div id="game-log" class="log-list">
+                    <!-- Logs will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const BOARD_LAYOUT = [
+            { row: 0, cols: 1 }, { row: 1, cols: 2 }, { row: 2, cols: 3 }, { row: 3, cols: 4 },
+            { row: 4, cols: 13 }, { row: 5, cols: 12 }, { row: 6, cols: 11 }, { row: 7, cols: 10 }, { row: 8, cols: 9 },
+            { row: 9, cols: 10 }, { row: 10, cols: 11 }, { row: 11, cols: 12 }, { row: 12, cols: 13 },
+            { row: 13, cols: 4 }, { row: 14, cols: 3 }, { row: 15, cols: 2 }, { row: 16, cols: 1 }
+        ];
+
+        const TARGET_TIPS = {
+            'top': {r: 0, c: 0},
+            'bottom': {r: 16, c: 0},
+            'top-left': {r: 4, c: 0},
+            'top-right': {r: 4, c: 12},
+            'bottom-left': {r: 12, c: 0},
+            'bottom-right': {r: 12, c: 12}
+        };
+
+        let holes = [];
+        let PLAYERS = {};
+        let mode = 2;
+        
+        let currentPlayer = 1;
+        let selectedHole = null;
+        let validMoves = [];
+        let hintMove = null;
+        
+        let stats = { 1: { steps: 0 }, 2: { steps: 0 }, 3: { steps: 0 } };
+        let logs = [];
+        let gameHistory = [];
+        let aiTimeout = null;
+
+        function getZone(r, c, rowCols) {
+            if (r <= 3) return 'top';
+            if (r >= 13) return 'bottom';
+            if (r >= 4 && r <= 7) {
+                if (c < (rowCols - 9)) return 'top-left';
+                if (c >= 9) return 'top-right';
+            }
+            if (r >= 9 && r <= 12) {
+                if (c < (rowCols - 9)) return 'bottom-left';
+                if (c >= 9) return 'bottom-right';
+            }
+            return 'center';
+        }
+
+        function initGeometry() {
+            holes = [];
+            BOARD_LAYOUT.forEach(layout => {
+                for (let c = 0; c < layout.cols; c++) {
+                    holes.push({
+                        r: layout.row,
+                        c: c,
+                        zone: getZone(layout.row, c, layout.cols),
+                        piece: null
+                    });
+                }
+            });
+            
+            // Neighbors calculation
+            holes.forEach(h1 => {
+                h1.neighbors = [];
+                const hx1 = h1.c - (BOARD_LAYOUT[h1.r].cols - 1) / 2;
+                const hy1 = (h1.r - 8) * Math.sqrt(3) / 2;
+                
+                holes.forEach(h2 => {
+                    if (h1 === h2) return;
+                    const hx2 = h2.c - (BOARD_LAYOUT[h2.r].cols - 1) / 2;
+                    const hy2 = (h2.r - 8) * Math.sqrt(3) / 2;
+                    const distSq = (hx1 - hx2) ** 2 + (hy1 - hy2) ** 2;
+                    if (distSq > 0.8 && distSq < 1.2) h1.neighbors.push(h2);
+                });
+            });
+            
+            // Jumps calculation
+            holes.forEach(h1 => {
+                h1.jumps = [];
+                h1.neighbors.forEach(h2 => {
+                    const hx1 = h1.c - (BOARD_LAYOUT[h1.r].cols - 1) / 2;
+                    const hy1 = (h1.r - 8) * Math.sqrt(3) / 2;
+                    const hx2 = h2.c - (BOARD_LAYOUT[h2.r].cols - 1) / 2;
+                    const hy2 = (h2.r - 8) * Math.sqrt(3) / 2;
+                    
+                    const dx = hx2 - hx1;
+                    const dy = hy2 - hy1;
+                    const targetX = hx1 + 2 * dx;
+                    const targetY = hy1 + 2 * dy;
+                    
+                    holes.forEach(h3 => {
+                        const hx3 = h3.c - (BOARD_LAYOUT[h3.r].cols - 1) / 2;
+                        const hy3 = (h3.r - 8) * Math.sqrt(3) / 2;
+                        const distSq = (hx3 - targetX) ** 2 + (hy3 - targetY) ** 2;
+                        if (distSq < 0.1) h1.jumps.push({ over: h2, to: h3 });
+                    });
+                });
+            });
+        }
+
+        function onModeChange() {
+            let m = parseInt(document.getElementById('mode-select').value);
+            document.getElementById('config-p3').style.display = m === 3 ? 'flex' : 'none';
+            // Also update texts for P2
+            if (m === 2) {
+                document.querySelector('#config-p2 .player-ident').innerHTML = '<div class="player-dot"></div>藍方 (S)';
+            } else {
+                document.querySelector('#config-p2 .player-ident').innerHTML = '<div class="player-dot"></div>藍方 (SW)';
+            }
+        }
+
+        function updatePlayerTypes() {
+            if(!PLAYERS[1]) return;
+            PLAYERS[1].type = document.querySelector('input[name="p1-type"]:checked').value;
+            PLAYERS[2].type = document.querySelector('input[name="p2-type"]:checked').value;
+            if (mode === 3) {
+                PLAYERS[3].type = document.querySelector('input[name="p3-type"]:checked').value;
+            }
+            updateUI();
+        }
+
+        function initPlayers() {
+            mode = parseInt(document.getElementById('mode-select').value);
+            let p1Type = document.querySelector('input[name="p1-type"]:checked').value;
+            let p2Type = document.querySelector('input[name="p2-type"]:checked').value;
+            let p3Type = document.querySelector('input[name="p3-type"]:checked') ? document.querySelector('input[name="p3-type"]:checked').value : 'ai';
+            
+            if (mode === 2) {
+                PLAYERS = {
+                    1: { color: 'var(--p1-color)', hex: '#f43f5e', start: 'top', target: 'bottom', name: '紅方 (N)', type: p1Type, class: 'p1' },
+                    2: { color: 'var(--p2-color)', hex: '#3b82f6', start: 'bottom', target: 'top', name: '藍方 (S)', type: p2Type, class: 'p2' }
+                };
+            } else {
+                PLAYERS = {
+                    1: { color: 'var(--p1-color)', hex: '#f43f5e', start: 'top', target: 'bottom', name: '紅方 (N)', type: p1Type, class: 'p1' },
+                    2: { color: 'var(--p2-color)', hex: '#3b82f6', start: 'bottom-left', target: 'top-right', name: '藍方 (SW)', type: p2Type, class: 'p2' },
+                    3: { color: 'var(--p3-color)', hex: '#10b981', start: 'bottom-right', target: 'top-left', name: '綠方 (SE)', type: p3Type, class: 'p3' }
+                };
+            }
+        }
+
+        function setupBoard() {
+            holes.forEach(h => h.piece = null);
+            Object.keys(PLAYERS).forEach(pId => {
+                let player = PLAYERS[pId];
+                holes.forEach(h => {
+                    if (h.zone === player.start) h.piece = parseInt(pId);
+                });
+            });
+        }
+
+        function getValidMoves(startHole) {
+            let valid = new Set();
+            startHole.neighbors.forEach(n => { if (!n.piece) valid.add(n); });
+            
+            let queue = [startHole];
+            let visited = new Set([startHole]);
+            
+            while (queue.length > 0) {
+                let current = queue.shift();
+                current.jumps.forEach(jump => {
+                    if (jump.over.piece && !jump.to.piece && !visited.has(jump.to)) {
+                        visited.add(jump.to);
+                        valid.add(jump.to);
+                        queue.push(jump.to);
+                    }
+                });
+            }
+            return Array.from(valid);
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const spacing = canvas.width / 18; 
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+
+            // Pre-calculate positions
+            holes.forEach(h => {
+                h.x = cx + (h.c - (BOARD_LAYOUT[h.r].cols - 1) / 2) * spacing;
+                h.y = cy + (h.r - 8) * spacing * Math.sqrt(3) / 2;
+            });
+
+            // Draw grid lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.lineWidth = 1;
+            holes.forEach(h => {
+                h.neighbors.forEach(n => {
+                    ctx.beginPath();
+                    ctx.moveTo(h.x, h.y);
+                    ctx.lineTo(n.x, n.y);
+                    ctx.stroke();
+                });
+            });
+
+            // Draw holes & pieces
+            holes.forEach(h => {
+                let isTarget = PLAYERS[currentPlayer] && h.zone === PLAYERS[currentPlayer].target;
+
+                // Faint outline for hole
+                ctx.beginPath();
+                ctx.arc(h.x, h.y, spacing * 0.35, 0, Math.PI * 2);
+                
+                if (isTarget && !h.piece) {
+                    ctx.fillStyle = PLAYERS[currentPlayer].hex + '33';
+                    ctx.fill();
+                    ctx.strokeStyle = PLAYERS[currentPlayer].hex + '80';
+                } else {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                }
+                ctx.stroke();
+
+                if (h.piece) {
+                    let p = PLAYERS[h.piece];
+                    let grad = ctx.createRadialGradient(
+                        h.x - spacing*0.1, h.y - spacing*0.1, spacing*0.05,
+                        h.x, h.y, spacing*0.35
+                    );
+                    grad.addColorStop(0, '#ffffff');
+                    grad.addColorStop(0.3, p.hex);
+                    grad.addColorStop(1, '#000000');
+                    
+                    ctx.beginPath();
+                    ctx.arc(h.x, h.y, spacing * 0.35, 0, Math.PI * 2);
+                    ctx.fillStyle = grad;
+                    
+                    // Shadow for glowing effect
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = p.hex;
+                    ctx.fill();
+                    ctx.shadowBlur = 0; // reset
+                    
+                    if (selectedHole === h) {
+                        ctx.beginPath();
+                        ctx.arc(h.x, h.y, spacing * 0.45, 0, Math.PI * 2);
+                        ctx.strokeStyle = '#fff';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        ctx.lineWidth = 1;
+                    }
+                }
+                
+                if (validMoves.includes(h)) {
+                    ctx.beginPath();
+                    ctx.arc(h.x, h.y, spacing * 0.15, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#fff';
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+            });
+
+            // Draw hint
+            if (hintMove) {
+                ctx.beginPath();
+                ctx.moveTo(hintMove.from.x, hintMove.from.y);
+                ctx.lineTo(hintMove.to.x, hintMove.to.y);
+                ctx.strokeStyle = '#facc15';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([5, 5]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                ctx.beginPath();
+                ctx.arc(hintMove.to.x, hintMove.to.y, spacing * 0.4, 0, Math.PI * 2);
+                ctx.strokeStyle = '#facc15';
+                ctx.stroke();
+            }
+        }
+
+        function checkWinCondition() {
+            let winner = null;
+            Object.keys(PLAYERS).forEach(pId => {
+                pId = parseInt(pId);
+                let player = PLAYERS[pId];
+                let count = 0;
+                let piecesTotal = 0;
+                holes.forEach(h => {
+                    if (h.piece === pId) {
+                        piecesTotal++;
+                        if (h.zone === player.target) count++;
+                    }
+                });
+                
+                // Update stats UI dynamically
+                if (pId === currentPlayer) {
+                    document.getElementById('stat-arrived').innerText = count;
+                }
+
+                if (count === piecesTotal && piecesTotal > 0) {
+                    winner = pId;
+                }
+            });
+            
+            if (winner) {
+                document.getElementById('message-title').innerText = `${PLAYERS[winner].name} 獲勝!`;
+                document.getElementById('message-overlay').style.display = 'block';
+                return true;
+            }
+            return false;
+        }
+
+        function addLog(pId, from, to) {
+            let p = PLAYERS[pId];
+            let typeStr = p.type === 'human' ? '玩家' : '電腦';
+            let dist = Math.abs(from.r - to.r) + Math.abs(from.c - to.c);
+            let actionStr = dist > 2 ? '跳躍' : '滑動';
+            let text = `${p.name} 將棋子從 (${from.r}, ${from.c}) ${actionStr}至 (${to.r}, ${to.c})`;
+            logs.push({ class: p.class, text: text });
+            renderLogs();
+        }
+
+        function renderLogs() {
+            const container = document.getElementById('game-log');
+            container.innerHTML = '';
+            logs.forEach(l => {
+                let div = document.createElement('div');
+                div.className = `log-item ${l.class}`;
+                div.innerText = l.text;
+                container.appendChild(div);
+            });
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function updateUI() {
+            if(!PLAYERS[currentPlayer]) return;
+            const p = PLAYERS[currentPlayer];
+            const card = document.getElementById('turn-card');
+            
+            document.getElementById('turn-text').innerText = `${p.name} (${p.type === 'human' ? '玩家' : '電腦'})`;
+            document.getElementById('turn-text').style.color = p.hex;
+            
+            card.style.borderColor = p.hex;
+            card.style.boxShadow = `0 0 20px ${p.hex}33`; // 20% opacity hex
+            
+            document.getElementById('stat-steps').innerText = stats[currentPlayer].steps;
+            
+            checkWinCondition(); // updates arrived stat
+        }
+
+        function saveState() {
+            gameHistory.push({
+                holes: holes.map(h => h.piece),
+                currentPlayer: currentPlayer,
+                stats: JSON.parse(JSON.stringify(stats)),
+                logs: [...logs]
+            });
+        }
+
+        function undoMove() {
+            if (gameHistory.length === 0) return;
+            if (document.getElementById('message-overlay').style.display === 'block') return;
+
+            let state = gameHistory.pop();
+            // keep popping if it's an AI's turn, to give human control back
+            while (gameHistory.length > 0 && PLAYERS[state.currentPlayer].type === 'ai') {
+                let anyHuman = Object.values(PLAYERS).some(p => p.type === 'human');
+                if (!anyHuman) break;
+                state = gameHistory.pop();
+            }
+
+            holes.forEach((h, i) => h.piece = state.holes[i]);
+            currentPlayer = state.currentPlayer;
+            stats = state.stats;
+            logs = state.logs;
+            selectedHole = null;
+            validMoves = [];
+            hintMove = null;
+            
+            if(aiTimeout) clearTimeout(aiTimeout);
+            
+            renderLogs();
+            updateUI();
+            draw();
+        }
+
+        function showHint() {
+            if (PLAYERS[currentPlayer].type === 'ai') return;
+            let move = calculateBestMove(currentPlayer);
+            if (move) {
+                hintMove = move;
+                draw();
+                // auto-hide hint after 2 seconds
+                setTimeout(() => { hintMove = null; draw(); }, 2000);
+            }
+        }
+
+        function nextTurn() {
+            if (document.getElementById('message-overlay').style.display === 'block') return;
+            
+            hintMove = null;
+            currentPlayer++;
+            if (currentPlayer > mode) currentPlayer = 1;
+            
+            updateUI();
+            draw();
+            
+            if (PLAYERS[currentPlayer].type === 'ai') {
+                aiTimeout = setTimeout(makeAIMove, 800); // realistic delay
+            }
+        }
+
+        function getTipHole(zoneName) {
+            let tip = TARGET_TIPS[zoneName];
+            return holes.find(h => h.r === tip.r && h.c === tip.c);
+        }
+
+        function evaluateBoard(playerID) {
+            let player = PLAYERS[playerID];
+            let tipHole = getTipHole(player.target);
+            const tipHx = tipHole.c - (BOARD_LAYOUT[tipHole.r].cols - 1) / 2;
+            const tipHy = (tipHole.r - 8) * Math.sqrt(3) / 2;
+            
+            let score = 0;
+            holes.forEach(h => {
+                if (h.piece === playerID) {
+                    const hx = h.c - (BOARD_LAYOUT[h.r].cols - 1) / 2;
+                    const hy = (h.r - 8) * Math.sqrt(3) / 2;
+                    const dist = Math.sqrt((hx - tipHx)**2 + (hy - tipHy)**2);
+                    score -= dist; 
+                    if (h.zone === player.target) score += 10; // bonus for reaching target
+                }
+            });
+            return score;
+        }
+
+        function calculateBestMove(pId) {
+            let bestScore = -Infinity;
+            let possibleMoves = [];
+            
+            holes.forEach(h => {
+                if (h.piece === pId) {
+                    let moves = getValidMoves(h);
+                    moves.forEach(m => {
+                        // simulate
+                        h.piece = null;
+                        m.piece = pId;
+                        
+                        let score = evaluateBoard(pId);
+                        
+                        // Penalty for leaving target zone
+                        if (h.zone === PLAYERS[pId].target && m.zone !== h.zone) {
+                            score -= 100; 
+                        }
+                        
+                        // undo
+                        m.piece = null;
+                        h.piece = pId;
+                        
+                        if (score > bestScore) {
+                            bestScore = score;
+                            possibleMoves = [{from: h, to: m, score: score}];
+                        } else if (Math.abs(score - bestScore) < 0.1) {
+                            possibleMoves.push({from: h, to: m, score: score});
+                        }
+                    });
+                }
+            });
+            
+            if (possibleMoves.length > 0) {
+                return possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+            }
+            return null;
+        }
+
+        function makeAIMove() {
+            if (document.getElementById('message-overlay').style.display === 'block') return;
+
+            let move = calculateBestMove(currentPlayer);
+            if (move) {
+                saveState();
+                move.to.piece = move.from.piece;
+                move.from.piece = null;
+                
+                stats[currentPlayer].steps++;
+                addLog(currentPlayer, move.from, move.to);
+                
+                draw();
+                if (!checkWinCondition()) {
+                    nextTurn();
+                }
+            }
+        }
+
+        canvas.addEventListener('click', e => {
+            if (PLAYERS[currentPlayer].type === 'ai') return;
+            if (document.getElementById('message-overlay').style.display === 'block') return;
+
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+            
+            let clickedHole = null;
+            const spacing = canvas.width / 18;
+            
+            holes.forEach(h => {
+                const distSq = (h.x - x) ** 2 + (h.y - y) ** 2;
+                if (distSq < (spacing * 0.4) ** 2) clickedHole = h;
+            });
+            
+            if (!clickedHole) return;
+
+            if (clickedHole.piece === currentPlayer) {
+                selectedHole = clickedHole;
+                validMoves = getValidMoves(clickedHole);
+                hintMove = null;
+                draw();
+            } else if (selectedHole && validMoves.includes(clickedHole)) {
+                saveState();
+                clickedHole.piece = selectedHole.piece;
+                
+                stats[currentPlayer].steps++;
+                addLog(currentPlayer, selectedHole, clickedHole);
+
+                selectedHole.piece = null;
+                selectedHole = null;
+                validMoves = [];
+                hintMove = null;
+                
+                draw();
+                if (!checkWinCondition()) {
+                    nextTurn();
+                }
+            }
+        });
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const size = Math.min(container.clientWidth, container.clientHeight) * 0.95;
+            canvas.style.width = size + 'px';
+            canvas.style.height = size + 'px';
+            if (holes.length > 0) draw();
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        function resetGame() {
+            if(aiTimeout) clearTimeout(aiTimeout);
+            startGame();
+        }
+
+        function startGame() {
+            document.getElementById('message-overlay').style.display = 'none';
+            if(aiTimeout) clearTimeout(aiTimeout);
+            
+            currentPlayer = 1;
+            selectedHole = null;
+            validMoves = [];
+            hintMove = null;
+            stats = { 1: { steps: 0 }, 2: { steps: 0 }, 3: { steps: 0 } };
+            logs = [];
+            gameHistory = [];
+            
+            initPlayers();
+            setupBoard();
+            renderLogs();
+            updateUI();
+            draw();
+            
+            if (PLAYERS[currentPlayer].type === 'ai') {
+                aiTimeout = setTimeout(makeAIMove, 800);
+            }
+        }
+
+        // Init
+        resizeCanvas();
+        initGeometry();
+        onModeChange(); // trigger initial UI setup
+        startGame();
+
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,236 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>卡坦島 Catan</title>
+  <style>
+    :root { --bg:#111827; --panel:#1f2937; --line:#374151; --gold:#f59e0b; --red:#ef4444; --blue:#3b82f6; --muted:#cbd5e1; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; color:#f8fafc; font-family:"Segoe UI","Noto Sans TC",sans-serif; background:linear-gradient(135deg,#0f172a,#2f2414); }
+    .top { height:64px; display:flex; align-items:center; justify-content:space-between; padding:0 22px; background:rgba(15,23,42,.92); border-bottom:1px solid #3f321a; position:sticky; top:0; z-index:5; }
+    a { color:#f8fafc; text-decoration:none; }
+    h1 { margin:0; color:#fbbf24; font-size:22px; }
+    .badge { border:1px solid #b45309; color:#fcd34d; border-radius:16px; padding:5px 10px; font-size:13px; }
+    .app { display:grid; grid-template-columns:300px 1fr 310px; gap:16px; padding:16px; }
+    .panel { background:rgba(31,41,55,.93); border:1px solid var(--line); border-radius:8px; padding:14px; box-shadow:0 14px 30px rgba(0,0,0,.28); }
+    .panel h2 { margin:0 0 10px; font-size:16px; color:#fbbf24; }
+    .board { min-height:620px; position:relative; overflow:auto; background:linear-gradient(#164e63,#0e7490); border:1px solid #256d7e; border-radius:8px; }
+    .island { position:relative; width:760px; height:610px; margin:18px auto; }
+    .hex { position:absolute; width:110px; height:96px; clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%); display:grid; place-items:center; border:2px solid rgba(255,255,255,.25); color:#111827; font-weight:800; text-align:center; box-shadow:0 5px 12px rgba(0,0,0,.3); }
+    .hex.robber::after { content:"盜賊"; position:absolute; inset:auto 20px 8px; background:#111827; color:white; border-radius:10px; font-size:12px; padding:2px; }
+    .wood { background:#2f8f46; } .brick { background:#b45309; } .sheep { background:#86efac; } .wheat { background:#fde047; } .ore { background:#94a3b8; } .desert { background:#d6b17b; }
+    .pip { width:34px; height:34px; border-radius:50%; background:#fff7ed; display:grid; place-items:center; margin:auto; color:#7c2d12; }
+    .site { position:absolute; width:28px; height:28px; border-radius:50%; border:2px solid white; background:rgba(15,23,42,.75); cursor:pointer; display:grid; place-items:center; font-size:15px; z-index:3; }
+    .site.p0 { background:#2563eb; } .site.p1 { background:#dc2626; } .site.city { border-radius:5px; transform:rotate(45deg); }
+    .road { position:absolute; height:10px; background:rgba(255,255,255,.18); border-radius:8px; transform-origin:left center; z-index:2; border:1px solid rgba(255,255,255,.25); cursor:pointer; }
+    .road.p0 { background:#60a5fa; } .road.p1 { background:#f87171; }
+    button, select { border:1px solid #785d1c; background:#92400e; color:white; border-radius:6px; padding:9px 11px; font-weight:800; cursor:pointer; }
+    button:hover { background:#b45309; } button:disabled { opacity:.45; cursor:not-allowed; }
+    .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:8px 0; }
+    .res { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
+    .res div { background:#111827; border:1px solid #475569; border-radius:6px; padding:8px 4px; text-align:center; }
+    .score { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .player { background:#111827; border:1px solid #475569; border-radius:7px; padding:10px; }
+    .active { outline:2px solid #fbbf24; }
+    .num { color:#fbbf24; font-size:28px; font-weight:900; }
+    .log { height:250px; overflow:auto; background:#111827; border-radius:6px; padding:10px; font-size:13px; line-height:1.5; color:#dbeafe; }
+    .help { color:var(--muted); font-size:13px; line-height:1.55; }
+    @media (max-width:1000px){ .app{grid-template-columns:1fr}.board{min-height:560px}.island{transform:scale(.78);transform-origin:top left;height:760px} }
+  </style>
+</head>
+<body>
+  <div class="top"><a href="../index.html">← 返回大廳</a><h1>卡坦島 Catan</h1><div class="badge">可完成單機版</div></div>
+  <div class="app">
+    <aside class="panel">
+      <h2>你的回合</h2>
+      <div id="turnText" class="help"></div>
+      <div class="row"><button id="rollBtn">擲骰</button><button id="endBtn">結束回合</button></div>
+      <div class="row">
+        <button id="roadBtn">建道路</button>
+        <button id="settleBtn">建村莊</button>
+        <button id="cityBtn">升城市</button>
+        <button id="devBtn">買發展卡</button>
+      </div>
+      <div class="row">
+        <select id="give"></select><select id="take"></select><button id="tradeBtn">4:1 交易</button>
+      </div>
+      <p class="help">建設費：道路=木+磚，村莊=木+磚+羊+麥，城市=2麥+3礦，發展卡=羊+麥+礦。點空道路/據點即可建造。10 分勝利。</p>
+    </aside>
+    <main class="board"><div id="island" class="island"></div></main>
+    <aside class="panel">
+      <h2>分數</h2>
+      <div class="score">
+        <div id="p0" class="player"><b>你</b><div class="num" id="vp0">0</div><div>路 <span id="roads0"></span> 村 <span id="settles0"></span> 城 <span id="cities0"></span></div></div>
+        <div id="p1" class="player"><b>AI</b><div class="num" id="vp1">0</div><div>路 <span id="roads1"></span> 村 <span id="settles1"></span> 城 <span id="cities1"></span></div></div>
+      </div>
+      <h2>資源</h2>
+      <div id="resPanel" class="res"></div>
+      <h2>紀錄</h2>
+      <div id="log" class="log"></div>
+    </aside>
+  </div>
+  <script>
+    window.addEventListener('error', event => { document.body.dataset.error = event.message; });
+    const RES = ['wood','brick','sheep','wheat','ore'];
+    const RNAME = {wood:'木',brick:'磚',sheep:'羊',wheat:'麥',ore:'礦'};
+    const ICON = {wood:'木',brick:'磚',sheep:'羊',wheat:'麥',ore:'礦',desert:'沙'};
+    const hexLayout = [
+      [2,0],[3,0],[4,0],
+      [1,1],[2,1],[3,1],[4,1],
+      [0,2],[1,2],[2,2],[3,2],[4,2],
+      [1,3],[2,3],[3,3],[4,3],
+      [2,4],[3,4],[4,4]
+    ];
+    const resources = ['wood','wood','wood','wood','brick','brick','brick','sheep','sheep','sheep','sheep','wheat','wheat','wheat','wheat','ore','ore','ore','desert'];
+    const nums = [5,2,6,3,8,10,9,12,11,4,8,10,9,4,5,6,3,11];
+    const sites = [
+      {x:270,y:62,h:[0,1]},{x:380,y:62,h:[1,2]},{x:220,y:150,h:[0,3,4]},{x:325,y:150,h:[0,1,4,5]},{x:435,y:150,h:[1,2,5,6]},{x:540,y:150,h:[2,6]},
+      {x:165,y:240,h:[3,7,8]},{x:270,y:240,h:[3,4,8,9]},{x:380,y:240,h:[4,5,9,10]},{x:490,y:240,h:[5,6,10,11]},{x:595,y:240,h:[6,11]},
+      {x:165,y:335,h:[7,12]},{x:270,y:335,h:[8,9,12,13]},{x:380,y:335,h:[9,10,13,14]},{x:490,y:335,h:[10,11,14,15]},{x:595,y:335,h:[11,15]},
+      {x:220,y:425,h:[12,16]},{x:325,y:425,h:[12,13,16,17]},{x:435,y:425,h:[13,14,17,18]},{x:540,y:425,h:[14,15,18]},
+      {x:270,y:515,h:[16,17]},{x:380,y:515,h:[17,18]}
+    ];
+    const roads = [[0,2],[0,3],[1,3],[1,4],[2,6],[2,7],[3,7],[3,8],[4,8],[4,9],[5,9],[5,10],[6,11],[6,12],[7,12],[8,12],[8,13],[9,13],[9,14],[10,14],[10,15],[11,16],[12,16],[12,17],[13,17],[13,18],[14,18],[14,19],[15,19],[16,20],[17,20],[17,21],[18,21],[19,21]];
+    let hexes, state, mode, rolled;
+    const $ = id => document.getElementById(id);
+    function shuffle(a){ return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]); }
+    function newGame(){
+      const res = shuffle(resources), numbers = [...nums];
+      hexes = res.map((r,i)=>({res:r,num:r==='desert'?0:numbers.shift(), robber:r==='desert'}));
+      state = {turn:0, players:[newPlayer('你',0),newPlayer('AI',1)], sites:sites.map(()=>null), roads:roads.map(()=>null), devDeck:shuffle(['騎士','騎士','騎士','道路建設','豐收','得分','得分'])};
+      mode = ''; rolled = false; $('log').innerHTML = '';
+      setupInitial();
+      log('初始村莊與道路已建立。你先手。');
+      render();
+    }
+    function newPlayer(name,id){ return {id,name,res:{wood:2,brick:2,sheep:1,wheat:1,ore:0}, roads:13, settlements:3, cities:4, knights:0, vpBonus:0}; }
+    function setupInitial(){
+      buildSite(2,0,true); buildRoad(4,0,true); buildSite(19,0,true); buildRoad(27,0,true);
+      buildSite(5,1,true); buildRoad(10,1,true); buildSite(16,1,true); buildRoad(29,1,true);
+      state.players[0].res = {wood:2,brick:2,sheep:1,wheat:1,ore:0};
+      state.players[1].res = {wood:2,brick:2,sheep:1,wheat:1,ore:0};
+    }
+    function vp(p){
+      let v = p.vpBonus;
+      state.sites.forEach(s => { if(s?.owner === p.id) v += s.city ? 2 : 1; });
+      return v;
+    }
+    function hasCost(p,cost){ return Object.entries(cost).every(([r,n]) => p.res[r] >= n); }
+    function pay(p,cost){ Object.entries(cost).forEach(([r,n]) => p.res[r]-=n); }
+    function addRes(p,r,n=1){ if(r !== 'desert') p.res[r] += n; }
+    function roadTouchesPlayer(idx, pid){
+      const [a,b] = roads[idx];
+      return state.sites[a]?.owner === pid || state.sites[b]?.owner === pid || state.roads.some((o,i) => o === pid && i !== idx && roads[i].some(s => s===a || s===b));
+    }
+    function siteLegal(idx,pid){
+      if(state.sites[idx]) return false;
+      if(roads.some(([a,b]) => (a===idx || b===idx) && (state.sites[a]?.owner !== undefined || state.sites[b]?.owner !== undefined))) return false;
+      return state.roads.some((o,i) => o === pid && roads[i].includes(idx));
+    }
+    function buildRoad(idx,pid,free=false){
+      const p = state.players[pid]; if(state.roads[idx] !== null) return false;
+      if(!free && (!hasCost(p,{wood:1,brick:1}) || !roadTouchesPlayer(idx,pid))) return false;
+      if(!free) pay(p,{wood:1,brick:1});
+      state.roads[idx] = pid; p.roads--; return true;
+    }
+    function buildSite(idx,pid,free=false){
+      const p = state.players[pid]; if(!free && (!hasCost(p,{wood:1,brick:1,sheep:1,wheat:1}) || !siteLegal(idx,pid))) return false;
+      if(!free) pay(p,{wood:1,brick:1,sheep:1,wheat:1});
+      state.sites[idx] = {owner:pid, city:false}; p.settlements--; return true;
+    }
+    function buildCity(idx,pid){
+      const p = state.players[pid], s = state.sites[idx];
+      if(!s || s.owner !== pid || s.city || !hasCost(p,{wheat:2,ore:3})) return false;
+      pay(p,{wheat:2,ore:3}); s.city = true; p.cities--; p.settlements++; return true;
+    }
+    function roll(){
+      if(state.turn !== 0 || rolled) return;
+      const d1 = Math.ceil(Math.random()*6), d2 = Math.ceil(Math.random()*6), n = d1+d2;
+      rolled = true;
+      if(n === 7){ robber(0); log(`你擲出 ${d1}+${d2}=7，移動盜賊。`); }
+      else { produce(n); log(`你擲出 ${d1}+${d2}=${n}，島嶼產出資源。`); }
+      render(); checkWin();
+    }
+    function produce(n){
+      hexes.forEach((h,hi) => {
+        if(h.num !== n || h.robber || h.res === 'desert') return;
+        sites.forEach((s,si) => {
+          if(s.h.includes(hi) && state.sites[si]) addRes(state.players[state.sites[si].owner], h.res, state.sites[si].city ? 2 : 1);
+        });
+      });
+    }
+    function robber(pid){
+      hexes.forEach(h=>h.robber=false);
+      const occupied = hexes.map((h,i)=>i).filter(i=>hexes[i].res!=='desert');
+      hexes[occupied[Math.floor(Math.random()*occupied.length)]].robber = true;
+      state.players.forEach(p => {
+        const total = RES.reduce((a,r)=>a+p.res[r],0);
+        if(total > 7) for(let i=0;i<Math.floor(total/2);i++){ const rs=RES.filter(r=>p.res[r]>0); p.res[rs[Math.floor(Math.random()*rs.length)]]--; }
+      });
+      const other = state.players[1-pid], mine = state.players[pid], rs = RES.filter(r=>other.res[r]>0);
+      if(rs.length){ const r = rs[Math.floor(Math.random()*rs.length)]; other.res[r]--; mine.res[r]++; }
+    }
+    function buyDev(pid){
+      const p = state.players[pid]; if(!state.devDeck.length || !hasCost(p,{sheep:1,wheat:1,ore:1})) return false;
+      pay(p,{sheep:1,wheat:1,ore:1}); const card = state.devDeck.pop();
+      if(card === '得分') p.vpBonus++;
+      else if(card === '騎士'){ p.knights++; robber(pid); }
+      else if(card === '豐收'){ addRes(p,'wheat',2); addRes(p,'ore',1); }
+      else { let built = 0; state.roads.forEach((_,i)=>{ if(built<2 && state.roads[i]===null && roadTouchesPlayer(i,pid)){ buildRoad(i,pid,true); built++; } }); }
+      log(`${p.name} 使用發展卡：${card}`); return true;
+    }
+    function clickSite(i){ if(state.turn!==0 || !rolled) return; if(mode==='settle' && buildSite(i,0)) log('你建立村莊。'); if(mode==='city' && buildCity(i,0)) log('你升級城市。'); render(); checkWin(); }
+    function clickRoad(i){ if(state.turn!==0 || !rolled) return; if(mode==='road' && buildRoad(i,0)) log('你建立道路。'); render(); checkWin(); }
+    function aiTurn(){
+      state.turn = 1; rolled = true; render();
+      const n = Math.ceil(Math.random()*6)+Math.ceil(Math.random()*6);
+      if(n===7) robber(1); else produce(n);
+      const p = state.players[1];
+      for(let k=0;k<5;k++){
+        let done = false;
+        state.sites.forEach((s,i)=>{ if(!done && buildCity(i,1)){ log('AI 升級城市。'); done=true; } });
+        state.sites.forEach((s,i)=>{ if(!done && buildSite(i,1)){ log('AI 建立村莊。'); done=true; } });
+        state.roads.forEach((r,i)=>{ if(!done && buildRoad(i,1)){ log('AI 建立道路。'); done=true; } });
+        if(!done && buyDev(1)) done = true;
+        if(!done) break;
+      }
+      checkWin();
+      if(!state.gameOver){ state.turn = 0; rolled = false; log('輪到你。'); render(); }
+    }
+    function endTurn(){ if(state.turn===0 && rolled && !state.gameOver) setTimeout(aiTurn,400); }
+    function trade(){
+      const p=state.players[0], g=$('give').value, t=$('take').value;
+      if(g!==t && p.res[g]>=4){ p.res[g]-=4; p.res[t]++; log(`你用 4 ${RNAME[g]} 換 1 ${RNAME[t]}。`); render(); }
+    }
+    function checkWin(){
+      [0,1].forEach(i => { if(vp(state.players[i]) >= 10 && !state.gameOver){ state.gameOver = true; log(`${state.players[i].name} 達到 10 分，遊戲結束！`); } });
+    }
+    function render(){
+      $('turnText').innerHTML = state.gameOver ? '遊戲結束' : `${state.turn===0 ? '你的' : 'AI 的'}回合 ${rolled ? '可建設' : '請先擲骰'}`;
+      $('rollBtn').disabled = state.turn!==0 || rolled || state.gameOver; $('endBtn').disabled = state.turn!==0 || !rolled || state.gameOver;
+      ['road','settle','city'].forEach(m => $(m+'Btn').disabled = state.turn!==0 || !rolled || state.gameOver);
+      $('devBtn').disabled = state.turn!==0 || !rolled || state.gameOver;
+      $('vp0').textContent = vp(state.players[0]); $('vp1').textContent = vp(state.players[1]);
+      $('p0').classList.toggle('active',state.turn===0&&!state.gameOver); $('p1').classList.toggle('active',state.turn===1&&!state.gameOver);
+      [0,1].forEach(i=>{ const p=state.players[i]; $('roads'+i).textContent=p.roads; $('settles'+i).textContent=p.settlements; $('cities'+i).textContent=p.cities; });
+      $('resPanel').innerHTML = RES.map(r=>`<div><b>${RNAME[r]}</b><br>${state.players[0].res[r]}</div>`).join('');
+      drawIsland();
+    }
+    function drawIsland(){
+      const el=$('island'); el.innerHTML='';
+      hexLayout.forEach(([x,y],i)=>{ const h=hexes[i], d=document.createElement('div'); d.className=`hex ${h.res} ${h.robber?'robber':''}`; d.style.left=(125+x*95-y*48)+'px'; d.style.top=(30+y*90)+'px'; d.innerHTML=`<div>${ICON[h.res]}<br><span class="pip">${h.num || ''}</span></div>`; el.appendChild(d); });
+      roads.forEach(([a,b],i)=>{ const A=sites[a],B=sites[b], dx=B.x-A.x, dy=B.y-A.y, len=Math.hypot(dx,dy), r=document.createElement('div'); r.className=`road ${state.roads[i]!==null?'p'+state.roads[i]:''}`; r.style.left=A.x+'px'; r.style.top=A.y+'px'; r.style.width=len+'px'; r.style.transform=`rotate(${Math.atan2(dy,dx)}rad)`; r.onclick=()=>clickRoad(i); el.appendChild(r); });
+      sites.forEach((s,i)=>{ const o=state.sites[i], d=document.createElement('div'); d.className=`site ${o?'p'+o.owner:''} ${o?.city?'city':''}`; d.style.left=(s.x-14)+'px'; d.style.top=(s.y-14)+'px'; d.textContent=o ? (o.city?'城':'村') : ''; d.onclick=()=>clickSite(i); el.appendChild(d); });
+    }
+    function log(msg){ $('log').innerHTML = `<div>${msg}</div>` + $('log').innerHTML; }
+    $('rollBtn').onclick = roll; $('endBtn').onclick = endTurn;
+    $('roadBtn').onclick=()=>mode='road'; $('settleBtn').onclick=()=>mode='settle'; $('cityBtn').onclick=()=>mode='city';
+    $('devBtn').onclick=()=>{ if(buyDev(0)){ render(); checkWin(); } };
+    $('tradeBtn').onclick=trade;
+    RES.forEach(r=>{ $('give').innerHTML += `<option value="${r}">${RNAME[r]}</option>`; $('take').innerHTML += `<option value="${r}">${RNAME[r]}</option>`; });
+    newGame();
+  </script>
+</body>
+</html>
+

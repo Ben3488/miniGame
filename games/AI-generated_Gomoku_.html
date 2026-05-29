@@ -1,0 +1,536 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>極致五子棋 Gomoku</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap');
+
+        :root {
+            --bg-color: #0f172a;
+            --board-bg: rgba(30, 41, 59, 0.7);
+            --board-border: #334155;
+            --line-color: #475569;
+            --p1-color: #38bdf8; /* Neon Blue */
+            --p2-color: #f472b6; /* Neon Pink */
+            --text-main: #f8fafc;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at top right, #1e293b, #0f172a);
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 20px rgba(255,255,255,0.1);
+            letter-spacing: 2px;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .status {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            padding: 8px 25px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .status.p1-turn {
+            color: var(--p1-color);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        .status.p2-turn {
+            color: var(--p2-color);
+            box-shadow: 0 0 15px rgba(244, 114, 182, 0.2);
+            border-color: rgba(244, 114, 182, 0.3);
+        }
+
+        .board {
+            position: relative;
+            background: var(--board-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 1px var(--board-border);
+            display: grid;
+            grid-template-columns: repeat(15, 1fr);
+            grid-template-rows: repeat(15, 1fr);
+            gap: 0;
+            width: 550px;
+            height: 550px;
+        }
+
+        .cell {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cell::before, .cell::after {
+            content: '';
+            position: absolute;
+            background-color: var(--line-color);
+            z-index: 1;
+        }
+
+        .cell::before { top: 50%; left: 0; right: 0; height: 1px; transform: translateY(-50%); }
+        .cell::after { left: 50%; top: 0; bottom: 0; width: 1px; transform: translateX(-50%); }
+
+        .cell[data-row="0"]::after { top: 50%; }
+        .cell[data-row="14"]::after { bottom: 50%; }
+        .cell[data-col="0"]::before { left: 50%; }
+        .cell[data-col="14"]::before { right: 50%; }
+
+        .piece {
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+            transform: scale(0);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            box-shadow: inset -3px -3px 6px rgba(0,0,0,0.3), 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .piece.p1 { background: radial-gradient(circle at 30% 30%, #7dd3fc, var(--p1-color)); box-shadow: 0 0 15px var(--p1-color), inset -2px -2px 5px rgba(0,0,0,0.3); }
+        .piece.p2 { background: radial-gradient(circle at 30% 30%, #f9a8d4, var(--p2-color)); box-shadow: 0 0 15px var(--p2-color), inset -2px -2px 5px rgba(0,0,0,0.3); }
+        
+        .board:not(.ai-thinking) .cell:not(.occupied):hover .ghost-piece {
+            opacity: 0.4;
+            transform: scale(0.8);
+        }
+        
+        .ghost-piece {
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            position: absolute;
+            z-index: 2;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .board[data-turn="1"] .ghost-piece { background: var(--p1-color); }
+        .board[data-turn="2"] .ghost-piece { background: var(--p2-color); }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .controls {
+            margin-top: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 25px;
+            font-size: 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.active {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.5);
+            box-shadow: 0 0 15px rgba(255,255,255,0.2);
+        }
+
+        /* Winning modal */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .modal.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: rgba(30, 41, 59, 0.9);
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            transform: scale(0.8);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal h2 {
+            font-size: 2.5rem;
+            margin: 0 0 1.5rem 0;
+        }
+        
+        .modal.p1-win h2 { color: var(--p1-color); text-shadow: 0 0 20px rgba(56,189,248,0.4); }
+        .modal.p2-win h2 { color: var(--p2-color); text-shadow: 0 0 20px rgba(244,114,182,0.4); }
+        
+        .piece.winning-piece {
+            animation: pulseWin 1s infinite alternate;
+            z-index: 3;
+        }
+        
+        @keyframes pulseWin {
+            0% { transform: scale(1); box-shadow: 0 0 15px currentColor; }
+            100% { transform: scale(1.2); box-shadow: 0 0 30px currentColor, 0 0 40px white; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>GOMOKU</h1>
+
+    <div class="mode-selector">
+        <button class="btn active" id="btn-pve" onclick="setMode('pve')">玩家 vs 電腦 (AI)</button>
+        <button class="btn" id="btn-pvp" onclick="setMode('pvp')">玩家 vs 玩家</button>
+        <button class="btn" onclick="initGame()">重新開始</button>
+        <a href="../index.html" class="btn" style="text-decoration: none; display: inline-flex; align-items: center;">返回選單</a>
+    </div>
+
+    <div class="status p1-turn" id="status">玩家 1 (藍色) 的回合</div>
+    
+    <div class="board" id="board" data-turn="1">
+        <!-- Cells will be generated by JS -->
+    </div>
+
+    <!-- controls removed to combine with mode-selector -->
+
+    <div class="modal" id="winModal">
+        <div class="modal-content">
+            <h2 id="winMessage">玩家 1 獲勝！</h2>
+            <button class="btn" onclick="initGame()">再來一局</button>
+        </div>
+    </div>
+
+    <script>
+        const BOARD_SIZE = 15;
+        let boardData = [];
+        let currentPlayer = 1; // 1 for Blue, 2 for Pink
+        let gameActive = true;
+        let gameMode = 'pve'; // pve or pvp
+        let isAITurn = false;
+
+        const boardElement = document.getElementById('board');
+        const statusElement = document.getElementById('status');
+        const winModal = document.getElementById('winModal');
+        const winMessage = document.getElementById('winMessage');
+
+        function setMode(mode) {
+            gameMode = mode;
+            document.getElementById('btn-pvp').classList.toggle('active', mode === 'pvp');
+            document.getElementById('btn-pve').classList.toggle('active', mode === 'pve');
+            initGame();
+        }
+
+        function initGame() {
+            boardData = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(0));
+            currentPlayer = 1;
+            gameActive = true;
+            isAITurn = false;
+            boardElement.innerHTML = '';
+            boardElement.setAttribute('data-turn', '1');
+            boardElement.classList.remove('ai-thinking');
+            winModal.classList.remove('show');
+            winModal.classList.remove('p1-win', 'p2-win');
+            updateStatus();
+
+            for (let r = 0; r < BOARD_SIZE; r++) {
+                for (let c = 0; c < BOARD_SIZE; c++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+                    
+                    const ghost = document.createElement('div');
+                    ghost.classList.add('ghost-piece');
+                    cell.appendChild(ghost);
+                    
+                    cell.addEventListener('click', () => handlePlayerMove(r, c, cell));
+                    boardElement.appendChild(cell);
+                }
+            }
+        }
+
+        function handlePlayerMove(row, col, cellElement) {
+            if (!gameActive || boardData[row][col] !== 0) return;
+            if (gameMode === 'pve' && currentPlayer === 2) return; // Prevent clicks during AI turn
+
+            placePiece(row, col, cellElement, currentPlayer);
+        }
+
+        function placePiece(row, col, cellElement, player) {
+            boardData[row][col] = player;
+            cellElement.classList.add('occupied');
+            
+            const piece = document.createElement('div');
+            piece.classList.add('piece', player === 1 ? 'p1' : 'p2');
+            cellElement.appendChild(piece);
+
+            const winningCells = checkWin(row, col, player);
+            if (winningCells) {
+                gameOver(player, winningCells);
+            } else {
+                currentPlayer = player === 1 ? 2 : 1;
+                boardElement.setAttribute('data-turn', currentPlayer.toString());
+                updateStatus();
+
+                if (gameMode === 'pve' && currentPlayer === 2 && gameActive) {
+                    isAITurn = true;
+                    boardElement.classList.add('ai-thinking');
+                    setTimeout(makeAIMove, 400); // Small delay for realism
+                }
+            }
+        }
+
+        function makeAIMove() {
+            if (!gameActive) return;
+
+            let bestScore = -1;
+            let bestMoves = [];
+            
+            // Check if board is empty (first move for AI if player somehow passes, or we just want AI to place near center)
+            let pieceCount = 0;
+            for(let r=0; r<BOARD_SIZE; r++) for(let c=0; c<BOARD_SIZE; c++) if(boardData[r][c]!==0) pieceCount++;
+            
+            if (pieceCount === 0) {
+                bestMoves = [[7, 7]];
+            } else {
+                for (let r = 0; r < BOARD_SIZE; r++) {
+                    for (let c = 0; c < BOARD_SIZE; c++) {
+                        if (boardData[r][c] === 0) {
+                            let score = evaluateCell(r, c);
+                            if (score > bestScore) {
+                                bestScore = score;
+                                bestMoves = [[r, c]];
+                            } else if (score === bestScore) {
+                                bestMoves.push([r, c]);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (bestMoves.length > 0) {
+                const move = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+                const cellIndex = move[0] * BOARD_SIZE + move[1];
+                const cellElement = boardElement.children[cellIndex];
+                
+                isAITurn = false;
+                boardElement.classList.remove('ai-thinking');
+                placePiece(move[0], move[1], cellElement, 2);
+            }
+        }
+
+        function evaluateCell(r, c) {
+            let attackScore = evaluateDirectionalScore(r, c, 2); // AI playing
+            let defenseScore = evaluateDirectionalScore(r, c, 1); // Player playing
+            
+            // Bias heavily towards defense if the player has a strong threat
+            // If player has a line score >= 10000 (meaning they will win if we don't block), we MUST block
+            return attackScore + defenseScore * 1.1; 
+        }
+
+        function evaluateDirectionalScore(r, c, player) {
+            let totalScore = 0;
+            const directions = [ [0, 1], [1, 0], [1, 1], [1, -1] ];
+            for (let dir of directions) {
+                totalScore += evaluateLine(r, c, dir[0], dir[1], player);
+            }
+            return totalScore;
+        }
+
+        function evaluateLine(r, c, dr, dc, player) {
+            let pieces = 1;
+            let openEnds = 0;
+            
+            // Check forward
+            let nr = r + dr;
+            let nc = c + dc;
+            while (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE) {
+                if (boardData[nr][nc] === player) {
+                    pieces++;
+                    nr += dr;
+                    nc += dc;
+                } else if (boardData[nr][nc] === 0) {
+                    openEnds++;
+                    break;
+                } else {
+                    break;
+                }
+            }
+            
+            // Check backward
+            nr = r - dr;
+            nc = c - dc;
+            while (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE) {
+                if (boardData[nr][nc] === player) {
+                    pieces++;
+                    nr -= dr;
+                    nc -= dc;
+                } else if (boardData[nr][nc] === 0) {
+                    openEnds++;
+                    break;
+                } else {
+                    break;
+                }
+            }
+            
+            if (pieces >= 5) return 100000;
+            if (pieces === 4) return openEnds === 2 ? 10000 : (openEnds === 1 ? 1000 : 0);
+            if (pieces === 3) return openEnds === 2 ? 1000 : (openEnds === 1 ? 100 : 0);
+            if (pieces === 2) return openEnds === 2 ? 100 : (openEnds === 1 ? 10 : 0);
+            
+            return 1;
+        }
+
+        function updateStatus() {
+            if (currentPlayer === 1) {
+                statusElement.textContent = "玩家 1 (藍色) 的回合";
+                statusElement.className = "status p1-turn";
+            } else {
+                if (gameMode === 'pve') {
+                    statusElement.textContent = "電腦思考中...";
+                } else {
+                    statusElement.textContent = "玩家 2 (粉紅) 的回合";
+                }
+                statusElement.className = "status p2-turn";
+            }
+        }
+
+        function checkWin(r, c, player) {
+            const directions = [
+                [[0, 1], [0, -1]], [[1, 0], [-1, 0]], [[1, 1], [-1, -1]], [[1, -1], [-1, 1]]
+            ];
+
+            for (let dir of directions) {
+                let count = 1;
+                let cells = [[r, c]];
+
+                for (let d of dir) {
+                    let nr = r + d[0];
+                    let nc = c + d[1];
+                    while (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE && boardData[nr][nc] === player) {
+                        count++;
+                        cells.push([nr, nc]);
+                        nr += d[0];
+                        nc += d[1];
+                    }
+                }
+                if (count >= 5) return cells;
+            }
+            return null;
+        }
+
+        function gameOver(winner, winningCells) {
+            gameActive = false;
+            
+            winningCells.forEach(coords => {
+                const cellIndex = coords[0] * BOARD_SIZE + coords[1];
+                const piece = boardElement.children[cellIndex].querySelector('.piece');
+                if (piece) {
+                    piece.classList.add('winning-piece');
+                    if (winner === 1) piece.style.color = 'var(--p1-color)';
+                    if (winner === 2) piece.style.color = 'var(--p2-color)';
+                }
+            });
+
+            setTimeout(() => {
+                if (winner === 1) {
+                    winMessage.textContent = "玩家 1 (藍色) 獲勝！";
+                    winModal.classList.add('p1-win');
+                } else {
+                    winMessage.textContent = gameMode === 'pve' ? "電腦 (粉紅) 獲勝！" : "玩家 2 (粉紅) 獲勝！";
+                    winModal.classList.add('p2-win');
+                }
+                winModal.classList.add('show');
+            }, 800);
+        }
+
+        // Start game
+        initGame();
+
+        // Responsive scaling for mobile
+        function resizeBoard() {
+            const boardEl = document.getElementById('board');
+            const targetWidth = 590; // board width + safe padding
+            if (window.innerWidth < targetWidth) {
+                const scale = window.innerWidth / targetWidth;
+                boardEl.style.transform = `scale(${scale})`;
+                boardEl.style.transformOrigin = 'top center';
+                boardEl.style.marginBottom = `-${boardEl.offsetHeight * (1 - scale)}px`;
+            } else {
+                boardEl.style.transform = 'none';
+                boardEl.style.marginBottom = '2rem';
+            }
+        }
+        window.addEventListener('resize', resizeBoard);
+        resizeBoard();
+    </script>
+</body>
+</html>
+
