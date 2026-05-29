@@ -1,41 +1,38 @@
 import requests
 from bs4 import BeautifulSoup
-import urllib.parse
-import ssl
-
-# Disable SSL warnings
 import urllib3
+import urllib.parse
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"
 }
 
-def check_url(url, label):
-    print(f"\n--- Checking: {label} ({url}) ---")
-    try:
-        res = requests.get(url, headers=HEADERS, timeout=10, verify=False)
-        print(f"Status Code: {res.status_code}")
-        if res.status_code == 200:
-            soup = BeautifulSoup(res.text, 'html.parser')
-            print(f"Title: {soup.title.text if soup.title else 'No title'}")
-            # Find links or tables
-            tables = soup.find_all('table')
-            print(f"Found {len(tables)} tables")
-            # Print a few links
-            links = [a.get('href') for a in soup.find_all('a') if a.get('href')]
-            print(f"Found {len(links)} links. First 10 links:")
-            for l in links[:10]:
-                print("  ", l)
-    except Exception as e:
-        print(f"Error checking {label}: {e}")
+url = "https://sanguosha.fandom.com/zh/wiki/" + urllib.parse.quote("殺")
 
-urls = {
-    "Wiki Main": "https://sanguosha.fandom.com/zh/wiki/%E4%B8%89%E5%9B%BD%E6%9D%80_%E7%BB%B4%E5%9F%BA",
-    "Shenhua Zailin": "https://sanguosha.fandom.com/zh/wiki/%E7%89%8C/%E7%A5%9E%E8%AF%9D%E5%86%8D%E4%B8%B5",
-    "Jiexian Tupo": "https://sanguosha.fandom.com/zh/wiki/%E7%89%8C/%E7%95%8C%E9%99%90%E7%AA%81%E7%A0%B4",
-    "SP": "https://sanguosha.fandom.com/zh/wiki/%E7%89%8C/SP"
-}
+res = requests.get(url, headers=HEADERS, verify=False)
+soup = BeautifulSoup(res.text, 'html.parser')
 
-for name, url in urls.items():
-    check_url(url, name)
+print("Status Code:", res.status_code)
+print("URL fetched:", res.url)
+
+# Print out a few image tags to see their classes
+imgs = soup.find_all('img')
+print(f"Found {len(imgs)} img tags. Printing first 10:")
+for img in imgs[:10]:
+    print("IMG:", img.get('class'), img.get('src'))
+    
+# Check what 'a' tags look like for images
+a_tags = soup.find_all('a', class_=lambda c: c and 'image' in c)
+print(f"Found {len(a_tags)} a tags with 'image' in class:")
+for a in a_tags[:5]:
+    print("A TAG:", a.get('class'), a.get('href'))
+
+# Let's also check for pi-image (Portable Infobox image)
+pi_images = soup.find_all(class_="pi-image")
+print(f"Found {len(pi_images)} pi-images:")
+for pi in pi_images:
+    a = pi.find('a')
+    if a:
+        print("PI-IMAGE A HREF:", a.get('href'))

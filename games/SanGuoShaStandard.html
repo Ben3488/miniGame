@@ -324,11 +324,134 @@
         .card.bg-trick { background-image: url('../assets/SanGuoSha/backgrounds/trick_bg.png'); }
         .card.bg-delay_trick { background-image: url('../assets/SanGuoSha/backgrounds/trick_bg.png'); }
         .card.bg-equip { background-image: url('../assets/SanGuoSha/backgrounds/equip_bg.png'); }
+
+        /* Faction Styling */
+        .player-area.faction-wei {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 58, 138, 0.9) 100%);
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 10px 25px rgba(30, 58, 138, 0.25);
+        }
+        .player-area.faction-shu {
+            background: linear-gradient(135deg, rgba(24, 9, 9, 0.95) 0%, rgba(127, 29, 29, 0.9) 100%);
+            border-color: rgba(239, 68, 68, 0.4);
+            box-shadow: 0 10px 25px rgba(127, 29, 29, 0.25);
+        }
+        .player-area.faction-wu {
+            background: linear-gradient(135deg, rgba(6, 25, 17, 0.95) 0%, rgba(6, 95, 70, 0.9) 100%);
+            border-color: rgba(16, 185, 129, 0.4);
+            box-shadow: 0 10px 25px rgba(6, 95, 70, 0.25);
+        }
+        .player-area.faction-qun {
+            background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(55, 65, 81, 0.9) 100%);
+            border-color: rgba(156, 163, 175, 0.4);
+            box-shadow: 0 10px 25px rgba(55, 65, 81, 0.25);
+        }
+        .player-area.faction-god {
+            background: linear-gradient(135deg, rgba(20, 10, 30, 0.95) 0%, rgba(88, 28, 135, 0.9) 100%);
+            border-color: rgba(245, 158, 11, 0.5);
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.25);
+        }
+        
+        /* HP Dots styling */
+        .hp-dots {
+            display: flex;
+            gap: 3px;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+        }
+        .hp-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .hp-dot.green {
+            background: #10b981;
+            box-shadow: 0 0 6px #10b981;
+        }
+        .hp-dot.yellow {
+            background: #eab308;
+            box-shadow: 0 0 6px #eab308;
+        }
+        .hp-dot.red {
+            background: #ef4444;
+            box-shadow: 0 0 6px #ef4444;
+        }
+        .hp-dot.empty {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: none;
+        }
+
+        /* History Sidebar styling */
+        .history-sidebar {
+            position: fixed; top: 0; right: -320px; width: 300px; height: 100vh;
+            background: rgba(15, 12, 10, 0.95); border-left: 2px solid var(--theme-border);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.8); z-index: 600;
+            display: flex; flex-direction: column; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(15px);
+        }
+        .history-sidebar.open { right: 0; }
+        .history-header {
+            padding: 16px; border-bottom: 1px solid var(--theme-border);
+            display: flex; justify-content: space-between; align-items: center;
+            color: var(--theme-gold); font-weight: 900; font-size: 1.25rem;
+            letter-spacing: 1px;
+        }
+        .history-close {
+            background: none; border: none; color: #a1a1aa; font-size: 1.5rem; cursor: pointer;
+            transition: color 0.2s;
+        }
+        .history-close:hover { color: #fff; }
+        .history-content {
+            flex: 1; overflow-y: auto; padding: 16px;
+            display: flex; flex-direction: column; gap: 12px;
+            font-size: 0.9rem; line-height: 1.5; color: #e4e4e7;
+            scrollbar-width: thin; scrollbar-color: var(--theme-border) transparent;
+        }
+        .history-content::-webkit-scrollbar {
+            width: 4px;
+        }
+        .history-content::-webkit-scrollbar-thumb {
+            background-color: var(--theme-border);
+            border-radius: 2px;
+        }
+        .log-entry {
+            border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;
+        }
+        
+        /* Central Active Card area */
+        .active-card-area {
+            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 150; pointer-events: none; display: none; flex-direction: column; align-items: center; gap: 14px;
+        }
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        /* Phase tag */
+        .phase-tag {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--theme-gold);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-top: 4px;
+            font-weight: bold;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
     <div class="top-bar">
-        <a href="../index.html" class="back-btn">← 返回大廳</a>
+        <div style="display:flex; gap:12px; align-items:center;">
+            <a href="../index.html" class="back-btn">← 返回大廳</a>
+            <button class="back-btn" onclick="UI.toggleHistoryLog()" style="cursor:pointer; font-size: 1rem;">📜 戰局日誌</button>
+        </div>
         <h1 class="game-title">三國殺 - 標準版</h1>
         <div id="selfTestBadge" style="background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 4px;">
             <span>牌堆驗證中...</span>
@@ -378,6 +501,9 @@
             <div id="cipTitle" class="cip-title"></div>
             <div id="cipDesc" class="cip-desc"></div>
         </div>
+        
+        <!-- Central Active Card Show -->
+        <div class="active-card-area" id="activeCardShow"></div>
     </div>
 
     <!-- Lobby / Hero Selection Modal -->
@@ -456,6 +582,50 @@
             
             <div style="text-align: center;">
                 <button class="btn" id="btnGxConfirm" style="padding: 8px 24px; font-size: 1.1rem;">確定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Sidebar -->
+    <div class="history-sidebar" id="historySidebar">
+        <div class="history-header">
+            <span>📜 戰局日誌</span>
+            <button class="history-close" onclick="UI.toggleHistoryLog()">×</button>
+        </div>
+        <div class="history-content" id="historyLogContent">
+            <div class="log-entry" style="color: #888;">遊戲日誌已初始化。</div>
+        </div>
+    </div>
+
+    <!-- Card Pick Modal -->
+    <div class="modal-overlay" id="cardPickModal" style="display:none; z-index: 550;">
+        <div class="modal-content" style="max-width: 650px; padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+            <h2 id="cardPickTitle" style="color: var(--theme-gold); margin: 0; text-align: center; font-size: 1.8rem; font-weight: 900;">請選擇卡牌</h2>
+            <p id="cardPickPrompt" style="margin: 0; color: #ccc; text-align: center; font-size: 1rem;"></p>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <!-- Hand cards section -->
+                <div id="cpHandSection" style="border: 1px solid rgba(245, 158, 11, 0.25); padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.5); display:none;">
+                    <div style="color: var(--theme-gold); font-weight: bold; margin-bottom: 8px; font-size: 0.95rem;">手牌區 (Hand Cards)</div>
+                    <div id="cpHandCards" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; min-height: 60px;"></div>
+                </div>
+                
+                <!-- Equips section -->
+                <div id="cpEquipSection" style="border: 1px solid rgba(245, 158, 11, 0.25); padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.5); display:none;">
+                    <div style="color: var(--theme-gold); font-weight: bold; margin-bottom: 8px; font-size: 0.95rem;">裝備區 (Equipped Cards)</div>
+                    <div id="cpEquipCards" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; min-height: 60px;"></div>
+                </div>
+                
+                <!-- Judges section -->
+                <div id="cpJudgeSection" style="border: 1px solid rgba(245, 158, 11, 0.25); padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.5); display:none;">
+                    <div style="color: var(--theme-gold); font-weight: bold; margin-bottom: 8px; font-size: 0.95rem;">判定區 (Pending Judgment Cards)</div>
+                    <div id="cpJudgeCards" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; min-height: 60px;"></div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; display: flex; gap: 12px; justify-content: center;">
+                <button class="btn btn-cancel" id="btnCpCancel" style="padding: 8px 30px; font-size: 1.1rem; display:none;">取消</button>
+                <button class="btn" id="btnCpConfirm" disabled style="padding: 8px 30px; font-size: 1.1rem;">確定</button>
             </div>
         </div>
     </div>
@@ -858,6 +1028,7 @@
                 this.discardPile = [];
                 this.currentPlayerIdx = 0;
                 this.state = 'INIT'; // INIT, PLAYING, TARGETING, RESPONDING, DISCARDING, WAITING, GAME_OVER
+                this.currentPhase = '';
                 this.pendingAction = null;
                 this.selectedCardIds = [];
                 this.selectedTargets = [];
@@ -1004,6 +1175,16 @@
                             }
                         }, 50);
                     }
+                }
+                
+                // Lu Xun Continuous Camps (連營)
+                if (player.hero.skills.includes('連營') && player.hand.length === 0 && !player.isDead) {
+                    setTimeout(async () => {
+                        if (player.hand.length === 0 && !player.isDead) {
+                            this.log(`【${player.hero.name}】發動【連營】！`);
+                            await this.drawCards(player, 1, '發動【連營】摸了');
+                        }
+                    }, 50);
                 }
             }
 
@@ -1243,7 +1424,176 @@
             }
 
             log(msg) {
+                if (!msg) return;
                 document.getElementById('gameLog').innerText = msg;
+                
+                let historyContent = document.getElementById('historyLogContent');
+                if (historyContent) {
+                    let formatted = msg;
+                    // Highlight player names
+                    this.players.forEach(p => {
+                        let name = p.hero.name;
+                        let color = p.hero.faction === 'wei' ? '#60a5fa' :
+                                    p.hero.faction === 'shu' ? '#f87171' :
+                                    p.hero.faction === 'wu' ? '#34d399' :
+                                    p.hero.faction === 'qun' ? '#d1d5db' : '#f59e0b';
+                        
+                        let regex = new RegExp(`【${name}】`, 'g');
+                        formatted = formatted.replace(regex, `<span style="color:${color}; font-weight:bold;">【${name}】</span>`);
+                    });
+                    
+                    // Highlight card names in gold
+                    formatted = formatted.replace(/【([^】]+)】/g, (match, p1) => {
+                        if (match.includes('color:')) return match;
+                        return `<span style="color:var(--theme-gold); font-weight:bold;">【${p1}】</span>`;
+                    });
+                    
+                    let entry = document.createElement('div');
+                    entry.className = 'log-entry';
+                    entry.innerHTML = formatted;
+                    historyContent.appendChild(entry);
+                    historyContent.scrollTop = historyContent.scrollHeight;
+                }
+            }
+
+            askForCardPick(actor, target, mode, prompt = '') {
+                if (actor.id !== 0) {
+                    // AI selection:
+                    let options = [];
+                    target.hand.forEach((c, idx) => {
+                        options.push({ zone: 'hand', card: c, index: idx });
+                    });
+                    for (let slot of ['armor', 'weapon', 'defMount', 'offMount', 'treasure']) {
+                        if (target.equips[slot]) {
+                            options.push({ zone: 'equip', card: target.equips[slot], slot: slot });
+                        }
+                    }
+                    target.judges.forEach((j, idx) => {
+                        options.push({ zone: 'judge', card: j, index: idx });
+                    });
+                    
+                    if (options.length === 0) return null;
+                    
+                    // AI priorities: Armor > Weapon > Mounts > Hand > Judge
+                    let armors = options.filter(o => o.zone === 'equip' && o.slot === 'armor');
+                    let weapons = options.filter(o => o.zone === 'equip' && o.slot === 'weapon');
+                    let mounts = options.filter(o => o.zone === 'equip' && (o.slot === 'defMount' || o.slot === 'offMount'));
+                    let treasures = options.filter(o => o.zone === 'equip' && o.slot === 'treasure');
+                    let hands = options.filter(o => o.zone === 'hand');
+                    let judges = options.filter(o => o.zone === 'judge');
+                    
+                    if (armors.length > 0) return armors[0];
+                    if (weapons.length > 0) return weapons[0];
+                    if (mounts.length > 0) return mounts[0];
+                    if (treasures.length > 0) return treasures[0];
+                    if (hands.length > 0) return hands[Math.floor(Math.random() * hands.length)];
+                    return options[0];
+                }
+                
+                // Human player selection:
+                return new Promise(resolve => {
+                    let modal = document.getElementById('cardPickModal');
+                    let pPrompt = document.getElementById('cardPickPrompt');
+                    let confirmBtn = document.getElementById('btnCpConfirm');
+                    
+                    pPrompt.innerText = prompt || `請從【${target.hero.name}】那裡選擇一張牌。`;
+                    
+                    let cpHandSection = document.getElementById('cpHandSection');
+                    let cpHandCards = document.getElementById('cpHandCards');
+                    let cpEquipSection = document.getElementById('cpEquipSection');
+                    let cpEquipCards = document.getElementById('cpEquipCards');
+                    let cpJudgeSection = document.getElementById('cpJudgeSection');
+                    let cpJudgeCards = document.getElementById('cpJudgeCards');
+                    
+                    cpHandCards.innerHTML = '';
+                    cpEquipCards.innerHTML = '';
+                    cpJudgeCards.innerHTML = '';
+                    
+                    let selectedItem = null;
+                    
+                    const updateSelection = (item, element) => {
+                        modal.querySelectorAll('.card').forEach(el => el.classList.remove('selected'));
+                        element.classList.add('selected');
+                        selectedItem = item;
+                        confirmBtn.disabled = false;
+                    };
+                    
+                    // 1. Hand cards
+                    if (target.hand.length > 0) {
+                        cpHandSection.style.display = 'block';
+                        target.hand.forEach((c, idx) => {
+                            let el = document.createElement('div');
+                            el.className = 'card';
+                            el.style.width = '75px';
+                            el.style.height = '105px';
+                            el.style.borderWidth = '1px';
+                            el.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
+                            el.onclick = () => updateSelection({ zone: 'hand', index: idx, card: c }, el);
+                            cpHandCards.appendChild(el);
+                        });
+                    } else {
+                        cpHandSection.style.display = 'none';
+                    }
+                    
+                    // 2. Equips
+                    let hasEquips = false;
+                    for (let slot of ['weapon', 'armor', 'defMount', 'offMount', 'treasure']) {
+                        let eq = target.equips[slot];
+                        if (eq) {
+                            hasEquips = true;
+                            let el = document.createElement('div');
+                            el.className = `card face-up ${eq.bg || ''}`;
+                            el.style.width = '75px';
+                            el.style.height = '105px';
+                            el.style.borderWidth = '1px';
+                            el.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
+                            el.innerHTML = `
+                                <div class="card-illustration" style="background-image: url('${eq.img || ''}')"></div>
+                                <div class="card-title" style="font-size: 0.7rem; color:${eq.color === 'red' ? '#dc2626' : '#1c1917'};">${eq.name}</div>
+                                <div class="card-suit suit-${eq.color}" style="font-size: 0.7rem; left:2px; top:2px;">${eq.suit}</div>
+                                <div class="card-point suit-${eq.color}" style="font-size: 0.7rem; right:2px; top:2px;">${eq.point}</div>
+                            `;
+                            el.onclick = () => updateSelection({ zone: 'equip', slot: slot, card: eq }, el);
+                            cpEquipCards.appendChild(el);
+                        }
+                    }
+                    if (hasEquips) {
+                        cpEquipSection.style.display = 'block';
+                    } else {
+                        cpEquipSection.style.display = 'none';
+                    }
+                    
+                    // 3. Judges
+                    if (target.judges.length > 0) {
+                        cpJudgeSection.style.display = 'block';
+                        target.judges.forEach((j, idx) => {
+                            let el = document.createElement('div');
+                            el.className = `card face-up ${j.bg || 'bg-trick'}`;
+                            el.style.width = '75px';
+                            el.style.height = '105px';
+                            el.style.borderWidth = '1px';
+                            el.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
+                            el.innerHTML = `
+                                <div class="card-illustration" style="background-image: url('${j.img || ''}')"></div>
+                                <div class="card-title" style="font-size: 0.7rem; color:${j.color === 'red' ? '#dc2626' : '#1c1917'};">${j.name}</div>
+                                <div class="card-suit suit-${j.color}" style="font-size: 0.7rem; left:2px; top:2px;">${j.suit}</div>
+                                <div class="card-point suit-${j.color}" style="font-size: 0.7rem; right:2px; top:2px;">${j.point}</div>
+                            `;
+                            el.onclick = () => updateSelection({ zone: 'judge', index: idx, card: j }, el);
+                            cpJudgeCards.appendChild(el);
+                        });
+                    } else {
+                        cpJudgeSection.style.display = 'none';
+                    }
+                    
+                    confirmBtn.onclick = () => {
+                        modal.style.display = 'none';
+                        resolve(selectedItem);
+                    };
+                    
+                    confirmBtn.disabled = true;
+                    modal.style.display = 'flex';
+                });
             }
 
             async triggerHook(name, context) {
@@ -1367,10 +1717,13 @@
                 p.flags.luoYi = false;
                 
                 this.log(`【${p.hero.name}】的回合開始`);
+                this.currentPhase = '準備';
                 UI.updateAll();
                 await this.sleep(800);
                 
                 await this.triggerHook('onPhaseStart', { player: p, phase: 'start' });
+                this.currentPhase = '判定';
+                UI.updateAll();
                 await this.judgePhase(p);
                 if(p.isDead || this.state === 'GAME_OVER') return;
                 
@@ -1380,6 +1733,8 @@
                 if (!skipDraw) {
                     await this.drawPhase(p);
                 } else {
+                    this.currentPhase = '摸牌';
+                    UI.updateAll();
                     this.log(`【${p.hero.name}】跳過摸牌階段！`);
                     await this.sleep(800);
                 }
@@ -1387,6 +1742,8 @@
                 if(!skipPlay) {
                     await this.playPhase(p);
                 } else {
+                    this.currentPhase = '出牌';
+                    UI.updateAll();
                     this.log(`【${p.hero.name}】跳過出牌階段`);
                     await this.sleep(800);
                     await this.discardPhase(p);
@@ -1394,6 +1751,8 @@
             }
             
             async judgePhase(p) {
+                this.currentPhase = '判定';
+                UI.updateAll();
                 await this.triggerHook('onPhaseStart', { player: p, phase: 'judge' });
                 while(p.judges && p.judges.length > 0) {
                     let jCard = p.judges.pop();
@@ -1508,6 +1867,8 @@
             }
 
             async drawPhase(p) {
+                this.currentPhase = '摸牌';
+                UI.updateAll();
                 await this.triggerHook('onPhaseStart', { player: p, phase: 'draw' });
                 let context = { player: p, count: 2 };
                 if(p.hero.skills.includes('英姿')) context.count++;
@@ -1515,11 +1876,69 @@
                     let use = await this.askForSkill(p, '裸衣', '是否發動【裸衣】少摸一張，本回合殺/決鬥傷害+1？');
                     if(use) { context.count--; p.flags.luoYi = true; }
                 }
+                
+                // Zhang Liao Surprise Attack (突襲)
+                if (p.hero.skills.includes('突襲')) {
+                    let targets = this.getLivingPlayers().filter(o => o.id !== p.id && o.hand.length > 0);
+                    if (targets.length > 0) {
+                        let use = await this.askForSkill(p, '突襲', '是否發動【突襲】放棄摸牌並獲得其他角色手牌？');
+                        if (use) {
+                            let chosenTargets = [];
+                            if (p.id === 0) {
+                                this.state = 'TARGETING';
+                                this.pendingAction = {
+                                    type: 'TU_XI',
+                                    maxTargets: 2,
+                                    resolve: async targetIds => {
+                                        chosenTargets = targetIds.map(id => this.players[id]);
+                                    }
+                                };
+                                this.selectedTargets = [];
+                                this.log('請選擇 1 至 2 名有手牌的角色發動【突襲】');
+                                UI.updateAll();
+                                
+                                await new Promise(res => {
+                                    let check = setInterval(() => {
+                                        if (this.state !== 'TARGETING') {
+                                            clearInterval(check);
+                                            res();
+                                        }
+                                    }, 100);
+                                });
+                            } else {
+                                let enemies = targets.filter(o => this.isEnemy(p, o));
+                                if (enemies.length > 0) {
+                                    chosenTargets = enemies.slice(0, 2);
+                                } else {
+                                    chosenTargets = [targets[0]];
+                                }
+                            }
+                            
+                            if (chosenTargets.length > 0) {
+                                this.log(`【${p.hero.name}】發動【突襲】！`);
+                                for (let target of chosenTargets) {
+                                    let ref = await this.askForCardPick(p, target, 'gain', `【突襲】獲得【${target.hero.name}】的一張手牌`);
+                                    if (ref && ref.zone === 'hand') {
+                                        let cardIdx = target.hand.findIndex(c => c.id === ref.card.id);
+                                        let card = target.hand.splice(cardIdx !== -1 ? cardIdx : ref.index, 1)[0];
+                                        p.hand.push(card);
+                                        this.log(`【${p.hero.name}】從【${target.hero.name}】那裡獲得了一張手牌`);
+                                        UI.updateAll(); await this.sleep(600);
+                                    }
+                                }
+                                return;
+                            }
+                        }
+                    }
+                }
+
                 await this.triggerHook('onDraw', context);
                 await this.drawCards(p, Math.max(0, context.count), '摸了');
             }
 
             async playPhase(p) {
+                this.currentPhase = '出牌';
+                UI.updateAll();
                 await this.triggerHook('onPhaseStart', { player: p, phase: 'play' });
                 if(p.id === 0) {
                     this.state = 'PLAYING';
@@ -1531,6 +1950,8 @@
             }
 
             async discardPhase(p) {
+                this.currentPhase = '棄牌';
+                UI.updateAll();
                 await this.triggerHook('onPhaseStart', { player: p, phase: 'discard' });
                 let limit = p.hp;
                 if(p.hero.skills.includes('克己') && p.flags.usedSha === 0) limit = p.maxHp;
@@ -1565,6 +1986,8 @@
             }
 
             async finishDiscardPhase(p) {
+                this.currentPhase = '結束';
+                UI.updateAll();
                 await this.triggerHook('onPhaseStart', { player: p, phase: 'end' });
                 if(p.hero.skills.includes('閉月') && !p.isDead) await this.drawCards(p, 1, '發動【閉月】摸了');
                 this.nextTurn();
@@ -1639,20 +2062,31 @@
             }
 
             async removeOneCard(actor, target, mode) {
-                let ref = this.getFirstRemovableCard(target);
+                let ref = await this.askForCardPick(actor, target, mode, `【${actor.hero.name}】對【${target.hero.name}】使用【${mode === 'gain' ? '順手牽羊' : '過河拆橋'}】，請選擇一張卡牌`);
                 if(!ref) return false;
+                
+                let card = null;
                 if(ref.zone === 'hand') {
-                    let card = target.hand.splice(ref.index, 1)[0];
+                    let cardIdx = target.hand.findIndex(c => c.id === ref.card.id);
+                    if(cardIdx === -1) cardIdx = ref.index;
+                    card = target.hand.splice(cardIdx, 1)[0];
                     if(mode === 'gain') actor.hand.push(card); else this.discardPile.push(card);
-                } else {
-                    await this.loseEquip(target, ref.slot, mode === 'gain' ? 'hand' : 'discard', actor);
+                } else if(ref.zone === 'equip') {
+                    card = await this.loseEquip(target, ref.slot, mode === 'gain' ? 'hand' : 'discard', actor);
+                } else if(ref.zone === 'judge') {
+                    let judgeIdx = target.judges.findIndex(j => j.id === ref.card.id);
+                    if(judgeIdx === -1) judgeIdx = ref.index;
+                    card = target.judges.splice(judgeIdx, 1)[0];
+                    if(mode === 'gain') actor.hand.push(card); else this.discardPile.push(card);
                 }
-                this.log(`【${actor.hero.name}】${mode === 'gain' ? '獲得' : '棄置'}了【${target.hero.name}】的一張牌`);
+                
+                this.log(`【${actor.hero.name}】${mode === 'gain' ? '獲得' : '棄置'}了【${target.hero.name}】的【${ref.card ? ref.card.name : '卡牌'}】`);
                 UI.updateAll(); await this.sleep(800);
                 return true;
             }
 
             async resolveAttack(source, target, card) {
+                UI.showActiveCard(source, card);
                 let isHit = false;
                 let females = ['zhen_ji', 'huang_yue_ying', 'da_qiao', 'sun_shang_xiang', 'diao_chan', 'jie_da_qiao'];
                 let srcIsFemale = females.includes(source.hero.id);
@@ -1748,6 +2182,24 @@
                     UI.updateAll(); await this.sleep(800);
                 }
 
+                // Ma Chao Tieqi (鐵騎)
+                let tieqiHit = false;
+                if (source.hero.skills.includes('鐵騎')) {
+                    let use = await this.askForSkill(source, '鐵騎', `是否發動【鐵騎】對【${target.hero.name}】進行判定？`);
+                    if (use) {
+                        this.log(`【${source.hero.name}】發動【鐵騎】！`);
+                        let judge = await this.performJudge(source, '鐵騎');
+                        if (judge.color === COLOR.RED) {
+                            tieqiHit = true;
+                            this.log(`【鐵騎】判定為紅色，此【殺】不可避開！`);
+                            await this.sleep(800);
+                        } else {
+                            this.log(`【鐵騎】判定為黑色，失敗。`);
+                            await this.sleep(800);
+                        }
+                    }
+                }
+
                 // Renwang Shield (仁王盾) Check
                 if (!ignoreArmor && target.equips.armor && target.equips.armor.name === '仁王盾' && attackCard.color === COLOR.BLACK) {
                     this.log(`【${target.hero.name}】的【仁王盾】使黑色【殺】無效！`);
@@ -1773,6 +2225,9 @@
                 let requireTwo = source.hero.skills.includes('無雙') ? 2 : 1;
                 let flashed = 0;
                 while(flashed < requireTwo) {
+                    if (isZhaxiangHit || tieqiHit) {
+                        break;
+                    }
                     let dodgePlayed = false;
                     
                     if(!ignoreArmor && target.equips.armor && target.equips.armor.name === '八卦陣') {
@@ -1795,9 +2250,42 @@
                     }
                     
                     if(!dodgePlayed) {
-                        dodgePlayed = await this.askForCard(target, ['閃'], 1, `【${source.hero.name}】對你出殺，請打出 1 張閃！`, true);
-                        if (dodgePlayed) {
-                            await this.onPlayDodge(target, source);
+                        let canHujia = target.hero.skills.includes('護駕') && target.role === ROLE.LORD;
+                        let hujiaSuccess = false;
+                        if (canHujia) {
+                            let use = await this.askForSkill(target, '護駕', `是否發動主公技【護駕】令其他魏勢力角色打出【閃】？`);
+                            if (use) {
+                                this.log(`【${target.hero.name}】發動主公技【護駕】！`);
+                                for (let p of this.getLivingPlayers().filter(o => o.id !== target.id && o.hero.faction === 'wei')) {
+                                    let ok = false;
+                                    if (p.id === 0) {
+                                        ok = await this.askForCard(p, ['閃'], 1, `【${target.hero.name}】發動【護駕】，是否代為打出一張閃？`, true);
+                                    } else {
+                                        if (this.isSameSide(p, target)) {
+                                            ok = await this.askForCard(p, ['閃'], 1, ``, false);
+                                        }
+                                    }
+                                    if (ok) {
+                                        this.log(`【${p.hero.name}】代【${target.hero.name}】打出了一張【閃】！`);
+                                        hujiaSuccess = true;
+                                        await this.onPlayDodge(target, source);
+                                        break;
+                                    }
+                                }
+                                if (!hujiaSuccess) {
+                                    this.log(`沒有魏勢力角色提供【閃】。`);
+                                    await this.sleep(600);
+                                }
+                            }
+                        }
+                        
+                        if (hujiaSuccess) {
+                            dodgePlayed = true;
+                        } else {
+                            dodgePlayed = await this.askForCard(target, ['閃'], 1, `【${source.hero.name}】對你出殺，請打出 1 張閃！`, true);
+                            if (dodgePlayed) {
+                                await this.onPlayDodge(target, source);
+                            }
                         }
                     }
                     
@@ -1841,6 +2329,21 @@
                 }
                 
                 if(flashed < requireTwo || isHit) {
+                    if (source.equips.weapon && source.equips.weapon.name === '寒冰劍' && (target.hand.length > 0 || Object.values(target.equips).some(x => x))) {
+                        let use = await this.askForSkill(source, '寒冰劍', `是否發動【寒冰劍】防止傷害，改為棄置其兩張牌？`);
+                        if (use) {
+                            this.log(`【${source.hero.name}】發動【寒冰劍】，防止傷害！`);
+                            await this.removeOneCard(source, target, 'discard');
+                            if (target.hand.length > 0 || Object.values(target.equips).some(x => x)) {
+                                await this.removeOneCard(source, target, 'discard');
+                            }
+                            if (source.flags.drunk) {
+                                source.flags.drunk = false;
+                            }
+                            return;
+                        }
+                    }
+
                     let amount = 1 + (source.flags.luoYi ? 1 : 0) + (source.flags.drunk ? 1 : 0);
                     if (source.flags.drunk) {
                         source.flags.drunk = false;
@@ -1855,15 +2358,16 @@
                     if (source.hero.skills.includes('利馭') && !target.isDead) {
                         this.log(`【界呂布】發動【利馭】`);
                         await this.drawCards(target, 1, '利馭摸牌');
-                        let ref = this.getFirstRemovableCard(target);
+                        let ref = await this.askForCardPick(source, target, 'gain', `【利馭】請獲得【${target.hero.name}】的一張牌`);
                         if (ref) {
                             if (ref.zone === 'hand') {
-                                let card = target.hand.pop();
+                                let cardIdx = target.hand.findIndex(c => c.id === ref.card.id);
+                                let card = target.hand.splice(cardIdx !== -1 ? cardIdx : ref.index, 1)[0];
                                 source.hand.push(card);
-                            } else {
+                            } else if (ref.zone === 'equip') {
                                 await this.loseEquip(target, ref.slot, 'hand', source);
                             }
-                            this.log(`【界呂布】獲得了【${target.hero.name}】的一張牌`);
+                            this.log(`【界呂布】獲得了【${target.hero.name}】的【${ref.card ? ref.card.name : '卡牌'}】`);
                             UI.updateAll(); await this.sleep(800);
                         }
                     }
@@ -1998,7 +2502,9 @@
                         await this.equipCard(p, p.hand.splice(i, 1)[0]);
                     } else if(c.name === '桃') {
                         if(p.hp < p.maxHp) {
-                            this.discardPile.push(p.hand.splice(i, 1)[0]);
+                            let card = p.hand.splice(i, 1)[0];
+                            this.discardPile.push(card);
+                            UI.showActiveCard(p, card);
                             p.hp++;
                             this.log(`【${p.hero.name}】使用了 桃 回復了 1 點體力`);
                             UI.updateAll(); await this.sleep(800);
@@ -2007,7 +2513,9 @@
                         let hasSha = p.hand.some(c => c.name === '殺' || (p.hero.skills.includes('龍膽') && c.name === '閃') || (p.hero.skills.includes('武聖') && c.color === COLOR.RED) || (p.hero.skills.includes('武神') && c.suit === SUIT.HEART));
                         let inRange = enemies.some(o => this.getDistance(p.id, o.id) <= this.getAttackRange(p));
                         if (hasSha && inRange && !p.flags.drunk) {
-                            this.discardPile.push(p.hand.splice(i, 1)[0]);
+                            let card = p.hand.splice(i, 1)[0];
+                            this.discardPile.push(card);
+                            UI.showActiveCard(p, card);
                             p.flags.drunk = true;
                             this.log(`【${p.hero.name}】使用了【酒】，本回合下一張【殺】傷害+1！`);
                             UI.updateAll(); await this.sleep(800);
@@ -2016,40 +2524,54 @@
                         if(c.name === '樂不思蜀') {
                             let target = enemies.find(o => !o.judges.some(j => j.name === '樂不思蜀'));
                             if(target) {
-                                target.judges.push(p.hand.splice(i, 1)[0]);
+                                let card = p.hand.splice(i, 1)[0];
+                                target.judges.push(card);
+                                UI.showActiveCard(p, card);
                                 this.log(`【${p.hero.name}】對【${target.hero.name}】使用了 樂不思蜀`);
                                 UI.updateAll(); await this.sleep(800);
                             }
                         } else if(c.name === '兵糧寸斷') {
                             let target = enemies.find(o => this.getDistance(p.id, o.id) <= 1 && !o.judges.some(j => j.name === '兵糧寸斷'));
                             if(target) {
-                                target.judges.push(p.hand.splice(i, 1)[0]);
+                                let card = p.hand.splice(i, 1)[0];
+                                target.judges.push(card);
+                                UI.showActiveCard(p, card);
                                 this.log(`【${p.hero.name}】對【${target.hero.name}】使用了 兵糧寸斷`);
                                 UI.updateAll(); await this.sleep(800);
                             }
                         } else {
                             if(!p.judges.some(j => j.name === '閃電')) {
-                                p.judges.push(p.hand.splice(i, 1)[0]);
+                                let card = p.hand.splice(i, 1)[0];
+                                p.judges.push(card);
+                                UI.showActiveCard(p, card);
                                 this.log(`【${p.hero.name}】使用了 閃電`);
                                 UI.updateAll(); await this.sleep(800);
                             }
                         }
                     } else if(c.name === '決鬥') {
                         if(enemies.length > 0) {
-                            this.discardPile.push(p.hand.splice(i,1)[0]);
+                            let card = p.hand.splice(i, 1)[0];
+                            this.discardPile.push(card);
+                            UI.showActiveCard(p, card);
                             await this.resolveDuel(p, enemies[0], c);
                         }
                     } else if(c.name === '火攻') {
                         let target = enemies.find(o => o.hand.length > 0);
                         if (target) {
-                            this.discardPile.push(p.hand.splice(i, 1)[0]);
+                            let card = p.hand.splice(i, 1)[0];
+                            this.discardPile.push(card);
+                            UI.showActiveCard(p, card);
                             await this.resolveFireAttack(p, target, c);
                         }
                     } else if(c.name === '鐵索連環') {
-                        this.discardPile.push(p.hand.splice(i, 1)[0]);
+                        let card = p.hand.splice(i, 1)[0];
+                        this.discardPile.push(card);
+                        UI.showActiveCard(p, card);
                         await this.drawCards(p, 1, '重鑄摸了');
                     } else if(c.name === '無中生有') {
-                        this.discardPile.push(p.hand.splice(i,1)[0]);
+                        let card = p.hand.splice(i, 1)[0];
+                        this.discardPile.push(card);
+                        UI.showActiveCard(p, card);
                         if(!await this.askWuxie(c, p)) await this.drawCards(p, 2, '使用【無中生有】摸了');
                     } else if(c.name === '南蠻入侵' || c.name === '萬箭齊發' || c.name === '桃園結義') {
                         await this.useImmediateCard(p, p.hand.splice(i, 1)[0]);
@@ -2067,6 +2589,7 @@
                             let target = enemies[0];
                             let card = p.hand.splice(idx,1)[0];
                             this.discardPile.push(card);
+                            UI.showActiveCard(p, card);
                             p.flags.usedSha++;
                             this.log(`【${p.hero.name}】對【${target.hero.name}】使用了 殺！`);
                             UI.updateAll(); await this.sleep(800);
@@ -2235,6 +2758,32 @@
                     await this.sleep(600);
                     return false;
                 }
+
+                // Liu Bei Jijiang (激將)
+                if (player.hero.skills.includes('激將') && player.role === ROLE.LORD && validCardNames.includes('殺')) {
+                    let use = await this.askForSkill(player, '激將', `是否發動主公技【激將】令其他蜀勢力角色打出【殺】？`);
+                    if (use) {
+                        this.log(`【${player.hero.name}】發動主公技【激將】！`);
+                        for (let p of this.getLivingPlayers().filter(o => o.id !== player.id && o.hero.faction === 'shu')) {
+                            let ok = false;
+                            if (p.id === 0) {
+                                ok = await this.askForCard(p, ['殺'], 1, `【${player.hero.name}】發動【激將】，是否代為打出一張殺？`, true);
+                            } else {
+                                if (this.isSameSide(p, player)) {
+                                    ok = await this.askForCard(p, ['殺'], 1, ``, false);
+                                }
+                            }
+                            if (ok) {
+                                this.log(`【${p.hero.name}】代【${player.hero.name}】打出了一張【殺】！`);
+                                await this.sleep(600);
+                                return ok;
+                            }
+                        }
+                        this.log(`沒有蜀勢力角色提供【殺】。`);
+                        await this.sleep(600);
+                    }
+                }
+
                 if (player.id === 0) {
                     return new Promise(resolve => {
                         this.state = 'RESPONDING';
@@ -2277,7 +2826,10 @@
                             }
                             discardedCards.push(card);
                         }
-                        discardedCards.forEach(c => this.discardPile.push(c));
+                        discardedCards.forEach(c => {
+                            this.discardPile.push(c);
+                            UI.showActiveCard(player, c);
+                        });
                         return discardedCards;
                     }
                     return false;
@@ -2391,12 +2943,21 @@
                 }
                 
                 // Sima Yi (反饋)
-                if(target.hero.skills.includes('反饋') && source && source.hand.length > 0) {
+                if(target.hero.skills.includes('反饋') && source && (source.hand.length > 0 || Object.values(source.equips).some(x => x))) {
                     let use = await this.askForSkill(target, '反饋', `是否發動【反饋】獲得傷害來源一張牌？`);
                     if(use) {
-                        target.hand.push(source.hand.pop());
-                        this.log(`【${target.hero.name}】發動【反饋】獲得一張牌`);
-                        UI.updateAll(); await this.sleep(800);
+                        let ref = await this.askForCardPick(target, source, 'gain', `【反饋】請獲得【${source.hero.name}】的一張牌`);
+                        if(ref) {
+                            if(ref.zone === 'hand') {
+                                let cardIdx = source.hand.findIndex(c => c.id === ref.card.id);
+                                let card = source.hand.splice(cardIdx !== -1 ? cardIdx : ref.index, 1)[0];
+                                target.hand.push(card);
+                            } else if(ref.zone === 'equip') {
+                                await this.loseEquip(source, ref.slot, 'hand', target);
+                            }
+                            this.log(`【${target.hero.name}】發動【反饋】獲得了【${source.hero.name}】的【${ref.card ? ref.card.name : '卡牌'}】`);
+                            UI.updateAll(); await this.sleep(800);
+                        }
                     }
                 }
                 
@@ -2485,12 +3046,13 @@
                         let use = await this.askForSkill(target, '歸心', `是否發動【歸心】獲得所有其他角色的一張牌並翻面？`);
                         if (use) {
                             for (let p of this.getLivingPlayers().filter(o => o.id !== target.id)) {
-                                let ref = this.getFirstRemovableCard(p);
+                                let ref = await this.askForCardPick(target, p, 'gain', `【歸心】請獲得【${p.hero.name}】的一張牌`);
                                 if (ref) {
-                                    if (ref.zone === 'hand') {
-                                        let card = p.hand.pop();
+                                    if(ref.zone === 'hand') {
+                                        let cardIdx = p.hand.findIndex(c => c.id === ref.card.id);
+                                        let card = p.hand.splice(cardIdx !== -1 ? cardIdx : ref.index, 1)[0];
                                         target.hand.push(card);
-                                    } else {
+                                    } else if(ref.zone === 'equip') {
                                         await this.loseEquip(p, ref.slot, 'hand', target);
                                     }
                                 }
@@ -2531,7 +3093,12 @@
                             let validRescueCards = (rescuer.id === target.id) ? ['桃', '酒'] : ['桃'];
                             let played = await this.askForCard(rescuer, validRescueCards, 1, `【${target.hero.name}】瀕死，是否使用桃/酒？`, true);
                             if(played) {
-                                target.hp++; rescued = true;
+                                let hpGain = 1;
+                                if (target.hero.skills.includes('救援') && target.role === ROLE.LORD && rescuer.hero.faction === 'wu' && rescuer.id !== target.id) {
+                                    hpGain = 2;
+                                    this.log(`主公技【救援】生效！【${rescuer.hero.name}】救助主公，回復體力加倍！`);
+                                }
+                                target.hp += hpGain; rescued = true;
                                 this.log(`你對【${target.hero.name}】使用了回復卡牌！`);
                                 UI.updateAll(); await this.sleep(800);
                             }
@@ -2545,7 +3112,12 @@
                                 if(shouldSave) {
                                     let c = rescuer.hand.splice(cardIdx, 1)[0];
                                     this.discardPile.push(c);
-                                    target.hp++; rescued = true;
+                                    let hpGain = 1;
+                                    if (target.hero.skills.includes('救援') && target.role === ROLE.LORD && rescuer.hero.faction === 'wu' && rescuer.id !== target.id) {
+                                        hpGain = 2;
+                                        this.log(`主公技【救援】生效！【${rescuer.hero.name}】救助主公，回復體力加倍！`);
+                                    }
+                                    target.hp += hpGain; rescued = true;
                                     this.log(`【${rescuer.hero.name}】對【${target.hero.name}】使用了 ${c.name}！`);
                                     UI.updateAll(); await this.sleep(800);
                                 }
@@ -2625,6 +3197,7 @@
                 if(p.hero.skills.includes('締盟') && !p.flags.usedDiMeng) activeSkills.push('締盟');
                 if(p.hero.skills.includes('神憤') && (p.flags.wrath || 0) >= 6) activeSkills.push('神憤');
                 if(p.hero.skills.includes('義絕') && !p.flags.usedYiJue) activeSkills.push('義絕');
+                if(p.hero.skills.includes('激將') && p.role === ROLE.LORD) activeSkills.push('激將');
                 if(p.equips.weapon && p.equips.weapon.name === '丈八蛇矛') activeSkills.push('丈八蛇矛');
                 
                 if(activeSkills.length === 0) {
@@ -2638,7 +3211,26 @@
                     skill = opt ? activeSkills[0] : activeSkills[1];
                 }
                 
-                if(skill === '苦肉') {
+                if(skill === '激將') {
+                    let maxSha = (p.equips.weapon && p.equips.weapon.name==='諸葛連弩' ? 99 : 1) + (p.flags.extraShaCount || 0);
+                    let canSha = p.flags.usedSha < maxSha || p.hero.skills.includes('咆哮');
+                    if (!canSha) {
+                        this.log("你本回合出殺次數已達上限！");
+                        if(this.state !== 'GAME_OVER') { this.state = 'PLAYING'; UI.updateAll(); }
+                        return;
+                    }
+                    let cards = await this.askForCard(p, ['殺'], 1, "發動【激將】中，請等待蜀勢力角色出殺...", true);
+                    if (cards && cards.length === 1) {
+                        this.state = 'TARGETING';
+                        this.pendingAction = { type: 'USE_CARD', card: cards[0], maxTargets: 1 };
+                        this.selectedTargets = [];
+                        this.log('請選擇一名目標使用【殺】');
+                        UI.updateAll();
+                    } else {
+                        if(this.state !== 'GAME_OVER') { this.state = 'PLAYING'; UI.updateAll(); }
+                    }
+                }
+                else if(skill === '苦肉') {
                     let res = await this.askForSkill(p, '苦肉', `是否失去1點體力並摸兩張牌？`);
                     if(res) {
                         p.hp--;
@@ -3127,6 +3719,13 @@
                                 return;
                             }
                         }
+                        else if(type === 'TU_XI') {
+                            let target = this.players[targetIdx];
+                            if(target.hand.length === 0) {
+                                this.log("該角色沒有手牌，無法發動突襲！");
+                                return;
+                            }
+                        }
                         else if(type === 'JI_XI') {
                             let dist = this.getDistance(0, targetIdx);
                             if(dist > 1 && !p.hero.skills.includes('奇才')) {
@@ -3280,6 +3879,7 @@
             }
 
             async useImmediateCard(p, card) {
+                UI.showActiveCard(p, card);
                 let idx = p.hand.findIndex(c => c.id === card.id);
                 if(idx < 0) return;
                 this.discardPile.push(p.hand.splice(idx, 1)[0]);
@@ -3366,6 +3966,17 @@
 
                 if(this.state === 'TARGETING') {
                     let type = this.pendingAction.type;
+                    if (type === 'TU_XI') {
+                        let resolve = this.pendingAction.resolve;
+                        let targets = this.selectedTargets;
+                        this.state = 'WAITING';
+                        this.pendingAction = null;
+                        this.selectedTargets = [];
+                        UI.updateAll();
+                        await resolve(targets);
+                        return;
+                    }
+
                     if (['REN_DE', 'JIE_YIN', 'LI_JIAN', 'FAN_JIAN', 'QU_HU', 'QU_HU_DAMAGE', 'DI_MENG', 'YI_JUE', 'LEI_JI', 'JIE_MING'].includes(type)) {
                         let resolve = this.pendingAction.resolve;
                         let targets = this.selectedTargets;
@@ -3393,12 +4004,16 @@
                     let isSha = card.name === '殺' || (p.hero.skills.includes('龍膽') && card.name === '閃') || (p.hero.skills.includes('武聖') && card.color === COLOR.RED) || (p.hero.skills.includes('武神') && card.suit === SUIT.HEART);
                     
                     if(card.name === '樂不思蜀' || card.name === '兵糧寸斷') {
-                        target.judges.push(p.hand.splice(idx, 1)[0]);
+                        let c = p.hand.splice(idx, 1)[0];
+                        target.judges.push(c);
+                        UI.showActiveCard(p, c);
                         this.log(`你對【${target.hero.name}】使用了 ${card.name}！`);
                         this.state = 'PLAYING';
                     } else {
                         if (idx >= 0) {
-                            this.discardPile.push(p.hand.splice(idx, 1)[0]);
+                            let c = p.hand.splice(idx, 1)[0];
+                            this.discardPile.push(c);
+                            UI.showActiveCard(p, c);
                         }
                         this.log(`你使用了 ${card.name}！`);
                         this.state = 'WAITING';
@@ -3446,9 +4061,15 @@
                     res(true);
                 } else if(this.state === 'RESPONDING' || this.state === 'DISCARDING') {
                     if(this.selectedCardIds.length === this.pendingAction.count) {
+                        let respondedCards = [];
                         for(let id of this.selectedCardIds) {
                             let idx = p.hand.findIndex(c => c.id === id);
-                            this.discardPile.push(p.hand.splice(idx, 1)[0]);
+                            let card = p.hand.splice(idx, 1)[0];
+                            this.discardPile.push(card);
+                            respondedCards.push(card);
+                        }
+                        if (this.state === 'RESPONDING') {
+                            respondedCards.forEach(c => UI.showActiveCard(p, c));
                         }
                         this.log(this.state === 'DISCARDING' ? `你棄置了 ${this.pendingAction.count} 張牌` : `你打出了卡牌！`);
                         let res = this.pendingAction.resolve;
@@ -3564,6 +4185,7 @@
 
             nextTurn() {
                 if(this.state === 'GAME_OVER') return;
+                this.currentPhase = '';
                 this.players.forEach(p => { p.flags.yiJueLoss = false; });
                 let next = (this.currentPlayerIdx + 1) % this.players.length;
                 while(this.players[next].isDead) next = (next + 1) % this.players.length;
@@ -3578,6 +4200,7 @@
 
                 if(lord && lord.isDead) {
                     this.state = 'GAME_OVER';
+                    this.currentPhase = '';
                     if(aliveRebels === 0 && aliveLoyals === 0 && aliveSpies > 0) {
                         this.log('遊戲結束：內奸獲勝');
                     } else {
@@ -3585,6 +4208,7 @@
                     }
                 } else if(aliveRebels === 0 && aliveSpies === 0) {
                     this.state = 'GAME_OVER';
+                    this.currentPhase = '';
                     this.log('遊戲結束：主忠方獲勝');
                 }
                 UI.updateAll();
@@ -3719,11 +4343,51 @@
                     document.getElementById('infoModal').style.display = 'flex';
                 }
             },
+            toggleHistoryLog: function() {
+                let sidebar = document.getElementById('historySidebar');
+                if (sidebar) {
+                    sidebar.classList.toggle('open');
+                }
+            },
+            showActiveCard: function(source, card) {
+                let el = document.getElementById('activeCardShow');
+                if (!el) return;
+                
+                let cardHTML = `
+                    <div style="font-size: 1.4rem; color: #fff; font-weight: 900; text-shadow: 0 2px 8px rgba(0,0,0,0.8); margin-bottom: 8px; letter-spacing: 2px;">
+                        【<span style="color: var(--theme-gold);">${source.hero.name}</span>】使用了
+                    </div>
+                    <div class="card face-up ${card.bg || ''}" style="transform: scale(1.2); box-shadow: 0 20px 40px rgba(0,0,0,0.8); border-color: var(--theme-gold);">
+                        <div class="card-illustration" style="background-image: url('${card.img || ''}')"></div>
+                        <div class="card-title" style="color:${card.color === 'red' ? '#dc2626' : '#1c1917'}; text-shadow: 0px 0px 3px rgba(255,255,255,0.8);">${card.name}</div>
+                        <div class="card-suit suit-${card.color}">${card.suit}</div>
+                        <div class="card-point suit-${card.color}">${card.point}</div>
+                        <div class="card-desc">${card.type === 'equip' ? card.equipType : card.type}</div>
+                    </div>
+                `;
+                
+                el.innerHTML = cardHTML;
+                el.style.display = 'flex';
+                el.style.animation = 'none';
+                el.offsetHeight; // trigger reflow
+                el.style.animation = 'zoomIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards';
+                
+                if (this._activeCardTimeout) clearTimeout(this._activeCardTimeout);
+                this._activeCardTimeout = setTimeout(() => {
+                    el.style.display = 'none';
+                }, 1000);
+            },
             updateAll: function() {
                 if(Engine.players.length === 0) return;
                 for(let i=0; i<Engine.players.length; i++) {
                     let p = Engine.players[i];
                     let el = document.getElementById(`p${i}`);
+                    
+                    // Reset class names and apply faction styles
+                    el.className = `player-area ${i === 0 ? '' : 'ai-player'}`;
+                    if(p.hero.faction) {
+                        el.classList.add(`faction-${p.hero.faction}`);
+                    }
                     
                     document.getElementById(`heroName${i}`).innerText = p.hero.name;
                     let heroCardEl = document.getElementById(`hero${i}`);
@@ -3737,7 +4401,24 @@
                         document.getElementById(`heroName${i}`).style.background = 'rgba(0,0,0,0.6)';
                     }
                     
-                    document.getElementById(`hp${i}`).innerHTML = `❤️ ${p.hp} / ${p.maxHp}`;
+                    // Visual HP Dot Indicators
+                    let hpHTML = `<div class="hp-dots">`;
+                    for(let h=0; h<p.maxHp; h++) {
+                        if(h < p.hp) {
+                            let dotClass = p.hp > 2 ? 'green' : p.hp === 2 ? 'yellow' : 'red';
+                            hpHTML += `<span class="hp-dot ${dotClass}"></span>`;
+                        } else {
+                            hpHTML += `<span class="hp-dot empty"></span>`;
+                        }
+                    }
+                    hpHTML += `</div><span style="font-size:0.75rem; margin-top:2px; font-weight:bold;">${p.hp} / ${p.maxHp}</span>`;
+                    
+                    // Current Phase Indicator Tag
+                    if (Engine.currentPlayerIdx === i && !p.isDead && Engine.currentPhase) {
+                        hpHTML += `<div class="phase-tag">${Engine.currentPhase}階段</div>`;
+                    }
+                    document.getElementById(`hp${i}`).innerHTML = hpHTML;
+                    
                     if(i !== 0) document.getElementById(`h${i}`).innerText = p.hand.length;
                     
                     let rEl = document.getElementById(`role${i}`);
@@ -3778,19 +4459,44 @@
                             <div class="ai-equip-item">寶物: ${p.equips.treasure ? p.equips.treasure.name : '無'}</div>
                         `;
                     } else {
-                        // show judges for p0 inside eq section or a new section
                         let jHTML = p.judges.map(j => `<span style="background:rgba(0,0,0,0.8);color:var(--theme-gold);padding:2px 4px;margin-bottom:2px;border-radius:4px;font-size:0.8rem;">[判定] ${j.name}</span>`).join('');
-                        // We will append it to weapon if it exists, or just prepend to equip0 in hand section? Actually, let's prepend to eqWeapon0.
                     }
 
                     if(p.isDead) el.classList.add('dead'); else el.classList.remove('dead');
                     if(Engine.currentPlayerIdx === i && !p.isDead) el.classList.add('active'); else el.classList.remove('active');
-                    if(Engine.state === 'TARGETING' && i !== 0 && !p.isDead) el.classList.add('targetable'); else el.classList.remove('targetable');
+                    
+                    // Zhang Liao Surprise Attack (突襲) targetable logic
+                    let isTargetable = false;
+                    if(Engine.state === 'TARGETING' && i !== 0 && !p.isDead) {
+                        if (Engine.pendingAction && Engine.pendingAction.type === 'TU_XI') {
+                            isTargetable = p.hand.length > 0;
+                        } else {
+                            isTargetable = true;
+                        }
+                    }
+                    if(isTargetable) el.classList.add('targetable'); else el.classList.remove('targetable');
+                    
                     if(Engine.selectedTargets.includes(i)) el.style.borderColor = 'var(--theme-gold)'; else el.style.borderColor = '';
                 }
 
                 let p0 = Engine.players[0];
                 let handHTML = '';
+                
+                // Calculate dynamic card overlap to prevent overflow scrollbars
+                let cardCount = p0.hand.length;
+                let cardWidth = 112;
+                let maxContainerWidth = window.innerWidth * 0.55;
+                let overlapStyle = '';
+                if (cardCount * (cardWidth + 12) > maxContainerWidth) {
+                    let totalNeeded = cardCount * cardWidth;
+                    let extraSpace = maxContainerWidth - cardWidth;
+                    let step = extraSpace / (cardCount - 1);
+                    let negMargin = cardWidth + 12 - step;
+                    if (negMargin > 0) {
+                        overlapStyle = `margin-right: -${Math.min(90, Math.floor(negMargin))}px;`;
+                    }
+                }
+
                 p0.hand.forEach(c => {
                     let isSelected = Engine.selectedCardIds.includes(c.id);
                     let isDisabled = false;
@@ -3835,6 +4541,7 @@
                     
                     handHTML += `
                         <div class="card face-up ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''} ${c.bg ? c.bg : ''}" 
+                             style="${overlapStyle}"
                              onclick="Engine.onCardClick(${c.id})"
                              onmouseenter="UI.showCardInfoPanelById(${c.id})"
                              onmouseleave="UI.hideCardInfoPanel()">
