@@ -397,9 +397,9 @@
                 <div style="color: #ccc; font-size: 0.95rem; display: flex; gap: 15px; align-items: center;">
                     <span style="color: var(--theme-gold); font-weight: bold;">擴充包：</span>
                     <label><input type="checkbox" id="expMilitary" checked onchange="if(window.Engine) window.Engine.validateDeckTest()"> 軍爭篇</label>
-                    <label><input type="checkbox" id="expGod" checked> 神話再臨</label>
-                    <label><input type="checkbox" id="expBreakthrough" checked> 界限突破</label>
-                    <label><input type="checkbox" id="expSP" checked> SP</label>
+                    <label><input type="checkbox" id="expGod" checked onchange="if(window.renderLobbyHeroes) window.renderLobbyHeroes(); if(window.Engine) window.Engine.validateDeckTest()"> 神話再臨</label>
+                    <label><input type="checkbox" id="expBreakthrough" checked onchange="if(window.renderLobbyHeroes) window.renderLobbyHeroes(); if(window.Engine) window.Engine.validateDeckTest()"> 界限突破</label>
+                    <label><input type="checkbox" id="expSP" checked onchange="if(window.renderLobbyHeroes) window.renderLobbyHeroes(); if(window.Engine) window.Engine.validateDeckTest()"> SP</label>
                     <button class="btn" style="padding: 2px 10px; font-size: 0.8rem;" onclick="if(window.Engine) window.Engine.validateDeckTest()">重新驗證牌堆</button>
                 </div>
             </div>
@@ -606,57 +606,57 @@
         // Complete Hero Pool containing standard, breakthrough, and expansion heroes
         const HEROES = [
             // --- Standard Heroes ---
-            { id: 'cao_cao', name: '曹操', hp: 4, faction: 'wei', skills: ['奸雄', '護駕'], desc: '【奸雄】當你受到傷害後，你可以獲得對你造成傷害的牌。<br>【護駕】主公技，當你需要使用或打出【閃】時，你可以令其他魏勢力角色打出【閃】。' },
-            { id: 'si_ma_yi', name: '司馬懿', hp: 3, faction: 'wei', skills: ['反饋', '鬼才'], desc: '【反饋】當你受到傷害後，你可以獲得傷害來源的一張牌。<br>【鬼才】當一名角色的判定牌生效前，你可以打出一張手牌代替之。' },
-            { id: 'xia_hou_dun', name: '夏侯惇', hp: 4, faction: 'wei', skills: ['剛烈'], desc: '【剛烈】當你受到傷害後，你可以進行一次判定，若結果不為紅桃，傷害來源選擇一項：棄置兩張手牌，或受到你對其造成的1點傷害。' },
-            { id: 'zhang_liao', name: '張遼', hp: 4, faction: 'wei', skills: ['突襲'], desc: '【突襲】摸牌階段，你可以放棄摸牌，改為獲得一至兩名其他角色的各一張手牌。' },
-            { id: 'xu_chu', name: '許褚', hp: 4, faction: 'wei', skills: ['裸衣'], desc: '【裸衣】摸牌階段，你可以少摸一張牌，若如此做，你本回合使用【殺】或【決鬥】造成的傷害+1。' },
-            { id: 'guo_jia', name: '郭嘉', hp: 3, faction: 'wei', skills: ['天妒', '遺計'], desc: '【天妒】當你的判定牌生效後，你可以獲得此牌。<br>【遺計】當你受到1點傷害後，你可以摸兩張牌，然後可以將這些牌交給任意角色。' },
-            { id: 'zhen_ji', name: '甄姬', hp: 3, faction: 'wei', skills: ['傾國', '洛神'], desc: '【傾國】你可以將一張黑色手牌當【閃】使用或打出。<br>【洛神】準備階段，你可以進行一次判定，若結果為黑色，你獲得此牌，並可重複此流程。' },
+            { id: 'cao_cao', name: '曹操', hp: 4, faction: 'wei', exp: 'standard', skills: ['奸雄', '護駕'], desc: '【奸雄】當你受到傷害後，你可以獲得對你造成傷害的牌。<br>【護駕】主公技，當你需要使用或打出【閃】時，你可以令其他魏勢力角色打出【閃】。' },
+            { id: 'si_ma_yi', name: '司馬懿', hp: 3, faction: 'wei', exp: 'standard', skills: ['反饋', '鬼才'], desc: '【反饋】當你受到傷害後，你可以獲得傷害來源的一張牌。<br>【鬼才】當一名角色的判定牌生效前，你可以打出一張手牌代替之。' },
+            { id: 'xia_hou_dun', name: '夏侯惇', hp: 4, faction: 'wei', exp: 'standard', skills: ['剛烈'], desc: '【剛烈】當你受到傷害後，你可以進行一次判定，若結果不為紅桃，傷害來源選擇一項：棄置兩張手牌，或受到你對其造成的1點傷害。' },
+            { id: 'zhang_liao', name: '張遼', hp: 4, faction: 'wei', exp: 'standard', skills: ['突襲'], desc: '【突襲】摸牌階段，你可以放棄摸牌，改為獲得一至兩名其他角色的各一張手牌。' },
+            { id: 'xu_chu', name: '許褚', hp: 4, faction: 'wei', exp: 'standard', skills: ['裸衣'], desc: '【裸衣】摸牌階段，你可以少摸一張牌，若如此做，你本回合使用【殺】或【決鬥】造成的傷害+1。' },
+            { id: 'guo_jia', name: '郭嘉', hp: 3, faction: 'wei', exp: 'standard', skills: ['天妒', '遺計'], desc: '【天妒】當你的判定牌生效後，你可以獲得此牌。<br>【遺計】當你受到1點傷害後，你可以摸兩張牌，然後可以將這些牌交給任意角色。' },
+            { id: 'zhen_ji', name: '甄姬', hp: 3, faction: 'wei', exp: 'standard', skills: ['傾國', '洛神'], desc: '【傾國】你可以將一張黑色手牌當【閃】使用或打出。<br>【洛神】準備階段，你可以進行一次判定，若結果為黑色，你獲得此牌，並可重複此流程。' },
             
-            { id: 'liu_bei', name: '劉備', hp: 4, faction: 'shu', skills: ['仁德', '激將'], desc: '【仁德】出牌階段，你可以將任意張手牌交給其他角色，若你於此階段給出第二張手牌，你回復1點體力。<br>【激將】主公技，當你需要使用或打出【殺】時，你可以令其他蜀勢力角色打出【殺】。' },
-            { id: 'guan_yu', name: '關羽', hp: 4, faction: 'shu', skills: ['武聖'], desc: '【武聖】你可以將一張紅色牌當【殺】使用或打出。' },
-            { id: 'zhang_fei', name: '張飛', hp: 4, faction: 'shu', skills: ['咆哮'], desc: '【咆哮】你使用【殺】無次數限制。' },
-            { id: 'zhu_ge_liang', name: '諸葛亮', hp: 3, faction: 'shu', skills: ['觀星', '空城'], desc: '【觀星】準備階段，你可以觀看牌堆頂的 X 張牌（X 為存活角色數且最多為5），然後將 these 牌以任意順序置於牌堆頂或牌堆底。<br>【空城】鎖定技，若你沒有手牌，你不能被選擇為【殺】或【決鬥】的目標。' },
-            { id: 'zhao_yun', name: '趙雲', hp: 4, faction: 'shu', skills: ['龍膽'], desc: '【龍膽】你可以將一張【殺】當【閃】使用或打出；你可以將一張【閃】當【殺】使用或打出。' },
-            { id: 'ma_chao', name: '馬超', hp: 4, faction: 'shu', skills: ['馬術', '鐵騎'], desc: '【馬術】鎖定技，你計算與其他角色的距離-1。<br>【鐵騎】當你使用【殺】指定一名角色為目標後，你可以進行一次判定，若結果為紅色，該角色不能使用【閃】。' },
-            { id: 'huang_yue_ying', name: '黃月英', hp: 3, faction: 'shu', skills: ['集智', '奇才'], desc: '【集智】當你使用一張非延時類錦囊牌時，你可以摸一張牌。<br>【奇才】鎖定技，你使用錦囊牌無距離限制。' },
+            { id: 'liu_bei', name: '劉備', hp: 4, faction: 'shu', exp: 'standard', skills: ['仁德', '激將'], desc: '【仁德】出牌階段，你可以將任意張手牌交給其他角色，若你於此階段給出第二張手牌，你回復1點體力。<br>【激將】主公技，當你需要使用或打出【殺】時，你可以令其他蜀勢力角色打出【殺】。' },
+            { id: 'guan_yu', name: '關羽', hp: 4, faction: 'shu', exp: 'standard', skills: ['武聖'], desc: '【武聖】你可以將一張紅色牌當【殺】使用或打出。' },
+            { id: 'zhang_fei', name: '張飛', hp: 4, faction: 'shu', exp: 'standard', skills: ['咆哮'], desc: '【咆哮】你使用【殺】無次數限制。' },
+            { id: 'zhu_ge_liang', name: '諸葛亮', hp: 3, faction: 'shu', exp: 'standard', skills: ['觀星', '空城'], desc: '【觀星】準備階段，你可以觀看牌堆頂的 X 張牌（X 為存活角色數且最多為5），然後將 these 牌以任意順序置於牌堆頂或牌堆底。<br>【空城】鎖定技，若你沒有手牌，你不能被選擇為【殺】或【決鬥】的目標。' },
+            { id: 'zhao_yun', name: '趙雲', hp: 4, faction: 'shu', exp: 'standard', skills: ['龍膽'], desc: '【龍膽】你可以將一張【殺】當【閃】使用或打出；你可以將一張【閃】當【殺】使用或打出。' },
+            { id: 'ma_chao', name: '馬超', hp: 4, faction: 'shu', exp: 'standard', skills: ['馬術', '鐵騎'], desc: '【馬術】鎖定技，你計算與其他角色的距離-1。<br>【鐵騎】當你使用【殺】指定一名角色為目標後，你可以進行一次判定，若結果為紅色，該角色不能使用【閃】。' },
+            { id: 'huang_yue_ying', name: '黃月英', hp: 3, faction: 'shu', exp: 'standard', skills: ['集智', '奇才'], desc: '【集智】當你使用一張非延時類錦囊牌時，你可以摸一張牌。<br>【奇才】鎖定技，你使用錦囊牌無距離限制。' },
  
-            { id: 'sun_quan', name: '孫權', hp: 4, faction: 'wu', skills: ['制衡', '救援'], desc: '【制衡】出牌階段限一次，你可以棄置任意張牌，然後摸等量的牌。<br>【救援】主公技，鎖定技，其他吳勢力角色對你使用【桃】回復的體力+1。' },
-            { id: 'gan_ning', name: '甘寧', hp: 4, faction: 'wu', skills: ['奇襲'], desc: '【奇襲】你可以將一張黑色牌當【過河拆橋】使用。' },
-            { id: 'lu_meng', name: '呂蒙', hp: 4, faction: 'wu', skills: ['克己'], desc: '【克己】若你於出牌階段內未使用或打出過【殺】，棄牌階段你的手牌上限為你的體力上限。' },
-            { id: 'zhou_yu', name: '周瑜', hp: 3, faction: 'wu', skills: ['英姿', '反間'], desc: '【英姿】摸牌階段，你可以額外摸一張牌。<br>【反間】出牌階段限一次，你可以令一名其他角色選擇一種花色後獲得你的一張手牌，若猜錯則受到1點傷害。' },
-            { id: 'lu_xun', name: '陸遜', hp: 3, faction: 'wu', skills: ['謙遜', '連營'], desc: '【謙遜】你不能成為【順手牽羊】和【樂不思蜀】的目標。<br>【連營】當你失去最後的手牌後，你可以摸一張牌。' },
-            { id: 'sun_shang_xiang', name: '孫尚香', hp: 3, faction: 'wu', skills: ['結姻', '梟姬'], desc: '【結姻】出牌階段限一次，你可以棄置兩張手牌，令你與一名已受傷男性角色各回復1點體力。<br>【梟姬】當你失去裝備區裡的一張牌後，你可以摸兩張牌。' },
+            { id: 'sun_quan', name: '孫權', hp: 4, faction: 'wu', exp: 'standard', skills: ['制衡', '救援'], desc: '【制衡】出牌階段限一次，你可以棄置任意張牌，然後摸等量的牌。<br>【救援】主公技，鎖定技，其他吳勢力角色對你使用【桃】回復的體力+1。' },
+            { id: 'gan_ning', name: '甘寧', hp: 4, faction: 'wu', exp: 'standard', skills: ['奇襲'], desc: '【奇襲】你可以將一張黑色牌當【過河拆橋】使用。' },
+            { id: 'lu_meng', name: '呂蒙', hp: 4, faction: 'wu', exp: 'standard', skills: ['克己'], desc: '【克己】若你於出牌階段內未使用或打出過【殺】，棄牌階段你的手牌上限為你的體力上限。' },
+            { id: 'zhou_yu', name: '周瑜', hp: 3, faction: 'wu', exp: 'standard', skills: ['英姿', '反間'], desc: '【英姿】摸牌階段，你可以額外摸一張牌。<br>【反間】出牌階段限一次，你可以令一名其他角色選擇一種花色後獲得你的一張手牌，若猜錯則受到1點傷害。' },
+            { id: 'lu_xun', name: '陸遜', hp: 3, faction: 'wu', exp: 'standard', skills: ['謙遜', '連營'], desc: '【謙遜】你不能成為【順手牽羊】和【樂不思蜀】的目標。<br>【連營】當你失去最後的手牌後，你可以摸一張牌。' },
+            { id: 'sun_shang_xiang', name: '孫尚香', hp: 3, faction: 'wu', exp: 'standard', skills: ['結姻', '梟姬'], desc: '【結姻】出牌階段限一次，你可以棄置兩張手牌，令你與一名已受傷男性角色各回復1點體力。<br>【梟姬】當你失去裝備區裡的一張牌後，你可以摸兩張牌。' },
             
-            { id: 'lu_bu', name: '呂布', hp: 4, faction: 'qun', skills: ['無雙'], desc: '【無雙】鎖定技，你使用【殺】指定目標後，目標需連續使用兩張【閃】才能抵消；你發起【決鬥】時，對方每次需打出兩張【殺】。' },
-            { id: 'diao_chan', name: '貂蟬', hp: 3, faction: 'qun', skills: ['離間', '閉月'], desc: '【離間】出牌階段限一次，你可以棄置一張牌，令兩名男性角色視為由其中一名對另一名使用【決鬥】。<br>【閉月】結束階段，你可以摸一張牌。' },
-            { id: 'hua_tuo', name: '華佗', hp: 3, faction: 'qun', skills: ['急救', '青囊'], desc: '【急救】你的回合外，你可以將一張紅色牌當【桃】使用。<br>【青囊】出牌階段限一次，你可以棄置一張手牌，令一名角色回復1點體力。' },
-            { id: 'yuan_shao', name: '袁紹', hp: 4, faction: 'qun', skills: ['亂擊', '血裔'], desc: '【亂擊】你可以將兩張相同花色的手牌當【萬箭齊發】使用。<br>【血裔】主公技，你的手牌上限額外增加群勢力角色數。' },
-            { id: 'hua_xiong', name: '華雄', hp: 6, faction: 'qun', skills: ['耀武'], desc: '【耀武】鎖定技，當你受到紅色【殺】造成的傷害時，傷害來源回復1點體力或摸一張牌。' },
+            { id: 'lu_bu', name: '呂布', hp: 4, faction: 'qun', exp: 'standard', skills: ['無雙'], desc: '【無雙】鎖定技，你使用【殺】指定目標後，目標需連續使用兩張【閃】才能抵消；你發起【決鬥】時，對方每次需打出兩張【殺】。' },
+            { id: 'diao_chan', name: '貂蟬', hp: 3, faction: 'qun', exp: 'standard', skills: ['離間', '閉月'], desc: '【離間】出牌階段限一次，你可以棄置一張牌，令兩名男性角色視為由其中一名對另一名使用【決鬥】。<br>【閉月】結束階段，你可以摸一張牌。' },
+            { id: 'hua_tuo', name: '華佗', hp: 3, faction: 'qun', exp: 'standard', skills: ['急救', '青囊'], desc: '【急救】你的回合外，你可以將一張紅色牌當【桃】使用。<br>【青囊】出牌階段限一次，你可以棄置一張手牌，令一名角色回復1點體力。' },
+            { id: 'yuan_shao', name: '袁紹', hp: 4, faction: 'qun', exp: 'standard', skills: ['亂擊', '血裔'], desc: '【亂擊】你可以將兩張相同花色的手牌當【萬箭齊發】使用。<br>【血裔】主公技，你的手牌上限額外增加群勢力角色數。' },
+            { id: 'hua_xiong', name: '華雄', hp: 6, faction: 'qun', exp: 'standard', skills: ['耀武'], desc: '【耀武】鎖定技，當你受到紅色【殺】造成的傷害時，傷害來源回復1點體力或摸一張牌。' },
 
             // --- Breakthrough (界限突破) Heroes ---
-            { id: 'jie_cao_cao', name: '界曹操', hp: 4, faction: 'wei', skills: ['奸雄', '護駕'], desc: '【奸雄】當你受到傷害後，你可以獲得對你造成傷害的牌，並可摸一張牌。<br>【護駕】主公技，當你需要使用或打出【閃】時，你可以令其他魏勢力角色打出【閃】。' },
-            { id: 'jie_liu_bei', name: '界劉備', hp: 4, faction: 'shu', skills: ['仁德', '激將'], desc: '【仁德】出牌階段，你可以將任意張手牌交給其他角色，若你於此階段給出第二張手牌，你回復1點體力。當你於此階段給出牌數達到兩張或更多時，你可以將一張基本牌當作另一張基本牌使用。<br>【激將】主公技，當你需要使用或打出【殺】時，你可以令其他蜀勢力角色打出【殺】。' },
-            { id: 'jie_guan_yu', name: '界關羽', hp: 4, faction: 'shu', skills: ['武聖', '義絕'], desc: '【武聖】你可以將一張紅色牌當【殺】使用或打出。<br>【義絕】出牌階段限一次，你可以與一名其他角色拼點。若你贏，該角色本回合非鎖定技失效且不能使用/打出手牌；若你輸，其可以回復1點體力。' },
-            { id: 'jie_zhang_fei', name: '界張飛', hp: 4, faction: 'shu', skills: ['咆哮', '替身'], desc: '【咆哮】你使用【殺】無次數限制。你使用的【殺】被【閃】抵消後，你可以摸一張牌。<br>【替身】限定技，準備階段，若你已受傷，你可以摸X張牌（X為你已損失的體力值），然後回復1點體力。' },
-            { id: 'jie_zhao_yun', name: '界趙雲', hp: 4, faction: 'shu', skills: ['龍膽', '涯角'], desc: '【龍膽】你可以將【殺】當【閃】、或【閃】當【殺】使用或打出。<br>【涯角】當你於回合外使用或打出一張手牌後，你可以展示牌堆頂的一張牌。若此牌與你使用的牌類型相同，你可以獲得此牌；若不同，你可以將此牌交給一名其他角色。' },
-            { id: 'jie_lu_bu', name: '界呂布', hp: 4, faction: 'qun', skills: ['無雙', '利馭'], desc: '【無雙】鎖定技，【殺】需兩張【閃】避開；【決鬥】需兩張【殺】避開。<br>【利馭】當你使用【殺】對一名其他角色造成傷害後，該角色可以選擇：摸一張牌，然後將其裝備區裡的一張牌交給你；或讓你獲得其一張手牌。' },
-            { id: 'jie_huang_gai', name: '界黃蓋', hp: 4, faction: 'wu', skills: ['苦肉', '詐降'], desc: '【苦肉】出牌階段限一次，你可以失去1點體力，然後摸兩張牌。<br>【詐降】鎖定技，每當你失去1點體力後，你摸三張牌。若此時是你的回合內，你本回合使用【殺】的次數上限+1，你使用紅色的【殺】無距離限制且不能被【閃】抵消。' },
-            { id: 'jie_da_qiao', name: '界大喬', hp: 3, faction: 'wu', skills: ['國色', '流離'], desc: '【國色】你可以將一張方塊牌當作【樂不思蜀】使用，若此牌是裝備牌，你摸一張牌。出牌階段限一次，你可以棄置一張【樂不思蜀】並摸一張牌。<br>【流離】當你成為【殺】的目標時，你可以棄置一張牌，將此【殺】轉移給攻擊範圍內的一名其他角色（此【殺】的來源除外）。' },
+            { id: 'jie_cao_cao', name: '界曹操', hp: 4, faction: 'wei', exp: 'breakthrough', skills: ['奸雄', '護駕'], desc: '【奸雄】當你受到傷害後，你可以獲得對你造成傷害的牌，並可摸一張牌。<br>【護駕】主公技，當你需要使用或打出【閃】時，你可以令其他魏勢力角色打出【閃】。' },
+            { id: 'jie_liu_bei', name: '界劉備', hp: 4, faction: 'shu', exp: 'breakthrough', skills: ['仁德', '激將'], desc: '【仁德】出牌階段，你可以將任意張手牌交給其他角色，若你於此階段給出第二張手牌，你回復1點體力。當你於此階段給出牌數達到兩張或更多時，你可以將一張基本牌當作另一張基本牌使用。<br>【激將】主公技，當你需要使用或打出【殺】時，你可以令其他蜀勢力角色打出【殺】。' },
+            { id: 'jie_guan_yu', name: '界關羽', hp: 4, faction: 'shu', exp: 'breakthrough', skills: ['武聖', '義絕'], desc: '【武聖】你可以將一張紅色牌當【殺】使用或打出。<br>【義絕】出牌階段限一次，你可以與一名其他角色拼點。若你贏，該角色本回合非鎖定技失效且不能使用/打出手牌；若你輸，其可以回復1點體力。' },
+            { id: 'jie_zhang_fei', name: '界張飛', hp: 4, faction: 'shu', exp: 'breakthrough', skills: ['咆哮', '替身'], desc: '【咆哮】你使用【殺】無次數限制。你使用的【殺】被【閃】抵消後，你可以摸一張牌。<br>【替身】限定技，準備階段，若你已受傷，你可以摸X張牌（X為你已損失的體力值），然後回復1點體力。' },
+            { id: 'jie_zhao_yun', name: '界趙雲', hp: 4, faction: 'shu', exp: 'breakthrough', skills: ['龍膽', '涯角'], desc: '【龍膽】你可以將【殺】當【閃】、或【閃】當【殺】使用或打出。<br>【涯角】當你於回合外使用或打出一張手牌後，你可以展示牌堆頂的一張牌。若此牌與你使用的牌類型相同，你可以獲得此牌；若不同，你可以將此牌交給一名其他角色。' },
+            { id: 'jie_lu_bu', name: '界呂布', hp: 4, faction: 'qun', exp: 'breakthrough', skills: ['無雙', '利馭'], desc: '【無雙】鎖定技，【殺】需兩張【閃】避開；【決鬥】需兩張【殺】避開。<br>【利馭】當你使用【殺】對一名其他角色造成傷害後，該角色可以選擇：摸一張牌，然後將其裝備區裡的一張牌交給你；或讓你獲得其一張手牌。' },
+            { id: 'jie_huang_gai', name: '界黃蓋', hp: 4, faction: 'wu', exp: 'breakthrough', skills: ['苦肉', '詐降'], desc: '【苦肉】出牌階段限一次，你可以失去1點體力，然後摸兩張牌。<br>【詐降】鎖定技，每當你失去1點體力後，你摸三張牌。若此時是你的回合內，你本回合使用【殺】的次數上限+1，你使用紅色的【殺】無距離限制且不能被【閃】抵消。' },
+            { id: 'jie_da_qiao', name: '界大喬', hp: 3, faction: 'wu', exp: 'breakthrough', skills: ['國色', '流離'], desc: '【國色】你可以將一張方塊牌當作【樂不思蜀】使用，若此牌是裝備牌，你摸一張牌。出牌階段限一次，你可以棄置一張【樂不思蜀】並摸一張牌。<br>【流離】當你成為【殺】的目標時，你可以棄置一張牌，將此【殺】轉移給攻擊範圍內的一名其他角色（此【殺】的來源除外）。' },
 
             // --- expansion (神話再臨 & SP) Heroes ---
-            { id: 'zhang_jiao', name: '張角', hp: 3, faction: 'qun', skills: ['雷擊', '鬼道', '黃天'], desc: '【雷擊】當你使用或打出一張【閃】時，你可以進行判定。若結果為黑桃，你令一名角色受到2點雷電傷害。<br>【鬼道】當一名角色的判定牌生效前，你可以用一張黑色牌代替之。<br>【黃天】主公技，群勢力角色於出牌階段可以交給你一張【閃】或【閃電】。' },
-            { id: 'xun_yu', name: '荀彧', hp: 3, faction: 'wei', skills: ['驅虎', '節命'], desc: '【驅虎】出牌階段限一次，你可以與一名體力比你多的角色拼點。若你贏，其對你指定的另一名角色造成1點傷害；若你輸，其對你造成1點傷害。<br>【節命】當你受到1點傷害後，你可以令一名角色摸牌至其手牌上限（最多摸5張）。' },
-            { id: 'lu_su', name: '魯肅', hp: 3, faction: 'wu', skills: ['好施', '締盟'], desc: '【好施】摸牌階段，你可以額外摸兩張牌。若你的手牌數大於5，你必須將一半的手牌交給手牌最少的一名其他角色。<br>【締盟】出牌階段限一次，你可以棄置等同於兩名其他角色手牌差的牌，然後交換他們的手牌。' },
-            { id: 'zuo_ci', name: '左慈', hp: 3, faction: 'qun', skills: ['化身', '新生'], desc: '【化身】準備階段/結束階段，你可以選擇獲得一個已在武將牌池中的隨機技能。<br>【新生】當你受到1點傷害後，你可以摸一張牌。' },
-            { id: 'deng_ai', name: '鄧艾', hp: 4, faction: 'wei', skills: ['屯田', '鑿險'], desc: '【屯田】每次你在回合外失去牌時，你可以進行判定，若結果不為紅桃，你獲得一個「田」並置於武將牌上；你每有一個「田」，你與其他角色的距離-1。<br>【鑿險】覺醒技，準備階段開始時，若你的「田」達到3張或更多，你減1點體力上限，獲得技能「急襲」（可以將「田」當【順手牽羊】使用）。' },
-            { id: 'jiang_wei', name: '姜維', hp: 4, faction: 'shu', skills: ['挑釁', '志繼'], desc: '【挑釁】出牌階段限一次，你可以令一名你在其攻擊範圍內的其他角色對你使用一張【殺】，若其不如此做，你棄置其一張牌。<br>【志繼】覺醒技，準備階段開始時，若你沒有手牌，你減1點體力上限，回復1點體力（若已滿則摸兩張牌），然後獲得技能「觀星」。' },
-            { id: 'jia_xu', name: '賈詡', hp: 3, faction: 'qun', skills: ['帷幕', '完殺', '亂武'], desc: '【帷幕】鎖定技，你不能成為黑色錦囊牌的目標。<br>【完殺】鎖定技，你的回合內，不處於瀕死狀態的角色不能使用【桃】拯救瀕死角色。<br>【亂武】限定技，出牌階段，你可以令所有其他角色各對其距離最近的另一名角色使用一張【殺】，否則失去1點體力。' },
-            { id: 'shen_guan_yu', name: '神關羽', hp: 5, faction: 'qun', skills: ['武神', '武魂'], desc: '【武神】鎖定技，你的紅桃手牌視為普通【殺】；你使用紅桃【殺】無距離限制。<br>【武魂】鎖定技，當你死亡時，令殺死你的角色進行判定，若結果不為【桃】或【桃園結義】，該角色立即死亡。' },
-            { id: 'shen_lu_bu', name: '神呂布', hp: 5, faction: 'qun', skills: ['狂暴', '神憤'], desc: '【狂暴】鎖定技，遊戲開始你獲得2個「暴怒」標記；當你造成或受到傷害時，獲得1個標記。<br>【神憤】出牌階段限一次，你可以棄置6個標記，對所有其他角色各造成1點傷害，然後他們需棄置裝備區所有牌 and 4張手牌，最後你翻面。' },
-            { id: 'shen_cao_cao', name: '神曹操', hp: 3, faction: 'wei', skills: ['歸心'], desc: '【歸心】當你受到1點傷害後，你可以獲得所有其他角色區域裡的一張牌，然後你翻面。' },
-            { id: 'shen_zhao_yun', name: '神趙雲', hp: 2, faction: 'qun', skills: ['絕境', '龍魂'], desc: '【絕境】鎖定技，你的手牌上限始終為2；每當你受到或回復1點體力後，或你進入或脫離瀕死狀態時，若你的手牌數小於2，你摸牌至2張。<br>【龍魂】你可以將同花色的牌按以下規則使用或打出：紅桃當【桃】；方塊當火【殺】；梅花當【閃】；黑桃當【無懈可擊】。' },
+            { id: 'zhang_jiao', name: '張角', hp: 3, faction: 'qun', exp: 'god', skills: ['雷擊', '鬼道', '黃天'], desc: '【雷擊】當你使用或打出一張【閃】時，你可以進行判定。若結果為黑桃，你令一名角色受到2點雷電傷害。<br>【鬼道】當一名角色的判定牌生效前，你可以用一張黑色牌代替之。<br>【黃天】主公技，群勢力角色於出牌階段可以交給你一張【閃】或【閃電】。' },
+            { id: 'xun_yu', name: '荀彧', hp: 3, faction: 'wei', exp: 'god', skills: ['驅虎', '節命'], desc: '【驅虎】出牌階段限一次，你可以與一名體力比你多的角色拼點。若你贏，其對你指定的另一名角色造成1點傷害；若你輸，其對你造成1點傷害。<br>【節命】當你受到1點傷害後，你可以令一名角色摸牌至其手牌上限（最多摸5張）。' },
+            { id: 'lu_su', name: '魯肅', hp: 3, faction: 'wu', exp: 'god', skills: ['好施', '締盟'], desc: '【好施】摸牌階段，你可以額外摸兩張牌。若你的手牌數大於5，你必須將一半的手牌交給手牌最少的一名其他角色。<br>【締盟】出牌階段限一次，你可以棄置等同於兩名其他角色手牌差的牌，然後交換他們的手牌。' },
+            { id: 'zuo_ci', name: '左慈', hp: 3, faction: 'qun', exp: 'god', skills: ['化身', '新生'], desc: '【化身】準備階段/結束階段，你可以選擇獲得一個已在武將牌池中的隨機技能。<br>【新生】當你受到1點傷害後，你可以摸一張牌。' },
+            { id: 'deng_ai', name: '鄧艾', hp: 4, faction: 'wei', exp: 'god', skills: ['屯田', '鑿險'], desc: '【屯田】每次你在回合外失去牌時，你可以進行判定，若結果不為紅桃，你獲得一個「田」並置於武將牌上；你每有一個「田」，你與其他角色的距離-1。<br>【鑿險】覺醒技，準備階段開始時，若你的「田」達到3張或更多，你減1點體力上限，獲得技能「急襲」（可以將「田」當【順手牽羊】使用）。' },
+            { id: 'jiang_wei', name: '姜維', hp: 4, faction: 'shu', exp: 'god', skills: ['挑釁', '志繼'], desc: '【挑釁】出牌階段限一次，你可以令一名你在其攻擊範圍內的其他角色對你使用一張【殺】，若其不如此做，你棄置其一張牌。<br>【志繼】覺醒技，準備階段開始時，若你沒有手牌，你減1點體力上限，回復1點體力（若已滿則摸兩張牌），然後獲得技能「觀星」。' },
+            { id: 'jia_xu', name: '賈詡', hp: 3, faction: 'qun', exp: 'god', skills: ['帷幕', '完殺', '亂武'], desc: '【帷幕】鎖定技，你不能成為黑色錦囊牌的目標。<br>【完殺】鎖定技，你的回合內，不處於瀕死狀態的角色不能使用【桃】拯救瀕死角色。<br>【亂武】限定技，出牌階段，你可以令所有其他角色各對其距離最近的另一名角色使用一張【殺】，否則失去1點體力。' },
+            { id: 'shen_guan_yu', name: '神關羽', hp: 5, faction: 'qun', exp: 'god', skills: ['武神', '武魂'], desc: '【武神】鎖定技，你的紅桃手牌視為普通【殺】；你使用紅桃【殺】無距離限制。<br>【武魂】鎖定技，當你死亡時，令殺死你的角色進行判定，若結果不為【桃】或【桃園結義】，該角色立即死亡。' },
+            { id: 'shen_lu_bu', name: '神呂布', hp: 5, faction: 'qun', exp: 'god', skills: ['狂暴', '神憤'], desc: '【狂暴】鎖定技，遊戲開始你獲得2個「暴怒」標記；當你造成或受到傷害時，獲得1個標記。<br>【神憤】出牌階段限一次，你可以棄置6個標記，對所有其他角色各造成1點傷害，然後他們需棄置裝備區所有牌 and 4張手牌，最後你翻面。' },
+            { id: 'shen_cao_cao', name: '神曹操', hp: 3, faction: 'wei', exp: 'god', skills: ['歸心'], desc: '【歸心】當你受到1點傷害後，你可以獲得所有其他角色區域裡的一張牌，然後你翻面。' },
+            { id: 'shen_zhao_yun', name: '神趙雲', hp: 2, faction: 'qun', exp: 'god', skills: ['絕境', '龍魂'], desc: '【絕境】鎖定技，你的手牌上限始終為2；每當你受到或回復1點體力後，或你進入或脫離瀕死狀態時，若你的手牌數小於2，你摸牌至2張。<br>【龍魂】你可以將同花色的牌按以下規則使用或打出：紅桃當【桃】；方塊當火【殺】；梅花當【閃】；黑桃當【無懈可擊】。' },
 
             // --- SP Heroes ---
             { id: 'sp_zhao_yun', name: 'SP趙雲', hp: 4, faction: 'qun', skills: ['龍膽', '衝陣'], desc: '【龍膽】你可以【殺】當【閃】、【閃】當【殺】使用或打出。<br>【衝陣】當你發動【龍膽】使用或打出一張牌時，你可以獲得對方一張手牌。' },
@@ -669,19 +669,47 @@
             qun: { name: '群', colors: ['#4c1d95', '#f0abfc'], glow: '#d8b4fe' }
         };
 
-        HEROES.forEach(hero => { hero.img = `../assets/SanGuoSha/heroes/${hero.id}.png`; });
+        HEROES.forEach(hero => { hero.img = `../assets/SanGuoSha/heroes/${hero.name}.png`; });
+
+        const SUIT_ENG = { '♠': 'spade', '♥': 'heart', '♣': 'club', '♦': 'diamond' };
+        const CARD_ENG = {
+            '殺': 'sha', '雷殺': 'thunder_sha', '火殺': 'fire_sha', '閃': 'shan', '桃': 'tao', '酒': 'jiu',
+            '過河拆橋': 'dismantle', '順手牽羊': 'snatch', '無中生有': 'ex_nihilo', '決鬥': 'duel',
+            '借刀殺人': 'borrow_sword', '五穀豐登': 'harvest', '南蠻入侵': 'barbarian', '萬箭齊發': 'arrows',
+            '桃園結義': 'peach_garden', '無懈可擊': 'flawless', '鐵索連環': 'iron_shackles', '火攻': 'fire_attack',
+            '樂不思蜀': 'indulgence', '兵糧寸斷': 'supply_shortage', '閃電': 'lightning',
+            '諸葛連弩': 'crossbow', '雌雄雙股劍': 'double_swords', '青釭劍': 'qinggang_sword',
+            '青龍偃月刀': 'green_dragon_crescent_blade', '丈八蛇矛': 'serpent_spear', '貫石斧': 'stone_cleaving_axe',
+            '方天畫戟': 'fangtian_halberd', '麒麟弓': 'kirin_bow', '古錠刀': 'guding_blade',
+            '朱雀羽扇': 'feather_fan', '吳六劍': 'wu_six_swords', '寒冰劍': 'ice_sword',
+            '八卦陣': 'eight_diagrams', '仁王盾': 'renwang_shield', '藤甲': 'rattan_armor',
+            '白銀獅子': 'silver_lion', '木牛流馬': 'wooden_ox',
+            '絕影': 'shadow_runner', '的盧': 'dilu', '爪黃飛電': 'yellow_lightning', '驊騮': 'hualiu',
+            '赤兔': 'red_hare', '大宛': 'dawan', '紫騂': 'zixin',
+            '銀月槍': 'silver_moon_spear', '水淹七軍': 'drowning', '兵臨城下': 'city_under_siege',
+            '遠交近攻': 'allies_and_enemies', '知己知彼': 'know_self_and_enemy',
+            '三尖兩刃刀': 'three_point_double_edge_blade', '驚帆': 'jingfan', '玉龍': 'yulong'
+        };
 
         function generateDeck() {
             let deck = [];
             let id = 0;
             
-            const addCard = (name, suit, point) => {
+            const addCard = (name, suit, point, isMilitary = false) => {
                 const meta = CARD_META[name];
                 if (!meta) {
                     console.error('Missing card meta for: ' + name);
                     return;
                 }
                 const isRed = (suit === SUIT.HEART || suit === SUIT.DIAMOND);
+                
+                const suitEng = SUIT_ENG[suit] || '';
+                const cardEng = CARD_ENG[name] || '';
+                let imgPath = `../assets/SanGuoSha/cards/${name}.png`;
+                if (isMilitary) {
+                    imgPath = `../assets/SanGuoSha/cards/${suitEng}_${point}_${cardEng}.png`;
+                }
+                
                 deck.push({
                     id: id++,
                     name: name,
@@ -694,7 +722,7 @@
                     equipType: meta.equipType,
                     range: meta.range,
                     damageType: meta.damageType || 'normal',
-                    img: `../assets/SanGuoSha/cards/${name}.png`
+                    img: imgPath
                 });
             };
 
@@ -733,7 +761,7 @@
                     const suitMap = MILITARY_CARDS[suitKey];
                     for (const point in suitMap) {
                         const name = suitMap[point];
-                        addCard(name, suitChar, point);
+                        addCard(name, suitChar, point, true);
                     }
                 }
             }
@@ -835,6 +863,7 @@
                     wrap.style.display = (mode === '1v1') ? 'none' : 'block';
                 }
                 this.validateDeckTest();
+                window.renderLobbyHeroes();
             }
 
             validateDeckTest() {
@@ -3832,22 +3861,37 @@
 
         const Engine = new GameEngine();
         
-        let grid = document.getElementById('heroGrid');
-        HEROES.forEach(h => {
-            let el = document.createElement('div');
-            el.className = 'hero-select-card';
+        window.renderLobbyHeroes = function() {
+            let grid = document.getElementById('heroGrid');
+            if(!grid) return;
+            grid.innerHTML = '';
             
-            // Use avatar image for selection screen
-            let avatarImg = `../assets/SanGuoSha/heroes_avatar/${h.id}.png`;
-            el.style.backgroundImage = `url('${avatarImg}')`;
-            el.style.backgroundSize = 'cover';
-            el.style.backgroundPosition = 'center';
+            let allowGod = document.getElementById('expGod') ? document.getElementById('expGod').checked : true;
+            let allowBreakthrough = document.getElementById('expBreakthrough') ? document.getElementById('expBreakthrough').checked : true;
+            let allowSP = document.getElementById('expSP') ? document.getElementById('expSP').checked : true;
             
-            el.title = h.name;
-            el.innerHTML = `<div class="hero-select-name" style="background: rgba(0,0,0,0.6); padding: 2px 0; border-radius: 0 0 4px 4px; width: 100%; text-align: center; position: absolute; bottom: 0; left: 0; box-sizing: border-box;">${h.name}</div>`;
-            el.onclick = () => { Engine.initGame(h); };
-            grid.appendChild(el);
-        });
+            HEROES.forEach(h => {
+                if(h.exp === 'god' && !allowGod) return;
+                if(h.exp === 'breakthrough' && !allowBreakthrough) return;
+                if(h.exp === 'sp' && !allowSP) return;
+                
+                let el = document.createElement('div');
+                el.className = 'hero-select-card';
+                
+                // Use avatar image for selection screen
+                let avatarImg = `../assets/SanGuoSha/heroes_avatar/${h.name}.png`;
+                el.style.backgroundImage = `url('${avatarImg}')`;
+                el.style.backgroundSize = 'cover';
+                el.style.backgroundPosition = 'center';
+                
+                el.title = h.name;
+                el.innerHTML = `<div class="hero-select-name" style="background: rgba(0,0,0,0.6); padding: 2px 0; border-radius: 0 0 4px 4px; width: 100%; text-align: center; position: absolute; bottom: 0; left: 0; box-sizing: border-box;">${h.name}</div>`;
+                el.onclick = () => { Engine.initGame(h); };
+                grid.appendChild(el);
+            });
+        };
+        
+        window.renderLobbyHeroes();
 
     </script>
 </body>
