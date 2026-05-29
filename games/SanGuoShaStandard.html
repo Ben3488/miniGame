@@ -104,17 +104,27 @@
 
         /* P0 (Human) - Bottom */
         #p0 { 
-            bottom: 12px; left: 50%; transform: translateX(-50%); 
+            bottom: 6px; left: 50%; transform: translateX(-50%); 
             width: 96%; max-width: 1300px; 
             flex-direction: row; justify-content: space-between; 
-            padding: 14px 20px;
+            padding: 10px 20px;
         }
-        #p0 .hero-section { display: flex; align-items: center; gap: 20px; }
+        #p0 .hero-section { 
+            display: flex; 
+            align-items: flex-end; 
+            gap: 20px; 
+            align-self: flex-end;
+            height: 230px;
+        }
         #p0 .hand-section { 
             display: flex; gap: 12px; flex: 1; margin: 0 24px; 
-            overflow-x: auto; padding: 0 16px 12px; align-items: flex-end; height: 240px;
+            overflow-x: auto; padding: 0 16px 4px; align-items: flex-end; height: 230px;
             scrollbar-width: thin;
             scrollbar-color: var(--theme-border) transparent;
+            cursor: grab;
+        }
+        .dragging-active, .dragging-active * {
+            cursor: grabbing !important;
         }
         #p0 .hand-section::-webkit-scrollbar {
             height: 6px;
@@ -123,7 +133,22 @@
             background-color: var(--theme-border);
             border-radius: 3px;
         }
-        #p0 .equip-section { display: flex; flex-direction: column; gap: 6px; width: 190px; font-size: 0.9rem; }
+        #p0 .equip-section { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 6px; 
+            width: 190px; 
+            font-size: 0.9rem; 
+            align-self: flex-end;
+            margin-bottom: 2px;
+        }
+        #btnSkill {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 6px 10px;
+            font-size: 0.9rem;
+            border-radius: 4px;
+        }
         
         /* P1 (Left), P2 (Top), P3 (Right) */
         #p1 { top: 45%; left: 16px; transform: translateY(-50%); }
@@ -153,7 +178,7 @@
             transform: translateY(-4px);
             box-shadow: 0 8px 16px rgba(0,0,0,0.6);
         }
-        #p0 .hero-card { width: 125px; height: 175px; font-size: 1.8rem;}
+        #p0 .hero-card { width: 138px; height: 194px; font-size: 1.8rem;}
 
         .role-icon {
             position: absolute; top: -14px; left: -14px; width: 34px; height: 34px;
@@ -168,10 +193,11 @@
         .role-unknown { background: #4b5563; color: #d1d5db; border-color: #9ca3af; }
 
         .hp-bar {
-            position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%);
+            position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
             background: rgba(12, 10, 9, 0.95); color: #ef4444; border: 1px solid var(--theme-gold);
             padding: 2px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: bold;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5); white-space: nowrap; display: flex; align-items: center; gap: 4px;
+            z-index: 15;
         }
         
         .hand-count {
@@ -220,8 +246,8 @@
 
         /* Cards */
         .card {
-            width: 138px; 
-            height: 192px; 
+            width: 150px; 
+            height: 210px; 
             background: #e5e7eb; border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.6); border: 2px solid #3f3f46;
             position: relative; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -231,13 +257,13 @@
         }
         .card.face-up { background-image: none; background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); }
         .card:hover:not(.disabled) { 
-            transform: translateY(-20px) scale(1.08); 
+            transform: translateY(-12px) scale(1.04); 
             box-shadow: 0 18px 36px rgba(0,0,0,0.7);
             border-color: var(--theme-gold);
             z-index: 50;
         }
         .card.selected { 
-            transform: translateY(-30px) scale(1.08); 
+            transform: translateY(-20px) scale(1.04); 
             box-shadow: var(--glow-gold), 0 14px 30px rgba(245,158,11,0.6); 
             border-color: var(--theme-gold); 
             z-index: 60;
@@ -249,7 +275,7 @@
             top: 4px;
             left: 4px;
             right: 4px;
-            bottom: 28px;
+            bottom: 4px;
             background-size: cover;
             background-position: center;
             border-radius: 6px;
@@ -686,14 +712,12 @@
                     <div class="role-icon" id="role0" style="width:45px; height:45px; font-size:1.5rem; left:-20px;">主</div>
                     <div class="hp-bar" id="hp0"></div>
                 </div>
-                <div style="text-align:center;">
-                    <button class="btn" id="btnSkill" style="display:none; margin-top:10px; font-size: 0.9rem; padding: 5px 10px;" onclick="Engine.onSkillClick()">發動技能</button>
-                </div>
             </div>
             
             <div class="hand-section" id="hand0"></div>
             
             <div class="equip-section" id="equip0">
+                <button class="btn" id="btnSkill" style="display:none;" onclick="Engine.onSkillClick()">發動技能</button>
                 <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqWeapon0" onclick="UI.showEquipInfo('weapon')">武器: 無</div>
                 <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqArmor0" onclick="UI.showEquipInfo('armor')">防具: 無</div>
                 <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqDefMount0" onclick="UI.showEquipInfo('defMount')">+1馬: 無</div>
@@ -1360,69 +1384,7 @@
                     wrap.style.display = (mode === '1v1') ? 'none' : 'block';
                 }
                 this.validateDeckTest();
-                // --- Drag to Scroll for Player's Hand Cards ---
-        (function() {
-            const hand = document.getElementById('hand0');
-            if (!hand) return;
-
-            let isDown = false;
-            let startX;
-            let scrollLeft;
-            let isDragging = false;
-            let wasDragging = false;
-
-            hand.addEventListener('mousedown', (e) => {
-                isDown = true;
-                startX = e.pageX - hand.offsetLeft;
-                scrollLeft = hand.scrollLeft;
-                isDragging = false;
-                wasDragging = false;
-            });
-
-            window.addEventListener('mousemove', (e) => {
-                if (!isDown) return;
-                const x = e.pageX - hand.offsetLeft;
-                const walk = x - startX;
-                
-                if (Math.abs(walk) > 5) {
-                    if (!isDragging) {
-                        isDragging = true;
-                        wasDragging = true;
-                        hand.classList.add('dragging-active');
-                    }
-                    hand.scrollLeft = scrollLeft - walk;
-                }
-            });
-
-            window.addEventListener('mouseup', () => {
-                if (isDown) {
-                    isDown = false;
-                    hand.classList.remove('dragging-active');
-                    setTimeout(() => {
-                        wasDragging = false;
-                    }, 50); // small delay to block click events
-                }
-            });
-
-            // Prevent card selection click when dragging
-            hand.addEventListener('click', (e) => {
-                if (wasDragging) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    wasDragging = false;
-                }
-            }, true); // Capture phase is critical!
-
-            // Add support for vertical mouse wheel scrolling to scroll horizontally
-            hand.addEventListener('wheel', (e) => {
-                if (e.deltaY !== 0) {
-                    e.preventDefault();
-                    hand.scrollLeft += e.deltaY;
-                }
-            });
-        })();
-
-        window.renderLobbyHeroes();
+                window.renderLobbyHeroes();
             }
 
             validateDeckTest() {
@@ -4982,7 +4944,6 @@
                         <div class="card-title" style="color:${card.color === 'red' ? '#dc2626' : '#1c1917'}; text-shadow: 0px 0px 3px rgba(255,255,255,0.8);">${card.name}</div>
                         <div class="card-suit suit-${card.color}">${card.suit}</div>
                         <div class="card-point suit-${card.color}">${card.point}</div>
-                        <div class="card-desc">${card.type === 'equip' ? card.equipType : card.type}</div>
                     </div>
                 `;
                 
@@ -5106,7 +5067,7 @@
                 
                 // Calculate dynamic card overlap to prevent overflow scrollbars
                 let cardCount = p0.hand.length;
-                let cardWidth = 138;
+                let cardWidth = 150;
                 let maxContainerWidth = window.innerWidth * 0.55;
                 let overlapStyle = '';
                 if (cardCount * (cardWidth + 12) > maxContainerWidth) {
@@ -5171,7 +5132,6 @@
                             <div class="card-title" style="color:${c.color === COLOR.RED ? '#dc2626' : '#1c1917'}; text-shadow: 0px 0px 3px rgba(255,255,255,0.8);">${c.name}</div>
                             <div class="card-suit suit-${c.color}">${c.suit}</div>
                             <div class="card-point suit-${c.color}">${c.point}</div>
-                            <div class="card-desc">${c.type === 'equip' ? c.equipType : c.type}</div>
                         </div>
                     `;
                 });
@@ -5253,12 +5213,18 @@
             let isDragging = false;
             let wasDragging = false;
 
+            // Prevent default browser drag behavior on hand elements (images, text, cards)
+            hand.addEventListener('dragstart', (e) => {
+                e.preventDefault();
+            });
+
             hand.addEventListener('mousedown', (e) => {
                 isDown = true;
                 startX = e.pageX - hand.offsetLeft;
                 scrollLeft = hand.scrollLeft;
                 isDragging = false;
                 wasDragging = false;
+                hand.style.cursor = 'grabbing';
             });
 
             window.addEventListener('mousemove', (e) => {
@@ -5280,6 +5246,7 @@
                 if (isDown) {
                     isDown = false;
                     hand.classList.remove('dragging-active');
+                    hand.style.cursor = 'grab';
                     setTimeout(() => {
                         wasDragging = false;
                     }, 50); // small delay to block click events
