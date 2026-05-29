@@ -252,7 +252,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.6); border: 2px solid #3f3f46;
             position: relative; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             color: black; flex-shrink: 0;
-            background-image: url('../assets/SanGuoSha/backgrounds/card_back.png');
+            background-image: url('../assets/SanGuoSha/card_backs/game_card_back.png');
             background-size: cover;
         }
         .card.face-up { background-image: none; background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); }
@@ -357,7 +357,7 @@
         .modal-content { 
             background: radial-gradient(circle, #2d1a10 0%, #170d08 100%); 
             border: 2px solid var(--theme-border); padding: 32px; border-radius: 16px; 
-            text-align: center; width: min(980px, calc(100vw - 32px)); max-height: calc(100vh - 48px); 
+            text-align: center; width: min(1040px, calc(100vw - 32px)); max-height: calc(100vh - 48px); 
             overflow: auto;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
         }
@@ -385,12 +385,12 @@
         .cip-desc { color: #e7e5e4; font-size: 0.9rem; line-height: 1.5; }
 
         /* Card Backgrounds */
-        .card.bg-sha { background-image: url('../assets/SanGuoSha/backgrounds/basic_bg.png'); }
-        .card.bg-shan { background-image: url('../assets/SanGuoSha/backgrounds/basic_bg.png'); }
-        .card.bg-tao { background-image: url('../assets/SanGuoSha/backgrounds/basic_bg.png'); }
-        .card.bg-trick { background-image: url('../assets/SanGuoSha/backgrounds/trick_bg.png'); }
-        .card.bg-delay_trick { background-image: url('../assets/SanGuoSha/backgrounds/trick_bg.png'); }
-        .card.bg-equip { background-image: url('../assets/SanGuoSha/backgrounds/equip_bg.png'); }
+        .card.bg-sha { background: linear-gradient(135deg, #fffcf4 0%, #f5ebd3 100%); border-color: #b45309; }
+        .card.bg-shan { background: linear-gradient(135deg, #fffcf4 0%, #f5ebd3 100%); border-color: #b45309; }
+        .card.bg-tao { background: linear-gradient(135deg, #fffcf4 0%, #f5ebd3 100%); border-color: #b45309; }
+        .card.bg-trick { background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%); border-color: #0284c7; }
+        .card.bg-delay_trick { background: linear-gradient(135deg, #f3f0ff 0%, #e8e0ff 100%); border-color: #7c3aed; }
+        .card.bg-equip { background: linear-gradient(135deg, #f1f3f5 0%, #cfd4da 100%); border-color: #475569; }
 
         /* Faction Styling */
         .player-area.faction-wei {
@@ -686,6 +686,106 @@
         }
         #lbPrev { left: 20px; }
         #lbNext { right: 20px; }
+
+        /* Battle Effects CSS */
+        .slash-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150px;
+            height: 150px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1000;
+        }
+        .slash-line-1 {
+            position: absolute;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, transparent, #ff3b3b, #ffe500, #ff3b3b, transparent);
+            top: 50%;
+            left: 0;
+            transform: rotate(-45deg) scaleX(0);
+            box-shadow: 0 0 15px #ff3b3b;
+            animation: slash-anim-1 0.4s cubic-bezier(0.15, 0.85, 0.35, 1) forwards;
+        }
+        .slash-line-2 {
+            position: absolute;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, transparent, #ff3b3b, #ffe500, #ff3b3b, transparent);
+            top: 50%;
+            left: 0;
+            transform: rotate(45deg) scaleX(0);
+            box-shadow: 0 0 15px #ff3b3b;
+            animation: slash-anim-2 0.4s cubic-bezier(0.15, 0.85, 0.35, 1) 0.08s forwards;
+        }
+        .shield-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 160px;
+            height: 160px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1000;
+        }
+        .shield-bubble {
+            position: absolute;
+            inset: 5px;
+            border-radius: 50%;
+            border: 3px solid rgba(245, 158, 11, 0.85);
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.4) 100%);
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.65), inset 0 0 25px rgba(245, 158, 11, 0.65);
+            transform: scale(0.6);
+            opacity: 0;
+            animation: shield-anim 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .shield-spark {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #fff 0%, transparent 60%);
+            opacity: 0;
+            transform: scale(0.2);
+            animation: spark-anim 0.5s ease-out forwards;
+        }
+        .damage-flash {
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            background: rgba(239, 68, 68, 0.45);
+            box-shadow: inset 0 0 35px rgba(239, 68, 68, 0.95), 0 0 25px rgba(239, 68, 68, 0.7);
+            pointer-events: none;
+            animation: flash-anim 0.35s ease-out forwards;
+            z-index: 999;
+        }
+        @keyframes slash-anim-1 {
+            0% { transform: rotate(-45deg) scaleX(0); opacity: 0; }
+            45% { transform: rotate(-45deg) scaleX(1.4); opacity: 1; }
+            100% { transform: rotate(-45deg) scaleX(1.5); opacity: 0; }
+        }
+        @keyframes slash-anim-2 {
+            0% { transform: rotate(45deg) scaleX(0); opacity: 0; }
+            45% { transform: rotate(45deg) scaleX(1.4); opacity: 1; }
+            100% { transform: rotate(45deg) scaleX(1.5); opacity: 0; }
+        }
+        @keyframes shield-anim {
+            0% { transform: scale(0.6) rotate(0deg); opacity: 0; }
+            40% { transform: scale(1.05) rotate(12deg); opacity: 1; }
+            80% { transform: scale(1) rotate(20deg); opacity: 0.8; }
+            100% { transform: scale(1.1) rotate(25deg); opacity: 0; }
+        }
+        @keyframes spark-anim {
+            0% { opacity: 0; transform: scale(0.2); }
+            25% { opacity: 0.85; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1.35); }
+        }
+        @keyframes flash-anim {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            100% { opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -693,6 +793,7 @@
         <div style="display:flex; gap:12px; align-items:center;">
             <a href="../index.html" class="back-btn">← 返回大廳</a>
             <button class="back-btn" onclick="UI.toggleHistoryLog()" style="cursor:pointer; font-size: 1rem;">📜 戰局日誌</button>
+            <button class="back-btn" onclick="UI.showHeroGallery()" style="cursor:pointer; font-size: 1rem;">👑 武將圖鑑</button>
             <button class="back-btn" onclick="UI.showCardGallery()" style="cursor:pointer; font-size: 1rem;">📖 卡牌圖鑑</button>
         </div>
         <h1 class="game-title">三國殺 - 標準版</h1>
@@ -718,11 +819,11 @@
             
             <div class="equip-section" id="equip0">
                 <button class="btn" id="btnSkill" style="display:none;" onclick="Engine.onSkillClick()">發動技能</button>
-                <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqWeapon0" onclick="UI.showEquipInfo('weapon')">武器: 無</div>
-                <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqArmor0" onclick="UI.showEquipInfo('armor')">防具: 無</div>
-                <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqDefMount0" onclick="UI.showEquipInfo('defMount')">+1馬: 無</div>
-                <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqOffMount0" onclick="UI.showEquipInfo('offMount')">-1馬: 無</div>
-                <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqTreasure0" onclick="UI.showEquipInfo('treasure')">寶物: 無</div>
+                <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqWeapon0" onclick="Engine.onEquipClick('weapon')">武器: 無</div>
+                <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqArmor0" onclick="Engine.onEquipClick('armor')">防具: 無</div>
+                <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqDefMount0" onclick="Engine.onEquipClick('defMount')">+1馬: 無</div>
+                <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqOffMount0" onclick="Engine.onEquipClick('offMount')">-1馬: 無</div>
+                <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqTreasure0" onclick="Engine.onEquipClick('treasure')">寶物: 無</div>
             </div>
         </div>
 
@@ -749,23 +850,29 @@
 
     <!-- Lobby / Hero Selection Modal -->
     <div class="modal-overlay" id="lobbyModal" style="display:flex;">
-        <div class="modal-content" style="max-width: 900px; max-height: 80vh; overflow-y: auto;">
+        <div class="modal-content" style="max-width: 1040px; max-height: 85vh; overflow-y: auto;">
             <div style="display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid #777; padding-bottom: 15px; margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h1 style="color:var(--theme-gold); margin:0;">請選擇你的武將</h1>
-                    <div style="color: white; font-size: 1.1rem; display: flex; gap: 15px; align-items: center;">
-                        <button class="btn" onclick="UI.showCardGallery()" style="font-size: 0.95rem; padding: 5px 12px; margin-right: 8px;">📖 裝備圖鑑</button>
-                        <div>
-                            <label for="gameModeSelect">模式：</label>
-                            <select id="gameModeSelect" style="background: #333; color: white; border: 1px solid #777; padding: 5px; font-size: 1rem; border-radius: 4px;" onchange="if(window.Engine) window.Engine.updateLobbyMode()">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                    <!-- Left Group: Title & Galleries -->
+                    <div style="display: flex; align-items: center; gap: 16px; flex-shrink: 0; flex-wrap: nowrap;">
+                        <h1 style="color:var(--theme-gold); margin:0; font-size: 1.8rem; font-weight: 900; white-space: nowrap; flex-shrink: 0;">請選擇你的武將</h1>
+                        <button class="btn" onclick="UI.showHeroGallery()" style="font-size: 0.95rem; padding: 6px 14px; white-space: nowrap; flex-shrink: 0;">👑 武將圖鑑</button>
+                        <button class="btn" onclick="UI.showCardGallery()" style="font-size: 0.95rem; padding: 6px 14px; white-space: nowrap; flex-shrink: 0;">📖 裝備圖鑑</button>
+                    </div>
+                    
+                    <!-- Right Group: Dropdowns -->
+                    <div style="color: white; font-size: 1.05rem; display: flex; gap: 20px; align-items: center; flex-shrink: 0; margin-left: auto;">
+                        <div style="display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                            <label for="gameModeSelect" style="color: var(--theme-gold); font-weight: bold;">模式：</label>
+                            <select id="gameModeSelect" style="background: rgba(41, 37, 36, 0.95); color: white; border: 1px solid var(--theme-border); padding: 6px 12px; font-size: 0.95rem; border-radius: 6px; outline: none; cursor: pointer;" onchange="if(window.Engine) window.Engine.updateLobbyMode()">
                                 <option value="identity" selected>身分局</option>
                                 <option value="1v1">1v1 單挑</option>
                                 <option value="national">國戰</option>
                             </select>
                         </div>
-                        <div id="playerCountWrapper">
-                            <label for="playerCountSelect">人數：</label>
-                            <select id="playerCountSelect" style="background: #333; color: white; border: 1px solid #777; padding: 5px; font-size: 1rem; border-radius: 4px;">
+                        <div id="playerCountWrapper" style="display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                            <label for="playerCountSelect" style="color: var(--theme-gold); font-weight: bold;">人數：</label>
+                            <select id="playerCountSelect" style="background: rgba(41, 37, 36, 0.95); color: white; border: 1px solid var(--theme-border); padding: 6px 12px; font-size: 0.95rem; border-radius: 6px; outline: none; cursor: pointer;">
                                 <option value="4" selected>4 人局 (1主 1忠 1反 1內)</option>
                                 <option value="5">5 人局 (1主 1忠 2反 1內)</option>
                                 <option value="6">6 人局 (1主 1忠 3反 1內)</option>
@@ -776,14 +883,6 @@
                             </select>
                         </div>
                     </div>
-                </div>
-                <div style="color: #ccc; font-size: 0.95rem; display: flex; gap: 15px; align-items: center;">
-                    <span style="color: var(--theme-gold); font-weight: bold;">擴充包：</span>
-                    <label><input type="checkbox" id="expMilitary" onchange="if(window.Engine) window.Engine.validateDeckTest()"> 軍爭篇</label>
-                    <label><input type="checkbox" id="expGod" onchange="if(window.renderLobbyHeroes) window.renderLobbyHeroes(); if(window.Engine) window.Engine.validateDeckTest()"> 神話再臨</label>
-                    <label><input type="checkbox" id="expBreakthrough" onchange="if(window.renderLobbyHeroes) window.renderLobbyHeroes(); if(window.Engine) window.Engine.validateDeckTest()"> 界限突破</label>
-                    <label><input type="checkbox" id="expSP" onchange="if(window.renderLobbyHeroes) window.renderLobbyHeroes(); if(window.Engine) window.Engine.validateDeckTest()"> SP</label>
-                    <button class="btn" style="padding: 2px 10px; font-size: 0.8rem;" onclick="if(window.Engine) window.Engine.validateDeckTest()">重新驗證牌堆</button>
                 </div>
             </div>
             <div class="hero-grid" id="heroGrid"></div>
@@ -807,6 +906,27 @@
             </div>
 
             <div id="galleryGrid" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; padding: 8px 4px; scrollbar-width: thin; scrollbar-color: var(--theme-border) transparent; text-align: left;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Gallery Modal -->
+    <div class="modal-overlay" id="heroGalleryModal" style="z-index: 700; display: none; align-items: center; justify-content: center;">
+        <div class="modal-content" style="max-width: 950px; width: 90%; max-height: 85vh; display: flex; flex-direction: column; gap: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--theme-border); padding-bottom: 12px;">
+                <h2 style="color: var(--theme-gold); margin: 0; font-size: 1.8rem; font-weight: 900; letter-spacing: 2px;">👑 三國殺武將圖鑑</h2>
+                <button class="btn btn-cancel" onclick="UI.closeHeroGallery()" style="padding: 6px 16px; font-size: 1rem;">關閉</button>
+            </div>
+            
+            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                <button class="btn gallery-tab active" id="tab-hero-all" onclick="UI.filterHeroGallery('all')">全部</button>
+                <button class="btn gallery-tab" id="tab-hero-wei" onclick="UI.filterHeroGallery('wei')">魏勢力</button>
+                <button class="btn gallery-tab" id="tab-hero-shu" onclick="UI.filterHeroGallery('shu')">蜀勢力</button>
+                <button class="btn gallery-tab" id="tab-hero-wu" onclick="UI.filterHeroGallery('wu')">吳勢力</button>
+                <button class="btn gallery-tab" id="tab-hero-qun" onclick="UI.filterHeroGallery('qun')">群勢力</button>
+            </div>
+
+            <div id="heroGalleryGrid" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; padding: 8px 4px; scrollbar-width: thin; scrollbar-color: var(--theme-border) transparent; text-align: left;">
             </div>
         </div>
     </div>
@@ -1273,8 +1393,7 @@
             }
 
             // 3. Military Dispute Deck
-            let elMilitary = document.getElementById('expMilitary');
-            let useMilitary = elMilitary ? elMilitary.checked : true;
+            let useMilitary = false;
             if (useMilitary) {
                 for (const suitKey in MILITARY_CARDS) {
                     const suitChar = SUIT[suitKey];
@@ -2422,6 +2541,7 @@
 
             async resolveAttack(source, target, card) {
                 UI.showActiveCard(source, card);
+                UI.showSlashEffect(target.id);
                 let isHit = false;
                 let females = ['zhen_ji', 'huang_yue_ying', 'da_qiao', 'sun_shang_xiang', 'diao_chan', 'jie_da_qiao'];
                 let srcIsFemale = females.includes(source.hero.id);
@@ -2883,6 +3003,24 @@
                                 UI.updateAll(); await this.sleep(800);
                             }
                         }
+                    } else if(c.name === '借刀殺人') {
+                        let provider = enemies.find(o => o.equips.weapon !== null);
+                        if (provider) {
+                            let providerAttackRange = this.getAttackRange(provider);
+                            let victim = this.getLivingPlayers().find(o => 
+                                o.id !== provider.id && 
+                                this.getDistance(provider.id, o.id) <= providerAttackRange &&
+                                (this.isEnemy(provider, o) || this.isEnemy(p, o))
+                            );
+                            if (victim) {
+                                let card = p.hand.splice(i, 1)[0];
+                                this.discardPile.push(card);
+                                UI.showActiveCard(p, card);
+                                this.log(`【${p.hero.name}】對【${provider.hero.name}】使用了 借刀殺人，指定其對【${victim.hero.name}】出殺！`);
+                                UI.updateAll(); await this.sleep(1000);
+                                await this.resolveBorrowSword(p, provider, victim, c);
+                            }
+                        }
                     } else if(c.name === '決鬥') {
                         if(enemies.length > 0) {
                             let card = p.hand.splice(i, 1)[0];
@@ -2952,7 +3090,14 @@
                 if (p.hero.skills.includes('制衡') && !p.flags.usedZhiHeng && p.hand.length > 0) {
                     p.flags.usedZhiHeng = true;
                     let count = p.hand.length;
-                    while (p.hand.length > 0) this.discardPile.push(p.hand.pop());
+                    this.log(`【${p.hero.name}】發動【制衡】棄置了 ${count} 張手牌`);
+                    while (p.hand.length > 0) {
+                        let card = p.hand.pop();
+                        this.discardPile.push(card);
+                        UI.showActiveCard(p, card);
+                    }
+                    UI.updateAll();
+                    await this.sleep(800);
                     await this.drawCards(p, count, '發動【制衡】摸了');
                 }
                 
@@ -2960,6 +3105,7 @@
             }
 
             async onPlayDodge(player, source) {
+                UI.showDodgeEffect(player.id);
                 if (player.hero.skills.includes('雷擊') && !player.isDead) {
                     let use = await this.askForSkill(player, '雷擊', `是否發動【雷擊】對一名角色造成2點雷電傷害？`);
                     if (use) {
@@ -3236,6 +3382,7 @@
 
                 target.hp -= amount;
                 this.log(`【${target.hero.name}】受到 ${amount} 點【${damageType === 'fire' ? '火焰' : damageType === 'lightning' ? '雷電' : '普通'}】傷害`);
+                UI.showDamageFlash(target.id);
                 
                 if (source && source.hero.skills.includes('狂暴')) {
                     source.flags.wrath = (source.flags.wrath || 0) + amount;
@@ -3249,14 +3396,17 @@
                 UI.updateAll(); await this.sleep(800);
                 
                 await this.triggerHook('onDamage', { source, target, amount, card: damageCard, damageType });
-                await this.handleDamageSkills(source, target, amount, damageCard);
-                
-                if (triggerChain && target.isChained && (damageType === 'fire' || damageType === 'lightning')) {
-                    await this.transmitChainedDamage(target, amount, damageType, damageCard);
-                }
                 
                 if(target.hp <= 0) {
                     await this.checkDying(target, source);
+                }
+                
+                if (!target.isDead) {
+                    await this.handleDamageSkills(source, target, amount, damageCard);
+                }
+                
+                if (triggerChain && !target.isDead && target.isChained && (damageType === 'fire' || damageType === 'lightning')) {
+                    await this.transmitChainedDamage(target, amount, damageType, damageCard);
                 }
             }
 
@@ -4017,6 +4167,23 @@
                         if(this.players[targetIdx].hero.skills.includes('謙遜') && (cardName === '順手牽羊' || cardName === '樂不思蜀')) { this.log("該角色擁有謙遜，不能被指定！"); return; }
                         if(this.players[targetIdx].hero.skills.includes('帷幕') && this.pendingAction.card.color === COLOR.BLACK && this.pendingAction.card.type === 'trick') { this.log("該角色擁有帷幕，不受黑色錦囊牌影響！"); return; }
                         if(this.players[targetIdx].hero.skills.includes('空城') && this.players[targetIdx].hand.length === 0 && (cardName === '殺' || cardName === '決鬥')) { this.log("該角色處於空城狀態，不能被指定！"); return; }
+                        if(cardName === '借刀殺人') {
+                            if(this.selectedTargets.length === 0) {
+                                if(!this.players[targetIdx].equips.weapon) {
+                                    this.log("該角色沒有裝備武器，無法對其使用借刀殺人！");
+                                    return;
+                                }
+                            } else {
+                                let firstTargetIdx = this.selectedTargets[0];
+                                let firstTarget = this.players[firstTargetIdx];
+                                let distToSecond = this.getDistance(firstTargetIdx, targetIdx);
+                                let range = this.getAttackRange(firstTarget);
+                                if(distToSecond > range) {
+                                    this.log("該角色不在武器擁有者的攻擊範圍內！");
+                                    return;
+                                }
+                            }
+                        }
                     }
                     
                     // 2. Skill target checks
@@ -4105,6 +4272,43 @@
                 }
             }
 
+            onEquipClick(slot) {
+                if (this.state === 'RESPONDING' || this.state === 'DISCARDING') {
+                    let p = this.players[0];
+                    let card = p.equips[slot];
+                    if (!card) return;
+
+                    let isValid = this.state === 'DISCARDING';
+                    if (this.state === 'RESPONDING') {
+                        let validNames = this.pendingAction.names;
+                        let validSuit = this.pendingAction.suit;
+                        let validColor = this.pendingAction.color;
+                        isValid = validNames.length === 0 || validNames.includes(card.name) ||
+                            (validNames.includes('桃') && p.hero.skills.includes('急救') && card.color === COLOR.RED && this.currentPlayerIdx !== p.id) ||
+                            (validNames.includes('殺') && p.hero.skills.includes('武聖') && card.color === COLOR.RED);
+                        if (validSuit && card.suit !== validSuit) isValid = false;
+                        if (validColor && card.color !== validColor) isValid = false;
+                    }
+
+                    if (isValid) {
+                        let cardId = card.id;
+                        if (this.selectedCardIds.includes(cardId)) {
+                            this.selectedCardIds = this.selectedCardIds.filter(id => id !== cardId);
+                        } else {
+                            if (this.selectedCardIds.length >= this.pendingAction.count) {
+                                this.selectedCardIds.shift();
+                            }
+                            this.selectedCardIds.push(cardId);
+                        }
+                        UI.updateAll();
+                    } else {
+                        this.log("該裝備牌在此時無效！");
+                    }
+                } else {
+                    UI.showEquipInfo(slot);
+                }
+            }
+
             async onCardClick(cardId) {
                 let p = this.players[0];
                 if (p.flags.yiJueLoss) {
@@ -4166,6 +4370,18 @@
                         UI.updateAll();
                         return;
                     }
+                    if(card.name === '閃電') {
+                        if(p.judges.some(j => j.name === '閃電')) {
+                            this.log("你已裝備了【閃電】！");
+                            return;
+                        }
+                        let c = p.hand.splice(p.hand.findIndex(c => c.id === cardId), 1)[0];
+                        p.judges.push(c);
+                        UI.showActiveCard(p, c);
+                        this.log('你裝備了【閃電】！');
+                        UI.updateAll();
+                        return;
+                    }
                     if(card.name === '無中生有' || card.name === '桃園結義' || card.name === '南蠻入侵' || card.name === '萬箭齊發' || card.name === '五穀豐登') {
                         this.useImmediateCard(p, card);
                         return;
@@ -4174,14 +4390,19 @@
                         (p.hero.skills.includes('龍膽') && card.name === '閃') ||
                         (p.hero.skills.includes('武聖') && card.color === COLOR.RED) ||
                         (p.hero.skills.includes('武神') && card.suit === SUIT.HEART);
-                    let needsTarget = ['決鬥', '過河拆橋', '順手牽羊', '樂不思蜀', '火攻', '兵糧寸斷'].includes(card.name) || isSha;
+                    let needsTarget = ['決鬥', '過河拆橋', '順手牽羊', '樂不思蜀', '火攻', '兵糧寸斷', '借刀殺人'].includes(card.name) || isSha;
                     if(needsTarget) {
                         let isSha = card.name === '殺' || (p.hero.skills.includes('龍膽') && card.name === '閃') || (p.hero.skills.includes('武聖') && card.color === COLOR.RED) || (p.hero.skills.includes('武神') && card.suit === SUIT.HEART);
                         let maxTargets = isSha && p.equips.weapon && p.equips.weapon.name === '方天畫戟' && p.hand.length === 1 ? 3 : 1;
+                        if (card.name === '借刀殺人') maxTargets = 2;
                         this.state = 'TARGETING';
                         this.pendingAction = { type: 'USE_CARD', card, maxTargets };
                         this.selectedTargets = [];
-                        this.log(maxTargets > 1 ? '請選擇最多三名目標' : '請選擇一名目標');
+                        if (card.name === '借刀殺人') {
+                            this.log('請選擇第一目標（有武器者）與第二目標（出殺對象）');
+                        } else {
+                            this.log(maxTargets > 1 ? '請選擇最多三名目標' : '請選擇一名目標');
+                        }
                         UI.updateAll();
                     }
                 } else if(this.state === 'RESPONDING' || this.state === 'DISCARDING') {
@@ -4380,6 +4601,10 @@
                         }
                     } else if(card.name === '火攻') {
                         await this.resolveFireAttack(p, target, card);
+                    } else if(card.name === '借刀殺人') {
+                        if (targets.length >= 2) {
+                            await this.resolveBorrowSword(p, targets[0], targets[1], card);
+                        }
                     }
                     
                     if(this.state !== 'GAME_OVER') {
@@ -4395,25 +4620,43 @@
                     await this.sleep(800);
                     res(true);
                 } else if(this.state === 'RESPONDING' || this.state === 'DISCARDING') {
-                    if(this.selectedCardIds.length === this.pendingAction.count) {
+                    let requiredCount = this.pendingAction.count;
+                    let selectedCount = this.selectedCardIds.length;
+                    let canConfirm = false;
+                    if (requiredCount === 99) {
+                        canConfirm = selectedCount >= 1;
+                    } else {
+                        canConfirm = selectedCount === requiredCount;
+                    }
+                    
+                    if(canConfirm) {
                         let respondedCards = [];
                         for(let id of this.selectedCardIds) {
                             let idx = p.hand.findIndex(c => c.id === id);
-                            let card = p.hand.splice(idx, 1)[0];
-                            this.discardPile.push(card);
-                            respondedCards.push(card);
+                            let card = null;
+                            if(idx !== -1) {
+                                card = p.hand.splice(idx, 1)[0];
+                                this.discardPile.push(card);
+                            } else {
+                                for(let slot of ['weapon', 'armor', 'defMount', 'offMount', 'treasure']) {
+                                    if(p.equips[slot] && p.equips[slot].id === id) {
+                                        card = await this.loseEquip(p, slot, 'discard');
+                                        break;
+                                    }
+                                }
+                            }
+                            if(card) respondedCards.push(card);
                         }
                         if (this.state === 'RESPONDING') {
                             respondedCards.forEach(c => UI.showActiveCard(p, c));
                         }
-                        this.log(this.state === 'DISCARDING' ? `你棄置了 ${this.pendingAction.count} 張牌` : `你打出了卡牌！`);
+                        this.log(this.state === 'DISCARDING' ? `你棄置了 ${respondedCards.length} 張牌` : `你打出了卡牌！`);
                         let res = this.pendingAction.resolve;
-                        let action = this.pendingAction;
                         this.state = 'WAITING';
                         this.selectedCardIds = [];
                         UI.updateAll();
                         await this.sleep(800);
-                        res(true);
+                        res(respondedCards);
                     }
                 }
             }
@@ -4513,6 +4756,48 @@
                         await this.dealDamage(source, target, 1, card, 'fire');
                     } else {
                         this.log(`【${source.hero.name}】沒有相同花色的手牌，火攻失敗。`);
+                        await this.sleep(800);
+                    }
+                }
+            }
+
+            async resolveBorrowSword(source, provider, victim, card) {
+                let w = await this.askWuxie(card, provider);
+                if (w) return;
+
+                this.log(`【${provider.hero.name}】需對【${victim.hero.name}】使用一張【殺】，否則將其裝備的武器牌【${provider.equips.weapon ? provider.equips.weapon.name : ''}】交給【${source.hero.name}】`);
+                await this.sleep(1200);
+
+                let ok = false;
+                if (provider.id === 0) {
+                    ok = await this.askForCard(provider, ['殺'], 1, `【借刀殺人】請對【${victim.hero.name}】打出一張【殺】`, true);
+                } else {
+                    let hasSha = provider.hand.some(c => c.name === '殺' || (provider.hero.skills.includes('龍膽') && c.name === '閃') || (provider.hero.skills.includes('武聖') && c.color === COLOR.RED));
+                    let isFriendly = this.isSameSide(provider, victim);
+                    if (hasSha && !isFriendly) {
+                        ok = await this.askForCard(provider, ['殺'], 1, ``, true);
+                    } else {
+                        ok = false;
+                    }
+                }
+
+                if (ok) {
+                    this.log(`【${provider.hero.name}】打出了【殺】！`);
+                    UI.updateAll();
+                    await this.sleep(1000);
+                    // Resolve attack with a virtual Slash card
+                    let attackCard = { name: '殺', type: 'basic' };
+                    await this.resolveAttack(provider, victim, attackCard);
+                } else {
+                    let weapon = provider.equips.weapon;
+                    if (weapon) {
+                        provider.equips.weapon = null;
+                        source.hand.push(weapon);
+                        this.log(`【${provider.hero.name}】選擇不打出【殺】，將其武器【${weapon.name}】交給了【${source.hero.name}】！`);
+                        UI.updateAll();
+                        await this.sleep(1000);
+                    } else {
+                        this.log(`【${provider.hero.name}】沒有裝備武器！`);
                         await this.sleep(800);
                     }
                 }
@@ -4646,7 +4931,7 @@
         // --- Lightbox state ---
         let _lbCards = [];
         let _lbIndex = 0;
-        const _lbTypeLabels = { weapon: '武器牌', armor: '防具牌', mount: '坐騎牌', treasure: '寶物牌' };
+        const _lbTypeLabels = { weapon: '武器牌', armor: '防具牌', mount: '坐騎牌', treasure: '寶物牌', wei: '魏勢力', shu: '蜀勢力', wu: '吳勢力', qun: '群勢力' };
 
         document.addEventListener('keydown', function(e) {
             const lb = document.getElementById('lightboxOverlay');
@@ -4657,6 +4942,135 @@
         });
 
         const UI = {
+            showSlashEffect: function(targetId) {
+                const targetEl = document.getElementById('p' + targetId);
+                if (!targetEl) return;
+                
+                // Remove existing effects to avoid stacking
+                targetEl.querySelectorAll('.slash-effect, .damage-flash').forEach(el => el.remove());
+
+                // Create container for slashes
+                const container = document.createElement('div');
+                container.className = 'slash-effect';
+                
+                const line1 = document.createElement('div');
+                line1.className = 'slash-line-1';
+                const line2 = document.createElement('div');
+                line2.className = 'slash-line-2';
+                
+                container.appendChild(line1);
+                container.appendChild(line2);
+                
+                targetEl.appendChild(container);
+                
+                // Cleanup
+                setTimeout(() => {
+                    container.remove();
+                }, 800);
+            },
+            showDodgeEffect: function(playerId) {
+                const playerEl = document.getElementById('p' + playerId);
+                if (!playerEl) return;
+
+                // Remove existing to avoid stacking
+                playerEl.querySelectorAll('.shield-effect').forEach(el => el.remove());
+
+                const container = document.createElement('div');
+                container.className = 'shield-effect';
+                
+                const bubble = document.createElement('div');
+                bubble.className = 'shield-bubble';
+                const spark = document.createElement('div');
+                spark.className = 'shield-spark';
+                
+                container.appendChild(bubble);
+                container.appendChild(spark);
+                
+                playerEl.appendChild(container);
+                
+                setTimeout(() => {
+                    container.remove();
+                }, 800);
+            },
+            showDamageFlash: function(targetId) {
+                const targetEl = document.getElementById('p' + targetId);
+                if (!targetEl) return;
+
+                targetEl.querySelectorAll('.damage-flash').forEach(el => el.remove());
+
+                const flash = document.createElement('div');
+                flash.className = 'damage-flash';
+                
+                targetEl.appendChild(flash);
+                
+                setTimeout(() => {
+                    flash.remove();
+                }, 400);
+            },
+            showHeroGallery: function() {
+                document.getElementById('heroGalleryModal').style.display = 'flex';
+                this.filterHeroGallery('all');
+            },
+            closeHeroGallery: function() {
+                document.getElementById('heroGalleryModal').style.display = 'none';
+            },
+            filterHeroGallery: function(faction) {
+                document.querySelectorAll('#heroGalleryModal .gallery-tab').forEach(btn => btn.classList.remove('active'));
+                document.getElementById('tab-hero-' + faction).classList.add('active');
+                this.renderHeroGallery(faction);
+            },
+            renderHeroGallery: function(faction) {
+                const grid = document.getElementById('heroGalleryGrid');
+                grid.innerHTML = '';
+                
+                const factionLabels = {
+                    wei: '魏勢力',
+                    shu: '蜀勢力',
+                    wu: '吳勢力',
+                    qun: '群勢力'
+                };
+                
+                const filtered = STANDARD_HEROES.filter(h => faction === 'all' || h.faction === faction);
+                
+                filtered.forEach((h, idx) => {
+                    const imgUrl = `../assets/SanGuoSha/heroes/${h.id}.png`;
+                    
+                    const el = document.createElement('div');
+                    el.className = 'gallery-card-item';
+                    
+                    let borderGlow = 'rgba(245, 158, 11, 0.15)';
+                    if (h.faction === 'wei') borderGlow = 'rgba(59, 130, 246, 0.3)';
+                    else if (h.faction === 'shu') borderGlow = 'rgba(239, 68, 68, 0.3)';
+                    else if (h.faction === 'wu') borderGlow = 'rgba(16, 185, 129, 0.3)';
+                    else if (h.faction === 'qun') borderGlow = 'rgba(156, 163, 175, 0.3)';
+                    
+                    el.style.borderColor = borderGlow;
+                    
+                    el.innerHTML = `
+                        <div class="gallery-card-image" style="background-image: url('${imgUrl}')" title="點擊放大 ${h.name}" data-idx="${idx}"></div>
+                        <div class="gallery-card-details">
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px;">
+                                <h3 style="color: var(--theme-gold); margin: 0; font-size: 1.15rem; font-weight: bold;">${h.name}</h3>
+                                <span style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245,158,11,0.3); color: var(--theme-gold); padding: 1px 6px; font-size: 0.72rem; border-radius: 4px; font-weight: bold;">
+                                    ${factionLabels[h.faction]} (體力: ${h.hp})
+                                </span>
+                            </div>
+                            <p style="margin: 4px 0 0 0; font-size: 0.82rem; color: #d6d3d1; line-height: 1.4; word-break: break-all;">
+                                ${h.desc}
+                            </p>
+                        </div>
+                    `;
+                    el.querySelector('.gallery-card-image').addEventListener('click', () => {
+                        _lbCards = filtered.map(item => ({
+                            name: item.name,
+                            type: item.faction,
+                            url: `../assets/SanGuoSha/heroes/${item.id}.png`
+                        }));
+                        UI.openLightbox(idx);
+                    });
+                    grid.appendChild(el);
+                });
+            },
             showCardGallery: function() {
                 document.getElementById('cardGalleryModal').style.display = 'flex';
                 this.filterGallery('all');
@@ -4665,7 +5079,7 @@
                 document.getElementById('cardGalleryModal').style.display = 'none';
             },
             filterGallery: function(type) {
-                document.querySelectorAll('.gallery-tab').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('#cardGalleryModal .gallery-tab').forEach(btn => btn.classList.remove('active'));
                 document.getElementById('tab-' + type).classList.add('active');
                 this.renderCardGallery(type);
             },
@@ -5139,11 +5553,40 @@
 
                 let eq = p0.equips;
                 let jHTML = p0.judges.map(j => `<div style="border:1px solid #eab308; padding:5px; border-radius:4px; color:#eab308; margin-bottom:2px;">判定: ${j.name}</div>`).join('');
-                document.getElementById('eqWeapon0').innerHTML = jHTML + '武器: ' + (eq.weapon ? eq.weapon.name : '無');
-                document.getElementById('eqArmor0').innerText = '防具: ' + (eq.armor ? eq.armor.name : '無');
-                document.getElementById('eqDefMount0').innerText = '+1馬: ' + (eq.defMount ? eq.defMount.name : '無');
-                document.getElementById('eqOffMount0').innerText = '-1馬: ' + (eq.offMount ? eq.offMount.name : '無');
-                document.getElementById('eqTreasure0').innerText = '寶物: ' + (eq.treasure ? eq.treasure.name : '無');
+                
+                const updateEquipSlot = (slotId, label, slotName) => {
+                    let el = document.getElementById(slotId);
+                    let card = eq[slotName];
+                    let text = label + ': ' + (card ? card.name : '無');
+                    el.innerText = text;
+                    if (card && Engine.selectedCardIds.includes(card.id)) {
+                        el.style.borderColor = 'var(--theme-gold)';
+                        el.style.backgroundColor = 'rgba(245, 158, 11, 0.2)';
+                        el.style.boxShadow = '0 0 8px var(--theme-gold)';
+                    } else {
+                        el.style.borderColor = '#777';
+                        el.style.backgroundColor = '';
+                        el.style.boxShadow = '';
+                    }
+                };
+
+                // Weapon slot has jHTML prepended
+                let weaponEl = document.getElementById('eqWeapon0');
+                weaponEl.innerHTML = jHTML + '武器: ' + (eq.weapon ? eq.weapon.name : '無');
+                if (eq.weapon && Engine.selectedCardIds.includes(eq.weapon.id)) {
+                    weaponEl.style.borderColor = 'var(--theme-gold)';
+                    weaponEl.style.backgroundColor = 'rgba(245, 158, 11, 0.2)';
+                    weaponEl.style.boxShadow = '0 0 8px var(--theme-gold)';
+                } else {
+                    weaponEl.style.borderColor = '#777';
+                    weaponEl.style.backgroundColor = '';
+                    weaponEl.style.boxShadow = '';
+                }
+
+                updateEquipSlot('eqArmor0', '防具', 'armor');
+                updateEquipSlot('eqDefMount0', '+1馬', 'defMount');
+                updateEquipSlot('eqOffMount0', '-1馬', 'offMount');
+                updateEquipSlot('eqTreasure0', '寶物', 'treasure');
 
                 document.getElementById('btnEndTurn').style.display = (Engine.state === 'PLAYING' && Engine.currentPlayerIdx === 0) ? 'inline-block' : 'none';
                 let activeSkillNames = ['仁德', '制衡', '苦肉', '青囊', '結姻', '離間', '反間', '奇襲', '國色', '亂擊', '驅虎', '締盟', '神憤', '義絕'];
@@ -5151,9 +5594,26 @@
                 document.getElementById('btnSkill').style.display = (Engine.state === 'PLAYING' && Engine.currentPlayerIdx === 0 && hasActiveSkills) ? 'inline-block' : 'none';
                 
                 let showConfirm = false;
-                if(Engine.state === 'TARGETING' && Engine.selectedTargets.length > 0) showConfirm = true;
-                if(Engine.state === 'RESPONDING' && Engine.selectedCardIds.length === Engine.pendingAction.count) showConfirm = true;
-                if(Engine.state === 'DISCARDING' && Engine.selectedCardIds.length === Engine.pendingAction.count) showConfirm = true;
+                if(Engine.state === 'TARGETING' && Engine.selectedTargets.length > 0) {
+                    let type = Engine.pendingAction.type;
+                    let card = Engine.pendingAction.card;
+                    if (card && card.name === '借刀殺人') {
+                        if (Engine.selectedTargets.length === 2) showConfirm = true;
+                    } else if (type === 'LI_JIAN' || type === 'DI_MENG') {
+                        if (Engine.selectedTargets.length === 2) showConfirm = true;
+                    } else {
+                        showConfirm = true;
+                    }
+                }
+                if((Engine.state === 'RESPONDING' || Engine.state === 'DISCARDING') && Engine.pendingAction) {
+                    let requiredCount = Engine.pendingAction.count;
+                    let selectedCount = Engine.selectedCardIds.length;
+                    if (requiredCount === 99) {
+                        if (selectedCount >= 1) showConfirm = true;
+                    } else {
+                        if (selectedCount === requiredCount) showConfirm = true;
+                    }
+                }
                 if(Engine.state === 'ASK_SKILL') showConfirm = true;
                 document.getElementById('btnConfirm').style.display = showConfirm ? 'inline-block' : 'none';
 
