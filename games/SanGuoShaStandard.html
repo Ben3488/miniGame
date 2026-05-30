@@ -815,6 +815,30 @@
             .card { width: 110px; height: 154px; }
             .active-card-area { transform: translate(-50%, -50%) scale(0.85); }
             .log-box { min-width: 260px; padding: 12px 24px; font-size: 1.05rem; }
+            
+            /* Side & Top player adjustments for iPad / medium screens */
+            #p1 .hero-card, #p3 .hero-card, .ai-player.side-player .hero-card {
+                width: 105px; height: 147px;
+            }
+            #p2 .hero-card {
+                width: 90px; height: 126px; font-size: 1.1rem;
+            }
+            #p1 { left: 12px; top: 43%; }
+            #p3 { right: 12px; top: 43%; }
+            #p2 { top: 10px; }
+        }
+
+        @media (max-width: 1150px) {
+            .top-bar {
+                padding: 8px 16px;
+            }
+            .game-title {
+                font-size: 1.35rem;
+            }
+            .back-btn {
+                font-size: 0.85rem;
+                padding: 6px 12px;
+            }
         }
 
         @media (max-width: 1024px) {
@@ -828,6 +852,41 @@
             
             .center-area { top: 45%; gap: 10px; }
             .log-box { font-size: 0.95rem; padding: 8px 16px; }
+        }
+
+        /* ========================================== */
+        /* MEDIA QUERIES FOR SCREEN HEIGHT LIMITS     */
+        /* ========================================== */
+        @media (max-height: 850px) {
+            #p0 .hero-section { height: 170px; }
+            #p0 .hand-section { height: 170px; }
+            #p0 .hero-card { width: 95px; height: 133px; font-size: 1.25rem; }
+            .card { width: 95px; height: 133px; }
+            #p1 .hero-card, #p3 .hero-card, .ai-player.side-player .hero-card {
+                width: 95px; height: 133px;
+            }
+            #p2 .hero-card { width: 85px; height: 119px; font-size: 1.05rem; }
+            #p1 { top: 42%; }
+            #p3 { top: 42%; }
+            #p2 { top: 8px; }
+            .log-box { min-width: 240px; padding: 10px 20px; font-size: 0.95rem; }
+        }
+
+        @media (max-height: 720px) {
+            #p0 .hero-section { height: 130px; }
+            #p0 .hand-section { height: 130px; }
+            #p0 .hero-card { width: 80px; height: 112px; font-size: 1.1rem; }
+            .card { width: 80px; height: 112px; }
+            #p1 .hero-card, #p3 .hero-card, .ai-player.side-player .hero-card {
+                width: 75px; height: 105px;
+            }
+            #p2 .hero-card { width: 70px; height: 98px; font-size: 0.95rem; }
+            #p1 { left: 8px; top: 40%; }
+            #p3 { right: 8px; top: 40%; }
+            #p2 { top: 6px; }
+            .log-box { font-size: 0.85rem; padding: 6px 12px; min-width: 200px; }
+            #deckCount { font-size: 0.95rem; }
+            .action-buttons .btn { font-size: 0.8rem; padding: 6px 12px; }
         }
 
         /* ========================================== */
