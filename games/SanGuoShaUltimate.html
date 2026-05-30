@@ -687,9 +687,80 @@
             font-weight: bold;
             display: inline-block;
         }
+    
+        /* ========================================== */
+        /* PORTRAIT MODE WARNING OVERLAY              */
+        /* ========================================== */
+        .portrait-lock-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #0c0a09; color: var(--theme-gold, #f59e0b);
+            z-index: 9999; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; font-size: 1.35rem; font-weight: bold; padding: 32px;
+            box-sizing: border-box;
+            line-height: 1.6;
+        }
+        @media (orientation: portrait) {
+            .portrait-lock-overlay {
+                display: flex;
+            }
+        }
+
+        /* ========================================== */
+        /* MEDIA QUERIES FOR TABLETS & LAPTOPS        */
+        /* ========================================== */
+        @media (max-width: 1200px) {
+            #p0 { width: 98%; padding: 8px 12px; }
+            #p0 .hero-card { width: 110px; height: 154px; font-size: 1.4rem; }
+            #p0 .hero-section { height: 180px; }
+            #p0 .hand-section { height: 180px; margin: 0 12px; }
+            #p0 .equip-section { width: 150px; font-size: 0.8rem; }
+            .card { width: 110px; height: 154px; }
+            .active-card-area { transform: translate(-50%, -50%) scale(0.85); }
+            .log-box { min-width: 260px; padding: 12px 24px; font-size: 1.05rem; }
+        }
+
+        @media (max-width: 1024px) {
+            #p1 { left: 8px; top: 40%; }
+            #p3 { right: 8px; top: 40%; }
+            #p1 .hero-card, #p3 .hero-card, .ai-player.side-player .hero-card {
+                width: 100px; height: 140px;
+            }
+            #p2 { top: 8px; }
+            #p2 .hero-card { width: 90px; height: 126px; font-size: 1.1rem; }
+            
+            .center-area { top: 45%; gap: 10px; }
+            .log-box { font-size: 0.95rem; padding: 8px 16px; }
+        }
+
+        /* ========================================== */
+        /* MEDIA QUERIES FOR PHONES (LANDSCAPE)       */
+        /* ========================================== */
+        @media (max-width: 768px) {
+            #p0 { padding: 4px 8px; }
+            #p0 .hero-card { width: 80px; height: 112px; font-size: 1.1rem; }
+            #p0 .hero-section { height: 130px; }
+            #p0 .hand-section { height: 130px; margin: 0 6px; padding: 0 8px 2px; }
+            #p0 .equip-section { width: 110px; font-size: 0.7rem; gap: 4px; }
+            #p0 .equip-section div { padding: 3px !important; }
+            
+            .card { width: 80px; height: 112px; }
+            
+            #p1 .hero-card, #p3 .hero-card, .ai-player.side-player .hero-card {
+                width: 75px; height: 105px;
+            }
+            #p2 .hero-card { width: 70px; height: 98px; font-size: 0.95rem; }
+            
+            .center-area { top: 40%; }
+            .log-box { font-size: 0.85rem; padding: 6px 12px; min-width: 200px; }
+            #deckCount { font-size: 0.95rem; }
+            .action-buttons .btn { font-size: 0.8rem; padding: 6px 12px; }
+        }
     </style>
 </head>
 <body>
+    <div class="portrait-lock-overlay"><span>🔄 請旋轉您的裝置為橫屏模式 (Landscape) <br>以獲得最佳遊戲體驗！</span></div>
+
     <div class="top-bar">
         <div style="display:flex; gap:12px; align-items:center;">
             <a href="../index.html" class="back-btn">← 返回大廳</a>
@@ -1170,7 +1241,7 @@
             '定瀾夜明珠': ['定澜夜明珠', 'png'],
         };
 
-        function generateDeck() {
+                function generateDeck() {
             let deck = [];
             let id = 0;
             
@@ -1184,28 +1255,14 @@
                 
                 const suitEng = SUIT_ENG[suit] || '';
                 const cardEng = CARD_ENG[name] || '';
-                
                 let imgPath;
                 if (EQUIP_WIKI[name]) {
                     const [simpName, ext] = EQUIP_WIKI[name];
-                    imgPath = `../assets/SanGuoShaUltimate/cards_wiki/${simpName}.${ext}`;
+                    imgPath = `../assets/SanGuoSha/cards_wiki/${simpName}.${ext}`;
                 } else {
-                    // Basic & Trick cards
-                    if (cardEng === 'supply_shortage') {
-                        imgPath = `../assets/SanGuoShaUltimate/cards/supply_shortage.png`;
-                    } else if (cardEng === 'iron_shackles') {
-                        imgPath = `../assets/SanGuoShaUltimate/cards/iron_shackles.png`;
-                    } else if (cardEng === 'fire_attack') {
-                        imgPath = `../assets/SanGuoShaUltimate/cards/fire_attack.png`;
-                    } else if (cardEng === 'thunder_sha' || cardEng === 'fire_sha') {
-                        imgPath = `../assets/SanGuoShaUltimate/cards/sha.png`;
-                    } else if (cardEng === 'jiu') {
-                        imgPath = `../assets/SanGuoShaUltimate/cards/sha.png`;
-                    } else {
-                        imgPath = `../assets/SanGuoShaUltimate/cards/${cardEng}.png`;
-                        if (isMilitary) {
-                            imgPath = `../assets/SanGuoShaUltimate/cards/${suitEng}_${point}_${cardEng}.png`;
-                        }
+                    imgPath = `../assets/SanGuoSha/cards/${cardEng}.png`;
+                    if (isMilitary) {
+                        imgPath = `../assets/SanGuoSha/cards/${suitEng}_${point}_${cardEng}.png`;
                     }
                 }
                 
@@ -1225,87 +1282,116 @@
                 });
             };
 
-            // 1. Standard Deck (104 cards, 2 copies of each suit/point mapping)
-            for (const suitKey in STANDARD_CARDS) {
-                const suitChar = SUIT[suitKey];
-                const suitMap = STANDARD_CARDS[suitKey];
-                for (const point in suitMap) {
-                    const cardNames = suitMap[point];
-                    cardNames.forEach(name => {
-                        addCard(name, suitChar, point);
-                    });
-                }
-            }
-
-            // 2. EX Cards (4 cards)
-            let elExpEx = document.getElementById('expEX');
-            if (!elExpEx || elExpEx.checked) {
-                addCard('寒冰劍', SUIT.SPADE, '2');
-                addCard('仁王盾', SUIT.CLUB, '2');
-                addCard('閃電', SUIT.HEART, 'Q');
-                addCard('銀月槍', SUIT.DIAMOND, 'Q'); // Using 銀月槍 if SP/EX enabled
-            } else {
-                addCard('寒冰劍', SUIT.SPADE, '2');
-                addCard('仁王盾', SUIT.CLUB, '2');
-                addCard('閃電', SUIT.HEART, 'Q');
-                addCard('無懈可擊', SUIT.DIAMOND, 'Q');
-            }
-
-            // 3. Military Dispute Deck
-            let elMilitary = document.getElementById('expMilitary');
-            let useMilitary = elMilitary ? elMilitary.checked : true;
-            if (useMilitary) {
-                for (const suitKey in MILITARY_CARDS) {
-                    const suitChar = SUIT[suitKey];
-                    const suitMap = MILITARY_CARDS[suitKey];
-                    for (const point in suitMap) {
-                        const name = suitMap[point];
-                        addCard(name, suitChar, point, true);
-                    }
-                }
-            }
-
-            // 4. Mode Exclusive Decks
             let mode = document.getElementById('gameModeSelect') ? document.getElementById('gameModeSelect').value : 'identity';
-            
+
             if (mode === '1v1') {
-                for (const suitKey in V1_CARDS) {
+                // 1v1 專用 52 張牌堆，各花色 A-K 齊全
+                const V1_DECK_CARDS = {
+                    SPADE: {
+                        A: '決鬥', '2': '寒冰劍', '3': '過河拆橋', '4': '過河拆橋', '5': '青釭劍', '6': '樂不思蜀',
+                        '7': '南蠻入侵', '8': '殺', '9': '殺', '10': '殺', J: '無懈可擊', Q: '水淹七軍', K: '殺'
+                    },
+                    HEART: {
+                        A: '萬箭齊發', '2': '閃', '3': '桃', '4': '桃', '5': '諸葛連弩', '6': '桃', '7': '無中生有',
+                        '8': '無中生有', '9': '桃', '10': '殺', J: '殺', Q: '閃', K: '殺'
+                    },
+                    CLUB: {
+                        A: '決鬥', '2': '仁王盾', '3': '過河拆橋', '4': '殺', '5': '殺', '6': '兵糧寸斷',
+                        '7': '殺', '8': '殺', '9': '殺', '10': '殺', J: '殺', Q: '兵臨城下', K: '無懈可擊'
+                    },
+                    DIAMOND: {
+                        A: '諸葛連弩', '2': '閃', '3': '順手牽羊', '4': '順手牽羊', '5': '貫石斧', '6': '殺',
+                        '7': '殺', '8': '閃', '9': '順手牽羊', '10': '閃', J: '閃', Q: '兵臨城下', K: '八卦陣'
+                    }
+                };
+                for (const suitKey in V1_DECK_CARDS) {
                     const suitChar = SUIT[suitKey];
-                    const suitMap = V1_CARDS[suitKey];
+                    const suitMap = V1_DECK_CARDS[suitKey];
                     for (const point in suitMap) {
                         addCard(suitMap[point], suitChar, point);
                     }
                 }
             } else if (mode === 'national') {
-                for (const suitKey in NATIONAL_CARDS) {
+                // 國戰模式 108 張牌堆：以標準版為基底，但進行「替換」而非「追加」
+                const NATIONAL_REPLACEMENTS = {
+                    SPADE: { 'J': '知己知彼', 'K': '驚帆' },
+                    CLUB: { 'J': '知己知彼' },
+                    HEART: { 'A': '遠交近攻', '3': '遠交近攻', '4': '遠交近攻', '9': '遠交近攻', 'J': '玉龍' },
+                    DIAMOND: { 'Q': '三尖兩刃刀' }
+                };
+
+                // 生成國戰牌堆
+                for (const suitKey in STANDARD_CARDS) {
                     const suitChar = SUIT[suitKey];
-                    const suitMap = NATIONAL_CARDS[suitKey];
+                    const suitMap = STANDARD_CARDS[suitKey];
                     for (const point in suitMap) {
-                        addCard(suitMap[point], suitChar, point);
+                        const cardNames = suitMap[point];
+                        cardNames.forEach((name, idx) => {
+                            let cardToUse = name;
+                            if (NATIONAL_REPLACEMENTS[suitKey] && NATIONAL_REPLACEMENTS[suitKey][point] && idx === 0) {
+                                cardToUse = NATIONAL_REPLACEMENTS[suitKey][point];
+                            }
+                            if (cardToUse === '閃電') {
+                                cardToUse = '無懈可擊';
+                            }
+                            if (cardToUse === '桃園結義' || cardToUse === '五穀豐登') {
+                                cardToUse = '遠交近攻';
+                            }
+                            addCard(cardToUse, suitChar, point);
+                        });
                     }
+                }
+
+                // 2. EX Cards (4 cards)
+                addCard('寒冰劍', SUIT.SPADE, '2');
+                addCard('仁王盾', SUIT.CLUB, '2');
+                addCard('無懈可擊', SUIT.HEART, 'Q'); // 替換閃電
+                addCard('無懈可擊', SUIT.DIAMOND, 'Q'); // 國戰一般無銀月槍
+            } else {
+                // 1. Standard Deck (104 cards)
+                for (const suitKey in STANDARD_CARDS) {
+                    const suitChar = SUIT[suitKey];
+                    const suitMap = STANDARD_CARDS[suitKey];
+                    for (const point in suitMap) {
+                        const cardNames = suitMap[point];
+                        cardNames.forEach(name => {
+                            addCard(name, suitChar, point);
+                        });
+                    }
+                }
+
+                // 2. EX Cards (4 cards)
+                let elExpEx = document.getElementById('expEX');
+                if (!elExpEx || elExpEx.checked) {
+                    addCard('寒冰劍', SUIT.SPADE, '2');
+                    addCard('仁王盾', SUIT.CLUB, '2');
+                    addCard('閃電', SUIT.HEART, 'Q');
+                    addCard('銀月槍', SUIT.DIAMOND, 'Q');
+                } else {
+                    addCard('寒冰劍', SUIT.SPADE, '2');
+                    addCard('仁王盾', SUIT.CLUB, '2');
+                    addCard('閃電', SUIT.HEART, 'Q');
+                    addCard('無懈可擊', SUIT.DIAMOND, 'Q');
                 }
             }
 
             // Verify deck length
             console.log('Generated deck of ' + deck.length + ' cards.');
             
-            // Self-verification check
             const suitCounts = { [SUIT.SPADE]: 0, [SUIT.HEART]: 0, [SUIT.CLUB]: 0, [SUIT.DIAMOND]: 0 };
             deck.forEach(c => { suitCounts[c.suit]++; });
             console.log('Deck suit distribution:', suitCounts);
             
             let verificationPassed = true;
             let expectedTotal = 108; // Base standard + EX
-            if (useMilitary) expectedTotal += 52;
-            if (mode === '1v1') expectedTotal += 4;
-            if (mode === 'national') expectedTotal += 9; // Assuming National cards map has 9 cards
+            if (mode === '1v1') expectedTotal = 52;
+            if (mode === 'national') expectedTotal = 108;
 
             if (deck.length !== expectedTotal) {
                 console.error(`CRITICAL: Deck size is not ${expectedTotal}! Current size is: ${deck.length}`);
                 verificationPassed = false;
             }
             
-            // Verify that each of the 4 suits contains exactly all 13 points (A to K)
             for (let suitChar of [SUIT.SPADE, SUIT.HEART, SUIT.CLUB, SUIT.DIAMOND]) {
                 let pointsInSuit = new Set(deck.filter(c => c.suit === suitChar).map(c => c.point));
                 if (pointsInSuit.size !== 13) {
@@ -1783,6 +1869,7 @@
             }
 
             async loseHp(player, amount = 1) {
+                if (player.isDead) return;
                 player.hp -= amount;
                 if (player.hp <= 0) {
                     await this.checkDying(player, null);
@@ -1985,6 +2072,7 @@
             }
 
             isEnemy(a, b) {
+                if (a.id === b.id) return false;
                 if(a.role === ROLE.REBEL) return b.role === ROLE.LORD || b.role === ROLE.LOYAL;
                 if(a.role === ROLE.LOYAL || a.role === ROLE.LORD) return b.role === ROLE.REBEL || b.role === ROLE.SPY;
                 if(a.role === ROLE.SPY) return true;
@@ -2486,6 +2574,7 @@
             }
 
             async resolveAttack(source, target, card) {
+                if (target.isDead) return;
                 UI.showActiveCard(source, card);
                 UI.showSlashEffect(source, target);
                 // Chong Zhen active trigger
@@ -2809,6 +2898,7 @@
             }
 
             async doAITurn(p) {
+                if (p.isDead || this.state === 'GAME_OVER') return;
                 this.state = 'AI_THINKING';
                 await this.sleep(800);
                 
@@ -2823,23 +2913,26 @@
                 }
 
                 // 1. AI Hero Active Skills BEFORE playing cards
-                if (p.hero.skills.includes('亂武') && !p.flags.usedLuanWu) {
+                if (p.hero.skills.includes('亂武') && !p.flags.usedLuanWu && !p.isDead && this.state !== 'GAME_OVER') {
                     p.flags.usedLuanWu = true;
                     this.log(`【${p.hero.name}】發動限定技【亂武】！`);
                     UI.updateAll(); await this.sleep(1200);
                     await this.performLuanWu(p);
                 }
-                if (p.hero.skills.includes('苦肉') && p.hp > 1) {
+                if (p.hero.skills.includes('苦肉') && p.hp > 1 && !p.isDead && this.state !== 'GAME_OVER') {
                     p.hp--;
                     this.log(`【${p.hero.name}】發動【苦肉】流失1點體力！`);
                     UI.updateAll(); await this.sleep(600);
-                    await this.drawCards(p, 2, '發動【苦肉】摸了');
+                    if (!p.isDead && this.state !== 'GAME_OVER') {
+                        await this.drawCards(p, 2, '發動【苦肉】摸了');
+                    }
                 }
-                if (p.hero.skills.includes('神憤') && (p.flags.wrath || 0) >= 6) {
+                if (p.hero.skills.includes('神憤') && (p.flags.wrath || 0) >= 6 && !p.isDead && this.state !== 'GAME_OVER') {
                     p.flags.wrath -= 6;
                     this.log(`【${p.hero.name}】消耗6個暴怒標記發動【神憤】！`);
                     UI.updateAll(); await this.sleep(800);
                     for (let target of this.getLivingPlayers().filter(o => o.id !== p.id)) {
+                        if (this.state === 'GAME_OVER') break;
                         await this.dealDamage(p, target, 1, null);
                         for(let slot of ['weapon', 'armor', 'defMount', 'offMount', 'treasure']) {
                             if(target.equips[slot]) await this.loseEquip(target, slot, 'discard');
@@ -2854,13 +2947,15 @@
                             }
                         }
                     }
-                    p.flags.turnedOver = !p.flags.turnedOver;
-                    this.log(`【${p.hero.name}】翻面！`);
-                    UI.updateAll(); await this.sleep(800);
-                    await this.discardPhase(p);
+                    if (!p.isDead && this.state !== 'GAME_OVER') {
+                        p.flags.turnedOver = !p.flags.turnedOver;
+                        this.log(`【${p.hero.name}】翻面！`);
+                        UI.updateAll(); await this.sleep(800);
+                        await this.discardPhase(p);
+                    }
                     return;
                 }
-                if (p.hero.skills.includes('青囊') && !p.flags.usedQingNang && p.hand.length > 0) {
+                if (p.hero.skills.includes('青囊') && !p.flags.usedQingNang && p.hand.length > 0 && !p.isDead && this.state !== 'GAME_OVER') {
                     let injured = this.getLivingPlayers().find(o => o.hp < o.maxHp && this.isSameSide(p, o));
                     if (injured) {
                         p.flags.usedQingNang = true;
@@ -2870,8 +2965,8 @@
                         UI.updateAll(); await this.sleep(800);
                     }
                 }
-                if (p.hero.skills.includes('離間') && !p.flags.usedLiJian && p.hand.length > 0) {
-                    let maleEnemies = enemies.filter(o => !['zhen_ji', 'huang_yue_ying', 'da_qiao', 'sun_shang_xiang', 'diao_chan'].includes(o.hero.id));
+                if (p.hero.skills.includes('離間') && !p.flags.usedLiJian && p.hand.length > 0 && !p.isDead && this.state !== 'GAME_OVER') {
+                    let maleEnemies = enemies.filter(o => !o.isDead && !['zhen_ji', 'huang_yue_ying', 'da_qiao', 'sun_shang_xiang', 'diao_chan'].includes(o.hero.id));
                     if (maleEnemies.length >= 2) {
                         p.flags.usedLiJian = true;
                         this.discardPile.push(p.hand.pop());
@@ -2880,8 +2975,8 @@
                         await this.resolveDuel(maleEnemies[0], maleEnemies[1], { name: '決鬥' });
                     }
                 }
-                if (p.hero.skills.includes('反間') && !p.flags.usedFanJian && p.hand.length > 0) {
-                    let enemy = enemies[0];
+                if (p.hero.skills.includes('反間') && !p.flags.usedFanJian && p.hand.length > 0 && !p.isDead && this.state !== 'GAME_OVER') {
+                    let enemy = enemies.find(o => !o.isDead);
                     if (enemy) {
                         p.flags.usedFanJian = true;
                         let card = p.hand.pop();
@@ -2897,24 +2992,24 @@
                         }
                     }
                 }
-                if (p.hero.skills.includes('奇襲')) {
+                if (p.hero.skills.includes('奇襲') && !p.isDead && this.state !== 'GAME_OVER') {
                     let blackCardIdx = p.hand.findIndex(c => c.color === COLOR.BLACK);
-                    while (blackCardIdx !== -1 && enemies.length > 0) {
-                        let target = enemies.find(o => o.hand.length > 0 || o.equips.weapon || o.equips.armor || o.equips.defMount || o.equips.offMount);
+                    while (blackCardIdx !== -1 && enemies.filter(o => !o.isDead).length > 0 && !p.isDead && this.state !== 'GAME_OVER') {
+                        let target = enemies.find(o => !o.isDead && (o.hand.length > 0 || o.equips.weapon || o.equips.armor || o.equips.defMount || o.equips.offMount));
                         if (!target) break;
                         let card = p.hand.splice(blackCardIdx, 1)[0];
                         this.discardPile.push(card);
                         this.log(`【${p.hero.name}】發動【奇襲】，將黑色牌當【過河拆橋】對【${target.hero.name}】使用`);
                         UI.updateAll(); await this.sleep(800);
                         let w = await this.askWuxie({ name: '過河拆橋' }, target);
-                        if (!w) await this.removeOneCard(p, target, 'discard');
+                        if (!w && !target.isDead) await this.removeOneCard(p, target, 'discard');
                         blackCardIdx = p.hand.findIndex(c => c.color === COLOR.BLACK);
                     }
                 }
-                if (p.hero.skills.includes('國色')) {
+                if (p.hero.skills.includes('國色') && !p.isDead && this.state !== 'GAME_OVER') {
                     let diamondIdx = p.hand.findIndex(c => c.suit === SUIT.DIAMOND);
-                    while (diamondIdx !== -1 && enemies.length > 0) {
-                        let target = enemies.find(o => !o.judges.some(j => j.name === '樂不思蜀'));
+                    while (diamondIdx !== -1 && enemies.filter(o => !o.isDead).length > 0 && !p.isDead && this.state !== 'GAME_OVER') {
+                        let target = enemies.find(o => !o.isDead && !o.judges.some(j => j.name === '樂不思蜀'));
                         if (!target) break;
                         let card = p.hand.splice(diamondIdx, 1)[0];
                         target.judges.push(card);
@@ -2926,7 +3021,7 @@
                 
                 // Huang Tian Lord skill for Qun AI players
                 let lord = this.getLivingPlayers().find(o => o.role === ROLE.LORD);
-                if (lord && lord.hero.skills.includes('黃天') && p.hero.faction === 'qun' && p.id !== lord.id) {
+                if (lord && lord.hero.skills.includes('黃天') && p.hero.faction === 'qun' && p.id !== lord.id && !p.isDead && this.state !== 'GAME_OVER') {
                     let htCardIdx = p.hand.findIndex(c => c.name === '閃電');
                     if (htCardIdx === -1) {
                         let shans = p.hand.filter(c => c.name === '閃');
@@ -2944,7 +3039,7 @@
 
                 // 2. Play cards from hand
                 for(let i=p.hand.length-1; i>=0; i--) {
-                    if (p.isDead) break;
+                    if (p.isDead || this.state === 'GAME_OVER') break;
                     let c = p.hand[i];
                     if(c.type === 'equip') {
                         await this.equipCard(p, p.hand.splice(i, 1)[0]);
@@ -2959,7 +3054,7 @@
                         }
                     } else if(c.name === '酒') {
                         let hasSha = p.hand.some(c => c.name === '殺' || (p.hero.skills.includes('龍膽') && c.name === '閃') || (p.hero.skills.includes('武聖') && c.color === COLOR.RED) || (p.hero.skills.includes('武神') && c.suit === SUIT.HEART));
-                        let inRange = enemies.some(o => this.getDistance(p.id, o.id) <= this.getAttackRange(p));
+                        let inRange = enemies.filter(o => !o.isDead).some(o => this.getDistance(p.id, o.id) <= this.getAttackRange(p));
                         if (hasSha && inRange && !p.flags.drunk) {
                             let card = p.hand.splice(i, 1)[0];
                             this.discardPile.push(card);
@@ -2970,7 +3065,7 @@
                         }
                     } else if(c.name === '樂不思蜀' || c.name === '閃電' || c.name === '兵糧寸斷') {
                         if(c.name === '樂不思蜀') {
-                            let target = enemies.find(o => !o.judges.some(j => j.name === '樂不思蜀'));
+                            let target = enemies.find(o => !o.isDead && !o.judges.some(j => j.name === '樂不思蜀'));
                             if(target) {
                                 let card = p.hand.splice(i, 1)[0];
                                 target.judges.push(card);
@@ -2979,7 +3074,7 @@
                                 UI.updateAll(); await this.sleep(800);
                             }
                         } else if(c.name === '兵糧寸斷') {
-                            let target = enemies.find(o => this.getDistance(p.id, o.id) <= 1 && !o.judges.some(j => j.name === '兵糧寸斷'));
+                            let target = enemies.find(o => !o.isDead && this.getDistance(p.id, o.id) <= 1 && !o.judges.some(j => j.name === '兵糧寸斷'));
                             if(target) {
                                 let card = p.hand.splice(i, 1)[0];
                                 target.judges.push(card);
@@ -2997,14 +3092,15 @@
                             }
                         }
                     } else if(c.name === '決鬥') {
-                        if(enemies.length > 0) {
+                        let target = enemies.find(o => !o.isDead);
+                        if(target) {
                             let card = p.hand.splice(i, 1)[0];
                             this.discardPile.push(card);
                             UI.showActiveCard(p, card);
-                            await this.resolveDuel(p, enemies[0], c);
+                            await this.resolveDuel(p, target, c);
                         }
                     } else if(c.name === '火攻') {
-                        let target = enemies.find(o => o.hand.length > 0);
+                        let target = enemies.find(o => !o.isDead && o.hand.length > 0);
                         if (target) {
                             let card = p.hand.splice(i, 1)[0];
                             this.discardPile.push(card);
@@ -3020,7 +3116,7 @@
                         let card = p.hand.splice(i, 1)[0];
                         this.discardPile.push(card);
                         UI.showActiveCard(p, card);
-                        if(!await this.askWuxie(c, p)) await this.drawCards(p, 2, '使用【無中生有】摸了');
+                        if(!await this.askWuxie(c, p) && !p.isDead) await this.drawCards(p, 2, '使用【無中生有】摸了');
                     } else if(c.name === '南蠻入侵' || c.name === '萬箭齊發' || c.name === '桃園結義') {
                         await this.useImmediateCard(p, p.hand.splice(i, 1)[0]);
                     }
@@ -3035,7 +3131,7 @@
                         let card = p.hand[idx];
                         let noRangeLimit = p.hero.skills.includes('怒斬') && card.color === COLOR.RED && card.type === 'equip';
                         let range = noRangeLimit ? 999 : this.getAttackRange(p);
-                        enemies = enemies.filter(o => this.getDistance(p.id, o.id) <= range);
+                        enemies = enemies.filter(o => !o.isDead && this.getDistance(p.id, o.id) <= range);
                         if(enemies.length > 0) {
                             let target = enemies[0];
                             let card = p.hand.splice(idx,1)[0];
@@ -3334,6 +3430,7 @@
             }
 
             async dealDamage(source, target, amount, damageCard=null, damageType='normal', triggerChain=true) {
+                if (target.isDead) return;
                 if (damageCard && damageCard.damageType) {
                     damageType = damageCard.damageType;
                 }
@@ -3370,14 +3467,17 @@
                 UI.updateAll(); await this.sleep(800);
                 
                 await this.triggerHook('onDamage', { source, target, amount, card: damageCard, damageType });
-                await this.handleDamageSkills(source, target, amount, damageCard);
-                
-                if (triggerChain && target.isChained && (damageType === 'fire' || damageType === 'lightning')) {
-                    await this.transmitChainedDamage(target, amount, damageType, damageCard);
-                }
                 
                 if(target.hp <= 0) {
                     await this.checkDying(target, source);
+                }
+                
+                if (!target.isDead) {
+                    await this.handleDamageSkills(source, target, amount, damageCard);
+                }
+                
+                if (triggerChain && !target.isDead && target.isChained && (damageType === 'fire' || damageType === 'lightning')) {
+                    await this.transmitChainedDamage(target, amount, damageType, damageCard);
                 }
             }
 
@@ -3529,6 +3629,7 @@
             }
 
             async checkDying(target, source) {
+                if (target.isDead) return;
                 this.log(`【${target.hero.name}】進入瀕死狀態！`);
                 
                 // 神趙雲 絕境: draw on enter dying
@@ -3598,6 +3699,23 @@
                 if(target.hp <= 0) {
                     target.isDead = true;
                     this.log(`【${target.hero.name}】(${target.role}) 陣亡！`);
+                    
+                    // Discard all hand cards
+                    while(target.hand.length > 0) {
+                        this.discardPile.push(target.hand.pop());
+                    }
+                    // Discard all equips
+                    for(let slot in target.equips) {
+                        if(target.equips[slot]) {
+                            this.discardPile.push(target.equips[slot]);
+                            target.equips[slot] = null;
+                        }
+                    }
+                    // Discard all judges
+                    while(target.judges.length > 0) {
+                        this.discardPile.push(target.judges.pop());
+                    }
+
                     UI.updateAll();
                     await this.sleep(800);
                     
@@ -3610,7 +3728,19 @@
                             source.isDead = true;
                             source.hp = 0;
                             this.log(`【${source.hero.name}】判定結果不為桃或桃園結義，【武魂】生效，立即死亡！`);
+                            
+                            // Discard source's cards
+                            while(source.hand.length > 0) this.discardPile.push(source.hand.pop());
+                            for(let slot in source.equips) {
+                                if(source.equips[slot]) {
+                                    this.discardPile.push(source.equips[slot]);
+                                    source.equips[slot] = null;
+                                }
+                            }
+                            while(source.judges.length > 0) this.discardPile.push(source.judges.pop());
+
                             UI.updateAll(); await this.sleep(1000);
+                            await this.checkGameOver();
                         } else {
                             this.log(`【${source.hero.name}】判定為【${judge.name}】，武魂未生效。`);
                             await this.sleep(800);
@@ -4630,6 +4760,7 @@
             }
 
             async resolveDuel(source, target, card) {
+                if (source.isDead || target.isDead) return;
                 if(await this.askWuxie(card, target)) return;
                 let attacker = target;
                 let defender = source;
@@ -4710,7 +4841,17 @@
                 this.currentPhase = '';
                 this.players.forEach(p => { p.flags.yiJueLoss = false; });
                 let next = (this.currentPlayerIdx + 1) % this.players.length;
-                while(this.players[next].isDead) next = (next + 1) % this.players.length;
+                let count = 0;
+                while(this.players[next].isDead && count < this.players.length) {
+                    next = (next + 1) % this.players.length;
+                    count++;
+                }
+                if (count >= this.players.length) {
+                    this.state = 'GAME_OVER';
+                    this.log('所有角色皆已陣亡！');
+                    UI.updateAll();
+                    return;
+                }
                 this.startTurn(next);
             }
 
