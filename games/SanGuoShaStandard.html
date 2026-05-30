@@ -890,6 +890,147 @@
         }
 
         /* ========================================== */
+        /* MEDIA QUERIES FOR SCREEN HEIGHT LIMITS (MOBILE LANDSCAPE) */
+        /* ========================================== */
+        @media (max-width: 1024px) or (max-height: 550px) {
+            .top-bar {
+                padding: 4px 10px;
+            }
+            .game-title {
+                display: none !important;
+            }
+            .back-btn {
+                font-size: 0.75rem !important;
+                padding: 4px 8px !important;
+            }
+            #selfTestBadge {
+                display: none !important; /* Hide badge on mobile landscape to save space */
+            }
+            .center-area {
+                top: 42%;
+                gap: 6px;
+            }
+            .log-box {
+                font-size: 0.8rem;
+                padding: 6px 12px;
+                min-width: 200px;
+                max-width: 260px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            }
+            .action-buttons .btn {
+                font-size: 0.75rem;
+                padding: 4px 10px;
+            }
+            #deckCount {
+                font-size: 0.85rem;
+            }
+            
+            /* AI Player scale down and push to borders */
+            .player-area.ai-player {
+                transform: scale(0.68) !important;
+            }
+            #p1 {
+                left: 4px !important;
+                top: 38% !important;
+                flex-direction: row !important;
+                gap: 6px !important;
+                transform: translateY(-50%) scale(0.68) !important;
+                transform-origin: left center !important;
+            }
+            #p3 {
+                right: 4px !important;
+                top: 38% !important;
+                flex-direction: row-reverse !important;
+                gap: 6px !important;
+                transform: translateY(-50%) scale(0.68) !important;
+                transform-origin: right center !important;
+            }
+            #p2 {
+                top: 2px !important;
+                flex-direction: row !important;
+                gap: 6px !important;
+                transform: translateX(-50%) scale(0.68) !important;
+                transform-origin: top center !important;
+            }
+            .ai-equip {
+                margin-top: 0 !important;
+                gap: 2px !important;
+            }
+            .ai-equip-item {
+                padding: 2px 4px !important;
+                font-size: 0.7rem !important;
+                max-width: 80px !important;
+                text-align: left !important;
+            }
+            
+            /* Human player adjustments */
+            #p0 {
+                bottom: 2px !important;
+                padding: 4px 8px !important;
+            }
+            #p0 .hero-section {
+                height: 120px !important;
+                gap: 8px !important;
+            }
+            #p0 .hero-card {
+                width: 70px !important;
+                height: 98px !important;
+                font-size: 1rem !important;
+            }
+            #p0 .hand-section {
+                height: 120px !important;
+                margin: 0 8px !important;
+                padding: 0 4px 2px !important;
+            }
+            #p0 .equip-section {
+                width: 100px !important;
+                font-size: 0.65rem !important;
+                gap: 2px !important;
+            }
+            #p0 .equip-section div {
+                padding: 2px !important;
+            }
+            #btnSkill {
+                padding: 3px 6px !important;
+                font-size: 0.75rem !important;
+            }
+            .card {
+                width: 70px !important;
+                height: 98px !important;
+            }
+            .card-title {
+                font-size: 0.75rem !important;
+                top: 6px !important;
+                left: 4px !important;
+            }
+            .card-suit {
+                font-size: 0.75rem !important;
+                top: 4px !important;
+                right: 4px !important;
+            }
+            .card-point {
+                font-size: 0.75rem !important;
+                top: 14px !important;
+                right: 4px !important;
+            }
+            .card-desc {
+                font-size: 0.6rem !important;
+                bottom: 2px !important;
+            }
+            
+            /* Tooltip repositioning */
+            .card-info-panel {
+                top: 42px !important;
+                bottom: auto !important;
+                right: 10px !important;
+                width: 220px !important;
+                padding: 8px 12px !important;
+                font-size: 0.8rem !important;
+                z-index: 999 !important;
+            }
+        }
+
+        /* ========================================== */
         /* MEDIA QUERIES FOR PHONES (LANDSCAPE)       */
         /* ========================================== */
         @media (max-width: 768px) {
@@ -920,9 +1061,9 @@
     <div class="top-bar">
         <div style="display:flex; gap:12px; align-items:center;">
             <a href="../index.html" class="back-btn">← 返回大廳</a>
-            <button class="back-btn" onclick="UI.toggleHistoryLog()" style="cursor:pointer; font-size: 1rem;">📜 戰局日誌</button>
-            <button class="back-btn" onclick="UI.showHeroGallery()" style="cursor:pointer; font-size: 1rem;">👑 武將圖鑑</button>
-            <button class="back-btn" onclick="UI.showCardGallery()" style="cursor:pointer; font-size: 1rem;">📖 卡牌圖鑑</button>
+            <button class="back-btn" onclick="UI.toggleHistoryLog()" style="cursor:pointer;">📜 戰局日誌</button>
+            <button class="back-btn" onclick="UI.showHeroGallery()" style="cursor:pointer;">👑 武將圖鑑</button>
+            <button class="back-btn" onclick="UI.showCardGallery()" style="cursor:pointer;">📖 卡牌圖鑑</button>
         </div>
         <h1 class="game-title">三國殺 - 標準版</h1>
         <div id="selfTestBadge" style="background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 4px;">
@@ -5938,14 +6079,18 @@
 
                     if(i !== 0) {
                         let jHTML = p.judges.map(j => `<div class="ai-equip-item" style="border-color:#eab308; color:#eab308;">判定: ${j.name}</div>`).join('');
-                        document.getElementById(`equip${i}`).innerHTML = `
-                            ${jHTML}
-                            <div class="ai-equip-item">武器: ${p.equips.weapon ? p.equips.weapon.name : '無'}</div>
-                            <div class="ai-equip-item">防具: ${p.equips.armor ? p.equips.armor.name : '無'}</div>
-                            <div class="ai-equip-item">+1馬: ${p.equips.defMount ? p.equips.defMount.name : '無'}</div>
-                            <div class="ai-equip-item">-1馬: ${p.equips.offMount ? p.equips.offMount.name : '無'}</div>
-                            <div class="ai-equip-item">寶物: ${p.equips.treasure ? p.equips.treasure.name : '無'}</div>
-                        `;
+                        let eqHTML = '';
+                        if (p.equips.weapon) eqHTML += `<div class="ai-equip-item" style="color: #f59e0b; border-color: rgba(245,158,11,0.4);">⚔️ ${p.equips.weapon.name}</div>`;
+                        if (p.equips.armor) eqHTML += `<div class="ai-equip-item" style="color: #60a5fa; border-color: rgba(96,165,250,0.4);">🛡️ ${p.equips.armor.name}</div>`;
+                        if (p.equips.defMount) eqHTML += `<div class="ai-equip-item" style="color: #34d399; border-color: rgba(52,211,153,0.4);">🐴+1: ${p.equips.defMount.name}</div>`;
+                        if (p.equips.offMount) eqHTML += `<div class="ai-equip-item" style="color: #f472b6; border-color: rgba(244,114,182,0.4);">🐴-1: ${p.equips.offMount.name}</div>`;
+                        if (p.equips.treasure) eqHTML += `<div class="ai-equip-item" style="color: #c084fc; border-color: rgba(192,132,252,0.4);">💎 ${p.equips.treasure.name}</div>`;
+                        
+                        if (eqHTML === '') {
+                            eqHTML = `<div class="ai-equip-item" style="opacity: 0.5; border-style: dashed; font-size: 0.75rem;">無裝備</div>`;
+                        }
+                        
+                        document.getElementById(`equip${i}`).innerHTML = jHTML + eqHTML;
                     } else {
                         let jHTML = p.judges.map(j => `<span style="background:rgba(0,0,0,0.8);color:var(--theme-gold);padding:2px 4px;margin-bottom:2px;border-radius:4px;font-size:0.8rem;">[判定] ${j.name}</span>`).join('');
                     }
