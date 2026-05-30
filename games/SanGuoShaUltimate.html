@@ -5590,9 +5590,132 @@
                 el.onmouseenter = () => { UI.showLobbyHeroInfoPanel(h); };
                 el.onmouseleave = () => { UI.hideCardInfoPanel(); };
                 grid.appendChild(el);
-            });
         };
-        
+
+        // --- Battlefield Pinch-to-Zoom & Drag-to-Pan Utility ---
+        class BattlefieldZoomPan {
+            constructor(element) {
+                this.element = element;
+                this.scale = 1.0;
+                this.minScale = 0.8;
+                this.maxScale = 3.0;
+                this.x = 0;
+                this.y = 0;
+                this.startX = 0;
+                this.startY = 0;
+                this.dragStartX = 0;
+                this.dragStartY = 0;
+                this.isDragging = false;
+                this.wasDragging = false;
+                this.activePointers = [];
+                this.initialDistance = 0;
+                this.initialScale = 1.0;
+                this.lastTap = 0;
+                this.init();
+            }
+            init() {
+                this.element.style.touchAction = 'none';
+                this.element.style.transformOrigin = 'center center';
+                this.element.addEventListener('pointerdown', this.onPointerDown.bind(this));
+                this.element.addEventListener('pointermove', this.onPointerMove.bind(this));
+                this.element.addEventListener('pointerup', this.onPointerUp.bind(this));
+                this.element.addEventListener('pointercancel', this.onPointerUp.bind(this));
+                this.element.addEventListener('click', (e) => {
+                    if (this.wasDragging) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.wasDragging = false;
+                    }
+                }, true);
+            }
+            updateTransform() {
+                const maxOffset = (this.scale - 1) * 300;
+                if (this.scale <= 1.0) {
+                    this.x = 0;
+                    this.y = 0;
+                } else {
+                    this.x = Math.max(-maxOffset, Math.min(maxOffset, this.x));
+                    this.y = Math.max(-maxOffset, Math.min(maxOffset, this.y));
+                }
+                this.element.style.transform = `scale(${this.scale}) translate(${this.x}px, ${this.y}px)`;
+            }
+            onPointerDown(e) {
+                if (e.target.closest('#hand0') || e.target.closest('.top-bar') || e.target.closest('.modal-overlay') || e.target.closest('.btn') || e.target.closest('.back-btn')) {
+                    return;
+                }
+                const now = Date.now();
+                if (now - this.lastTap < 300) {
+                    this.reset();
+                    this.lastTap = 0;
+                    return;
+                }
+                this.lastTap = now;
+                this.activePointers.push(e);
+                if (this.activePointers.length === 1) {
+                    this.isDragging = true;
+                    this.dragStartX = e.clientX;
+                    this.dragStartY = e.clientY;
+                    this.startX = e.clientX - this.x * this.scale;
+                    this.startY = e.clientY - this.y * this.scale;
+                } else if (this.activePointers.length === 2) {
+                    this.isDragging = false;
+                    this.initialDistance = this.getDistance(this.activePointers[0], this.activePointers[1]);
+                    this.initialScale = this.scale;
+                }
+            }
+            onPointerMove(e) {
+                const index = this.activePointers.findIndex(p => p.pointerId === e.pointerId);
+                if (index === -1) return;
+                this.activePointers[index] = e;
+                if (this.activePointers.length === 1 && this.isDragging && this.scale > 1.0) {
+                    const dist = Math.hypot(e.clientX - this.dragStartX, e.clientY - this.dragStartY);
+                    if (dist > 8) {
+                        this.wasDragging = true;
+                    }
+                    this.x = (e.clientX - this.startX) / this.scale;
+                    this.y = (e.clientY - this.startY) / this.scale;
+                    this.updateTransform();
+                } else if (this.activePointers.length === 2) {
+                    const dist = this.getDistance(this.activePointers[0], this.activePointers[1]);
+                    if (this.initialDistance > 0) {
+                        const factor = dist / this.initialDistance;
+                        this.scale = Math.max(this.minScale, Math.min(this.maxScale, this.initialScale * factor));
+                        this.updateTransform();
+                    }
+                }
+            }
+            onPointerUp(e) {
+                this.activePointers = this.activePointers.filter(p => p.pointerId !== e.pointerId);
+                if (this.activePointers.length === 1) {
+                    const remaining = this.activePointers[0];
+                    this.isDragging = true;
+                    this.dragStartX = remaining.clientX;
+                    this.dragStartY = remaining.clientY;
+                    this.startX = remaining.clientX - this.x * this.scale;
+                    this.startY = remaining.clientY - this.y * this.scale;
+                }
+                if (this.activePointers.length < 2) {
+                    this.initialDistance = 0;
+                }
+                if (this.activePointers.length === 0) {
+                    this.isDragging = false;
+                    setTimeout(() => {
+                        this.wasDragging = false;
+                    }, 50);
+                }
+            }
+            getDistance(p1, p2) {
+                return Math.hypot(p1.clientX - p2.clientX, p1.clientY - p2.clientY);
+            }
+            reset() {
+                this.scale = 1.0;
+                this.x = 0;
+                this.y = 0;
+                this.updateTransform();
+            }
+        }
+        new BattlefieldZoomPan(document.getElementById('battlefield'));
+
         window.renderLobbyHeroes();
 
     </script>
