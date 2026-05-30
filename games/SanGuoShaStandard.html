@@ -1061,6 +1061,7 @@
     <div class="top-bar">
         <div style="display:flex; gap:12px; align-items:center;">
             <a href="../index.html" class="back-btn">← 返回大廳</a>
+            <button class="back-btn" id="btnForfeit" onclick="Engine.forfeitGame()" style="cursor:pointer; display:none; background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(239,68,68,0.08)); border-color:rgba(239,68,68,0.4); color:#fca5a5;">🏳️ 放棄本局</button>
             <button class="back-btn" onclick="UI.toggleHistoryLog()" style="cursor:pointer;">📜 戰局日誌</button>
             <button class="back-btn" onclick="UI.showHeroGallery()" style="cursor:pointer;">👑 武將圖鑑</button>
             <button class="back-btn" onclick="UI.showCardGallery()" style="cursor:pointer;">📖 卡牌圖鑑</button>
@@ -1882,11 +1883,44 @@
                 }
 
                 document.getElementById('lobbyModal').style.display = 'none';
+                document.getElementById('btnForfeit').style.display = 'inline-flex';
                 UI.initPlayers(numPlayers);
                 UI.updateAll();
                 
                 this.log("遊戲開始！");
                 this.startTurn(0);
+            }
+
+            forfeitGame() {
+                if (this.state === 'INIT' || this.state === 'GAME_OVER') return;
+                if (!confirm('確定要放棄這場遊戲，回到武將選擇頁面嗎？')) return;
+                // Cancel any pending player action
+                if (this.pendingAction && this.pendingAction.resolve) {
+                    this.pendingAction.resolve(null);
+                }
+                this.state = 'GAME_OVER';
+                this.players = [];
+                this.pendingAction = null;
+                this.selectedCardIds = [];
+                this.selectedTargets = [];
+                // Remove AI player DOM nodes
+                document.querySelectorAll('.player-area.ai-player').forEach(e => e.remove());
+                // Reset human player UI
+                document.getElementById('hand0').innerHTML = '';
+                document.getElementById('equip0').innerHTML = '';
+                document.getElementById('hp0').innerHTML = '';
+                ['eqWeapon0','eqArmor0','eqDefMount0','eqOffMount0','eqTreasure0'].forEach(id => {
+                    let el = document.getElementById(id);
+                    if (el) el.innerText = el.id.replace(/eq|0/g,'').replace(/([A-Z])/g,' $1').trim() + ': 無';
+                });
+                document.getElementById('gameLog').innerText = '等待逸戲開始...';
+                document.getElementById('btnConfirm').style.display = 'none';
+                document.getElementById('btnCancel').style.display = 'none';
+                document.getElementById('btnEndTurn').style.display = 'none';
+                document.getElementById('btnForfeit').style.display = 'none';
+                // Reopen lobby
+                window.renderLobbyHeroes();
+                document.getElementById('lobbyModal').style.display = 'flex';
             }
 
             wrapHand(player) {

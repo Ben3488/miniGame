@@ -1,0 +1,24 @@
+name: Deploy to Synology NAS
+
+on:
+  push:
+    branches:
+      - main  # 當您 push 到 main 分支時觸發
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Deploy via SSH rsync
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.NAS_HOST }}
+        username: ${{ secrets.NAS_USERNAME }}
+        password: ${{ secrets.NAS_PASSWORD }}
+        port: 22  # 如果您的 NAS SSH 端口有改，請修正這裡
+        source: "./*"
+        target: "/volume1/web/"
