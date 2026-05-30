@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
@@ -447,6 +447,197 @@
             text-shadow: 0 0 15px rgba(45, 212, 191, 0.5);
         }
 
+        .drawer-close-btn {
+            display: none;
+        }
+
+        /* Mobile Styles (Tablet/Phone) */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 0.75rem;
+                gap: 0;
+                height: calc(100vh - 60px);
+                position: relative;
+                flex-direction: column;
+            }
+
+            /* Convert panels to sliding drawers */
+            .left-panel, .right-panel {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                width: 310px;
+                z-index: 100;
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                border-radius: 0;
+                height: 100vh;
+                margin: 0;
+                box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+                box-sizing: border-box;
+            }
+
+            .left-panel {
+                left: 0;
+                transform: translateX(-100%);
+                border-right: 1px solid var(--panel-border);
+                border-left: none;
+            }
+
+            .left-panel.open {
+                transform: translateX(0);
+            }
+
+            .right-panel {
+                right: 0;
+                transform: translateX(100%);
+                border-left: 1px solid var(--panel-border);
+                border-right: none;
+                overflow-y: auto !important; /* Allow scrolling logs if screen is short */
+            }
+
+            .right-panel.open {
+                transform: translateX(0);
+            }
+
+            .drawer-close-btn {
+                display: flex !important;
+                background: transparent;
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                border-radius: 8px;
+                color: var(--text-sub);
+                font-size: 0.95rem;
+                cursor: pointer;
+                padding: 0.3rem 0.6rem;
+                transition: all 0.2s;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .drawer-close-btn:hover {
+                color: var(--text-main);
+                border-color: var(--text-sub);
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            /* Overlay backdrop */
+            .hud-backdrop {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(8, 11, 18, 0.6);
+                backdrop-filter: blur(4px);
+                z-index: 90;
+            }
+            
+            .hud-backdrop.open {
+                display: block;
+            }
+
+            /* Main board container */
+            .board-container {
+                width: 100%;
+                height: 100%;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                position: relative;
+            }
+
+            /* Floating HUD Card at the bottom */
+            .mobile-hud {
+                display: flex !important;
+                position: absolute;
+                bottom: 15px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 94%;
+                max-width: 480px;
+                background: rgba(16, 24, 39, 0.85);
+                border: 1px solid var(--panel-border);
+                border-radius: 16px;
+                padding: 0.6rem 0.8rem;
+                align-items: center;
+                justify-content: space-between;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(45, 212, 191, 0.15);
+                z-index: 50;
+                box-sizing: border-box;
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+            }
+
+            .hud-turn-info {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 2px;
+                flex: 1;
+            }
+
+            .hud-player-name {
+                font-size: 0.95rem;
+                font-weight: 700;
+                text-shadow: 0 0 8px currentColor;
+            }
+
+            .hud-steps {
+                font-size: 0.72rem;
+                color: var(--text-sub);
+                font-family: 'JetBrains Mono', monospace;
+            }
+
+            .hud-actions {
+                display: flex;
+                gap: 0.4rem;
+                align-items: center;
+            }
+
+            .hud-btn {
+                background: rgba(255, 255, 255, 0.04);
+                border: 1px solid var(--panel-border);
+                color: var(--text-main);
+                padding: 0.5rem;
+                border-radius: 8px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s;
+                font-size: 0.85rem;
+                width: 34px;
+                height: 34px;
+                box-sizing: border-box;
+            }
+
+            .hud-btn:hover {
+                background: rgba(255, 255, 255, 0.08);
+                border-color: rgba(255, 255, 255, 0.25);
+            }
+
+            .hud-btn.text-btn {
+                width: auto;
+                font-size: 0.75rem;
+                padding: 0.5rem 0.7rem;
+                font-weight: 700;
+                letter-spacing: 1px;
+            }
+            
+            /* Custom alignment for message overlays */
+            #message-overlay {
+                padding: 2rem;
+                border-radius: 16px;
+                width: 80%;
+                max-width: 320px;
+            }
+            #message-title {
+                font-size: 1.8rem;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -460,10 +651,15 @@
         <div></div> <!-- Spacer -->
     </div>
 
+    <div id="hud-backdrop" class="hud-backdrop" onclick="closeAllDrawers()"></div>
+
     <div class="container">
         <!-- Left Panel: Settings -->
-        <div class="panel left-panel">
-            <h3 class="panel-header">對局設定</h3>
+        <div class="panel left-panel" id="left-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <h3 class="panel-header" style="margin: 0;">對局設定</h3>
+                <button class="drawer-close-btn" style="display: none;" onclick="toggleDrawer('left', false)">✕</button>
+            </div>
             
             <div class="control-group">
                 <label>遊戲人數</label>
@@ -523,6 +719,20 @@
 
         <!-- Center: Board -->
         <div class="board-container">
+            <!-- Mobile HUD -->
+            <div class="mobile-hud" style="display: none;">
+                <button class="hud-btn text-btn" onclick="toggleDrawer('left', true)">⚙️ 設定</button>
+                <div class="hud-turn-info">
+                    <div class="hud-player-name" id="hud-turn-text">紅方 (N)</div>
+                    <div class="hud-steps" id="hud-steps-text">步數: 0</div>
+                </div>
+                <div class="hud-actions">
+                    <button class="hud-btn" onclick="undoMove()" title="上一步">↩</button>
+                    <button class="hud-btn" onclick="showHint()" title="提示">💡</button>
+                    <button class="hud-btn text-btn" onclick="toggleDrawer('right', true)">📋 日誌</button>
+                </div>
+            </div>
+
             <canvas id="gameCanvas" width="800" height="800"></canvas>
             
             <div id="message-overlay">
@@ -532,7 +742,12 @@
         </div>
 
         <!-- Right Panel: Status & Log -->
-        <div class="panel right-panel">
+        <div class="panel right-panel" id="right-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <h3 class="panel-header" style="margin: 0; font-size: 1.1rem;">對局狀態</h3>
+                <button class="drawer-close-btn" style="display: none;" onclick="toggleDrawer('right', false)">✕</button>
+            </div>
+            
             <div class="current-turn-card" id="turn-card">
                 <div class="turn-label">當前回合</div>
                 <div id="turn-text" class="turn-player">紅方 (N) (玩家)</div>
@@ -902,6 +1117,18 @@
             document.getElementById('stat-steps').innerText = stats[currentPlayer].steps;
             
             checkWinCondition(); // updates arrived stat
+            
+            // Sync mobile HUD
+            const hudTurnText = document.getElementById('hud-turn-text');
+            const hudStepsText = document.getElementById('hud-steps-text');
+            if (hudTurnText) {
+                hudTurnText.innerText = `${p.name} (${p.type === 'human' ? '玩家' : '電腦'})`;
+                hudTurnText.style.color = p.hex;
+            }
+            if (hudStepsText) {
+                const arrivedVal = document.getElementById('stat-arrived').innerText;
+                hudStepsText.innerText = `步數: ${stats[currentPlayer].steps} | 達陣: ${arrivedVal}`;
+            }
         }
 
         function saveState() {
@@ -1124,9 +1351,37 @@
             updateUI();
             draw();
             
+            // Auto close mobile drawers when starting game
+            closeAllDrawers();
+            
             if (PLAYERS[currentPlayer].type === 'ai') {
                 aiTimeout = setTimeout(makeAIMove, 800);
             }
+        }
+
+        // Mobile drawer controllers
+        function toggleDrawer(side, show) {
+            const panel = document.getElementById(side + '-panel');
+            const backdrop = document.getElementById('hud-backdrop');
+            if (!panel || !backdrop) return;
+            
+            if (show) {
+                panel.classList.add('open');
+                backdrop.classList.add('open');
+            } else {
+                panel.classList.remove('open');
+                // check if both are closed before hiding backdrop
+                const otherSide = side === 'left' ? 'right' : 'left';
+                const otherPanel = document.getElementById(otherSide + '-panel');
+                if (!otherPanel || !otherPanel.classList.contains('open')) {
+                    backdrop.classList.remove('open');
+                }
+            }
+        }
+
+        function closeAllDrawers() {
+            toggleDrawer('left', false);
+            toggleDrawer('right', false);
         }
 
         // Init
