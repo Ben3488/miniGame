@@ -688,67 +688,75 @@
         #lbNext { right: 20px; }
 
         /* Battle Effects CSS */
-        .slash-effect {
+        .battle-effect {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 150px;
-            height: 150px;
-            transform: translate(-50%, -50%);
+            left: 0;
+            top: 0;
+            z-index: 145;
             pointer-events: none;
-            z-index: 1000;
         }
-        .slash-line-1 {
-            position: absolute;
-            width: 100%;
-            height: 6px;
-            background: linear-gradient(90deg, transparent, #ff3b3b, #ffe500, #ff3b3b, transparent);
-            top: 50%;
-            left: 0;
-            transform: rotate(-45deg) scaleX(0);
-            box-shadow: 0 0 15px #ff3b3b;
-            animation: slash-anim-1 0.4s cubic-bezier(0.15, 0.85, 0.35, 1) forwards;
+        .slash-line {
+            height: 8px;
+            width: 100px;
+            transform-origin: left center;
+            background: linear-gradient(90deg, rgba(255,255,255,0), #fff7ed 12%, #fb923c 28%, #ef4444 62%, rgba(245,158,11,0));
+            border-radius: 999px;
+            box-shadow: 0 0 18px rgba(239,68,68,0.95), 0 0 42px rgba(245,158,11,0.65);
+            animation: slashTravel 0.62s ease-out forwards;
         }
-        .slash-line-2 {
+        .slash-line::before {
+            content: '';
             position: absolute;
-            width: 100%;
-            height: 6px;
-            background: linear-gradient(90deg, transparent, #ff3b3b, #ffe500, #ff3b3b, transparent);
+            left: 8%;
             top: 50%;
-            left: 0;
-            transform: rotate(45deg) scaleX(0);
-            box-shadow: 0 0 15px #ff3b3b;
-            animation: slash-anim-2 0.4s cubic-bezier(0.15, 0.85, 0.35, 1) 0.08s forwards;
+            width: 38%;
+            height: 52px;
+            transform: translateY(-50%) skewX(-24deg);
+            background: linear-gradient(90deg, rgba(255,255,255,0), rgba(254,226,226,0.46), rgba(239,68,68,0));
+            filter: blur(1px);
+        }
+        .slash-line::after {
+            content: '';
+            position: absolute;
+            right: -14px;
+            top: 50%;
+            width: 30px;
+            height: 30px;
+            border-top: 7px solid #fff7ed;
+            border-right: 7px solid #fff7ed;
+            transform: translateY(-50%) rotate(45deg);
+            filter: drop-shadow(0 0 8px rgba(239,68,68,0.95));
         }
         .shield-effect {
             position: absolute;
-            top: 50%;
+            width: 104px;
+            height: 118px;
+            margin-left: -52px;
+            margin-top: -64px;
+            clip-path: polygon(50% 0, 88% 14%, 84% 62%, 50% 100%, 16% 62%, 12% 14%);
+            border: 0;
+            background: linear-gradient(145deg, rgba(240,249,255,0.96), rgba(56,189,248,0.68) 44%, rgba(14,116,144,0.5));
+            box-shadow: 0 0 28px rgba(56,189,248,0.95), inset 0 0 24px rgba(255,255,255,0.72);
+            animation: shieldBurst 0.75s ease-out forwards;
+        }
+        .shield-effect::before {
+            content: '';
+            position: absolute;
+            inset: 10px;
+            clip-path: polygon(50% 0, 84% 14%, 80% 58%, 50% 91%, 20% 58%, 16% 14%);
+            border: 3px solid rgba(255,255,255,0.86);
+            background: linear-gradient(115deg, rgba(255,255,255,0.45), rgba(255,255,255,0.08) 42%, rgba(7,89,133,0.12));
+        }
+        .shield-effect::after {
+            content: '';
+            position: absolute;
             left: 50%;
-            width: 160px;
-            height: 160px;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 1000;
-        }
-        .shield-bubble {
-            position: absolute;
-            inset: 5px;
-            border-radius: 50%;
-            border: 3px solid rgba(245, 158, 11, 0.85);
-            background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.4) 100%);
-            box-shadow: 0 0 25px rgba(245, 158, 11, 0.65), inset 0 0 25px rgba(245, 158, 11, 0.65);
-            transform: scale(0.6);
-            opacity: 0;
-            animation: shield-anim 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-        .shield-spark {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, #fff 0%, transparent 60%);
-            opacity: 0;
-            transform: scale(0.2);
-            animation: spark-anim 0.5s ease-out forwards;
+            top: 15px;
+            width: 4px;
+            height: 82px;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.72);
+            box-shadow: 0 0 12px rgba(255,255,255,0.8);
         }
         .damage-flash {
             position: absolute;
@@ -760,26 +768,16 @@
             animation: flash-anim 0.35s ease-out forwards;
             z-index: 999;
         }
-        @keyframes slash-anim-1 {
-            0% { transform: rotate(-45deg) scaleX(0); opacity: 0; }
-            45% { transform: rotate(-45deg) scaleX(1.4); opacity: 1; }
-            100% { transform: rotate(-45deg) scaleX(1.5); opacity: 0; }
+        @keyframes slashTravel {
+            from { opacity: 0; clip-path: inset(0 100% 0 0); filter: blur(2px); }
+            18% { opacity: 1; }
+            62% { opacity: 1; filter: blur(0); }
+            to { opacity: 0; clip-path: inset(0 0 0 0); filter: blur(1px); }
         }
-        @keyframes slash-anim-2 {
-            0% { transform: rotate(45deg) scaleX(0); opacity: 0; }
-            45% { transform: rotate(45deg) scaleX(1.4); opacity: 1; }
-            100% { transform: rotate(45deg) scaleX(1.5); opacity: 0; }
-        }
-        @keyframes shield-anim {
-            0% { transform: scale(0.6) rotate(0deg); opacity: 0; }
-            40% { transform: scale(1.05) rotate(12deg); opacity: 1; }
-            80% { transform: scale(1) rotate(20deg); opacity: 0.8; }
-            100% { transform: scale(1.1) rotate(25deg); opacity: 0; }
-        }
-        @keyframes spark-anim {
-            0% { opacity: 0; transform: scale(0.2); }
-            25% { opacity: 0.85; transform: scale(1); }
-            100% { opacity: 0; transform: scale(1.35); }
+        @keyframes shieldBurst {
+            from { opacity: 0; transform: scale(0.35); }
+            35% { opacity: 1; transform: scale(1.05); }
+            to { opacity: 0; transform: scale(1.45); }
         }
         @keyframes flash-anim {
             0% { opacity: 0; }
@@ -2720,7 +2718,7 @@
             async resolveAttack(source, target, card) {
                 if (target.isDead) return;
                 UI.showActiveCard(source, card);
-                UI.showSlashEffect(target.id);
+                UI.showSlashEffect(source, target);
 
                 // Chong Zhen active trigger
                 if (source.hero.skills.includes('衝陣') && card.name === '閃' && target.hand.length > 0) {
@@ -3378,7 +3376,7 @@
             }
 
             async onPlayDodge(player, source) {
-                UI.showDodgeEffect(player.id);
+                UI.showDodgeEffect(player);
                 if (player.hero.skills.includes('雷擊') && !player.isDead) {
                     let use = await this.askForSkill(player, '雷擊', `是否發動【雷擊】對一名角色造成2點雷電傷害？`);
                     if (use) {
@@ -5385,55 +5383,46 @@
         });
 
         const UI = {
-            showSlashEffect: function(targetId) {
-                const targetEl = document.getElementById('p' + targetId);
-                if (!targetEl) return;
-                
-                // Remove existing effects to avoid stacking
-                targetEl.querySelectorAll('.slash-effect, .damage-flash').forEach(el => el.remove());
-
-                // Create container for slashes
-                const container = document.createElement('div');
-                container.className = 'slash-effect';
-                
-                const line1 = document.createElement('div');
-                line1.className = 'slash-line-1';
-                const line2 = document.createElement('div');
-                line2.className = 'slash-line-2';
-                
-                container.appendChild(line1);
-                container.appendChild(line2);
-                
-                targetEl.appendChild(container);
-                
-                // Cleanup
-                setTimeout(() => {
-                    container.remove();
-                }, 800);
+            getPlayerCenter: function(playerOrId) {
+                let id = typeof playerOrId === 'number' ? playerOrId : playerOrId.id;
+                let el = document.getElementById(`p${id}`);
+                let bf = document.getElementById('battlefield');
+                if (!el || !bf) return null;
+                let rect = el.getBoundingClientRect();
+                let parent = bf.getBoundingClientRect();
+                return {
+                    x: rect.left - parent.left + rect.width / 2,
+                    y: rect.top - parent.top + rect.height / 2
+                };
             },
-            showDodgeEffect: function(playerId) {
-                const playerEl = document.getElementById('p' + playerId);
-                if (!playerEl) return;
-
-                // Remove existing to avoid stacking
-                playerEl.querySelectorAll('.shield-effect').forEach(el => el.remove());
-
-                const container = document.createElement('div');
-                container.className = 'shield-effect';
-                
-                const bubble = document.createElement('div');
-                bubble.className = 'shield-bubble';
-                const spark = document.createElement('div');
-                spark.className = 'shield-spark';
-                
-                container.appendChild(bubble);
-                container.appendChild(spark);
-                
-                playerEl.appendChild(container);
-                
-                setTimeout(() => {
-                    container.remove();
-                }, 800);
+            addBattleEffect: function(className, x, y, duration = 900) {
+                let bf = document.getElementById('battlefield');
+                if (!bf) return null;
+                let el = document.createElement('div');
+                el.className = `battle-effect ${className}`;
+                el.style.left = `${x}px`;
+                el.style.top = `${y}px`;
+                bf.appendChild(el);
+                setTimeout(() => el.remove(), duration);
+                return el;
+            },
+            showSlashEffect: function(source, target) {
+                let from = this.getPlayerCenter(source);
+                let to = this.getPlayerCenter(target);
+                if (!from || !to) return;
+                let dx = to.x - from.x;
+                let dy = to.y - from.y;
+                let distance = Math.hypot(dx, dy);
+                let angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                let el = this.addBattleEffect('slash-line', from.x, from.y, 700);
+                if (!el) return;
+                el.style.width = `${Math.max(120, distance)}px`;
+                el.style.transform = `rotate(${angle}deg)`;
+            },
+            showDodgeEffect: function(player) {
+                let pos = this.getPlayerCenter(player);
+                if (!pos) return;
+                this.addBattleEffect('shield-effect', pos.x, pos.y, 850);
             },
             showDamageFlash: function(targetId) {
                 const targetEl = document.getElementById('p' + targetId);
