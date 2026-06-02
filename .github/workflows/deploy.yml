@@ -22,3 +22,4 @@ jobs:
         port: 22  # 如果您的 NAS SSH 端口有改，請修正這裡
         source: "./*"
         target: "/volume1/web/"
+        
