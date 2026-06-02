@@ -19,7 +19,7 @@ jobs:
         host: ${{ secrets.NAS_HOST }}
         username: ${{ secrets.NAS_USERNAME }}
         password: ${{ secrets.NAS_PASSWORD }}
-        port: 5800  # 如果您的 NAS SSH 端口有改，請修正這裡
+        port: 18089  # 如果您的 NAS SSH 端口有改，請修正這裡
         source: "./*"
         target: "/volume1/web/"
         
