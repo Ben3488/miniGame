@@ -2201,6 +2201,21 @@
             '藤甲': { type: 'equip', equipType: 'armor', bg: 'bg-equip', desc: '【藤甲】防具。鎖定技，【南蠻入侵】、【萬箭齊發】和普通【殺】對你無效。當你受到屬性傷害時，此傷害+1。' },
             '白銀獅子': { type: 'equip', equipType: 'armor', bg: 'bg-equip', desc: '【白銀獅子】防具。鎖定技，當你受到大於1點的傷害時，你將此傷害限制為1點；當你失去裝備區裡的【白銀獅子】時，你回復1點體力。' },
             '木牛流馬': { type: 'equip', equipType: 'treasure', bg: 'bg-equip', desc: '【木牛流馬】寶物。鎖定技，你的手牌上限額外+5。' },
+            '七寶刀': { type: 'equip', equipType: 'weapon', range: 2, bg: 'bg-equip', desc: '【七寶刀】武器（攻擊範圍2）。擴充裝備。' },
+            '六龍驂駕': { type: 'equip', equipType: 'defMount', bg: 'bg-equip', desc: '【六龍驂駕】坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
+            '太平要術': { type: 'equip', equipType: 'armor', bg: 'bg-equip', desc: '【太平要術】防具。擴充裝備。' },
+            '玉璽': { type: 'equip', equipType: 'treasure', bg: 'bg-equip', desc: '【玉璽】寶物。擴充裝備。' },
+            '定瀾夜明珠': { type: 'equip', equipType: 'treasure', bg: 'bg-equip', desc: '【定瀾夜明珠】寶物。擴充裝備。' },
+            '護心鏡': { type: 'equip', equipType: 'armor', bg: 'bg-equip', desc: '【護心鏡】防具。擴充裝備。' },
+            '明光鎧': { type: 'equip', equipType: 'armor', bg: 'bg-equip', desc: '【明光鎧】防具。鎖定技，【火殺】、【火攻】及雷電傷害對你無效。' },
+            '引蜂甲': { type: 'equip', equipType: 'armor', bg: 'bg-equip', desc: '【引蜂甲】防具。擴充裝備。' },
+            '爛銀甲': { type: 'equip', equipType: 'armor', bg: 'bg-equip', desc: '【爛銀甲】防具。擴充裝備。' },
+            '女裝': { type: 'equip', equipType: 'armor', bg: 'bg-equip', desc: '【女裝】防具。擴充裝備。' },
+            '霹靂車': { type: 'equip', equipType: 'weapon', range: 9, bg: 'bg-equip', desc: '【霹靂車】武器（攻擊範圍9）。擴充裝備。' },
+            '飛龍奪鳳': { type: 'equip', equipType: 'weapon', range: 2, bg: 'bg-equip', desc: '【飛龍奪鳳】武器（攻擊範圍2）。擴充裝備。' },
+            '衠鋼槊': { type: 'equip', equipType: 'weapon', range: 3, bg: 'bg-equip', desc: '【衠鋼槊】武器（攻擊範圍3）。擴充裝備。' },
+            '折戟': { type: 'equip', equipType: 'weapon', range: 0, bg: 'bg-equip', desc: '【折戟】武器（攻擊範圍0）。擴充裝備。' },
+            '駑馬': { type: 'equip', equipType: 'defMount', bg: 'bg-equip', desc: '【駑馬】坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
             '絕影': { type: 'equip', equipType: 'defMount', bg: 'bg-equip', desc: '【絕影】坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
             '的盧': { type: 'equip', equipType: 'defMount', bg: 'bg-equip', desc: '【的盧】坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
             '爪黃飛電': { type: 'equip', equipType: 'defMount', bg: 'bg-equip', desc: '【爪黃飛電】坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
@@ -2312,6 +2327,13 @@
             CLUB: { 'J': '知己知彼' },
             HEART: { 'A': '遠交近攻', '3': '遠交近攻', '4': '遠交近攻', '9': '遠交近攻', 'J': '玉龍' },
             DIAMOND: { 'Q': '三尖兩刃刀' }
+        };
+
+        const EXTRA_EQUIP_CARDS = {
+            SPADE: { '2': '七寶刀', '3': '護心鏡', '4': '引蜂甲', '5': '霹靂車' },
+            HEART: { '2': '太平要術', '3': '玉璽', '4': '定瀾夜明珠', '5': '六龍驂駕' },
+            CLUB: { '2': '女裝', '3': '明光鎧', '4': '爛銀甲', '5': '衠鋼槊' },
+            DIAMOND: { '2': '飛龍奪鳳', '3': '駑馬', '4': '折戟', '5': '三尖兩刃刀' }
         };
 
         // Complete Hero Pool containing standard, breakthrough, and expansion heroes
@@ -2608,6 +2630,13 @@
                             addCard(suitMap[point], suitChar, point, true);
                         }
                     }
+                    for (const suitKey in EXTRA_EQUIP_CARDS) {
+                        const suitChar = SUIT[suitKey];
+                        const suitMap = EXTRA_EQUIP_CARDS[suitKey];
+                        for (const point in suitMap) {
+                            addCard(suitMap[point], suitChar, point, true);
+                        }
+                    }
                 }
             }
 
@@ -2616,7 +2645,7 @@
             let expectedTotal = 108;
             if (mode === '1v1') expectedTotal = 52;
             else if (mode === 'national') expectedTotal = 108;
-            else if (showMilitary) expectedTotal = 108 + 52;
+            else if (showMilitary) expectedTotal = 108 + 52 + 16;
 
             if (deck.length !== expectedTotal) {
                 console.error(`CRITICAL: Deck size is not ${expectedTotal}! Current size is: ${deck.length}`);
