@@ -2009,8 +2009,10 @@
             </div>
             
             <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-                <button class="btn gallery-tab active" id="tab-all" onclick="UI.filterGallery('all')">全部</button>
-                <button class="btn gallery-tab" id="tab-weapon" onclick="UI.filterGallery('weapon')">武器牌</button>
+                    <button class="btn gallery-tab active" id="tab-all" onclick="UI.filterGallery('all')">全部</button>
+                    <button class="btn gallery-tab" id="tab-basic" onclick="UI.filterGallery('basic')">基本牌</button>
+                    <button class="btn gallery-tab" id="tab-trick" onclick="UI.filterGallery('trick')">錦囊牌</button>
+                    <button class="btn gallery-tab" id="tab-weapon" onclick="UI.filterGallery('weapon')">武器牌</button>
                 <button class="btn gallery-tab" id="tab-armor" onclick="UI.filterGallery('armor')">防具牌</button>
                 <button class="btn gallery-tab" id="tab-mount" onclick="UI.filterGallery('mount')">坐騎牌</button>
                 <button class="btn gallery-tab" id="tab-treasure" onclick="UI.filterGallery('treasure')">寶物牌</button>
@@ -2436,7 +2438,7 @@
 
         const SUIT_ENG = { '♠': 'spade', '♥': 'heart', '♣': 'club', '♦': 'diamond' };
         const CARD_ENG = {
-            '殺': 'sha', '雷殺': 'thunder_sha', '火殺': 'fire_sha', '閃': 'shan', '桃': 'tao', '酒': 'jiu',
+            '殺': 'sha', '雷殺': 'sha', '火殺': 'sha', '閃': 'shan', '桃': 'tao', '酒': 'tao',
             '過河拆橋': 'dismantle', '順手牽羊': 'snatch', '無中生有': 'ex_nihilo', '決鬥': 'duel',
             '借刀殺人': 'borrow_sword', '五穀豐登': 'harvest', '南蠻入侵': 'barbarian', '萬箭齊發': 'arrows',
             '桃園結義': 'peach_garden', '無懈可擊': 'flawless', '鐵索連環': 'iron_shackles', '火攻': 'fire_attack',
@@ -2526,9 +2528,6 @@
                     imgPath = `../assets/SanGuoShaUltimate/cards_wiki/${simpName}.${ext}`;
                 } else {
                     imgPath = `../assets/SanGuoShaUltimate/cards/${cardEng}.png`;
-                    if (isMilitary) {
-                        imgPath = `../assets/SanGuoShaUltimate/cards/${suitEng}_${point}_${cardEng}.png`;
-                    }
                 }
 
                 deck.push({
@@ -6710,6 +6709,15 @@
         };
 
         const GALLERY_CARDS = [
+            { name: '殺', type: 'basic', asset: '../assets/SanGuoShaUltimate/cards/sha.png', desc: '基本牌。對攻擊範圍內一名角色使用，目標需打出【閃】，否則受到1點傷害。' },
+            { name: '雷殺', type: 'basic', asset: '../assets/SanGuoShaUltimate/cards/sha.png', desc: '雷屬性基本牌。對攻擊範圍內一名角色使用，目標需打出【閃】，否則受到1點雷電傷害。' },
+            { name: '火殺', type: 'basic', asset: '../assets/SanGuoShaUltimate/cards/sha.png', desc: '火屬性基本牌。對攻擊範圍內一名角色使用，目標需打出【閃】，否則受到1點火焰傷害。' },
+            { name: '閃', type: 'basic', asset: '../assets/SanGuoShaUltimate/cards/shan.png', desc: '基本牌。抵消其他角色對你使用的【殺】。' },
+            { name: '桃', type: 'basic', asset: '../assets/SanGuoShaUltimate/cards/tao.png', desc: '基本牌。出牌階段對已受傷角色使用，或瀕死時使用，回復1點體力。' },
+            { name: '酒', type: 'basic', asset: '../assets/SanGuoShaUltimate/cards/tao.png', desc: '基本牌。出牌階段對自己使用，使下一張【殺】傷害+1；瀕死時可對自己使用並回復1點體力。' },
+            { name: '鐵索連環', type: 'trick', asset: '../assets/SanGuoShaUltimate/cards/iron_shackles.png', desc: '非延時類錦囊。對一至兩名角色使用，使其處於或脫離連環狀態；也可重鑄摸一張牌。' },
+            { name: '火攻', type: 'trick', asset: '../assets/SanGuoShaUltimate/cards/fire_attack.png', desc: '非延時類錦囊。對一名有手牌的角色使用，其展示一張手牌；若你棄置相同花色手牌，其受到1點火焰傷害。' },
+            { name: '兵糧寸斷', type: 'trick', asset: '../assets/SanGuoShaUltimate/cards/supply_shortage.png', desc: '延時類錦囊。判定結果不為梅花時，目標跳過摸牌階段。' },
             { name: '諸葛連弩', type: 'weapon', ext: 'jpg', desc: '鎖定技，你使用【殺】無次數限制。' },
             { name: '雌雄雙股劍', type: 'weapon', ext: 'jpg', desc: '當你使用【殺】指定一名異性角色為目標後，你可以令其選擇一項：棄置一張手牌，或令你摸一張牌。' },
             { name: '青釭劍', type: 'weapon', ext: 'jpg', desc: '鎖定技，當你使用【殺】指定一名角色為目標後，你無視其防具。' },
@@ -6760,6 +6768,8 @@
         let _lbCards = [];
         let _lbIndex = 0;
         const _lbTypeLabels = {
+            basic: '基本牌',
+            trick: '錦囊牌',
             weapon: '武器牌',
             armor: '防具牌',
             mount: '坐騎牌',
@@ -6881,12 +6891,12 @@
                 _lbCards = filtered.map(c => ({
                     name: c.titleMap || c.name,
                     type: c.type,
-                    url: `../assets/SanGuoShaUltimate/cards_wiki/${TRAD_TO_SIMP_MAP[c.name] || c.name}.${c.ext}`
+                    url: c.asset || `../assets/SanGuoShaUltimate/cards_wiki/${TRAD_TO_SIMP_MAP[c.name] || c.name}.${c.ext}`
                 }));
                 
                 filtered.forEach((c, idx) => {
                     const simpName = TRAD_TO_SIMP_MAP[c.name] || c.name;
-                    const imgUrl = `../assets/SanGuoShaUltimate/cards_wiki/${simpName}.${c.ext}`;
+                    const imgUrl = c.asset || `../assets/SanGuoShaUltimate/cards_wiki/${simpName}.${c.ext}`;
                     
                     let subTypeLabel = '';
                     if (c.type === 'weapon' && c.range) {
