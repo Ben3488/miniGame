@@ -2336,7 +2336,9 @@
             { id: 'sun_quan', name: '孫權', hp: 4, faction: 'wu', exp: 'standard', skills: ['制衡', '救援'], desc: '【制衡】出牌階段限一次，你可以棄置任意張牌，然後摸等量的牌。<br>【救援】主公技，鎖定技，其他吳勢力角色對你使用【桃】回復的體力+1。' },
             { id: 'gan_ning', name: '甘寧', hp: 4, faction: 'wu', exp: 'standard', skills: ['奇襲'], desc: '【奇襲】你可以將一張黑色牌當【過河拆橋】使用。' },
             { id: 'lu_meng', name: '呂蒙', hp: 4, faction: 'wu', exp: 'standard', skills: ['克己'], desc: '【克己】若你於出牌階段內未使用或打出過【殺】，棄牌階段你的手牌上限為你的體力上限。' },
+            { id: 'huang_gai', name: '黃蓋', hp: 4, faction: 'wu', exp: 'standard', skills: ['苦肉'], desc: '【苦肉】出牌階段限一次，你可以失去1點體力，然後摸兩張牌。' },
             { id: 'zhou_yu', name: '周瑜', hp: 3, faction: 'wu', exp: 'standard', skills: ['英姿', '反間'], desc: '【英姿】摸牌階段，你可以額外摸一張牌。<br>【反間】出牌階段限一次，你可以令一名其他角色選擇一種花色後獲得你的一張手牌，若猜錯則受到1點傷害。' },
+            { id: 'da_qiao', name: '大喬', hp: 3, faction: 'wu', exp: 'standard', skills: ['國色', '流離'], desc: '【國色】你可以將一張方塊牌當作【樂不思蜀】使用。<br>【流離】當你成為【殺】的目標時，你可以棄置一張牌，將此【殺】轉移給攻擊範圍內的一名其他角色。' },
             { id: 'lu_xun', name: '陸遜', hp: 3, faction: 'wu', exp: 'standard', skills: ['謙遜', '連營'], desc: '【謙遜】你不能成為【順手牽羊】和【樂不思蜀】的目標。<br>【連營】當你失去最後的手牌後，你可以摸一張牌。' },
             { id: 'sun_shang_xiang', name: '孫尚香', hp: 3, faction: 'wu', exp: 'standard', skills: ['結姻', '梟姬'], desc: '【結姻】出牌階段限一次，你可以棄置兩張手牌，令你與一名已受傷男性角色各回復1點體力。<br>【梟姬】當你失去裝備區裡的一張牌後，你可以摸兩張牌。' },
 
@@ -2348,13 +2350,31 @@
 
             // --- Breakthrough (界限突破) Heroes ---
             { id: 'jie_cao_cao', name: '界曹操', hp: 4, faction: 'wei', exp: 'breakthrough', skills: ['奸雄', '護駕'], desc: '【奸雄】當你受到傷害後，你可以獲得對你造成傷害的牌，並可摸一張牌。<br>【護駕】主公技，當你需要使用或打出【閃】時，你可以令其他魏勢力角色打出【閃】。' },
+            { id: 'jie_si_ma_yi', name: '界司馬懿', hp: 3, faction: 'wei', exp: 'breakthrough', imgId: 'si_ma_yi', avatarId: 'si_ma_yi', skills: ['反饋', '鬼才'], desc: '【反饋】當你受到傷害後，你可以獲得傷害來源的一張牌。<br>【鬼才】當判定牌生效前，你可以打出一張牌代替之。' },
+            { id: 'jie_xia_hou_dun', name: '界夏侯惇', hp: 4, faction: 'wei', exp: 'breakthrough', imgId: 'xia_hou_dun', avatarId: 'xia_hou_dun', skills: ['剛烈'], desc: '【剛烈】當你受到傷害後，你可以判定；若結果不為紅桃，傷害來源需棄置兩張牌或受到1點傷害。' },
+            { id: 'jie_zhang_liao', name: '界張遼', hp: 4, faction: 'wei', exp: 'breakthrough', imgId: 'zhang_liao', avatarId: 'zhang_liao', skills: ['突襲'], desc: '【突襲】摸牌階段，你可以少摸牌，改為獲得至多兩名其他角色各一張手牌。' },
+            { id: 'jie_xu_chu', name: '界許褚', hp: 4, faction: 'wei', exp: 'breakthrough', imgId: 'xu_chu', avatarId: 'xu_chu', skills: ['裸衣'], desc: '【裸衣】摸牌階段，你可以少摸一張牌；若如此做，本回合你使用【殺】或【決鬥】造成的傷害+1。' },
+            { id: 'jie_guo_jia', name: '界郭嘉', hp: 3, faction: 'wei', exp: 'breakthrough', imgId: 'guo_jia', avatarId: 'guo_jia', skills: ['天妒', '遺計'], desc: '【天妒】判定牌生效後，你可以獲得之。<br>【遺計】當你受到1點傷害後，你可以摸兩張牌並分配。' },
+            { id: 'jie_zhen_ji', name: '界甄姬', hp: 3, faction: 'wei', exp: 'breakthrough', imgId: 'zhen_ji', avatarId: 'zhen_ji', skills: ['傾國', '洛神'], desc: '【傾國】你可以將黑色手牌當【閃】使用或打出。<br>【洛神】準備階段，你可以重複判定並獲得黑色判定牌。' },
             { id: 'jie_liu_bei', name: '界劉備', hp: 4, faction: 'shu', exp: 'breakthrough', skills: ['仁德', '激將'], desc: '【仁德】出牌階段，你可以將任意張手牌交給其他角色，若你於此階段給出第二張手牌，你回復1點體力。當你於此階段給出牌數達到兩張或更多時，你可以將一張基本牌當作另一張基本牌使用。<br>【激將】主公技，當你需要使用或打出【殺】時，你可以令其他蜀勢力角色打出【殺】。' },
             { id: 'jie_guan_yu', name: '界關羽', hp: 4, faction: 'shu', exp: 'breakthrough', skills: ['武聖', '義絕'], desc: '【武聖】你可以將一張紅色牌當【殺】使用或打出。<br>【義絕】出牌階段限一次，你可以與一名其他角色拼點。若你贏，該角色本回合非鎖定技失效且不能使用/打出手牌；若你輸，其可以回復1點體力。' },
             { id: 'jie_zhang_fei', name: '界張飛', hp: 4, faction: 'shu', exp: 'breakthrough', skills: ['咆哮', '替身'], desc: '【咆哮】你使用【殺】無次數限制。你使用的【殺】被【閃】抵消後，你可以摸一張牌。<br>【替身】限定技，準備階段，若你已受傷，你可以摸X張牌（X為你已損失的體力值），然後回復1點體力。' },
+            { id: 'jie_zhu_ge_liang', name: '界諸葛亮', hp: 3, faction: 'shu', exp: 'breakthrough', imgId: 'zhu_ge_liang', avatarId: 'zhu_ge_liang', skills: ['觀星', '空城'], desc: '【觀星】準備階段，你可以觀看牌堆頂若干張牌並調整順序。<br>【空城】鎖定技，若你沒有手牌，不能成為【殺】或【決鬥】的目標。' },
             { id: 'jie_zhao_yun', name: '界趙雲', hp: 4, faction: 'shu', exp: 'breakthrough', skills: ['龍膽', '涯角'], desc: '【龍膽】你可以將【殺】當【閃】、或【閃】當【殺】使用或打出。<br>【涯角】當你於回合外使用或打出一張手牌後，你可以展示牌堆頂的一張牌。若此牌與你使用的牌類型相同，你可以獲得此牌；若不同，你可以將此牌交給一名其他角色。' },
+            { id: 'jie_ma_chao', name: '界馬超', hp: 4, faction: 'shu', exp: 'breakthrough', imgId: 'ma_chao', avatarId: 'ma_chao', skills: ['馬術', '鐵騎'], desc: '【馬術】鎖定技，你計算與其他角色的距離-1。<br>【鐵騎】當你使用【殺】指定目標後，你可以判定並限制其響應。' },
+            { id: 'jie_huang_yue_ying', name: '界黃月英', hp: 3, faction: 'shu', exp: 'breakthrough', imgId: 'huang_yue_ying', avatarId: 'huang_yue_ying', skills: ['集智', '奇才'], desc: '【集智】當你使用非延時錦囊牌時，你可以摸一張牌。<br>【奇才】鎖定技，你使用錦囊牌無距離限制。' },
             { id: 'jie_lu_bu', name: '界呂布', hp: 4, faction: 'qun', exp: 'breakthrough', skills: ['無雙', '利馭'], desc: '【無雙】鎖定技，【殺】需兩張【閃】避開；【決鬥】需兩張【殺】避開。<br>【利馭】當你使用【殺】對一名其他角色造成傷害後，該角色可以選擇：摸一張牌，然後將其裝備區裡的一張牌交給你；或讓你獲得其一張手牌。' },
+            { id: 'jie_sun_quan', name: '界孫權', hp: 4, faction: 'wu', exp: 'breakthrough', imgId: 'sun_quan', avatarId: 'sun_quan', skills: ['制衡', '救援'], desc: '【制衡】出牌階段限一次，你可以棄置任意張牌，然後摸等量的牌。<br>【救援】主公技，其他吳勢力角色對你使用【桃】回復效果提升。' },
+            { id: 'jie_gan_ning', name: '界甘寧', hp: 4, faction: 'wu', exp: 'breakthrough', imgId: 'gan_ning', avatarId: 'gan_ning', skills: ['奇襲'], desc: '【奇襲】你可以將黑色牌當【過河拆橋】使用。' },
+            { id: 'jie_lu_meng', name: '界呂蒙', hp: 4, faction: 'wu', exp: 'breakthrough', imgId: 'lu_meng', avatarId: 'lu_meng', skills: ['克己'], desc: '【克己】若你於出牌階段未使用或打出【殺】，棄牌階段可以保留更多手牌。' },
             { id: 'jie_huang_gai', name: '界黃蓋', hp: 4, faction: 'wu', exp: 'breakthrough', skills: ['苦肉', '詐降'], desc: '【苦肉】出牌階段限一次，你可以失去1點體力，然後摸兩張牌。<br>【詐降】鎖定技，每當你失去1點體力後，你摸三張牌。若此時是你的回合內，你本回合使用【殺】的次數上限+1，你使用紅色的【殺】無距離限制且不能被【閃】抵消。' },
+            { id: 'jie_zhou_yu', name: '界周瑜', hp: 3, faction: 'wu', exp: 'breakthrough', imgId: 'zhou_yu', avatarId: 'zhou_yu', skills: ['英姿', '反間'], desc: '【英姿】摸牌階段，你可以額外摸一張牌。<br>【反間】出牌階段限一次，你可以令一名其他角色獲得你一張手牌並猜花色，猜錯則受到傷害。' },
             { id: 'jie_da_qiao', name: '界大喬', hp: 3, faction: 'wu', exp: 'breakthrough', skills: ['國色', '流離'], desc: '【國色】你可以將一張方塊牌當作【樂不思蜀】使用，若此牌是裝備牌，你摸一張牌。出牌階段限一次，你可以棄置一張【樂不思蜀】並摸一張牌。<br>【流離】當你成為【殺】的目標時，你可以棄置一張牌，將此【殺】轉移給攻擊範圍內的一名其他角色（此【殺】的來源除外）。' },
+            { id: 'jie_lu_xun', name: '界陸遜', hp: 3, faction: 'wu', exp: 'breakthrough', imgId: 'lu_xun', avatarId: 'lu_xun', skills: ['謙遜', '連營'], desc: '【謙遜】你不能成為【順手牽羊】和【樂不思蜀】的目標。<br>【連營】當你失去最後的手牌後，你可以摸一張牌。' },
+            { id: 'jie_sun_shang_xiang', name: '界孫尚香', hp: 3, faction: 'wu', exp: 'breakthrough', imgId: 'sun_shang_xiang', avatarId: 'sun_shang_xiang', skills: ['結姻', '梟姬'], desc: '【結姻】出牌階段限一次，你可以令你與一名已受傷男性角色各回復1點體力。<br>【梟姬】當你失去裝備區裡的一張牌後，你可以摸兩張牌。' },
+            { id: 'jie_diao_chan', name: '界貂蟬', hp: 3, faction: 'qun', exp: 'breakthrough', imgId: 'diao_chan', avatarId: 'diao_chan', skills: ['離間', '閉月'], desc: '【離間】出牌階段限一次，你可以令兩名男性角色視為其中一名對另一名使用【決鬥】。<br>【閉月】結束階段，你可以摸一張牌。' },
+            { id: 'jie_hua_tuo', name: '界華佗', hp: 3, faction: 'qun', exp: 'breakthrough', imgId: 'hua_tuo', avatarId: 'hua_tuo', skills: ['急救', '青囊'], desc: '【急救】你的回合外，你可以將紅色牌當【桃】使用。<br>【青囊】出牌階段限一次，你可以棄置一張手牌令一名角色回復1點體力。' },
+            { id: 'jie_yuan_shao', name: '界袁紹', hp: 4, faction: 'qun', exp: 'breakthrough', imgId: 'yuan_shao', avatarId: 'yuan_shao', skills: ['亂擊', '血裔'], desc: '【亂擊】你可以將兩張相同花色的手牌當【萬箭齊發】使用。<br>【血裔】主公技，你的手牌上限額外增加。' },
 
             // --- expansion (神話再臨 & SP) Heroes ---
             { id: 'zhang_jiao', name: '張角', hp: 3, faction: 'qun', exp: 'god', skills: ['雷擊', '鬼道', '黃天'], desc: '【雷擊】當你使用或打出一張【閃】時，你可以進行判定。若結果為黑桃，你令一名角色受到2點雷電傷害。<br>【鬼道】當一名角色的判定牌生效前，你可以用一張黑色牌代替之。<br>【黃天】主公技，群勢力角色於出牌階段可以交給你一張【閃】或【閃電】。' },
@@ -2368,6 +2388,9 @@
             { id: 'shen_lu_bu', name: '神呂布', hp: 5, faction: 'qun', exp: 'god', skills: ['狂暴', '神憤'], desc: '【狂暴】鎖定技，遊戲開始你獲得2個「暴怒」標記；當你造成或受到傷害時，獲得1個標記。<br>【神憤】出牌階段限一次，你可以棄置6個標記，對所有其他角色各造成1點傷害，然後他們需棄置裝備區所有牌 and 4張手牌，最後你翻面。' },
             { id: 'shen_cao_cao', name: '神曹操', hp: 3, faction: 'wei', exp: 'god', skills: ['歸心'], desc: '【歸心】當你受到1點傷害後，你可以獲得所有其他角色區域裡的一張牌，然後你翻面。' },
             { id: 'shen_zhao_yun', name: '神趙雲', hp: 2, faction: 'qun', exp: 'god', skills: ['絕境', '龍魂'], desc: '【絕境】鎖定技，你的手牌上限始終為2；每當你受到或回復1點體力後，或你進入或脫離瀕死狀態時，若你的手牌數小於2，你摸牌至2張。<br>【龍魂】你可以將同花色的牌按以下規則使用或打出：紅桃當【桃】；方塊當火【殺】；梅花當【閃】；黑桃當【無懈可擊】。' },
+            { id: 'shen_zhu_ge_liang', name: '神諸葛亮', hp: 3, faction: 'shu', exp: 'god', imgId: '神諸葛亮', avatarId: 'zhu_ge_liang', skills: ['七星', '狂風', '大霧'], desc: '【七星】遊戲開始時，你可以獲得星標記。<br>【狂風】結束階段，你可以令一名角色受到的火焰傷害增加。<br>【大霧】結束階段，你可以令角色防止非雷電傷害。' },
+            { id: 'shen_zhou_yu', name: '神周瑜', hp: 4, faction: 'wu', exp: 'god', imgId: '神周瑜', avatarId: 'zhou_yu', skills: ['琴音', '業炎'], desc: '【琴音】棄牌階段結束時，若你棄置過至少兩張手牌，可以令所有角色回復或失去體力。<br>【業炎】限定技，出牌階段，你可以對至多三名角色造成火焰傷害。' },
+            { id: 'shen_lu_meng', name: '神呂蒙', hp: 3, faction: 'wu', exp: 'god', imgId: '神呂蒙', avatarId: 'lu_meng', skills: ['涉獵', '攻心'], desc: '【涉獵】摸牌階段，你可以改為亮出牌堆頂若干張牌並獲得不同花色的牌。<br>【攻心】出牌階段限一次，你可以觀看一名其他角色的手牌並處理其中一張紅桃牌。' },
 
             // --- SP Heroes ---
             { id: 'sp_zhao_yun', name: 'SP趙雲', hp: 4, faction: 'qun', exp: 'sp', skills: ['龍膽', '衝陣'], desc: '【龍膽】你可以【殺】當【閃】、【閃】當【殺】使用或打出。<br>【衝陣】當你發動【龍膽】使用或打出一張牌時，你可以獲得對方一張手牌。' },
@@ -2381,7 +2404,7 @@
         };
 
         HEROES.forEach(hero => {
-            let imgId = hero.id;
+            let imgId = hero.imgId || hero.id;
             const missingJie = ['jie_cao_cao', 'jie_liu_bei', 'jie_guan_yu', 'jie_zhang_fei', 'jie_lu_bu'];
             if (missingJie.includes(imgId)) {
                 imgId = imgId.replace('jie_', '');
@@ -7454,7 +7477,7 @@
                 el.className = 'hero-select-card';
 
                 // Use avatar image for selection screen
-                let avatarImg = `../assets/SanGuoShaUltimate/heroes_avatar/${h.id}.png`;
+                let avatarImg = `../assets/SanGuoShaUltimate/heroes_avatar/${h.avatarId || h.id}.png`;
                 el.style.backgroundImage = `url('${avatarImg}')`;
                 el.style.backgroundSize = 'cover';
                 el.style.backgroundPosition = 'center';
