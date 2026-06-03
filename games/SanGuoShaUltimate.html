@@ -3194,7 +3194,17 @@
                         cpHandSection.style.display = 'block';
                         target.hand.forEach((c, idx) => {
                             let el = document.createElement('div');
-                            el.className = 'card';
+                            if (mode === 'view') {
+                                el.className = `card face-up ${c.bg || ''}`;
+                                el.innerHTML = `
+                                    <div class="card-illustration" style="background-image: url('${c.img || ''}')"></div>
+                                    <div class="card-title" style="font-size: 0.7rem; color:${c.color === 'red' ? '#dc2626' : '#1c1917'};">${c.name}</div>
+                                    <div class="card-suit suit-${c.color}" style="font-size: 0.7rem; left:2px; top:2px;">${c.suit}</div>
+                                    <div class="card-point suit-${c.color}" style="font-size: 0.7rem; right:2px; top:2px;">${c.point}</div>
+                                `;
+                            } else {
+                                el.className = 'card';
+                            }
                             el.style.width = '75px';
                             el.style.height = '105px';
                             el.style.borderWidth = '1px';
@@ -3262,7 +3272,7 @@
                         resolve(selectedItem);
                     };
 
-                    confirmBtn.disabled = true;
+                    confirmBtn.disabled = (mode !== 'view');
                     modal.style.display = 'flex';
                 });
             }
@@ -3623,8 +3633,81 @@
                     }
                 }
 
+                if (p.hero.skills.includes('好施')) {
+                    let use = await this.askForSkill(p, '好施', '是否發動【好施】多摸兩張牌？');
+                    if (use) {
+                        context.count += 2;
+                        p.flags.haoshiActive = true;
+                    }
+                }
+
                 await this.triggerHook('onDraw', context);
                 await this.drawCards(p, Math.max(0, context.count), '摸了');
+
+                if (p.flags.haoshiActive) {
+                    p.flags.haoshiActive = false;
+                    if (p.hand.length > 5) {
+                        let giveCount = Math.floor(p.hand.length / 2);
+                        this.log(`【${p.hero.name}】發動【好施】需要分出 ${giveCount} 張手牌給手牌最少的一名其他角色`);
+                        
+                        let others = this.getLivingPlayers().filter(o => o.id !== p.id);
+                        let minCards = Math.min(...others.map(o => o.hand.length));
+                        let minPlayers = others.filter(o => o.hand.length === minCards);
+                        
+                        let chosenTarget = null;
+                        if (minPlayers.length === 1) {
+                            chosenTarget = minPlayers[0];
+                        } else {
+                            if (p.id === 0) {
+                                this.log(`請選擇一名手牌最少的角色 (${minPlayers.map(o => o.hero.name).join(', ')})`);
+                                this.state = 'TARGETING';
+                                this.pendingAction = {
+                                    type: 'HAOSHI',
+                                    minPlayers: minPlayers,
+                                    resolve: async targetIdx => {
+                                        chosenTarget = this.players[targetIdx];
+                                    }
+                                };
+                                this.selectedTargets = [];
+                                UI.updateAll();
+                                
+                                await new Promise(res => {
+                                    let check = setInterval(() => {
+                                        if (this.state !== 'TARGETING') {
+                                            clearInterval(check);
+                                            res();
+                                        }
+                                    }, 100);
+                                });
+                            } else {
+                                let allies = minPlayers.filter(o => this.isSameSide(p, o));
+                                chosenTarget = allies.length > 0 ? allies[0] : minPlayers[0];
+                            }
+                        }
+                        
+                        if (chosenTarget) {
+                            if (p.id === 0) {
+                                let cards = await this.askForCard(p, [], giveCount, `【好施】請選擇 ${giveCount} 張手牌給予【${chosenTarget.hero.name}】`, false);
+                                if (cards && cards.length === giveCount) {
+                                    for (let card of cards) {
+                                        let discardIdx = this.discardPile.findIndex(c => c.id === card.id);
+                                        if (discardIdx !== -1) this.discardPile.splice(discardIdx, 1);
+                                        chosenTarget.hand.push(card);
+                                    }
+                                }
+                            } else {
+                                let cards = [];
+                                for (let i = 0; i < giveCount; i++) {
+                                    let card = p.hand.pop();
+                                    chosenTarget.hand.push(card);
+                                    cards.push(card);
+                                }
+                            }
+                            this.log(`【${p.hero.name}】給了【${chosenTarget.hero.name}】 ${giveCount} 張手牌`);
+                            UI.updateAll(); await this.sleep(800);
+                        }
+                    }
+                }
             }
 
             async playPhase(p) {
@@ -4099,8 +4182,60 @@
                         if (use) {
                             let slot = target.equips.defMount ? 'defMount' : 'offMount';
                             await this.loseEquip(target, slot, 'discard');
-                            this.log(`【${source.hero.name}】用麒麟弓棄置了【${target.hero.name}】的坐騎`);
+                            this.log(`【${source.hero.name}】用麒麟弓棄置了【${target.hero.name}】的坐氣`);
                             UI.updateAll(); await this.sleep(800);
+                        }
+                    }
+
+                    if (source.equips.weapon && source.equips.weapon.name === '三尖兩刃刀' && source.hand.length > 0 && !target.isDead) {
+                        let alivePlayers = this.players.filter(p => !p.isDead);
+                        let targetIdxInAlive = alivePlayers.findIndex(p => p.id === target.id);
+                        let neighbors = [];
+                        if (alivePlayers.length > 1) {
+                            let leftNeighbor = alivePlayers[(targetIdxInAlive - 1 + alivePlayers.length) % alivePlayers.length];
+                            let rightNeighbor = alivePlayers[(targetIdxInAlive + 1) % alivePlayers.length];
+                            if (leftNeighbor.id !== source.id) neighbors.push(leftNeighbor);
+                            if (rightNeighbor.id !== source.id && rightNeighbor.id !== leftNeighbor.id) neighbors.push(rightNeighbor);
+                        }
+                        if (neighbors.length > 0) {
+                            let use = await this.askForSkill(source, '三尖兩刃刀', `是否發動【三尖兩刃刀】棄置一張手牌，令【${neighbors.map(n => n.hero.name).join('或')}】受到1點傷害？`);
+                            if (use) {
+                                let cards = await this.askForCard(source, [], 1, `【三尖兩刃刀】請棄置一張手牌`, true);
+                                if (cards && cards.length === 1) {
+                                    let neighborTarget = neighbors[0];
+                                    if (neighbors.length > 1) {
+                                        if (source.id === 0) {
+                                            this.state = 'TARGETING';
+                                            this.pendingAction = {
+                                                type: 'SAN_JIAN',
+                                                neighbors: neighbors,
+                                                resolve: async targetIdx => {
+                                                    neighborTarget = this.players[targetIdx];
+                                                }
+                                            };
+                                            this.selectedTargets = [];
+                                            this.log(`請選擇相鄰的一名角色 (${neighbors.map(n => n.hero.name).join('或')})`);
+                                            UI.updateAll();
+                                            await new Promise(res => {
+                                                let check = setInterval(() => {
+                                                    if (this.state !== 'TARGETING') {
+                                                        clearInterval(check);
+                                                        res();
+                                                    }
+                                                }, 100);
+                                            });
+                                        } else {
+                                            let enemyNeighbor = neighbors.find(n => this.isEnemy(source, n));
+                                            neighborTarget = enemyNeighbor || neighbors[0];
+                                        }
+                                    }
+                                    if (neighborTarget) {
+                                        this.log(`【${source.hero.name}】發動【三尖兩刃刀】！對【${neighborTarget.hero.name}】造成 1 點傷害`);
+                                        await this.dealDamage(source, neighborTarget, 1, null);
+                                        UI.updateAll(); await this.sleep(800);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -4227,6 +4362,114 @@
                         diamondIdx = p.hand.findIndex(c => c.suit === SUIT.DIAMOND);
                     }
                 }
+                if (p.hero.skills.includes('義絕') && !p.flags.usedYiJue && p.hand.length > 1 && !p.isDead && this.state !== 'GAME_OVER') {
+                    let hasHighCard = p.hand.some(c => ['10', 'J', 'Q', 'K'].includes(c.point));
+                    let enemy = enemies.find(o => !o.isDead && o.hand.length > 0);
+                    if (hasHighCard && enemy) {
+                        p.flags.usedYiJue = true;
+                        this.log(`【${p.hero.name}】對【${enemy.hero.name}】發動【義絕】！`);
+                        UI.updateAll(); await this.sleep(800);
+                        let win = await this.performPinDian(p, enemy);
+                        if (win) {
+                            enemy.flags.yiJueLoss = true;
+                            this.log(`【${enemy.hero.name}】拼點失敗，本回合非鎖定技失效且不能使用手牌！`);
+                        } else {
+                            if (enemy.hp < enemy.maxHp) {
+                                enemy.hp++;
+                                this.log(`【${enemy.hero.name}】拼點獲勝，回復了 1 點體力！`);
+                            } else {
+                                this.log(`【${enemy.hero.name}】拼點獲勝，體力已滿`);
+                            }
+                            UI.updateAll(); await this.sleep(800);
+                        }
+                    }
+                }
+                if (p.hero.skills.includes('驅虎') && !p.flags.usedQuHu && p.hand.length > 0 && !p.isDead && this.state !== 'GAME_OVER') {
+                    let hasHighCard = p.hand.some(c => ['9', '10', 'J', 'Q', 'K'].includes(c.point));
+                    let targets = this.players.filter(o => !o.isDead && o.hp > p.hp && o.id !== p.id);
+                    if (hasHighCard && targets.length > 0) {
+                        let target = targets.find(t => {
+                            let otherSide = this.getLivingPlayers().filter(o => o.id !== t.id && this.isEnemy(p, o));
+                            return otherSide.some(o => this.getDistance(t.id, o.id) <= this.getAttackRange(t));
+                        });
+                        if (target) {
+                            p.flags.usedQuHu = true;
+                            this.log(`【${p.hero.name}】對【${target.hero.name}】發動【驅虎】！`);
+                            UI.updateAll(); await this.sleep(800);
+                            let win = await this.performPinDian(p, target);
+                            if (win) {
+                                let otherSide = this.getLivingPlayers().filter(o => o.id !== target.id && this.isEnemy(p, o) && this.getDistance(target.id, o.id) <= this.getAttackRange(target));
+                                let target2 = otherSide[0] || this.getLivingPlayers().filter(o => o.id !== target.id)[0];
+                                this.log(`【驅虎】成功！【${target.hero.name}】對【${target2.hero.name}】造成 1 點傷害！`);
+                                await this.dealDamage(target, target2, 1, null);
+                            } else {
+                                this.log(`【驅虎】失敗！`);
+                                await this.dealDamage(target, p, 1, null);
+                            }
+                        }
+                    }
+                }
+                if (p.hero.skills.includes('締盟') && !p.flags.usedDiMeng && !p.isDead && this.state !== 'GAME_OVER') {
+                    let enemy = enemies.sort((a,b) => b.hand.length - a.hand.length)[0];
+                    let ally = allies.sort((a,b) => a.hand.length - b.hand.length)[0];
+                    if (enemy && ally && enemy.hand.length > ally.hand.length + 1) {
+                        let diff = enemy.hand.length - ally.hand.length;
+                        let myCardsCount = p.hand.length;
+                        for (let slot of ['weapon', 'armor', 'defMount', 'offMount', 'treasure']) {
+                            if (p.equips[slot]) myCardsCount++;
+                        }
+                        if (myCardsCount >= diff + 1) {
+                            p.flags.usedDiMeng = true;
+                            let discardedCount = 0;
+                            while (discardedCount < diff && p.hand.length > 0) {
+                                this.discardPile.push(p.hand.pop());
+                                discardedCount++;
+                            }
+                            for (let slot of ['weapon', 'armor', 'defMount', 'offMount', 'treasure']) {
+                                if (discardedCount < diff && p.equips[slot]) {
+                                    await this.loseEquip(p, slot, 'discard');
+                                    discardedCount++;
+                                }
+                            }
+                            let temp = enemy.hand;
+                            enemy.hand = ally.hand;
+                            ally.hand = temp;
+                            this.log(`【${p.hero.name}】發動【締盟】交換了【${enemy.hero.name}】和【${ally.hero.name}】的手牌！`);
+                            UI.updateAll(); await this.sleep(1000);
+                        }
+                    }
+                }
+                if (p.hero.skills.includes('挑釁') && !p.flags.usedTiaoXin && !p.isDead && this.state !== 'GAME_OVER') {
+                    let targets = enemies.filter(o => !o.isDead && this.getDistance(o.id, p.id) <= this.getAttackRange(o) && (o.hand.length > 0 || o.equips.weapon || o.equips.armor || o.equips.defMount || o.equips.offMount));
+                    if (targets.length > 0) {
+                        p.flags.usedTiaoXin = true;
+                        let target = targets[0];
+                        this.log(`【${p.hero.name}】對【${target.hero.name}】發動【挑釁】！`);
+                        UI.updateAll(); await this.sleep(800);
+                        let cards = await this.askForCard(target, ['殺'], 1, `【挑釁】請對【${p.hero.name}】使用一張【殺】`, true);
+                        if (cards && cards.length === 1) {
+                            this.log(`【${target.hero.name}】響應挑釁對【${p.hero.name}】使用【殺】！`);
+                            UI.updateAll(); await this.sleep(800);
+                            await this.resolveAttack(target, p, cards[0]);
+                        } else {
+                            this.log(`【${target.hero.name}】拒絕使用【殺】`);
+                            await this.removeOneCard(p, target, 'discard');
+                        }
+                    }
+                }
+                if (p.hero.skills.includes('急襲') && p.flags.tuntian > 0 && !p.isDead && this.state !== 'GAME_OVER') {
+                    let targets = enemies.filter(o => !o.isDead && this.getDistance(p.id, o.id) <= 1 && !o.hero.skills.includes('謙遜') && (o.hand.length > 0 || o.equips.weapon || o.equips.armor || o.equips.defMount || o.equips.offMount));
+                    while (p.flags.tuntian > 0 && targets.length > 0 && !p.isDead && this.state !== 'GAME_OVER') {
+                        let target = targets[0];
+                        p.flags.tuntian--;
+                        this.log(`【${p.hero.name}】發動【急襲】消耗1個「田」對【${target.hero.name}】使用【順手牽羊】`);
+                        UI.updateAll(); await this.sleep(800);
+                        let virtualShunshou = { name: '順手牽羊' };
+                        let w = await this.askWuxie(virtualShunshou, target);
+                        if (!w && !target.isDead) await this.removeOneCard(p, target, 'gain');
+                        targets = enemies.filter(o => !o.isDead && this.getDistance(p.id, o.id) <= 1 && !o.hero.skills.includes('謙遜') && (o.hand.length > 0 || o.equips.weapon || o.equips.armor || o.equips.defMount || o.equips.offMount));
+                    }
+                }
 
                 // Huang Tian Lord skill for Qun AI players
                 let lord = this.getLivingPlayers().find(o => o.role === ROLE.LORD);
@@ -4328,6 +4571,89 @@
                         if (!await this.askWuxie(c, p) && !p.isDead) await this.drawCards(p, 2, '使用【無中生有】摸了');
                     } else if (c.name === '南蠻入侵' || c.name === '萬箭齊發' || c.name === '桃園結義') {
                         await this.useImmediateCard(p, p.hand.splice(i, 1)[0]);
+                    } else if (c.name === '水淹七軍') {
+                        let target = enemies.find(o => !o.isDead && (o.equips.weapon || o.equips.armor || o.equips.defMount || o.equips.offMount || o.equips.treasure));
+                        if (target) {
+                            let card = p.hand.splice(i, 1)[0];
+                            this.discardPile.push(card);
+                            UI.showActiveCard(p, card);
+                            this.log(`【${p.hero.name}】對【${target.hero.name}】使用了 水淹七軍`);
+                            UI.updateAll(); await this.sleep(800);
+                            let w = await this.askWuxie(card, target);
+                            if (!w && !target.isDead) {
+                                if (target.id === 0) {
+                                    let discard = await this.askForSkill(target, '水淹七軍_選擇', '確定=棄置所有裝備，取消=受到1點雷電傷害');
+                                    if (discard) {
+                                        for (let slot of ['weapon', 'armor', 'defMount', 'offMount', 'treasure']) {
+                                            if (target.equips[slot]) await this.loseEquip(target, slot, 'discard');
+                                        }
+                                    } else {
+                                        await this.dealDamage(p, target, 1, card, 'lightning');
+                                    }
+                                } else {
+                                    let equipCount = 0;
+                                    for (let slot of ['weapon', 'armor', 'defMount', 'offMount', 'treasure']) {
+                                        if (target.equips[slot]) equipCount++;
+                                    }
+                                    if (target.hp <= 1 || equipCount <= 1) {
+                                        this.log(`【${target.hero.name}】選擇受到1點雷電傷害`);
+                                        await this.dealDamage(p, target, 1, card, 'lightning');
+                                    } else {
+                                        this.log(`【${target.hero.name}】選擇棄置裝備區所有牌`);
+                                        for (let slot of ['weapon', 'armor', 'defMount', 'offMount', 'treasure']) {
+                                            if (target.equips[slot]) await this.loseEquip(target, slot, 'discard');
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else if (c.name === '兵臨城下') {
+                        let target = enemies.find(o => !o.isDead);
+                        if (target) {
+                            let card = p.hand.splice(i, 1)[0];
+                            this.discardPile.push(card);
+                            UI.showActiveCard(p, card);
+                            this.log(`【${p.hero.name}】對【${target.hero.name}】使用了 兵臨城下`);
+                            UI.updateAll(); await this.sleep(800);
+                            let w = await this.askWuxie(card, target);
+                            if (!w && !target.isDead) {
+                                let ok = await this.askForCard(target, ['殺', '閃'], 1, `【兵臨城下】請打出一張 殺 或 閃，否則受到你造成的1點傷害`, true);
+                                if (!ok) {
+                                    await this.dealDamage(p, target, 1, card);
+                                } else {
+                                    this.log(`【${target.hero.name}】打出了【${ok[0].name}】躲過了兵臨城下！`);
+                                    UI.updateAll(); await this.sleep(800);
+                                }
+                            }
+                        }
+                    } else if (c.name === '知己知彼') {
+                        let target = enemies.find(o => !o.isDead);
+                        if (target) {
+                            let card = p.hand.splice(i, 1)[0];
+                            this.discardPile.push(card);
+                            UI.showActiveCard(p, card);
+                            this.log(`【${p.hero.name}】對【${target.hero.name}】使用了 知己知彼`);
+                            UI.updateAll(); await this.sleep(800);
+                            let w = await this.askWuxie(card, target);
+                            if (!w && !target.isDead) {
+                                this.log(`【${p.hero.name}】觀觀看了【${target.hero.name}】的手牌！`);
+                                await this.sleep(1000);
+                            }
+                        }
+                    } else if (c.name === '遠交近攻') {
+                        let target = enemies.find(o => !o.isDead && o.hero.faction !== p.hero.faction);
+                        if (target) {
+                            let card = p.hand.splice(i, 1)[0];
+                            this.discardPile.push(card);
+                            UI.showActiveCard(p, card);
+                            this.log(`【${p.hero.name}】對【${target.hero.name}】使用了 遠交近攻`);
+                            UI.updateAll(); await this.sleep(800);
+                            let w = await this.askWuxie(card, target);
+                            if (!w && !target.isDead && !p.isDead) {
+                                await this.drawCards(target, 1, '遠交近攻');
+                                await this.drawCards(p, 3, '遠交近攻');
+                            }
+                        }
                     }
                 }
 
@@ -4416,6 +4742,55 @@
                         } else {
                             this.log('雷擊判定不為黑桃，發動失敗！');
                             await this.sleep(800);
+                        }
+                    }
+                }
+
+                if (this.currentPlayerIdx !== player.id && player.equips.weapon && player.equips.weapon.name === '銀月槍' && !player.isDead) {
+                    let targets = this.getLivingPlayers().filter(o => this.getDistance(o.id, player.id) <= this.getAttackRange(o));
+                    if (targets.length > 0) {
+                        let use = await this.askForSkill(player, '銀月槍', `是否發動【銀月槍】？`);
+                        if (use) {
+                            let chosenTarget = targets[0];
+                            if (targets.length > 1) {
+                                if (player.id === 0) {
+                                    this.state = 'TARGETING';
+                                    this.pendingAction = {
+                                        type: 'YIN_YUE',
+                                        targets: targets,
+                                        resolve: async targetIdx => {
+                                            chosenTarget = this.players[targetIdx];
+                                        }
+                                    };
+                                    this.selectedTargets = [];
+                                    this.log(`請選擇一名能攻擊到你的角色發動【銀月槍】 (${targets.map(t => t.hero.name).join('或')})`);
+                                    UI.updateAll();
+                                    await new Promise(res => {
+                                        let check = setInterval(() => {
+                                            if (this.state !== 'TARGETING') {
+                                                clearInterval(check);
+                                                res();
+                                            }
+                                        }, 100);
+                                    });
+                                } else {
+                                    let enemy = targets.find(t => this.isEnemy(player, t));
+                                    chosenTarget = enemy || targets[0];
+                                }
+                            }
+                            if (chosenTarget) {
+                                this.log(`【${player.hero.name}】發動【銀月槍】！令【${chosenTarget.hero.name}】打出一張【殺】`);
+                                UI.updateAll(); await this.sleep(800);
+                                let cards = await this.askForCard(chosenTarget, ['殺'], 1, `【銀月槍】請對【${player.hero.name}】使用一張【殺】，否則被棄置一張牌`, true);
+                                if (cards && cards.length === 1) {
+                                    this.log(`【${chosenTarget.hero.name}】打出了一張【殺】`);
+                                    UI.updateAll(); await this.sleep(800);
+                                    await this.resolveAttack(chosenTarget, player, cards[0]);
+                                } else {
+                                    this.log(`【${chosenTarget.hero.name}】拒絕使用【殺】`);
+                                    await this.removeOneCard(player, chosenTarget, 'discard');
+                                }
+                            }
                         }
                     }
                 }
@@ -5006,6 +5381,8 @@
                 if (p.hero.skills.includes('神憤') && (p.flags.wrath || 0) >= 6) activeSkills.push('神憤');
                 if (p.hero.skills.includes('義絕') && !p.flags.usedYiJue) activeSkills.push('義絕');
                 if (p.hero.skills.includes('激將') && p.role === ROLE.LORD) activeSkills.push('激將');
+                if (p.hero.skills.includes('挑釁') && !p.flags.usedTiaoXin) activeSkills.push('挑釁');
+                if (p.hero.skills.includes('急襲') && (p.flags.tuntian || 0) > 0) activeSkills.push('急襲');
                 if (p.equips.weapon && p.equips.weapon.name === '丈八蛇矛') activeSkills.push('丈八蛇矛');
 
                 if (activeSkills.length === 0) {
@@ -5492,6 +5869,57 @@
                     this.log('請選擇一名角色發動【義絕】拼點');
                     UI.updateAll();
                 }
+                else if (skill === '挑釁') {
+                    let targets = this.players.filter(o => !o.isDead && o.id !== p.id && this.getDistance(o.id, p.id) <= this.getAttackRange(o));
+                    if (targets.length === 0) {
+                        this.log("沒有角色能攻擊到你，無法發動【挑釁】！");
+                        return;
+                    }
+                    p.flags.usedTiaoXin = true;
+                    this.state = 'TARGETING';
+                    this.pendingAction = {
+                        type: 'TIAO_XIN',
+                        resolve: async targetIdx => {
+                            let target = this.players[targetIdx];
+                            this.log(`【${p.hero.name}】對【${target.hero.name}】發動【挑釁】！`);
+                            UI.updateAll(); await this.sleep(800);
+                            let cards = await this.askForCard(target, ['殺'], 1, `【挑釁】請對【${p.hero.name}】使用一張【殺】`, true);
+                            if (cards && cards.length === 1) {
+                                this.log(`【${target.hero.name}】響應挑釁對【${p.hero.name}】使用【殺】！`);
+                                UI.updateAll(); await this.sleep(800);
+                                await this.resolveAttack(target, p, cards[0]);
+                            } else {
+                                this.log(`【${target.hero.name}】拒絕使用【殺】`);
+                                await this.removeOneCard(p, target, 'discard');
+                            }
+                        }
+                    };
+                    this.selectedTargets = [];
+                    this.log('請選擇一名能攻擊到你的角色進行挑釁');
+                    UI.updateAll();
+                }
+                else if (skill === '急襲') {
+                    if ((p.flags.tuntian || 0) <= 0) {
+                        this.log("你沒有「田」牌，無法發動【急襲】！");
+                        return;
+                    }
+                    let virtualShunshou = {
+                        id: -777,
+                        name: '順手牽羊',
+                        type: 'trick',
+                        suit: SUIT.SPADE,
+                        point: '3',
+                        color: COLOR.BLACK,
+                        bg: 'bg-trick',
+                        desc: CARD_META['順手牽羊'].desc,
+                        img: `../assets/SanGuoShaUltimate/cards/snatch.png`
+                    };
+                    this.state = 'TARGETING';
+                    this.pendingAction = { type: 'USE_CARD', card: virtualShunshou, maxTargets: 1, isJixi: true };
+                    this.selectedTargets = [];
+                    this.log('請選擇一名目標使用【順手牽羊】（發動急襲消耗1個「田」）');
+                    UI.updateAll();
+                }
             }
 
             onPlayerClick(targetIdx) {
@@ -5516,6 +5944,22 @@
                             if (dist > attackRange) { this.log("距離過遠！"); return; }
                         }
                         if (cardName === '樂不思蜀' && this.players[targetIdx].judges.some(j => j.name === '樂不思蜀')) { this.log("已存在此判定牌！"); return; }
+                        if (cardName === '水淹七軍') {
+                            let hasEquip = false;
+                            for (let slot of ['armor', 'weapon', 'defMount', 'offMount', 'treasure']) {
+                                if (this.players[targetIdx].equips[slot]) hasEquip = true;
+                            }
+                            if (!hasEquip) {
+                                this.log("該角色的裝備區沒有牌，無法使用【水淹七軍】！");
+                                return;
+                            }
+                        }
+                        if (cardName === '遠交近攻') {
+                            if (this.players[targetIdx].hero.faction === p.hero.faction) {
+                                this.log("不能選擇與你相同勢力的角色！");
+                                return;
+                            }
+                        }
                         if (this.players[targetIdx].hero.skills.includes('謙遜') && (cardName === '順手牽羊' || cardName === '樂不思蜀')) { this.log("該角色擁有謙遜，不能被指定！"); return; }
                         if (this.players[targetIdx].hero.skills.includes('帷幕') && this.pendingAction.card.color === COLOR.BLACK && this.pendingAction.card.type === 'trick') { this.log("該角色擁有帷幕，不受黑色錦囊牌影響！"); return; }
                         if (this.players[targetIdx].hero.skills.includes('空城') && this.players[targetIdx].hand.length === 0 && (cardName === '殺' || cardName === '決鬥')) { this.log("該角色處於空城狀態，不能被指定！"); return; }
@@ -5560,6 +6004,27 @@
                             let target = this.players[targetIdx];
                             if (target.hand.length === 0) {
                                 this.log("該角色沒有手牌，無法發動突襲！");
+                                return;
+                            }
+                        }
+                        else if (type === 'HAOSHI') {
+                            let allowed = this.pendingAction.minPlayers.map(o => o.id);
+                            if (!allowed.includes(targetIdx)) {
+                                this.log("必須選擇一名手牌最少的其他角色！");
+                                return;
+                            }
+                        }
+                        else if (type === 'SAN_JIAN') {
+                            let allowed = this.pendingAction.neighbors.map(n => n.id);
+                            if (!allowed.includes(targetIdx)) {
+                                this.log("必須選擇相鄰的目標角色！");
+                                return;
+                            }
+                        }
+                        else if (type === 'YIN_YUE') {
+                            let allowed = this.pendingAction.targets.map(t => t.id);
+                            if (!allowed.includes(targetIdx)) {
+                                this.log("必須選擇能攻擊到該角色的玩家！");
                                 return;
                             }
                         }
@@ -5676,7 +6141,7 @@
                         (p.hero.skills.includes('龍膽') && card.name === '閃') ||
                         (p.hero.skills.includes('武聖') && card.color === COLOR.RED) ||
                         (p.hero.skills.includes('武神') && card.suit === SUIT.HEART);
-                    let needsTarget = ['決鬥', '過河拆橋', '順手牽羊', '樂不思蜀', '火攻', '兵糧寸斷'].includes(card.name) || isSha;
+                    let needsTarget = ['決鬥', '過河拆橋', '順手牽羊', '樂不思蜀', '火攻', '兵糧寸斷', '水淹七軍', '兵臨城下', '知己知彼', '遠交近攻'].includes(card.name) || isSha;
                     if (needsTarget) {
                         let isSha = card.name === '殺' || (p.hero.skills.includes('龍膽') && card.name === '閃') || (p.hero.skills.includes('武聖') && card.color === COLOR.RED) || (p.hero.skills.includes('武神') && card.suit === SUIT.HEART);
                         let maxTargets = isSha && p.equips.weapon && p.equips.weapon.name === '方天畫戟' && p.hand.length === 1 ? 3 : 1;
@@ -5824,7 +6289,7 @@
                         return;
                     }
 
-                    if (['REN_DE', 'JIE_YIN', 'LI_JIAN', 'FAN_JIAN', 'QU_HU', 'QU_HU_DAMAGE', 'DI_MENG', 'YI_JUE', 'LEI_JI', 'JIE_MING'].includes(type)) {
+                    if (['REN_DE', 'JIE_YIN', 'LI_JIAN', 'FAN_JIAN', 'QU_HU', 'QU_HU_DAMAGE', 'DI_MENG', 'YI_JUE', 'LEI_JI', 'JIE_MING', 'TIAO_XIN', 'HAOSHI', 'SAN_JIAN', 'YIN_YUE'].includes(type)) {
                         let resolve = this.pendingAction.resolve;
                         let targets = this.selectedTargets;
                         this.state = 'WAITING';
@@ -5861,6 +6326,9 @@
                             let c = p.hand.splice(idx, 1)[0];
                             this.discardPile.push(c);
                             UI.showActiveCard(p, c);
+                        } else if (this.pendingAction.isJixi) {
+                            p.flags.tuntian = (p.flags.tuntian || 0) - 1;
+                            this.log(`【${p.hero.name}】發動【急襲】，消耗 1 個「田」！(剩餘 ${p.flags.tuntian} 個)`);
                         }
                         this.log(`你使用了 ${card.name}！`);
                         this.state = 'WAITING';
@@ -5892,6 +6360,61 @@
                         }
                     } else if (card.name === '火攻') {
                         await this.resolveFireAttack(p, target, card);
+                    } else if (card.name === '水淹七軍') {
+                        let w = await this.askWuxie(card, target);
+                        if (!w) {
+                            if (target.id === 0) {
+                                let discard = await this.askForSkill(target, '水淹七軍_選擇', '確定=棄置所有裝備，取消=受到1點雷電傷害');
+                                if (discard) {
+                                    for (let slot of ['weapon', 'armor', 'defMount', 'offMount', 'treasure']) {
+                                        if (target.equips[slot]) await this.loseEquip(target, slot, 'discard');
+                                    }
+                                } else {
+                                    await this.dealDamage(p, target, 1, card, 'lightning');
+                                }
+                            } else {
+                                let equipCount = 0;
+                                for (let slot of ['weapon', 'armor', 'defMount', 'offMount', 'treasure']) {
+                                    if (target.equips[slot]) equipCount++;
+                                }
+                                if (target.hp <= 1 || equipCount <= 1) {
+                                    this.log(`【${target.hero.name}】選擇受到1點雷電傷害`);
+                                    await this.dealDamage(p, target, 1, card, 'lightning');
+                                } else {
+                                    this.log(`【${target.hero.name}】選擇棄置裝備區所有牌`);
+                                    for (let slot of ['weapon', 'armor', 'defMount', 'offMount', 'treasure']) {
+                                        if (target.equips[slot]) await this.loseEquip(target, slot, 'discard');
+                                    }
+                                }
+                            }
+                        }
+                    } else if (card.name === '兵臨城下') {
+                        let w = await this.askWuxie(card, target);
+                        if (!w) {
+                            let ok = await this.askForCard(target, ['殺', '閃'], 1, `【兵臨城下】請打出一張 殺 或 閃，否則受到你造成的1點傷害`, true);
+                            if (!ok) {
+                                await this.dealDamage(p, target, 1, card);
+                            } else {
+                                this.log(`【${target.hero.name}】打出了【${ok[0].name}】躲過了兵臨城下！`);
+                                UI.updateAll(); await this.sleep(800);
+                            }
+                        }
+                    } else if (card.name === '知己知彼') {
+                        let w = await this.askWuxie(card, target);
+                        if (!w) {
+                            if (p.id === 0) {
+                                await this.askForCardPick(p, target, 'view', `【知己知彼】觀看【${target.hero.name}】的手牌`);
+                            } else {
+                                this.log(`【${p.hero.name}】觀看了【${target.hero.name}】的手牌！`);
+                                await this.sleep(1000);
+                            }
+                        }
+                    } else if (card.name === '遠交近攻') {
+                        let w = await this.askWuxie(card, target);
+                        if (!w) {
+                            await this.drawCards(target, 1, '遠交近攻');
+                            await this.drawCards(p, 3, '遠交近攻');
+                        }
                     }
 
                     if (this.state !== 'GAME_OVER') {
