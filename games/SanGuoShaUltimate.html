@@ -1672,6 +1672,181 @@
                 padding: 6px 12px;
             }
         }
+
+        /* Card Gallery Modal */
+        .gallery-tab {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #d1d5db;
+            padding: 8px 18px;
+            font-size: 0.95rem;
+        }
+        .gallery-tab.active {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            border-color: var(--theme-gold);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+        }
+        .gallery-card-item {
+            background: rgba(24, 18, 15, 0.85);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+        }
+        .gallery-card-item:hover {
+            transform: translateY(-4px) scale(1.02);
+            border-color: var(--theme-gold);
+            box-shadow: var(--glow-gold), 0 8px 24px rgba(0,0,0,0.6);
+        }
+        .gallery-card-image {
+            width: 100px;
+            height: 140px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 8px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            flex-shrink: 0;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        .gallery-card-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        /* --- Lightbox --- */
+        .gallery-card-image {
+            cursor: zoom-in;
+        }
+        .gallery-card-image:hover {
+            border-color: var(--theme-gold) !important;
+            box-shadow: var(--glow-gold), inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        #lightboxOverlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1200;
+            background: rgba(0, 0, 0, 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+            cursor: zoom-out;
+        }
+        #lightboxOverlay.visible {
+            background: rgba(0, 0, 0, 0.88);
+        }
+        #lightboxOverlay.visible::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: -1;
+        }
+        #lightboxImg {
+            max-width: 88vw;
+            max-height: 88vh;
+            object-fit: contain;
+            border-radius: 12px;
+            border: 2px solid rgba(245,158,11,0.6);
+            box-shadow: 0 0 60px rgba(245,158,11,0.3), 0 30px 80px rgba(0,0,0,0.8);
+            transform: scale(0.6) translateY(40px);
+            opacity: 0;
+            transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+            cursor: default;
+        }
+        #lightboxImg.visible {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+        #lightboxCaption {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(18,12,8,0.92);
+            border: 1px solid rgba(245,158,11,0.4);
+            border-radius: 30px;
+            padding: 8px 22px;
+            opacity: 0;
+            transition: opacity 0.4s ease 0.15s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        #lightboxCaption.visible {
+            opacity: 1;
+        }
+        #lightboxCaption .lb-name {
+            color: var(--theme-gold);
+            font-size: 1.15rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+        #lightboxCaption .lb-type {
+            color: #9ca3af;
+            font-size: 0.82rem;
+            border-left: 1px solid rgba(245,158,11,0.3);
+            padding-left: 10px;
+        }
+        #lightboxClose {
+            position: fixed;
+            top: 20px;
+            right: 28px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(245,158,11,0.15);
+            border: 1px solid rgba(245,158,11,0.4);
+            color: var(--theme-gold);
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            opacity: 0;
+        }
+        #lightboxClose.visible { opacity: 1; }
+        #lightboxClose:hover {
+            background: rgba(245,158,11,0.35);
+            transform: scale(1.1);
+        }
+        .lb-nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(245,158,11,0.15);
+            border: 1px solid rgba(245,158,11,0.35);
+            color: var(--theme-gold);
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            opacity: 0;
+            z-index: 1210;
+        }
+        .lb-nav.visible { opacity: 1; }
+        .lb-nav:hover {
+            background: rgba(245,158,11,0.35);
+            transform: translateY(-50%) scale(1.1);
+        }
+        #lbPrev { left: 20px; }
+        #lbNext { right: 20px; }
     </style>
 </head>
 
@@ -1682,6 +1857,8 @@
         <div style="display:flex; gap:12px; align-items:center;">
             <a href="../index.html" class="back-btn">← 返回大廳</a>
             <button class="back-btn" onclick="UI.toggleHistoryLog()" style="cursor:pointer;">📜 戰局日誌</button>
+            <button class="back-btn" onclick="UI.showHeroGallery()" style="cursor:pointer;">👑 武將圖鑑</button>
+            <button class="back-btn" onclick="UI.showCardGallery()" style="cursor:pointer;">📖 卡牌圖鑑</button>
         </div>
         <h1 class="game-title">三國殺 - 終極優化版 (標準+軍爭+界限突破+神話+SP)</h1>
         <div id="selfTestBadge"
@@ -1757,8 +1934,13 @@
         <div class="modal-content" style="max-width: 900px; max-height: 80vh; overflow-y: auto;">
             <div
                 style="display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid #777; padding-bottom: 15px; margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h1 style="color:var(--theme-gold); margin:0;">請選擇你的武將</h1>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                    <!-- Left Group: Title & Galleries -->
+                    <div style="display: flex; align-items: center; gap: 16px; flex-shrink: 0; flex-wrap: nowrap;">
+                        <h1 style="color:var(--theme-gold); margin:0; font-size: 1.8rem; font-weight: 900; white-space: nowrap; flex-shrink: 0;">請選擇你的武將</h1>
+                        <button class="btn" onclick="UI.showHeroGallery()" style="font-size: 0.95rem; padding: 6px 14px; white-space: nowrap; flex-shrink: 0;">👑 武將圖鑑</button>
+                        <button class="btn" onclick="UI.showCardGallery()" style="font-size: 0.95rem; padding: 6px 14px; white-space: nowrap; flex-shrink: 0;">📖 裝備圖鑑</button>
+                    </div>
                     <div style="color: white; font-size: 1.1rem; display: flex; gap: 15px; align-items: center;">
                         <div>
                             <label for="gameModeSelect">模式：</label>
@@ -1815,6 +1997,60 @@
             </div>
             <p id="infoDesc" style="font-size: 1.2rem; line-height: 1.6; color: #f5f5f4; text-align: left;">說明</p>
             <p style="color: #777; font-size: 0.9rem; margin-top: 20px;">(點擊任意處關閉)</p>
+        </div>
+    </div>
+
+    <!-- Card Gallery Modal -->
+    <div class="modal-overlay" id="cardGalleryModal" style="z-index: 700; display: none; align-items: center; justify-content: center;">
+        <div class="modal-content" style="max-width: 950px; width: 90%; max-height: 85vh; display: flex; flex-direction: column; gap: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--theme-border); padding-bottom: 12px;">
+                <h2 style="color: var(--theme-gold); margin: 0; font-size: 1.8rem; font-weight: 900; letter-spacing: 2px;">📖 裝備卡牌圖鑑</h2>
+                <button class="btn btn-cancel" onclick="UI.closeCardGallery()" style="padding: 6px 16px; font-size: 1rem;">關閉</button>
+            </div>
+            
+            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                <button class="btn gallery-tab active" id="tab-all" onclick="UI.filterGallery('all')">全部</button>
+                <button class="btn gallery-tab" id="tab-weapon" onclick="UI.filterGallery('weapon')">武器牌</button>
+                <button class="btn gallery-tab" id="tab-armor" onclick="UI.filterGallery('armor')">防具牌</button>
+                <button class="btn gallery-tab" id="tab-mount" onclick="UI.filterGallery('mount')">坐騎牌</button>
+                <button class="btn gallery-tab" id="tab-treasure" onclick="UI.filterGallery('treasure')">寶物牌</button>
+            </div>
+
+            <div id="galleryGrid" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; padding: 8px 4px; scrollbar-width: thin; scrollbar-color: var(--theme-border) transparent; text-align: left;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Gallery Modal -->
+    <div class="modal-overlay" id="heroGalleryModal" style="z-index: 700; display: none; align-items: center; justify-content: center;">
+        <div class="modal-content" style="max-width: 950px; width: 90%; max-height: 85vh; display: flex; flex-direction: column; gap: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--theme-border); padding-bottom: 12px;">
+                <h2 style="color: var(--theme-gold); margin: 0; font-size: 1.8rem; font-weight: 900; letter-spacing: 2px;">👑 三國殺武將圖鑑</h2>
+                <button class="btn btn-cancel" onclick="UI.closeHeroGallery()" style="padding: 6px 16px; font-size: 1rem;">關閉</button>
+            </div>
+            
+            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                <button class="btn gallery-tab active" id="tab-hero-all" onclick="UI.filterHeroGallery('all')">全部</button>
+                <button class="btn gallery-tab" id="tab-hero-wei" onclick="UI.filterHeroGallery('wei')">魏勢力</button>
+                <button class="btn gallery-tab" id="tab-hero-shu" onclick="UI.filterHeroGallery('shu')">蜀勢力</button>
+                <button class="btn gallery-tab" id="tab-hero-wu" onclick="UI.filterHeroGallery('wu')">吳勢力</button>
+                <button class="btn gallery-tab" id="tab-hero-qun" onclick="UI.filterHeroGallery('qun')">群勢力</button>
+            </div>
+
+            <div id="heroGalleryGrid" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; padding: 8px 4px; scrollbar-width: thin; scrollbar-color: var(--theme-border) transparent; text-align: left;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div id="lightboxOverlay" onclick="UI.closeLightbox(event)" style="display:none;">
+        <button id="lightboxClose" onclick="UI.closeLightbox()" title="關閉 (ESC)">✕</button>
+        <button class="lb-nav" id="lbPrev" onclick="event.stopPropagation(); UI.lightboxNav(-1)" title="上一張 (←)">‹</button>
+        <img id="lightboxImg" src="" alt="" onclick="event.stopPropagation()">
+        <button class="lb-nav" id="lbNext" onclick="event.stopPropagation(); UI.lightboxNav(1)" title="下一張 (→)">›</button>
+        <div id="lightboxCaption">
+            <span class="lb-name" id="lbName"></span>
+            <span class="lb-type" id="lbType"></span>
         </div>
     </div>
 
@@ -2144,7 +2380,14 @@
             qun: { name: '群', colors: ['#4c1d95', '#f0abfc'], glow: '#d8b4fe' }
         };
 
-        HEROES.forEach(hero => { hero.img = `../assets/SanGuoShaUltimate/heroes/${hero.id}.png`; });
+        HEROES.forEach(hero => {
+            let imgId = hero.id;
+            const missingJie = ['jie_cao_cao', 'jie_liu_bei', 'jie_guan_yu', 'jie_zhang_fei', 'jie_lu_bu'];
+            if (missingJie.includes(imgId)) {
+                imgId = imgId.replace('jie_', '');
+            }
+            hero.img = `../assets/SanGuoShaUltimate/heroes/${imgId}.png`;
+        });
 
         const SUIT_ENG = { '♠': 'spade', '♥': 'heart', '♣': 'club', '♦': 'diamond' };
         const CARD_ENG = {
@@ -5847,7 +6090,350 @@
         }
 
         // --- 3. UI RENDERER ---
+        const TRAD_TO_SIMP_MAP = {
+            '諸葛連弩': '诸葛连弩',
+            '雌雄雙股劍': '雌雄双股剑',
+            '青釭劍': '青釭剑',
+            '青龍偃月刀': '青龙偃月刀',
+            '丈八蛇矛': '丈八蛇矛',
+            '貫石斧': '贯石斧',
+            '方天畫戟': '方天画戟',
+            '麒麟弓': '麒麟弓',
+            '古錠刀': '古锭刀',
+            '朱雀羽扇': '朱雀羽扇',
+            '吳六劍': '吴六剑',
+            '寒冰劍': '寒冰剑',
+            '三尖兩刃刀': '三尖两刃刀',
+            '八卦陣': '八卦阵',
+            '仁王盾': '仁王盾',
+            '藤甲': '藤甲',
+            '白銀獅子': '白银狮子',
+            '木牛流馬': '木牛流马',
+            '絕影': '绝影',
+            '的盧': '的卢',
+            '爪黃飛電': '爪黄飞电',
+            '驊騮': '骅骝',
+            '赤兔': '赤兔',
+            '大宛': '大宛',
+            '紫騂': '紫骍',
+            '銀月槍': '银月枪',
+            '六龍驂駕': '六龙骖驾',
+            '玉璽': '玉玺',
+            '定瀾夜明珠': '定澜夜明珠',
+            '七寶刀': '七宝刀',
+            '衠鋼槊': '衠钢槊',
+            '霹靂車': '霹雳车',
+            '明光鎧': '明光铠',
+            '太平要術': '太平要术',
+            '爛銀甲': '烂银甲',
+            '女裝': '女装',
+            '引蜂甲': '引蜂甲',
+            '駑馬': '驽马',
+            '折戟': '折戟',
+            '護心鏡': '护心镜',
+            '飛龍奪鳳': '飞龙夺凤'
+        };
+
+        const GALLERY_CARDS = [
+            { name: '諸葛連弩', type: 'weapon', ext: 'jpg', desc: '鎖定技，你使用【殺】無次數限制。' },
+            { name: '雌雄雙股劍', type: 'weapon', ext: 'jpg', desc: '當你使用【殺】指定一名異性角色為目標後，你可以令其選擇一項：棄置一張手牌，或令你摸一張牌。' },
+            { name: '青釭劍', type: 'weapon', ext: 'jpg', desc: '鎖定技，當你使用【殺】指定一名角色為目標後，你無視其防具。' },
+            { name: '青龍偃月刀', type: 'weapon', ext: 'jpg', desc: '當你使用的【殺】被【閃】抵消時，你可以對該角色再使用一張【殺】。' },
+            { name: '丈八蛇矛', type: 'weapon', ext: 'jpg', desc: '你可以將兩張手牌當【殺】使用或打出。' },
+            { name: '貫石斧', type: 'weapon', ext: 'jpg', desc: '當你使用的【殺】被【閃】抵消時，你可以棄置兩張牌，令此【殺】依然造成傷害。' },
+            { name: '方天畫戟', type: 'weapon', ext: 'jpg', desc: '當你使用的【殺】是你最後的手牌時，你可以為此【殺】指定最多三名目標。' },
+            { name: '麒麟弓', type: 'weapon', ext: 'jpg', desc: '當你使用【殺】對目標角色造成傷害時，你可以棄置其裝備區裡的一匹裝備（坐騎）。' },
+            { name: '古錠刀', type: 'weapon', ext: 'png', desc: '鎖定技，若你使用的【殺】指定手牌數為0的目標角色，該【殺】造成的傷害+1。' },
+            { name: '朱雀羽扇', type: 'weapon', ext: 'png', desc: '你可以將普通【殺】當【火殺】使用。' },
+            { name: '吳六劍', type: 'weapon', ext: 'png', desc: '鎖定技，其他吳勢力角色計算與你的距離-1。' },
+            { name: '寒冰劍', type: 'weapon', ext: 'jpg', desc: '當你使用【殺】對目標角色造成傷害時，若該角色有牌，你可以防止此傷害，改為棄置其兩張牌。' },
+            { name: '三尖兩刃刀', type: 'weapon', ext: 'png', desc: '當你使用【殺】造成傷害後，你可以棄置一張手牌，對該角色距離為1的另一名角色造成1點傷害。' },
+            { name: '七寶刀', type: 'weapon', ext: 'jpg', desc: '當你使用【殺】指定一名角色為目標後，若其防禦值大於等於你，無視其防具且傷害+1。' },
+            { name: '衠鋼槊', type: 'weapon', ext: 'jpg', desc: '當你使用【殺】指定一名角色為目標後，你可以令其棄置其防具，否則此【殺】傷害+1。' },
+            { name: '霹靂車', type: 'weapon', ext: 'png', desc: '攻擊範圍9。當你使用的【殺】被抵消時，你可以棄置防守方的一張防具牌或坐騎牌。' },
+            { name: '飛龍奪鳳', type: 'weapon', ext: 'jpg', desc: '當你使用【殺】對目標角色造成傷害後，你可以獲得其一張手牌。' },
+            { name: '折戟', type: 'weapon', ext: 'jpg', desc: '攻擊範圍0。贈物牌，不可主動裝備。裝備此牌的角色攻擊範圍減為0。' },
+            { name: '銀月槍', type: 'weapon', ext: 'jpg', desc: '武器（攻擊範圍3）。你的回合外，當你使用或打出了一張黑色牌，你可以令一名其他角色打出一張【閃】，否則受到你造成的1點傷害。' },
+
+            { name: '八卦陣', type: 'armor', ext: 'png', desc: '當你需要使用或打出【閃】時，你可以進行一次判定，若結果為紅色，視為你使用或打出了一張【閃】。' },
+            { name: '仁王盾', type: 'armor', ext: 'jpg', desc: '鎖定技，黑色的【殺】對你無效。' },
+            { name: '藤甲', type: 'armor', ext: 'png', desc: '鎖定技，【南蠻入侵】、【萬箭齊發】和普通【殺】對你無效。當你受到屬性傷害時，此傷害+1。' },
+            { name: '白銀獅子', type: 'armor', ext: 'jpg', desc: '鎖定技，當你受到大於1點的傷害時，你將此傷害限制為1點；當你失去裝備區裡的【白銀獅子】時，你回復1點體力。' },
+            { name: '護心鏡', type: 'armor', ext: 'jpg', desc: '防具。當你即將受到致死傷害時，你可以將【護心鏡】棄置，防止該傷害。' },
+            { name: '明光鎧', type: 'armor', ext: 'jpg', desc: '防具。鎖定技，【火殺】、【火攻】及雷電傷害對你無效。' },
+            { name: '太平要術', type: 'armor', ext: 'png', desc: '防具。鎖定技，防止你受到的所有屬性傷害；你的手牌上限為你體力上限。' },
+            { name: '爛銀甲', type: 'armor', ext: 'jpg', desc: '防具。鎖定技，當你受到傷害時，若此傷害非屬性傷害，防止之。' },
+            { name: '女裝', type: 'armor', ext: 'jpg', desc: '防具. 贈物牌，當其裝備於男性角色時，該角色出牌階段不能使用【殺】。' },
+            { name: '引蜂甲', type: 'armor', ext: 'jpg', desc: '防具. 贈物牌，裝備此牌的角色每次受到的傷害額外+1。' },
+
+            { name: '赤兔', type: 'mount', subtype: 'off', ext: 'png', desc: '坐騎（-1馬）。鎖定技，你計算與其他角色的距離-1。' },
+            { name: '大宛', type: 'mount', subtype: 'off', ext: 'png', desc: '坐騎（-1馬）。鎖定技，你計算與其他角色的距離-1。' },
+            { name: '紫騂', type: 'mount', subtype: 'off', ext: 'png', desc: '坐騎（-1馬）。鎖定技，你計算與其他角色的距離-1。' },
+            { name: '的盧', type: 'mount', subtype: 'def', ext: 'png', desc: '坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
+            { name: '絕影', type: 'mount', subtype: 'def', ext: 'png', desc: '坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
+            { name: '爪黃飛電', type: 'mount', subtype: 'def', ext: 'png', desc: '坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
+            { name: '驊騮', type: 'mount', subtype: 'def', ext: 'png', desc: '坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
+            { name: '六龍驂駕', type: 'mount', subtype: 'def', ext: 'jpg', desc: '坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1；你的手牌上限+1。' },
+            { name: '駑馬', type: 'mount', subtype: 'off', ext: 'jpg', desc: '坐騎. 贈物牌，裝備此牌的角色計算與其他角色的距離+1。' },
+
+            { name: '木牛流馬', type: 'treasure', ext: 'jpg', desc: '寶物。出牌階段限一次，你可以將一張手牌置於【木牛流馬】下。你計算手牌上限時，置於其下的牌不計入。你可以將【木牛流馬】下的牌交給與你距離為1的其他角色。' },
+            { name: '玉璽', type: 'treasure', ext: 'jpg', desc: '寶物。鎖定技，你計算手牌上限+2；在摸牌階段，你額外摸一張牌。' },
+            { name: '定瀾夜明珠', type: 'treasure', ext: 'png', desc: '寶物。鎖定技，無視其他角色計算與你的距離+1的效果；當你需要進行判定時，可以改為進行兩次判定並選擇其一。' }
+        ];
+
+        // --- Lightbox state ---
+        let _lbCards = [];
+        let _lbIndex = 0;
+        const _lbTypeLabels = {
+            weapon: '武器牌',
+            armor: '防具牌',
+            mount: '坐騎牌',
+            treasure: '寶物牌',
+            wei: '魏勢力',
+            shu: '蜀勢力',
+            wu: '吳勢力',
+            qun: '群勢力'
+        };
+
+        document.addEventListener('keydown', function (e) {
+            const lb = document.getElementById('lightboxOverlay');
+            if (!lb || lb.style.display === 'none') return;
+            if (e.key === 'Escape') UI.closeLightbox();
+            else if (e.key === 'ArrowLeft') UI.lightboxNav(-1);
+            else if (e.key === 'ArrowRight') UI.lightboxNav(1);
+        });
+
         const UI = {
+            showHeroGallery: function() {
+                document.getElementById('heroGalleryModal').style.display = 'flex';
+                this.filterHeroGallery('all');
+            },
+            closeHeroGallery: function() {
+                document.getElementById('heroGalleryModal').style.display = 'none';
+            },
+            filterHeroGallery: function(faction) {
+                document.querySelectorAll('#heroGalleryModal .gallery-tab').forEach(btn => btn.classList.remove('active'));
+                document.getElementById('tab-hero-' + faction).classList.add('active');
+                this.renderHeroGallery(faction);
+            },
+            renderHeroGallery: function(faction) {
+                const grid = document.getElementById('heroGalleryGrid');
+                grid.innerHTML = '';
+                
+                const factionLabels = {
+                    wei: '魏勢力',
+                    shu: '蜀勢力',
+                    wu: '吳勢力',
+                    qun: '群勢力'
+                };
+
+                const expLabels = {
+                    standard: '標準版',
+                    breakthrough: '界限突破',
+                    god: '神話再臨',
+                    sp: 'SP武將'
+                };
+                
+                const filtered = HEROES.filter(h => faction === 'all' || h.faction === faction);
+                
+                filtered.forEach((h, idx) => {
+                    const imgUrl = h.img;
+                    
+                    const el = document.createElement('div');
+                    el.className = 'gallery-card-item';
+                    
+                    let borderGlow = 'rgba(245, 158, 11, 0.15)';
+                    if (h.faction === 'wei') borderGlow = 'rgba(59, 130, 246, 0.3)';
+                    else if (h.faction === 'shu') borderGlow = 'rgba(239, 68, 68, 0.3)';
+                    else if (h.faction === 'wu') borderGlow = 'rgba(16, 185, 129, 0.3)';
+                    else if (h.faction === 'qun') borderGlow = 'rgba(156, 163, 175, 0.3)';
+                    
+                    el.style.borderColor = borderGlow;
+                    
+                    const expText = expLabels[h.exp] || h.exp;
+                    el.innerHTML = `
+                        <div class="gallery-card-image" style="background-image: url('${imgUrl}')" title="點擊放大 ${h.name}" data-idx="${idx}"></div>
+                        <div class="gallery-card-details">
+                            <div style="display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px;">
+                                <h3 style="color: var(--theme-gold); margin: 0; font-size: 1.25rem; font-weight: bold; white-space: nowrap;">${h.name}</h3>
+                                <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                                    <span style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245,158,11,0.3); color: var(--theme-gold); padding: 1px 6px; font-size: 0.72rem; border-radius: 4px; font-weight: bold; white-space: nowrap;">
+                                        ${factionLabels[h.faction] || h.faction}
+                                    </span>
+                                    <span style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.15); color: #d6d3d1; padding: 1px 6px; font-size: 0.72rem; border-radius: 4px; font-weight: bold; white-space: nowrap;">
+                                        ${expText}
+                                    </span>
+                                    <span style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); color: #fca5a5; padding: 1px 6px; font-size: 0.72rem; border-radius: 4px; font-weight: bold; white-space: nowrap;">
+                                        體力: ${h.hp}
+                                    </span>
+                                </div>
+                            </div>
+                            <p style="margin: 6px 0 0 0; font-size: 0.82rem; color: #d6d3d1; line-height: 1.4; word-break: break-all;">
+                                ${h.desc}
+                            </p>
+                        </div>
+                    `;
+                    el.querySelector('.gallery-card-image').addEventListener('click', () => {
+                        _lbCards = filtered.map(item => ({
+                            name: item.name,
+                            type: item.faction,
+                            url: item.img
+                        }));
+                        UI.openLightbox(idx);
+                    });
+                    grid.appendChild(el);
+                });
+            },
+            showCardGallery: function() {
+                document.getElementById('cardGalleryModal').style.display = 'flex';
+                this.filterGallery('all');
+            },
+            closeCardGallery: function() {
+                document.getElementById('cardGalleryModal').style.display = 'none';
+            },
+            filterGallery: function(type) {
+                document.querySelectorAll('#cardGalleryModal .gallery-tab').forEach(btn => btn.classList.remove('active'));
+                document.getElementById('tab-' + type).classList.add('active');
+                this.renderCardGallery(type);
+            },
+            renderCardGallery: function(type) {
+                const grid = document.getElementById('galleryGrid');
+                grid.innerHTML = '';
+                
+                const typeLabels = _lbTypeLabels;
+                const filtered = GALLERY_CARDS.filter(c => type === 'all' || c.type === type);
+                // Store for lightbox navigation
+                _lbCards = filtered.map(c => ({
+                    name: c.titleMap || c.name,
+                    type: c.type,
+                    url: `../assets/SanGuoShaUltimate/cards_wiki/${TRAD_TO_SIMP_MAP[c.name] || c.name}.${c.ext}`
+                }));
+                
+                filtered.forEach((c, idx) => {
+                    const simpName = TRAD_TO_SIMP_MAP[c.name] || c.name;
+                    const imgUrl = `../assets/SanGuoShaUltimate/cards_wiki/${simpName}.${c.ext}`;
+                    
+                    let subTypeLabel = '';
+                    if (c.type === 'weapon' && c.range) {
+                        subTypeLabel = ` (攻擊範圍: ${c.range})`;
+                    } else if (c.type === 'mount') {
+                        subTypeLabel = c.subtype === 'def' ? ' (+1 防守馬)' : ' (-1 進攻馬)';
+                    }
+                    
+                    const el = document.createElement('div');
+                    el.className = 'gallery-card-item';
+                    
+                    let borderGlow = 'rgba(245, 158, 11, 0.15)';
+                    if (c.type === 'weapon') borderGlow = 'rgba(245, 158, 11, 0.3)';
+                    else if (c.type === 'armor') borderGlow = 'rgba(59, 130, 246, 0.3)';
+                    else if (c.type === 'mount') borderGlow = 'rgba(16, 185, 129, 0.3)';
+                    else if (c.type === 'treasure') borderGlow = 'rgba(139, 92, 246, 0.3)';
+                    
+                    el.style.borderColor = borderGlow;
+                    
+                    const displayName = c.titleMap || c.name;
+                    el.innerHTML = `
+                        <div class="gallery-card-image" style="background-image: url('${imgUrl}')" title="點擊放大 ${displayName}" data-idx="${idx}"></div>
+                        <div class="gallery-card-details">
+                            <div style="display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px;">
+                                <h3 style="color: var(--theme-gold); margin: 0; font-size: 1.25rem; font-weight: bold; white-space: nowrap;">${displayName}</h3>
+                                <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                                    <span style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245,158,11,0.3); color: var(--theme-gold); padding: 1px 6px; font-size: 0.72rem; border-radius: 4px; font-weight: bold; white-space: nowrap;">
+                                        ${typeLabels[c.type]}
+                                    </span>
+                                    ${subTypeLabel ? `
+                                    <span style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.15); color: #d6d3d1; padding: 1px 6px; font-size: 0.72rem; border-radius: 4px; font-weight: bold; white-space: nowrap;">
+                                        ${subTypeLabel.trim()}
+                                    </span>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            <p style="margin: 6px 0 0 0; font-size: 0.82rem; color: #d6d3d1; line-height: 1.4; word-break: break-all;">
+                                ${c.desc}
+                            </p>
+                        </div>
+                    `;
+                    // Click on image to open lightbox
+                    el.querySelector('.gallery-card-image').addEventListener('click', () => UI.openLightbox(idx));
+                    grid.appendChild(el);
+                });
+            },
+            openLightbox: function(idx) {
+                _lbIndex = idx;
+                const card = _lbCards[idx];
+                const overlay = document.getElementById('lightboxOverlay');
+                const img    = document.getElementById('lightboxImg');
+                const close  = document.getElementById('lightboxClose');
+                const prev   = document.getElementById('lbPrev');
+                const next   = document.getElementById('lbNext');
+                const cap    = document.getElementById('lightboxCaption');
+
+                // Reset animation state
+                img.classList.remove('visible');
+                cap.classList.remove('visible');
+                close.classList.remove('visible');
+                prev.classList.remove('visible');
+                next.classList.remove('visible');
+                overlay.classList.remove('visible');
+
+                overlay.style.display = 'flex';
+                img.src = card.url;
+                document.getElementById('lbName').textContent = card.name;
+                document.getElementById('lbType').textContent = _lbTypeLabels[card.type] || '';
+
+                // Trigger animations
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        overlay.classList.add('visible');
+                        img.classList.add('visible');
+                        close.classList.add('visible');
+                        prev.classList.add('visible');
+                        next.classList.add('visible');
+                        cap.classList.add('visible');
+                    });
+                });
+            },
+            closeLightbox: function(e) {
+                if (e && e.target !== document.getElementById('lightboxOverlay')) return;
+                const overlay = document.getElementById('lightboxOverlay');
+                const img    = document.getElementById('lightboxImg');
+                const close  = document.getElementById('lightboxClose');
+                const prev   = document.getElementById('lbPrev');
+                const next   = document.getElementById('lbNext');
+                const cap    = document.getElementById('lightboxCaption');
+                overlay.classList.remove('visible');
+                img.classList.remove('visible');
+                close.classList.remove('visible');
+                prev.classList.remove('visible');
+                next.classList.remove('visible');
+                cap.classList.remove('visible');
+                setTimeout(() => { overlay.style.display = 'none'; }, 350);
+            },
+            lightboxNav: function(dir) {
+                _lbIndex = (_lbIndex + dir + _lbCards.length) % _lbCards.length;
+                const card = _lbCards[_lbIndex];
+                const img  = document.getElementById('lightboxImg');
+                const cap  = document.getElementById('lightboxCaption');
+                // Slide out
+                img.style.transition = 'none';
+                img.style.opacity = '0';
+                img.style.transform = `scale(0.85) translateX(${dir > 0 ? '-60px' : '60px'})`;
+                cap.classList.remove('visible');
+                setTimeout(() => {
+                    img.src = card.url;
+                    document.getElementById('lbName').textContent = card.name;
+                    document.getElementById('lbType').textContent = _lbTypeLabels[card.type] || '';
+                    img.style.transform = `scale(0.85) translateX(${dir > 0 ? '60px' : '-60px'})`;
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            img.style.transition = 'transform 0.3s cubic-bezier(0.34,1.3,0.64,1), opacity 0.3s ease';
+                            img.style.opacity = '1';
+                            img.style.transform = 'scale(1) translateX(0)';
+                            cap.classList.add('visible');
+                        });
+                    });
+                }, 120);
+            },
             initPlayers: function (numPlayers) {
                 document.querySelectorAll('.player-area.ai-player').forEach(e => e.remove());
 
