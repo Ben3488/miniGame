@@ -1847,6 +1847,235 @@
         }
         #lbPrev { left: 20px; }
         #lbNext { right: 20px; }
+
+        /* ========================================== */
+        /* PREMIUM EFFECTS OVERLAY STYLES             */
+        /* ========================================== */
+        #premiumEffectOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            pointer-events: none;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0) 40%, rgba(15, 23, 42, 0.4) 100%);
+            transition: background 0.4s ease;
+        }
+        #premiumEffectOverlay.active {
+            display: flex;
+        }
+        
+        /* Background Hero Graphic */
+        .pe-hero-bg {
+            position: absolute;
+            right: -10%;
+            bottom: -10%;
+            width: 70%;
+            height: 120%;
+            background-size: contain;
+            background-position: right bottom;
+            background-repeat: no-repeat;
+            opacity: 0;
+            filter: blur(10px) brightness(0.6) contrast(1.2);
+            transform: translateX(100px) scale(0.9);
+            animation: peHeroSlideIn 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Screen flash/slashes */
+        .pe-slash {
+            position: absolute;
+            width: 150%;
+            height: 300px;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.95), transparent);
+            transform: rotate(-30deg) translateY(-500px);
+            opacity: 0;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .pe-slash-red {
+            background: linear-gradient(to bottom, transparent, rgba(239, 68, 68, 0.95) 40%, #ffffff, rgba(239, 68, 68, 0.95) 60%, transparent);
+            box-shadow: 0 0 80px rgba(239, 68, 68, 0.8);
+            animation: peSlashSwipe 1.0s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        /* Starfield rotate */
+        .pe-starfield {
+            position: absolute;
+            inset: -50%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, #ffffff 1px, transparent 1px),
+                radial-gradient(circle at 75% 40%, #ffffff 1.5px, transparent 1.5px),
+                radial-gradient(circle at 40% 70%, #ffffff 1.2px, transparent 1.2px),
+                radial-gradient(circle at 85% 80%, #ffffff 1px, transparent 1px);
+            background-size: 50% 50%;
+            opacity: 0;
+            z-index: 1;
+            transform: rotate(0deg);
+            animation: peStarfieldRotate 3.5s linear infinite, peFadeInOut 2.0s ease-out forwards;
+        }
+
+        /* Ripple waves */
+        .pe-waves {
+            position: absolute;
+            bottom: -50px;
+            left: 0;
+            width: 100%;
+            height: 250px;
+            background: radial-gradient(ellipse at bottom, rgba(56, 189, 248, 0.4), transparent 70%);
+            opacity: 0;
+            z-index: 1;
+            animation: peWaveRise 2.0s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        /* Golden aura */
+        .pe-aura {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0.05) 50%, transparent 70%);
+            box-shadow: inset 0 0 80px rgba(245, 158, 11, 0.2);
+            opacity: 0;
+            z-index: 1;
+            transform: scale(0.2);
+            animation: peAuraExpand 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        /* Green healing rings */
+        .pe-heal {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border: 4px solid rgba(16, 185, 129, 0.6);
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.5), inset 0 0 40px rgba(16, 185, 129, 0.5);
+            opacity: 0;
+            z-index: 1;
+            transform: scale(0.5);
+            animation: peHealExpand 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Main Info Card */
+        .pe-card {
+            position: relative;
+            z-index: 5;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.85));
+            border: 2px solid var(--theme-gold, #f59e0b);
+            border-radius: 16px;
+            padding: 24px 40px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 158, 11, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.05);
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px) scale(0.9);
+            animation: peCardPop 1.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            max-width: 500px;
+        }
+        
+        /* Premium general-themed borders */
+        .pe-card.theme-red { border-color: #ef4444; box-shadow: 0 0 40px rgba(239, 68, 68, 0.4); }
+        .pe-card.theme-blue { border-color: #3b82f6; box-shadow: 0 0 40px rgba(59, 130, 246, 0.4); }
+        .pe-card.theme-green { border-color: #10b981; box-shadow: 0 0 40px rgba(16, 185, 129, 0.4); }
+        .pe-card.theme-purple { border-color: #8b5cf6; box-shadow: 0 0 40px rgba(139, 92, 246, 0.4); }
+
+        .pe-title-sub {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .pe-title-main {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #fff7ed;
+            margin: 0;
+            letter-spacing: 6px;
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+            font-family: 'Noto Serif TC', serif;
+        }
+        .pe-title-main.kill-text {
+            color: #fca5a5;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+            animation: peTextShake 0.5s ease-out;
+        }
+        .pe-quote {
+            font-style: italic;
+            color: #cbd5e1;
+            font-size: 1.1rem;
+            margin-top: 14px;
+            line-height: 1.6;
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        /* Screen Shake effect for kills */
+        .pe-shake {
+            animation: peScreenShake 0.4s ease-out !important;
+        }
+
+        /* Animations */
+        @keyframes peHeroSlideIn {
+            0% { opacity: 0; transform: translateX(150px) scale(0.8); filter: blur(15px) brightness(0.4); }
+            30% { opacity: 0.45; filter: blur(3px) brightness(0.65) contrast(1.2); }
+            70% { opacity: 0.45; }
+            100% { opacity: 0; transform: translateX(50px) scale(0.95); filter: blur(8px) brightness(0.4); }
+        }
+        @keyframes peCardPop {
+            0% { opacity: 0; transform: translateY(40px) scale(0.85); }
+            12% { opacity: 1; transform: translateY(0) scale(1.03); }
+            16% { transform: translateY(0) scale(1); }
+            84% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-30px) scale(0.92); }
+        }
+        @keyframes peSlashSwipe {
+            0% { opacity: 0; transform: rotate(-30deg) translateY(-500px) scaleY(0.8); }
+            20% { opacity: 1; }
+            50% { transform: rotate(-30deg) translateY(200px) scaleY(1.2); opacity: 0.6; }
+            100% { transform: rotate(-30deg) translateY(600px) scaleY(0.8); opacity: 0; }
+        }
+        @keyframes peStarfieldRotate {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes peFadeInOut {
+            0% { opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.6; }
+            100% { opacity: 0; }
+        }
+        @keyframes peWaveRise {
+            0% { opacity: 0; transform: translateY(100px) scaleY(0.5); }
+            30% { opacity: 0.8; transform: translateY(0) scaleY(1.1); }
+            100% { opacity: 0; transform: translateY(-50px) scaleY(0.8); }
+        }
+        @keyframes peAuraExpand {
+            0% { opacity: 0; transform: scale(0.2); }
+            20% { opacity: 0.8; }
+            100% { opacity: 0; transform: scale(1.5); }
+        }
+        @keyframes peHealExpand {
+            0% { opacity: 0; transform: scale(0.4); }
+            15% { opacity: 0.9; }
+            100% { opacity: 0; transform: scale(1.6); }
+        }
+        @keyframes peScreenShake {
+            0% { transform: translate(0, 0); }
+            10% { transform: translate(-8px, 6px); }
+            30% { transform: translate(8px, -6px); }
+            50% { transform: translate(-6px, -4px); }
+            70% { transform: translate(6px, 4px); }
+            90% { transform: translate(-3px, 2px); }
+            100% { transform: translate(0, 0); }
+        }
+        @keyframes peTextShake {
+            0% { transform: scale(1.5); }
+            15% { transform: scale(0.95); }
+            25% { transform: scale(1.05); }
+            35% { transform: scale(1); }
+        }
     </style>
 </head>
 
@@ -2157,6 +2386,8 @@
             </div>
         </div>
     </div>
+
+    <div id="premiumEffectOverlay"></div>
 
     <script>
         // --- 1. CONSTANTS & DATA ---
@@ -2504,6 +2735,23 @@
             '木牛流馬': ['木牛流马', 'jpg'],
             '玉璽': ['玉玺', 'jpg'],
             '定瀾夜明珠': ['定澜夜明珠', 'png'],
+        };
+
+        const SIGNATURE_EFFECTS = {
+            '關羽': { heroId: 'guan_yu', quote: '「關羽在此，誰敢與我一戰！」', faction: 'shu' },
+            '曹操': { heroId: 'cao_cao', quote: '「寧我負人，毋人負我！」', faction: 'wei' },
+            '劉備': { heroId: 'liu_bei', quote: '「德布天下，仁義為先！」', faction: 'shu' },
+            '呂布': { heroId: 'lu_bu', quote: '「三個打一個，不要臉！」', faction: 'qun' },
+            '諸葛亮': { heroId: 'zhu_ge_liang', quote: '「觀今夜之天象，知天下之大事！」', faction: 'shu' },
+            '甄姬': { heroId: 'zhen_ji', quote: '「髣髴兮若輕雲之蔽月，飄颻兮若流風之回雪。」', faction: 'wei' },
+            '華佗': { heroId: 'hua_tuo', quote: '「妙手回春，醫者仁心。」', faction: 'qun' },
+            '張飛': { heroId: 'zhang_fei', quote: '「燕人張翼德在此！！」', faction: 'shu' },
+            '趙雲': { heroId: 'zhao_yun', quote: '「吾乃常山趙子龍也！」', faction: 'shu' },
+            '周瑜': { heroId: 'zhou_yu', quote: '「哈哈，掙扎吧，在絕望中掙扎吧！」', faction: 'wu' },
+            '陸遜': { heroId: 'lu_xun', quote: '「謙謙君子，溫潤如玉。」', faction: 'wu' },
+            '司馬懿': { heroId: 'si_ma_yi', quote: '「天命？哈哈，我就是天命！」', faction: 'wei' },
+            '大喬': { heroId: 'da_qiao', quote: '「請保重身體哦～」', faction: 'wu' },
+            '甘寧': { heroId: 'gan_ning', quote: '「裹甲銜枚，劫營如飛！」', faction: 'wu' }
         };
 
         function generateDeck() {
@@ -3147,6 +3395,86 @@
 
             log(msg) {
                 if (!msg) return;
+                
+                try {
+                    // 1. Skill activation effects
+                    const skillMatch = msg.match(/【(.*?)】發動(了|主公技|限定技)?【(.*?)】/);
+                    if (skillMatch) {
+                        const heroName = skillMatch[1];
+                        const skillName = skillMatch[3];
+                        const effect = SIGNATURE_EFFECTS[heroName];
+                        if (effect && (
+                            (heroName === '關羽' && skillName === '武聖') ||
+                            (heroName === '曹操' && skillName === '奸雄') ||
+                            (heroName === '劉備' && skillName === '仁德') ||
+                            (heroName === '呂布' && skillName === '無雙') ||
+                            (heroName === '諸葛亮' && skillName === '觀星') ||
+                            (heroName === '甄姬' && skillName === '洛神') ||
+                            (heroName === '華佗' && (skillName === '青囊' || skillName === '急救')) ||
+                            (heroName === '張飛' && skillName === '咆哮') ||
+                            (heroName === '趙雲' && skillName === '龍膽') ||
+                            (heroName === '周瑜' && (skillName === '反間' || skillName === '英姿')) ||
+                            (heroName === '陸遜' && skillName === '連營') ||
+                            (heroName === '司馬懿' && skillName === '鬼才') ||
+                            (heroName === '大喬' && skillName === '國色') ||
+                            (heroName === '甘寧' && skillName === '奇襲')
+                        )) {
+                            UI.showPremiumEffect('skill', {
+                                heroId: effect.heroId,
+                                heroName: heroName,
+                                name: skillName,
+                                quote: effect.quote,
+                                faction: effect.faction
+                            });
+                        }
+                    }
+
+                    // 2. Card play effects
+                    const cardMatch = msg.match(/【(.*?)】(?:對【.*?】)?使用了?(?:了一張)?【?([^\s！\d]+)】?/);
+                    if (cardMatch) {
+                        const heroName = cardMatch[1];
+                        const cardName = cardMatch[2].replace(/[【】]/g, '');
+                        const effect = SIGNATURE_EFFECTS[heroName];
+                        if (effect) {
+                            if (heroName === '關羽' && cardName === '殺') {
+                                UI.showPremiumEffect('skill', {
+                                    heroId: effect.heroId,
+                                    heroName: heroName,
+                                    name: '出牌：殺',
+                                    quote: '「青龍偃月刀，斬！」',
+                                    faction: effect.faction
+                                });
+                            } else if (heroName === '呂布' && (cardName === '殺' || cardName === '決鬥')) {
+                                UI.showPremiumEffect('skill', {
+                                    heroId: effect.heroId,
+                                    heroName: heroName,
+                                    name: '出牌：' + cardName,
+                                    quote: '「看我方天畫戟的厲害！」',
+                                    faction: effect.faction
+                                });
+                            } else if (heroName === '張飛' && cardName === '殺') {
+                                UI.showPremiumEffect('skill', {
+                                    heroId: effect.heroId,
+                                    heroName: heroName,
+                                    name: '出牌：殺',
+                                    quote: '「燕人張飛在此，受死吧！」',
+                                    faction: effect.faction
+                                });
+                            } else if (heroName === '趙雲' && (cardName === '殺' || cardName === '閃')) {
+                                UI.showPremiumEffect('skill', {
+                                    heroId: effect.heroId,
+                                    heroName: heroName,
+                                    name: '出牌：' + cardName,
+                                    quote: '「能進能退，乃法器也！」',
+                                    faction: effect.faction
+                                });
+                            }
+                        }
+                    }
+                } catch(e) {
+                    console.error("Error parsing skill/card effect in log:", e);
+                }
+
                 document.getElementById('gameLog').innerText = msg;
 
                 let historyContent = document.getElementById('historyLogContent');
@@ -5335,6 +5663,19 @@
                     target.isDead = true;
                     this.log(`【${target.hero.name}】(${target.role}) 陣亡！`);
 
+                    if (source && source.id !== target.id) {
+                        const killerName = source.hero.name;
+                        const victimName = target.hero.name;
+                        const effectData = SIGNATURE_EFFECTS[killerName] || { heroId: source.hero.id, quote: '', faction: source.hero.faction };
+                        UI.showPremiumEffect('kill', {
+                            heroId: effectData.heroId,
+                            heroName: killerName,
+                            victimName: victimName,
+                            faction: effectData.faction,
+                            quote: effectData.quote
+                        });
+                    }
+
                     // Discard all hand cards
                     while (target.hand.length > 0) {
                         this.discardPile.push(target.hand.pop());
@@ -7491,6 +7832,93 @@
 
                 let deckEl = document.getElementById('deckCount');
                 if (deckEl && Engine && Engine.deck) deckEl.innerText = `牌堆剩餘: ${Engine.deck.length} 張`;
+            },
+            showPremiumEffect: function(type, data) {
+                const overlay = document.getElementById('premiumEffectOverlay');
+                if (!overlay) return;
+                
+                overlay.innerHTML = '';
+                overlay.className = '';
+                overlay.classList.add('active');
+                
+                let themeClass = 'theme-gold';
+                if (data.faction === 'wei') themeClass = 'theme-blue';
+                else if (data.faction === 'shu') themeClass = 'theme-red';
+                else if (data.faction === 'wu') themeClass = 'theme-green';
+                else if (data.faction === 'qun') themeClass = 'theme-purple';
+                
+                if (data.heroId) {
+                    const bgEl = document.createElement('div');
+                    bgEl.className = 'pe-hero-bg';
+                    bgEl.style.backgroundImage = `url('../assets/SanGuoShaUltimate/heroes/${data.heroId}.png')`;
+                    overlay.appendChild(bgEl);
+                }
+                
+                if (type === 'kill') {
+                    const bf = document.getElementById('battlefield');
+                    if (bf) {
+                        bf.classList.remove('pe-shake');
+                        void bf.offsetWidth;
+                        bf.classList.add('pe-shake');
+                        setTimeout(() => bf.classList.remove('pe-shake'), 500);
+                    }
+                    
+                    const slashEl = document.createElement('div');
+                    slashEl.className = 'pe-slash pe-slash-red';
+                    overlay.appendChild(slashEl);
+                } else if (data.name === '武聖' || data.name === '無雙' || data.name === '殺') {
+                    const slashEl = document.createElement('div');
+                    slashEl.className = 'pe-slash pe-slash-red';
+                    overlay.appendChild(slashEl);
+                } else if (data.name === '奸雄') {
+                    const auraEl = document.createElement('div');
+                    auraEl.className = 'pe-aura';
+                    overlay.appendChild(auraEl);
+                } else if (data.name === '觀星') {
+                    const starEl = document.createElement('div');
+                    starEl.className = 'pe-starfield';
+                    overlay.appendChild(starEl);
+                } else if (data.name === '洛神') {
+                    const waveEl = document.createElement('div');
+                    waveEl.className = 'pe-waves';
+                    overlay.appendChild(waveEl);
+                } else if (data.name === '仁德') {
+                    const auraEl = document.createElement('div');
+                    auraEl.className = 'pe-aura';
+                    overlay.appendChild(auraEl);
+                } else if (data.name === '青囊' || data.name === '急救') {
+                    const healEl = document.createElement('div');
+                    healEl.className = 'pe-heal';
+                    overlay.appendChild(healEl);
+                }
+                
+                const cardEl = document.createElement('div');
+                cardEl.className = `pe-card ${themeClass}`;
+                
+                let titleSub = '';
+                let titleMain = '';
+                let quoteText = data.quote || '';
+                
+                if (type === 'kill') {
+                    titleSub = `【${data.heroName}】大殺四方！`;
+                    titleMain = `<span class="kill-text">擊 殺</span>`;
+                    quoteText = `「【${data.heroName}】擊殺了【${data.victimName}】！」`;
+                } else {
+                    titleSub = `【${data.heroName}】發動技能`;
+                    titleMain = `【${data.name}】`;
+                }
+                
+                cardEl.innerHTML = `
+                    <div class="pe-title-sub">${titleSub}</div>
+                    <h2 class="pe-title-main">${titleMain}</h2>
+                    ${quoteText ? `<div class="pe-quote">${quoteText}</div>` : ''}
+                `;
+                overlay.appendChild(cardEl);
+                
+                setTimeout(() => {
+                    overlay.classList.remove('active');
+                    overlay.innerHTML = '';
+                }, 2000);
             }
         };
 
