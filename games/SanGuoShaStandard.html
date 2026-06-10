@@ -1127,7 +1127,7 @@
                     <div style="display: flex; align-items: center; gap: 16px; flex-shrink: 0; flex-wrap: nowrap;">
                         <h1 style="color:var(--theme-gold); margin:0; font-size: 1.8rem; font-weight: 900; white-space: nowrap; flex-shrink: 0;">請選擇你的武將</h1>
                         <button class="btn" onclick="UI.showHeroGallery()" style="font-size: 0.95rem; padding: 6px 14px; white-space: nowrap; flex-shrink: 0;">👑 武將圖鑑</button>
-                        <button class="btn" onclick="UI.showCardGallery()" style="font-size: 0.95rem; padding: 6px 14px; white-space: nowrap; flex-shrink: 0;">📖 裝備圖鑑</button>
+                        <button class="btn" onclick="UI.showCardGallery()" style="font-size: 0.95rem; padding: 6px 14px; white-space: nowrap; flex-shrink: 0;">📖 卡牌圖鑑</button>
                     </div>
                     
                     <!-- Right Group: Dropdowns -->
@@ -1163,16 +1163,17 @@
     <div class="modal-overlay" id="cardGalleryModal" style="z-index: 700; display: none; align-items: center; justify-content: center;">
         <div class="modal-content" style="max-width: 950px; width: 90%; max-height: 85vh; display: flex; flex-direction: column; gap: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--theme-border); padding-bottom: 12px;">
-                <h2 style="color: var(--theme-gold); margin: 0; font-size: 1.8rem; font-weight: 900; letter-spacing: 2px;">📖 裝備卡牌圖鑑</h2>
+                <h2 style="color: var(--theme-gold); margin: 0; font-size: 1.8rem; font-weight: 900; letter-spacing: 2px;">📖 卡牌圖鑑</h2>
                 <button class="btn btn-cancel" onclick="UI.closeCardGallery()" style="padding: 6px 16px; font-size: 1rem;">關閉</button>
             </div>
             
             <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
                 <button class="btn gallery-tab active" id="tab-all" onclick="UI.filterGallery('all')">全部</button>
+                <button class="btn gallery-tab" id="tab-basic" onclick="UI.filterGallery('basic')">基本牌</button>
+                <button class="btn gallery-tab" id="tab-trick" onclick="UI.filterGallery('trick')">錦囊牌</button>
                 <button class="btn gallery-tab" id="tab-weapon" onclick="UI.filterGallery('weapon')">武器牌</button>
                 <button class="btn gallery-tab" id="tab-armor" onclick="UI.filterGallery('armor')">防具牌</button>
                 <button class="btn gallery-tab" id="tab-mount" onclick="UI.filterGallery('mount')">坐騎牌</button>
-                <button class="btn gallery-tab" id="tab-treasure" onclick="UI.filterGallery('treasure')">寶物牌</button>
             </div>
 
             <div id="galleryGrid" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; padding: 8px 4px; scrollbar-width: thin; scrollbar-color: var(--theme-border) transparent; text-align: left;">
@@ -5558,55 +5559,55 @@
         };
 
         const GALLERY_CARDS = [
-            { name: '諸葛連弩', type: 'weapon', ext: 'jpg', desc: '鎖定技，你使用【殺】無次數限制。' },
-            { name: '雌雄雙股劍', type: 'weapon', ext: 'jpg', desc: '當你使用【殺】指定一名異性角色為目標後，你可以令其選擇一項：棄置一張手牌，或令你摸一張牌。' },
-            { name: '青釭劍', type: 'weapon', ext: 'jpg', desc: '鎖定技，當你使用【殺】指定一名角色為目標後，你無視其防具。' },
-            { name: '青龍偃月刀', type: 'weapon', ext: 'jpg', desc: '當你使用的【殺】被【閃】抵消時，你可以對該角色再使用一張【殺】。' },
-            { name: '丈八蛇矛', type: 'weapon', ext: 'jpg', desc: '你可以將兩張手牌當【殺】使用或打出。' },
-            { name: '貫石斧', type: 'weapon', ext: 'jpg', desc: '當你使用的【殺】被【閃】抵消時，你可以棄置兩張牌，令此【殺】依然造成傷害。' },
-            { name: '方天畫戟', type: 'weapon', ext: 'jpg', desc: '當你使用的【殺】是你最後的手牌時，你可以為此【殺】指定最多三名目標。' },
-            { name: '麒麟弓', type: 'weapon', ext: 'jpg', desc: '當你使用【殺】對目標角色造成傷害時，你可以棄置其裝備區裡的一匹坐騎。' },
-            { name: '古錠刀', type: 'weapon', ext: 'png', desc: '鎖定技，若你使用的【殺】指定手牌數為0的目標角色，該【殺】造成的傷害+1。' },
-            { name: '朱雀羽扇', type: 'weapon', ext: 'png', desc: '你可以將普通【殺】當【火殺】使用。' },
-            { name: '吳六劍', type: 'weapon', ext: 'png', desc: '鎖定技，其他吳勢力角色計算與你的距離-1。' },
-            { name: '寒冰劍', type: 'weapon', ext: 'jpg', desc: '當你使用【殺】對目標角色造成傷害時，若該角色有牌，你可以防止此傷害，改為棄置其兩張牌。' },
-            { name: '三尖兩刃刀', type: 'weapon', ext: 'png', desc: '當你使用【殺】造成傷害後，你可以棄置一張手牌，對該角色距離為1的另一名角色造成1點傷害。' },
-            { name: '七寶刀', type: 'weapon', ext: 'jpg', desc: '當你使用【殺】指定一名角色為目標後，若其防禦值大於等於你，無視其防具且傷害+1。' },
-            { name: '衠鋼槊', type: 'weapon', ext: 'jpg', desc: '當你使用【殺】指定一名角色為目標後，你可以令其棄置其防具，否則此【殺】傷害+1。' },
-            { name: '霹靂車', type: 'weapon', ext: 'png', desc: '攻擊範圍9。當你使用的【殺】被抵消時，你可以棄置防守方的一張防具牌或坐騎牌。' },
-            { name: '飛龍奪鳳', type: 'weapon', ext: 'jpg', desc: '當你使用【殺】對目標角色造成傷害後，你可以獲得其一張手牌。' },
-            { name: '折戟', type: 'weapon', ext: 'jpg', desc: '攻擊範圍0。贈物牌，不可主動裝備。裝備此牌的角色攻擊範圍減為0。' },
+            // --- Basic Cards ---
+            { name: '殺', type: 'basic', asset: '../assets/SanGuoSha/cards/sha.png', desc: '基本牌。出牌階段，對你距離內的一名角色使用。其需打出一張【閃】，否則受到你造成的1點傷害。' },
+            { name: '閃', type: 'basic', asset: '../assets/SanGuoSha/cards/shan.png', desc: '基本牌。抵消一張【殺】的效果。' },
+            { name: '桃', type: 'basic', asset: '../assets/SanGuoSha/cards/tao.png', desc: '基本牌。出牌階段對你使用，回復1點體力；或在一名角色瀕死時對其使用，使其回復1點體力。' },
 
-            { name: '八卦陣', type: 'armor', ext: 'png', desc: '當你需要使用或打出【閃】時，你可以進行一次判定，若結果為紅色，視為你使用或打出了一張【閃】。' },
-            { name: '仁王盾', type: 'armor', ext: 'jpg', desc: '鎖定技，黑色的【殺】對你無效。' },
-            { name: '藤甲', type: 'armor', ext: 'png', desc: '鎖定技，【南蠻入侵】、【萬箭齊發】和普通【殺】對你無效。當你受到屬性傷害時，此傷害+1。' },
-            { name: '白銀獅子', type: 'armor', ext: 'jpg', desc: '鎖定技，當你受到大於1點的傷害時，你將此傷害限制為1點；當你失去裝備區裡的【白銀獅子】時，你回復1點體力。' },
-            { name: '護心鏡', type: 'armor', ext: 'jpg', desc: '防具。當你即將受到致死傷害時，你可以將【護心鏡】棄置，防止該傷害。' },
-            { name: '明光鎧', type: 'armor', ext: 'jpg', desc: '防具。鎖定技，【火殺】、【火攻】及雷電傷害對你無效。' },
-            { name: '太平要術', type: 'armor', ext: 'png', desc: '防具。鎖定技，防止你受到的所有屬性傷害；你的手牌上限為你體力上限。' },
-            { name: '爛銀甲', type: 'armor', ext: 'jpg', desc: '防具。鎖定技，當你受到傷害時，若此傷害非屬性傷害，防止之。' },
-            { name: '女裝', type: 'armor', ext: 'jpg', desc: '防具。贈物牌，當其裝備於男性角色時，該角色出牌階段不能使用【殺】。' },
-            { name: '引蜂甲', type: 'armor', ext: 'jpg', desc: '防具。贈物牌，裝備此牌的角色每次受到的傷害額外+1。' },
+            // --- Trick Cards ---
+            { name: '桃園結義', type: 'trick', asset: '../assets/SanGuoSha/cards/peach_garden.png', desc: '非延時類錦囊。出牌階段，對所有受傷的角色使用。每名角色回復1點體力。' },
+            { name: '萬箭齊發', type: 'trick', asset: '../assets/SanGuoSha/cards/arrows.png', desc: '非延時類錦囊。出牌階段，對所有其他角色使用。每名目標角色需打出一張【閃】，否則受到你造成的1點傷害。' },
+            { name: '南蠻入侵', type: 'trick', asset: '../assets/SanGuoSha/cards/barbarian.png', desc: '非延時類錦囊. 出牌階段，對所有其他角色使用。每名目標角色需打出一張【殺】，否則受到你造成的1點傷害。' },
+            { name: '五穀豐登', type: 'trick', asset: '../assets/SanGuoSha/cards/harvest.png', desc: '非延時類錦囊。出牌階段，對所有角色使用。亮出等同於存活角色數的牌，每名角色輪流獲得其中一張。' },
+            { name: '無中生有', type: 'trick', asset: '../assets/SanGuoSha/cards/ex_nihilo.png', desc: '非延時類錦囊。出牌階段，對你自己使用。你摸兩張牌。' },
+            { name: '決鬥', type: 'trick', asset: '../assets/SanGuoSha/cards/duel.png', desc: '非延時類錦囊。出牌階段，對一名其他角色使用。由其開始輪流打出一張【殺】，未打出者受到另一方造成的1點傷害。' },
+            { name: '過河拆橋', type: 'trick', asset: '../assets/SanGuoSha/cards/dismantle.png', desc: '非延時類錦囊。出牌階段，對一名其他角色使用。你棄置其區域內的一張牌。' },
+            { name: '順手牽羊', type: 'trick', asset: '../assets/SanGuoSha/cards/snatch.png', desc: '非延時類錦囊。出牌階段，對距離為1的一名其他角色使用。你獲得其區域內的一張牌。' },
+            { name: '借刀殺人', type: 'trick', asset: '../assets/SanGuoSha/cards/borrow_sword.png', desc: '非延時類錦囊。出牌階段，對裝備區裡有武器牌的一名其他角色使用。其需對你指定的一名角色使用一張【殺】，否則將其裝備的武器牌交給你。' },
+            { name: '無懈可擊', type: 'trick', asset: '../assets/SanGuoSha/cards/flawless.png', desc: '非延時類錦囊。抵消一張錦囊牌對一名角色的效果，或抵消另一張【無懈可擊】的效果。' },
+            { name: '樂不思蜀', type: 'trick', asset: '../assets/SanGuoSha/cards/indulgence.png', desc: '延時類錦囊。置於判定區。判定結果不為紅桃，跳過出牌階段。' },
+            { name: '閃電', type: 'trick', asset: '../assets/SanGuoSha/cards/lightning.png', desc: '延時類錦囊。置於判定區。判定結果為黑桃2~9，受到3點雷電傷害；否則傳給下家。' },
 
+            // --- Weapon Cards (Standard + EX) ---
+            { name: '諸葛連弩', type: 'weapon', range: 1, ext: 'jpg', desc: '武器（攻擊範圍1）。鎖定技，你使用【殺】無次數限制。' },
+            { name: '雌雄雙股劍', type: 'weapon', range: 2, ext: 'jpg', desc: '武器（攻擊範圍2）。當你使用【殺】指定一名異性角色為目標後，你可以令其選擇一項：棄置一張手牌，或令你摸一張牌。' },
+            { name: '青釭劍', type: 'weapon', range: 2, ext: 'jpg', desc: '武器（攻擊範圍2）。鎖定技，當你使用【殺】指定一名角色為目標後，你無視其防具。' },
+            { name: '青龍偃月刀', type: 'weapon', range: 3, ext: 'jpg', desc: '武器（攻擊範圍3）。當你使用的【殺】被【閃】抵消時，你可以對該角色再使用一張【殺】。' },
+            { name: '丈八蛇矛', type: 'weapon', range: 3, ext: 'jpg', desc: '武器（攻擊範圍3）。你可以將兩張手牌當【殺】使用或打出。' },
+            { name: '貫石斧', type: 'weapon', range: 3, ext: 'jpg', desc: '武器（攻擊範圍3）。當你使用的【殺】被【閃】抵消時，你可以棄置兩張牌，令此【殺】依然造成傷害。' },
+            { name: '方天畫戟', type: 'weapon', range: 4, ext: 'jpg', desc: '武器（攻擊範圍4）。當你使用的【殺】是你最後的手牌時，你可以為此【殺】指定最多三名目標。' },
+            { name: '麒麟弓', type: 'weapon', range: 5, ext: 'jpg', desc: '武器（攻擊範圍5）。當你使用【殺】對目標角色造成傷害時，你可以棄置其裝備區裡的一匹坐騎。' },
+            { name: '寒冰劍', type: 'weapon', range: 2, ext: 'jpg', desc: '武器（攻擊範圍2）。當你使用【殺】對目標角色造成傷害時，若該角色有牌，你可以防止此傷害，改為棄置其兩張牌。' },
+            { name: '吳六劍', type: 'weapon', range: 2, ext: 'png', desc: '武器（攻擊範圍2）。鎖定技，其他吳勢力角色計算與你的距離-1。' },
+            { name: '銀月槍', type: 'weapon', range: 3, ext: 'jpg', desc: '武器（攻擊範圍3）。你的回合外，當你使用或打出了一張黑色牌，你可以令一名其他角色打出一張【閃】，否則受到你造成的1點傷害。' },
+
+            // --- Armor Cards ---
+            { name: '八卦陣', type: 'armor', ext: 'png', desc: '防具。當你需要使用或打出【閃】時，你可以進行一次判定，若結果為紅色，視為你使用或打出了一張【閃】。' },
+            { name: '仁王盾', type: 'armor', ext: 'jpg', desc: '防具。鎖定技，黑色的【殺】對你無效。' },
+
+            // --- Mount Cards ---
+            { name: '絕影', type: 'mount', subtype: 'def', ext: 'png', desc: '坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
+            { name: '的盧', type: 'mount', subtype: 'def', ext: 'png', desc: '坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
+            { name: '爪黃飛電', type: 'mount', subtype: 'def', ext: 'png', desc: '坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
             { name: '赤兔', type: 'mount', subtype: 'off', ext: 'png', desc: '坐騎（-1馬）。鎖定技，你計算與其他角色的距離-1。' },
             { name: '大宛', type: 'mount', subtype: 'off', ext: 'png', desc: '坐騎（-1馬）。鎖定技，你計算與其他角色的距離-1。' },
-            { name: '紫騂', type: 'mount', subtype: 'off', ext: 'png', desc: '坐騎（-1馬）。鎖定技，你計算與其他角色的距離-1。' },
-            { name: '的盧', type: 'mount', subtype: 'def', ext: 'png', desc: '坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
-            { name: '絕影', type: 'mount', subtype: 'def', ext: 'png', desc: '坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
-            { name: '爪黃飛電', type: 'mount', subtype: 'def', ext: 'png', desc: '坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
-            { name: '驊騮', type: 'mount', subtype: 'def', ext: 'png', desc: '坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1。' },
-            { name: '六龍驂駕', type: 'mount', subtype: 'def', ext: 'jpg', desc: '坐騎（+1馬）。鎖定技，其他角色計算與你的距離+1；你的手牌上限+1。' },
-            { name: '駑馬', type: 'mount', subtype: 'off', ext: 'jpg', desc: '坐騎。贈物牌，裝備此牌的角色計算與其他角色的距離+1。' },
-
-            { name: '木牛流馬', type: 'treasure', ext: 'jpg', desc: '寶物。出牌階段限一次，你可以將一張手牌置於【木牛流馬】下。你計算手牌上限時，置於其下的牌不計入。你可以將【木牛流馬】下的牌交給與你距離為1的其他角色。' },
-            { name: '玉璽', type: 'treasure', ext: 'jpg', desc: '寶物。鎖定技，你計算手牌上限+2；在摸牌階段，你額外摸一張牌。' },
-            { name: '定瀾夜明珠', type: 'treasure', ext: 'png', desc: '寶物。鎖定技，無視其他角色計算與你的距離+1的效果；當你需要進行判定時，可以改為進行兩次判定並選擇其一。' }
+            { name: '紫騂', type: 'mount', subtype: 'off', ext: 'png', desc: '坐騎（-1馬）。鎖定技，你計算與其他角色的距離-1。' }
         ];
 
         // --- Lightbox state ---
         let _lbCards = [];
         let _lbIndex = 0;
-        const _lbTypeLabels = { weapon: '武器牌', armor: '防具牌', mount: '坐騎牌', treasure: '寶物牌', wei: '魏勢力', shu: '蜀勢力', wu: '吳勢力', qun: '群勢力' };
+        const _lbTypeLabels = { basic: '基本牌', trick: '錦囊牌', weapon: '武器牌', armor: '防具牌', mount: '坐騎牌', wei: '魏勢力', shu: '蜀勢力', wu: '吳勢力', qun: '群勢力' };
 
         document.addEventListener('keydown', function(e) {
             const lb = document.getElementById('lightboxOverlay');
@@ -5759,12 +5760,12 @@
                 _lbCards = filtered.map(c => ({
                     name: c.titleMap || c.name,
                     type: c.type,
-                    url: `../assets/SanGuoSha/cards_wiki/${TRAD_TO_SIMP_MAP[c.name] || c.name}.${c.ext}`
+                    url: c.asset || `../assets/SanGuoSha/cards_wiki/${TRAD_TO_SIMP_MAP[c.name] || c.name}.${c.ext}`
                 }));
                 
                 filtered.forEach((c, idx) => {
                     const simpName = TRAD_TO_SIMP_MAP[c.name] || c.name;
-                    const imgUrl = `../assets/SanGuoSha/cards_wiki/${simpName}.${c.ext}`;
+                    const imgUrl = c.asset || `../assets/SanGuoSha/cards_wiki/${simpName}.${c.ext}`;
                     
                     let subTypeLabel = '';
                     if (c.type === 'weapon' && c.range) {
@@ -5777,10 +5778,11 @@
                     el.className = 'gallery-card-item';
                     
                     let borderGlow = 'rgba(245, 158, 11, 0.15)';
-                    if (c.type === 'weapon') borderGlow = 'rgba(245, 158, 11, 0.3)';
+                    if (c.type === 'basic') borderGlow = 'rgba(239, 68, 68, 0.25)';
+                    else if (c.type === 'trick') borderGlow = 'rgba(139, 92, 246, 0.25)';
+                    else if (c.type === 'weapon') borderGlow = 'rgba(245, 158, 11, 0.3)';
                     else if (c.type === 'armor') borderGlow = 'rgba(59, 130, 246, 0.3)';
                     else if (c.type === 'mount') borderGlow = 'rgba(16, 185, 129, 0.3)';
-                    else if (c.type === 'treasure') borderGlow = 'rgba(139, 92, 246, 0.3)';
                     
                     el.style.borderColor = borderGlow;
                     
@@ -5788,13 +5790,20 @@
                     el.innerHTML = `
                         <div class="gallery-card-image" style="background-image: url('${imgUrl}')" title="點擊放大 ${displayName}" data-idx="${idx}"></div>
                         <div class="gallery-card-details">
-                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px;">
-                                <h3 style="color: var(--theme-gold); margin: 0; font-size: 1.15rem; font-weight: bold;">${displayName}</h3>
-                                <span style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245,158,11,0.3); color: var(--theme-gold); padding: 1px 6px; font-size: 0.72rem; border-radius: 4px; font-weight: bold;">
-                                    ${typeLabels[c.type]}${subTypeLabel}
-                                </span>
+                            <div style="display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px;">
+                                <h3 style="color: var(--theme-gold); margin: 0; font-size: 1.25rem; font-weight: bold; white-space: nowrap;">${displayName}</h3>
+                                <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                                    <span style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245,158,11,0.3); color: var(--theme-gold); padding: 1px 6px; font-size: 0.72rem; border-radius: 4px; font-weight: bold; white-space: nowrap;">
+                                        ${typeLabels[c.type]}
+                                    </span>
+                                    ${subTypeLabel ? `
+                                    <span style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.15); color: #d6d3d1; padding: 1px 6px; font-size: 0.72rem; border-radius: 4px; font-weight: bold; white-space: nowrap;">
+                                        ${subTypeLabel.trim()}
+                                    </span>
+                                    ` : ''}
+                                </div>
                             </div>
-                            <p style="margin: 4px 0 0 0; font-size: 0.82rem; color: #d6d3d1; line-height: 1.4; word-break: break-all;">
+                            <p style="margin: 6px 0 0 0; font-size: 0.82rem; color: #d6d3d1; line-height: 1.4; word-break: break-all;">
                                 ${c.desc}
                             </p>
                         </div>
