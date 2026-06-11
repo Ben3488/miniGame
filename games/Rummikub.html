@@ -4,15 +4,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>拉密 Rummikub</title>
+  <title>拉密 Rummikub - 經典智慧棋牌</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #101827;
-      --panel: #1f2937;
-      --line: #334155;
-      --blue: #3b82f6;
-      --gold: #facc15;
-      --muted: #cbd5e1;
+      --bg: #05160e;
+      --table-bg: radial-gradient(circle at center, #0a3a25 0%, #03170e 100%);
+      --panel: rgba(15, 23, 42, 0.85);
+      --line: rgba(255, 255, 255, 0.08);
+      --blue: #2563eb;
+      --blue-glow: 0 0 15px rgba(37, 99, 235, 0.6);
+      --gold: #d4af37;
+      --gold-glow: 0 0 15px rgba(212, 175, 55, 0.8);
+      --red: #dc2626;
+      --orange: #ea580c;
+      --black: #111827;
+      --muted: #94a3b8;
+      --card-white: #fcfbf7;
     }
 
     * {
@@ -22,9 +30,10 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: linear-gradient(135deg, #0f172a, #182c4f);
+      background: var(--table-bg);
       color: #f8fafc;
-      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      font-family: "Outfit", "Noto Sans TC", sans-serif;
+      overflow-x: hidden;
     }
 
     .top {
@@ -32,171 +41,333 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 22px;
-      background: rgba(15, 23, 42, .92);
-      border-bottom: 1px solid #334155;
+      padding: 0 24px;
+      background: rgba(3, 23, 14, 0.9);
+      border-bottom: 1px solid var(--line);
       position: sticky;
       top: 0;
-      z-index: 5;
+      z-index: 100;
+      backdrop-filter: blur(10px);
     }
 
     a {
       color: #f8fafc;
       text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    a:hover {
+      color: var(--gold);
     }
 
     h1 {
       margin: 0;
-      color: #93c5fd;
+      color: #f8fafc;
       font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    h1 span {
+      background: linear-gradient(135deg, var(--gold), #fbbf24);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .badge {
-      border: 1px solid #3b82f6;
-      color: #bfdbfe;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      background: rgba(212, 175, 55, 0.1);
       border-radius: 16px;
-      padding: 5px 10px;
-      font-size: 13px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.15);
     }
 
     .app {
       display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 16px;
-      padding: 16px;
+      grid-template-columns: 320px 1fr;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1600px;
+      margin: 0 auto;
     }
 
     .panel {
-      background: rgba(31, 41, 55, .93);
+      background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 14px;
-      box-shadow: 0 14px 30px rgba(0, 0, 0, .28);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      height: fit-content;
     }
 
     .panel h2 {
-      margin: 0 0 10px;
+      margin: 0;
       font-size: 16px;
-      color: #93c5fd;
+      color: var(--gold);
+      border-left: 4px solid var(--gold);
+      padding-left: 8px;
+      font-weight: 700;
     }
 
+    /* Turn status card */
+    .turn-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .turn-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 16px;
+      margin-bottom: 8px;
+      background: var(--blue);
+      color: white;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      box-shadow: var(--blue-glow);
+    }
+
+    .turn-badge.ai-turn {
+      background: var(--orange);
+      box-shadow: 0 0 15px rgba(234, 88, 12, 0.5);
+    }
+
+    .turn-detail {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    /* velvet poker table style */
     .table {
-      min-height: 42vh;
-      background: #0b5138;
-      border: 1px solid #2e7d5e;
+      min-height: 50vh;
+      background: rgba(0, 0, 0, 0.2);
+      border: 2px solid #0d5c3b;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+
+    /* Draft Area Styling */
+    .draft-container {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    .draft-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      color: #a7f3d0;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .draft-area {
+      min-height: 96px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.2);
       border-radius: 8px;
-      padding: 14px;
-      box-shadow: inset 0 0 30px rgba(0, 0, 0, .3);
-      transition: all 0.3s;
+      align-items: center;
+    }
+
+    .draft-area:empty::after {
+      content: "桌面暫存區：點擊下方牌組中的牌可拆移至此處重組";
+      color: rgba(255,255,255,0.25);
+      font-size: 13px;
+      width: 100%;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    /* Sets Layout */
+    .sets-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 8px;
+    }
+
+    .sets-header h2 {
+      margin: 0;
+      font-size: 16px;
+      color: #34d399;
+      font-weight: 700;
     }
 
     .sets {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
+      max-height: 480px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .sets:empty::after {
+      content: "桌面尚無牌組。破冰後即可進行桌面重組。";
+      color: rgba(255, 255, 255, 0.2);
+      font-size: 14px;
+      text-align: center;
+      padding: 40px 0;
+      width: 100%;
     }
 
     .meld {
-      min-height: 70px;
-      background: rgba(0, 0, 0, .18);
-      border: 1px solid rgba(255, 255, 255, .12);
-      border-radius: 8px;
-      padding: 8px;
+      min-height: 86px;
+      background: rgba(0, 0, 0, .25);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 10px;
+      padding: 10px 14px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       flex-wrap: wrap;
-      transition: all 0.2s;
-      cursor: default;
+      transition: all 0.2s ease;
+    }
+
+    .meld-header {
+      min-width: 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      pointer-events: auto;
     }
 
     .meld-label {
-      min-width: 72px;
-      color: #d1fae5;
-      font-size: 13px;
-      pointer-events: none;
+      color: #a7f3d0;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
 
-    /* Hover effects for appending to sets */
-    .can-append .meld {
-      cursor: pointer;
-      box-shadow: inset 0 0 15px rgba(59, 130, 246, 0.1);
-      border-color: rgba(59, 130, 246, 0.3);
+    /* Glowing error border when validation fails */
+    @keyframes neon-pulse {
+      0% { box-shadow: 0 0 5px #ef4444, inset 0 0 5px rgba(239, 68, 68, 0.2); border-color: #f87171; }
+      50% { box-shadow: 0 0 18px #ef4444, inset 0 0 10px rgba(239, 68, 68, 0.4); border-color: #ef4444; }
+      100% { box-shadow: 0 0 5px #ef4444, inset 0 0 5px rgba(239, 68, 68, 0.2); border-color: #f87171; }
+    }
+    
+    .meld.invalid-set {
+      animation: neon-pulse 1.2s infinite;
+      border-color: #ef4444 !important;
+      background: rgba(220, 38, 38, 0.08) !important;
     }
 
-    .can-append .meld:hover {
-      background: rgba(59, 130, 246, 0.25);
-      outline: 2px solid var(--blue);
-      transform: translateX(5px);
-    }
-
+    /* Hand Rack Style (Double Layer Veneer Wood look) */
     .rack-area {
-      margin-top: 14px;
-      background: linear-gradient(#7c3f14, #451a03);
-      border-radius: 8px;
-      padding: 12px;
+      margin-top: 20px;
+      background: linear-gradient(to bottom, #543115, #241203);
+      border-radius: 14px;
+      padding: 16px 14px 20px;
+      box-shadow: 
+        0 15px 30px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        inset 0 -5px 12px rgba(0, 0, 0, 0.5);
+      border: 1px solid #1a0b01;
+      position: relative;
+    }
+
+    .rack-area::before {
+      content: "YOUR RACK";
+      position: absolute;
+      top: -10px;
+      left: 20px;
+      background: #3e2009;
+      color: #e5c59e;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      border: 1px solid #543115;
     }
 
     .rack {
-      min-height: 160px;
+      min-height: 180px;
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      padding: 10px;
-      background: rgba(0, 0, 0, .22);
-      border-radius: 6px;
+      gap: 12px 8px;
+      padding: 14px;
+      background: rgba(0, 0, 0, .45);
+      border-radius: 8px;
       align-content: flex-start;
+      box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255,255,255,0.03);
     }
 
+    /* 3D Realistic Ivory Tile Styling */
     .tile {
-      width: 48px;
-      height: 70px;
-      background: #fafaf9;
-      border-radius: 6px;
-      box-shadow: 2px 4px 8px rgba(0, 0, 0, .4), inset -2px -2px 5px rgba(0, 0, 0, .1);
+      width: 52px;
+      height: 76px;
+      background: linear-gradient(135deg, #ffffff 0%, #f7f1df 100%);
+      border-radius: 8px;
+      border: 1px solid #ded6c0;
+      box-shadow: 
+        0 1px 0 #d3c7a6,
+        0 2px 0 #c7bb97,
+        0 3px 0 #bcaf89,
+        0 4px 0 #b0a37b,
+        0 5px 6px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
       color: #111827;
-      font-size: 28px;
+      font-size: 32px;
       font-weight: 900;
-      display: grid;
-      place-items: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       cursor: pointer;
       position: relative;
       user-select: none;
-      transition: transform 0.1s;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease, border-color 0.2s ease;
+      transform-style: preserve-3d;
     }
 
-    .tile.selected {
-      transform: translateY(-12px);
-      outline: 3px solid var(--gold);
-    }
-
-    .tile.black {
-      color: #111827;
-    }
-
-    .tile.blue {
-      color: #2563eb;
-    }
-
-    .tile.red {
-      color: #dc2626;
-    }
-
-    .tile.orange {
-      color: #ea580c;
-    }
-
+    .tile.black { color: var(--black); }
+    .tile.blue { color: var(--blue); }
+    .tile.red { color: var(--red); }
+    .tile.orange { color: var(--orange); }
+    
     .tile.joker {
-      color: #be123c;
+      color: var(--joker-color);
+      font-size: 38px;
     }
 
+    /* Bottom Line Under numbers (Rummikub standard) */
     .tile::after {
       content: "";
       position: absolute;
-      bottom: 7px;
-      width: 24px;
+      bottom: 10px;
+      width: 22px;
       height: 3px;
-      border-radius: 3px;
+      border-radius: 2px;
       background: currentColor;
     }
 
@@ -204,248 +375,1053 @@
       display: none;
     }
 
-    button {
-      border: 1px solid #4069aa;
-      background: #2563eb;
+    /* Selected 3D Lift & Gold Glow */
+    .tile.selected {
+      transform: translateY(-12px) scale(1.05);
+      border-color: var(--gold);
+      box-shadow: 
+        0 0 14px var(--gold),
+        0 1px 0 #d3c7a6,
+        0 2px 0 #c7bb97,
+        0 3px 0 #bcaf89,
+        0 4px 0 #b0a37b,
+        0 8px 16px rgba(0,0,0,0.5);
+    }
+
+    .tile:hover:not(.selected) {
+      transform: translateY(-5px);
+      box-shadow: 
+        0 1px 0 #d3c7a6,
+        0 2px 0 #c7bb97,
+        0 3px 0 #bcaf89,
+        0 4px 0 #b0a37b,
+        0 6px 10px rgba(0,0,0,0.3);
+    }
+
+    /* Shift Buttons for selected tile on rack (mobile friendly sorting) */
+    .tile-shift-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      background: rgba(0,0,0,0.8);
       color: white;
-      border-radius: 6px;
-      padding: 9px 12px;
-      font-weight: 800;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
       cursor: pointer;
-      transition: background 0.2s;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.2s, background 0.2s;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .tile.selected .tile-shift-btn {
+      opacity: 0.8;
+    }
+
+    .tile-shift-btn:hover {
+      background: var(--gold);
+      color: black;
+      opacity: 1 !important;
+    }
+
+    .tile-shift-left { left: -6px; }
+    .tile-shift-right { right: -6px; }
+
+    /* Buttons Style */
+    button {
+      border: 1px solid rgba(255,255,255,0.1);
+      background: #1e293b;
+      color: white;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
 
     button:hover:not(:disabled) {
-      background: #1d4ed8;
+      background: #334155;
+      transform: translateY(-1px);
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(0);
     }
 
     button:disabled {
-      opacity: .45;
+      opacity: .35;
       cursor: not-allowed;
     }
 
-    .row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin: 8px 0;
+    /* Color styles for specific buttons */
+    #endBtn {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border-color: #1d4ed8;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.2);
+    }
+    #endBtn:hover:not(:disabled) {
+      background: #1d4ed8;
+      box-shadow: 0 4px 15px rgba(37,99,235,0.3);
     }
 
+    #drawBtn {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      border-color: #b45309;
+    }
+    #drawBtn:hover:not(:disabled) {
+      background: #b45309;
+    }
+
+    .btn-new-set {
+      padding: 6px 12px;
+      font-size: 12px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-color: #047857;
+      color: white;
+      box-shadow: 0 2px 6px rgba(16,185,129,0.2);
+    }
+    .btn-new-set:hover:not(:disabled) {
+      background: #059669;
+      box-shadow: 0 2px 10px rgba(16,185,129,0.3);
+    }
+
+    .btn-place {
+      padding: 4px 8px;
+      font-size: 11px;
+      background: var(--blue);
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-weight: 800;
+      box-shadow: var(--blue-glow);
+    }
+    .btn-place:hover {
+      background: #1d4ed8;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* Status Display Grid */
     .stat {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 10px;
     }
 
     .stat div {
-      background: #111827;
-      border: 1px solid #475569;
-      border-radius: 7px;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--line);
+      border-radius: 10px;
       padding: 10px;
+      text-align: center;
+    }
+
+    .stat span {
+      font-size: 12px;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 4px;
     }
 
     .num {
       color: var(--gold);
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 900;
+      text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+    }
+
+    /* Ice breaking progress bar */
+    .ice-break-progress-container {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .progress-title {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+    }
+    .progress-bar-bg {
+      height: 10px;
+      background: #0b1510;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 8px;
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      transition: width 0.3s ease;
+      box-shadow: var(--blue-glow);
+    }
+
+    /* Game Logs Styling */
+    .log-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
     .log {
-      height: 260px;
-      overflow: auto;
-      background: #111827;
-      border-radius: 6px;
+      height: 200px;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
       padding: 10px;
-      font-size: 13px;
-      line-height: 1.5;
-      color: #dbeafe;
+      font-size: 12px;
+      line-height: 1.6;
+      border: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
-    .help {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
+    .log-item {
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.01);
+      border-left: 3px solid #64748b;
     }
 
-    @media (max-width:900px) {
+    .log-item.player {
+      color: #60a5fa;
+      border-left-color: var(--blue);
+      background: rgba(37, 99, 235, 0.03);
+    }
+
+    .log-item.ai {
+      color: #fb923c;
+      border-left-color: var(--orange);
+      background: rgba(234, 88, 12, 0.03);
+    }
+
+    .log-item.system {
+      color: #34d399;
+      border-left-color: #10b981;
+    }
+
+    .log-item.error {
+      color: #f87171;
+      border-left-color: var(--red);
+      background: rgba(220, 38, 38, 0.08);
+      font-weight: 500;
+    }
+
+    /* Rules & Victory Modal Styling */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(5px);
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .modal.show {
+      display: flex;
+      opacity: 1;
+    }
+    .modal-content {
+      background: #121e18;
+      border: 1px solid #1b4d32;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 650px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 26px;
+      color: #f8fafc;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+      position: relative;
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+    .modal.show .modal-content {
+      transform: scale(1);
+    }
+    .close-btn {
+      position: absolute;
+      top: 18px;
+      right: 22px;
+      font-size: 30px;
+      cursor: pointer;
+      color: #94a3b8;
+      transition: color 0.2s;
+    }
+    .close-btn:hover {
+      color: #f8fafc;
+    }
+
+    .modal h2 {
+      margin-top: 0;
+      color: var(--gold);
+      border-bottom: 2px solid rgba(212, 175, 55, 0.2);
+      padding-bottom: 10px;
+      font-size: 24px;
+    }
+
+    .rules-body h3 {
+      color: #34d399;
+      margin-top: 20px;
+      font-size: 16px;
+    }
+
+    .rules-body ul {
+      padding-left: 20px;
+      line-height: 1.6;
+      font-size: 14px;
+      color: #cbd5e1;
+    }
+
+    .rules-body li {
+      margin-bottom: 8px;
+    }
+
+    .rules-examples {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin: 15px 0;
+    }
+
+    .example-box {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .example-box strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #f8fafc;
+      font-size: 14px;
+    }
+
+    .example-box p {
+      font-size: 12px;
+      color: #94a3b8;
+      margin: 0 0 10px 0;
+    }
+
+    .example-tiles {
+      display: flex;
+      gap: 5px;
+    }
+
+    .tile-mini {
+      display: inline-block;
+      width: 24px;
+      height: 36px;
+      background: white;
+      border-radius: 4px;
+      color: black;
+      font-weight: 800;
+      text-align: center;
+      line-height: 36px;
+      font-size: 13px;
+      box-shadow: 1px 2px 3px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .tile-mini::after {
+      content: "";
+      position: absolute;
+      bottom: 4px;
+      left: 6px;
+      width: 12px;
+      height: 2px;
+      background: currentColor;
+    }
+    .tile-mini.red { color: var(--red); }
+    .tile-mini.blue { color: var(--blue); }
+    .tile-mini.orange { color: var(--orange); }
+    .tile-mini.black { color: var(--black); }
+
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
       .app {
-        grid-template-columns: 1fr
+        grid-template-columns: 1fr;
       }
-
       .tile {
-        width: 42px;
-        height: 62px;
-        font-size: 24px
+        width: 44px;
+        height: 64px;
+        font-size: 26px;
+      }
+      .tile::after {
+        bottom: 8px;
+        width: 18px;
+      }
+      .rack {
+        min-height: 140px;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="top"><a href="../index.html">← 返回大廳</a>
-    <h1>拉密 Rummikub</h1>
-    <div class="badge">完整單機版</div>
+  <div class="top">
+    <a href="../index.html">← 返回大廳</a>
+    <h1>經典拉密 <span>Rummikub</span></h1>
+    <div class="badge">正統拆分重組版</div>
   </div>
+
   <div class="app">
+    <!-- Left Sidebar: Operations & Stats -->
     <aside class="panel">
-      <h2>操作</h2>
-      <div id="turnText" class="help"></div>
-      <div class="row">
-        <button id="playBtn">打出新牌組</button>
-        <button id="undoBtn">復原</button>
-        <button id="drawBtn">抽牌</button>
-        <button id="endBtn">結束回合</button>
+      <!-- Turn Indicator -->
+      <div class="turn-card">
+        <div id="turnBadge" class="turn-badge">您的回合</div>
+        <div id="turnDetail" class="turn-detail">可從手牌出牌，或拆解重組桌面牌組</div>
       </div>
+
+      <!-- Controls -->
+      <h2>遊戲控制</h2>
+      <div class="row">
+        <button id="undoBtn">復原桌面</button>
+        <button id="drawBtn">抽牌</button>
+      </div>
+      <div class="row">
+        <button id="endBtn">結束回合</button>
+        <button id="newBtn" style="background: #374151;">重新開局</button>
+      </div>
+
+      <!-- Sorting -->
+      <h2>手牌整理</h2>
       <div class="row">
         <button id="sortValueBtn">數字排序</button>
         <button id="sortColorBtn">顏色排序</button>
-        <button id="newBtn">新局</button>
       </div>
-      <p class="help">
-        <strong>玩法：</strong>選取手牌點擊「打出新牌組」。破冰(首出≥30點)後，選取手牌並<strong>點擊桌上牌組</strong>即可接牌。若本回合無出牌，則必須「抽牌」結束回合。</p>
-      <h2>狀態</h2>
+
+      <!-- Rules -->
+      <button id="rulesBtn" style="background: #0f766e; width: 100%;">遊戲規則說明</button>
+
+      <!-- Ice breaking status -->
+      <div id="iceBreakProgressContainer" class="ice-break-progress-container">
+        <div class="progress-title">
+          <span>破冰累積點數 (需 &ge;30 點)</span>
+          <span id="iceBreakProgressText">0 / 30</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div id="iceBreakProgressBar" class="progress-bar-fill"></div>
+        </div>
+      </div>
+
+      <!-- Game Status Stats -->
+      <h2>狀態統計</h2>
       <div class="stat">
-        <div>牌池<div class="num" id="poolCount"></div>
-        </div>
-        <div>AI 架牌<div class="num" id="aiCount"></div>
-        </div>
-        <div>你已破冰<div class="num" id="opened0"></div>
-        </div>
-        <div>AI 已破冰<div class="num" id="opened1"></div>
-        </div>
+        <div><span>剩餘牌池</span><div class="num" id="poolCount">0</div></div>
+        <div><span>AI 手牌</span><div class="num" id="aiCount">0</div></div>
+        <div><span>你已破冰</span><div class="num" id="opened0">否</div></div>
+        <div><span>AI 已破冰</span><div class="num" id="opened1">否</div></div>
       </div>
-      <h2>紀錄</h2>
-      <div id="log" class="log"></div>
+
+      <!-- Logs -->
+      <div class="log-container">
+        <h2>對局紀錄</h2>
+        <div id="log" class="log"></div>
+      </div>
     </aside>
+
+    <!-- Right Main Area: Velvet Table & Hand Rack -->
     <main>
       <div class="table">
+        <!-- Table Draft/Buffer Area -->
+        <div class="draft-container">
+          <div class="draft-header">
+            <span>桌面暫存區 (可點選任意桌面卡牌取出至此重組)</span>
+          </div>
+          <div id="draftArea" class="draft-area"></div>
+        </div>
+
+        <!-- Sets Area -->
+        <div class="sets-header">
+          <h2>桌面牌組</h2>
+          <button id="newSetBtn" class="btn-new-set">+ 建立新牌組</button>
+        </div>
         <div id="sets" class="sets"></div>
       </div>
+
+      <!-- Wood Hand Rack Area -->
       <div class="rack-area">
         <div id="rack" class="rack"></div>
       </div>
     </main>
   </div>
+
+  <!-- Help Modal -->
+  <div id="rulesModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="toggleRules()">&times;</span>
+      <h2>拉密 Rummikub 遊戲規則</h2>
+      <div class="rules-body">
+        <p>拉密由 104 張數字牌（紅、藍、橘、黑四色，每色 1-13 各兩張）與 2 張百搭鬼牌（★）組成。目標是率先將自己手牌全部打出。</p>
+        
+        <h3>一、合法牌組種類</h3>
+        <div class="rules-examples">
+          <div class="example-box">
+            <strong>1. 同數組 (Group)</strong>
+            <p>3 張或 4 張<strong>數字相同</strong>但<strong>顏色不同</strong>的牌。</p>
+            <div class="example-tiles">
+              <span class="tile-mini red">5</span>
+              <span class="tile-mini blue">5</span>
+              <span class="tile-mini black">5</span>
+            </div>
+          </div>
+          <div class="example-box">
+            <strong>2. 順子 (Run)</strong>
+            <p>3 張或更多張<strong>顏色相同</strong>且<strong>數字連續</strong>的牌。</p>
+            <div class="example-tiles">
+              <span class="tile-mini orange">8</span>
+              <span class="tile-mini orange">9</span>
+              <span class="tile-mini orange">10</span>
+            </div>
+          </div>
+        </div>
+
+        <h3>二、首出限制：破冰 (First Meld)</h3>
+        <ul>
+          <li>每位玩家第一次出牌時，打出的新牌組數字總和必須<strong>大於等於 30 點</strong>。</li>
+          <li>破冰時<strong>只能使用手牌</strong>，且不允許移動或使用任何桌面上的既有牌。</li>
+          <li>破冰點數可以使用單一牌組或多個全新牌組累加。鬼牌（★）以其所代表的數字計分。</li>
+        </ul>
+
+        <h3>三、桌面拆分與重組（本版正統規則！）</h3>
+        <ul>
+          <li><strong>破冰成功後</strong>，您在自己的回合中可以點擊桌面既有牌組的卡牌，將其<strong>抽出到「暫存區」</strong>。</li>
+          <li>您可以將暫存區的牌與手牌混合，組合成新的牌組，或放回桌面其他牌組中。</li>
+          <li><strong>限制</strong>：當您點擊「結束回合」時，<strong>暫存區必須清空</strong>，且桌面上的所有牌組都<strong>必須維持合法</strong>（均為 3 張以上的同數組或順子）。</li>
+          <li>若不慎排錯或重組失敗，可隨時點擊「復原桌面」重設為回合開始時的狀態。</li>
+        </ul>
+        
+        <h3>四、抽牌規則</h3>
+        <ul>
+          <li>若您本回合無法出牌，或者不想進行重組，必須點擊「抽牌」按鈕，從牌池抽一張牌並結束回合。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Victory Modal -->
+  <div id="victoryModal" class="modal">
+    <div class="modal-content" style="text-align: center;">
+      <h2 id="victoryTitle" style="color: var(--gold); font-size: 32px; margin-bottom: 12px;">🏆 恭喜獲勝！</h2>
+      <p id="victoryDesc" style="font-size: 18px; margin-bottom: 24px; color: #cbd5e1;">您率先清空了牌架，獲得這場對局的勝利！</p>
+      <button onclick="closeVictoryAndReset()" style="background: linear-gradient(135deg, #fbbf24, #d4af37); color: #000; font-size: 16px; padding: 12px 36px; border: none; border-radius: 30px; font-weight: 900; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); width: auto; margin: 0 auto; display: inline-block;">再玩一局</button>
+    </div>
+  </div>
+
   <script>
+    // Audio Synthesizer Manager
+    const SoundManager = {
+      ctx: null,
+      init() {
+        if (this.ctx) return;
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      },
+      playClick() {
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(500, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.06);
+        gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.005, this.ctx.currentTime + 0.06);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.06);
+      },
+      playSlide() {
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(350, this.ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.06, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.005, this.ctx.currentTime + 0.12);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.12);
+      },
+      playChime() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const playNote = (freq, delay, dur) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + delay);
+          gain.gain.setValueAtTime(0.06, now + delay);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + delay + dur);
+          osc.start(now + delay);
+          osc.stop(now + delay + dur);
+        };
+        playNote(523.25, 0, 0.12); // C5
+        playNote(659.25, 0.06, 0.12); // E5
+        playNote(783.99, 0.12, 0.2); // G5
+      },
+      playError() {
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(120, this.ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(85, this.ctx.currentTime + 0.25);
+        gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.005, this.ctx.currentTime + 0.25);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.25);
+      },
+      playVictory() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const playNote = (freq, delay, dur) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + delay);
+          gain.gain.setValueAtTime(0.1, now + delay);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + delay + dur);
+          osc.start(now + delay);
+          osc.stop(now + delay + dur);
+        };
+        playNote(523.25, 0, 0.18);
+        playNote(659.25, 0.12, 0.18);
+        playNote(783.99, 0.24, 0.18);
+        playNote(1046.50, 0.36, 0.5);
+      }
+    };
+
+    // Confetti Animation Engine
+    const Confetti = {
+      canvas: null,
+      ctx: null,
+      particles: [],
+      active: false,
+      init() {
+        this.canvas = document.getElementById('confettiCanvas');
+        if (!this.canvas) {
+          this.canvas = document.createElement('canvas');
+          this.canvas.id = 'confettiCanvas';
+          this.canvas.style.position = 'fixed';
+          this.canvas.style.top = '0';
+          this.canvas.style.left = '0';
+          this.canvas.style.width = '100vw';
+          this.canvas.style.height = '100vh';
+          this.canvas.style.pointerEvents = 'none';
+          this.canvas.style.zIndex = '9999';
+          document.body.appendChild(this.canvas);
+        }
+        this.ctx = this.canvas.getContext('2d');
+        window.addEventListener('resize', () => this.resize());
+        this.resize();
+      },
+      resize() {
+        if (this.canvas) {
+          this.canvas.width = window.innerWidth;
+          this.canvas.height = window.innerHeight;
+        }
+      },
+      start() {
+        this.init();
+        this.particles = [];
+        const colors = ['#facc15', '#3b82f6', '#dc2626', '#ea580c', '#10b981', '#a78bfa', '#ec4899'];
+        for (let i = 0; i < 150; i++) {
+          this.particles.push({
+            x: Math.random() * this.canvas.width,
+            y: Math.random() * this.canvas.height - this.canvas.height,
+            r: Math.random() * 6 + 4,
+            d: Math.random() * this.canvas.height,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            tilt: Math.random() * 10 - 5,
+            tiltAngleIncremental: Math.random() * 0.07 + 0.02,
+            tiltAngle: 0
+          });
+        }
+        this.active = true;
+        this.animate();
+      },
+      stop() {
+        this.active = false;
+        if (this.ctx && this.canvas) {
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+      },
+      animate() {
+        if (!this.active) return;
+        requestAnimationFrame(() => this.animate());
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        let finished = true;
+        for (let i = 0; i < this.particles.length; i++) {
+          const p = this.particles[i];
+          p.tiltAngle += p.tiltAngleIncremental;
+          p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+          p.x += Math.sin(p.tiltAngle);
+          p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+          
+          if (p.y <= this.canvas.height) {
+            finished = false;
+          }
+          
+          this.ctx.beginPath();
+          this.ctx.lineWidth = p.r;
+          this.ctx.strokeStyle = p.color;
+          this.ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+          this.ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+          this.ctx.stroke();
+        }
+        if (finished) {
+          this.stop();
+        }
+      }
+    };
+
+    // Rummikub Game Core Logic
     const COLORS = ['black', 'blue', 'red', 'orange'];
     const CNAME = { black: '黑', blue: '藍', red: '紅', orange: '橙' };
-    let pool, players, tableSets, turn, selected, gameOver, playedThisTurn, turnPoints, backupState, consecutivePasses;
+    
+    let pool, players, tableSets, draftTiles, turn, selected, gameOver, playedThisTurn, turnPoints, backupState, consecutivePasses;
+    let invalidSets = []; // Indices of sets that failed validation
+    
     const $ = id => document.getElementById(id);
 
     function saveState() {
-       backupState = {
-           tiles: players[0].tiles.map(t => ({...t})),
-           tableSets: tableSets.map(s => ({...s, tiles: s.tiles.map(t=>({...t}))})),
-           opened: players[0].opened
-       };
+      backupState = {
+        tiles: players[0].tiles.map(t => ({...t})),
+        tableSets: tableSets.map(s => ({...s, tiles: s.tiles.map(t=>({...t}))})),
+        opened: players[0].opened
+      };
     }
     
     function restoreState() {
-       if (!backupState) return;
-       players[0].tiles = backupState.tiles.map(t => ({...t}));
-       tableSets = backupState.tableSets.map(s => ({...s, tiles: s.tiles.map(t=>({...t}))}));
-       players[0].opened = backupState.opened;
-       playedThisTurn = false;
-       turnPoints = 0;
-       selected = [];
-       render();
+      if (!backupState) return;
+      players[0].tiles = backupState.tiles.map(t => ({...t}));
+      tableSets = backupState.tableSets.map(s => ({...s, tiles: s.tiles.map(t=>({...t}))}));
+      players[0].opened = backupState.opened;
+      draftTiles = [];
+      invalidSets = [];
+      playedThisTurn = false;
+      turnPoints = 0;
+      selected = [];
+      render();
     }
 
-    function shuffle(a) { return a.map(v => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map(x => x[1]); }
+    function shuffle(a) { 
+      return a.map(v => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map(x => x[1]); 
+    }
 
     function makePool() {
-      const out = []; let id = 1;
-      for (let copy = 0; copy < 2; copy++) for (const color of COLORS) for (let value = 1; value <= 13; value++) out.push({ id: id++, color, value, joker: false });
+      const out = []; 
+      let id = 1;
+      for (let copy = 0; copy < 2; copy++) {
+        for (const color of COLORS) {
+          for (let value = 1; value <= 13; value++) {
+            out.push({ id: id++, color, value, joker: false });
+          }
+        }
+      }
       out.push({ id: id++, color: 'joker', value: 0, joker: true }, { id: id++, color: 'joker', value: 0, joker: true });
       return shuffle(out);
     }
 
     function draw(p, n = 1) {
-      for (let i = 0; i < n && pool.length; i++) p.tiles.push(pool.pop());
+      for (let i = 0; i < n && pool.length; i++) {
+        p.tiles.push(pool.pop());
+      }
     }
 
-    function newPlayer(name) { return { name, tiles: [], opened: false }; }
+    function newPlayer(name) { 
+      return { name, tiles: [], opened: false }; 
+    }
 
     function newGame() {
       pool = makePool();
       players = [newPlayer('你'), newPlayer('AI')];
-      tableSets = []; turn = 0; selected = [];
-      gameOver = false; playedThisTurn = false; turnPoints = 0; consecutivePasses = 0;
-      draw(players[0], 14); draw(players[1], 14);
-      $('log').innerHTML = ''; log('新局開始。');
+      tableSets = []; 
+      draftTiles = [];
+      invalidSets = [];
+      turn = 0; 
+      selected = [];
+      gameOver = false; 
+      playedThisTurn = false; 
+      turnPoints = 0; 
+      consecutivePasses = 0;
+      
+      draw(players[0], 14); 
+      draw(players[1], 14);
+      
+      $('log').innerHTML = ''; 
+      log('新局開始！歡迎體驗經典拉密對決。', 'system');
+      
       saveState();
       render();
     }
 
-    function tileText(t) { return t.joker ? '★' : t.value; }
+    function tileText(t) { 
+      return t.joker ? '★' : t.value; 
+    }
 
-    function tileEl(t, clickable = true) {
+    // Shift a selected tile in the hand rack left/right
+    function shiftTile(tileId, dir) {
+      const idx = players[0].tiles.findIndex(x => x.id === tileId);
+      if (idx === -1) return;
+      const targetIdx = idx + dir;
+      if (targetIdx < 0 || targetIdx >= players[0].tiles.length) return;
+      // Swap positions
+      const temp = players[0].tiles[idx];
+      players[0].tiles[idx] = players[0].tiles[targetIdx];
+      players[0].tiles[targetIdx] = temp;
+      SoundManager.playClick();
+      renderRack();
+    }
+
+    // Build the tile DOM element
+    function tileEl(t, location) {
       const d = document.createElement('div');
       d.className = `tile ${t.joker ? 'joker' : t.color} ${selected.includes(t.id) ? 'selected' : ''}`;
       d.textContent = tileText(t);
       d.title = t.joker ? '鬼牌' : `${CNAME[t.color]} ${t.value}`;
-      if (clickable) {
-        d.onclick = () => {
-          if (turn !== 0 || gameOver) return;
+      
+      d.onclick = (e) => {
+        e.stopPropagation();
+        if (turn !== 0 || gameOver) return;
+        
+        if (location === 'rack') {
+          // Toggle selection in Hand Rack
           selected = selected.includes(t.id) ? selected.filter(id => id !== t.id) : [...selected, t.id];
-          renderTable(); // Update table hover state
-          renderRack();
+          SoundManager.playClick();
+          render();
+        } else if (location === 'draft') {
+          // Toggle selection in Draft Area
+          selected = selected.includes(t.id) ? selected.filter(id => id !== t.id) : [...selected, t.id];
+          SoundManager.playClick();
+          render();
+        } else if (location.startsWith('table-set-')) {
+          // Table tiles behavior:
+          // Clicking a table tile immediately moves it to the Draft Area
+          if (!players[0].opened) {
+            log('未破冰前，您不能移動或使用桌面上的牌！', 'error');
+            SoundManager.playError();
+            return;
+          }
+          const setIndex = parseInt(location.split('-')[2]);
+          const targetSet = tableSets[setIndex];
+          
+          // Remove the tile from set
+          targetSet.tiles = targetSet.tiles.filter(x => x.id !== t.id);
+          draftTiles.push(t);
+          
+          // Clean empty sets
+          tableSets = tableSets.filter(s => s.tiles.length > 0);
+          
+          // Remove from selection if selected
+          selected = selected.filter(id => id !== t.id);
+          
+          playedThisTurn = true;
+          SoundManager.playSlide();
+          render();
+        }
+      };
+
+      // Add shift control arrows when exactly one hand tile is selected
+      if (location === 'rack' && selected.includes(t.id) && selected.length === 1) {
+        const leftBtn = document.createElement('div');
+        leftBtn.className = 'tile-shift-btn tile-shift-left';
+        leftBtn.innerHTML = '‹';
+        leftBtn.onclick = (e) => {
+          e.stopPropagation();
+          shiftTile(t.id, -1);
         };
+        d.appendChild(leftBtn);
+
+        const rightBtn = document.createElement('div');
+        rightBtn.className = 'tile-shift-btn tile-shift-right';
+        rightBtn.innerHTML = '›';
+        rightBtn.onclick = (e) => {
+          e.stopPropagation();
+          shiftTile(t.id, 1);
+        };
+        d.appendChild(rightBtn);
       }
+      
       return d;
     }
 
     function render() {
-      $('turnText').innerHTML = gameOver ? '遊戲結束' : `${turn === 0 ? '你的' : 'AI 的'}回合`;
-      $('poolCount').textContent = pool.length; $('aiCount').textContent = players[1].tiles.length;
-      $('opened0').textContent = players[0].opened ? '是' : '否'; $('opened1').textContent = players[1].opened ? '是' : '否';
+      // 1. Turn Information Badge
+      const isPlayerTurn = (turn === 0);
+      const badge = $('turnBadge');
+      const detail = $('turnDetail');
+      
+      if (gameOver) {
+        badge.textContent = '遊戲結束';
+        badge.className = 'turn-badge';
+        detail.textContent = '可點擊「重新開局」開啟新遊戲';
+      } else if (isPlayerTurn) {
+        badge.textContent = '您的回合';
+        badge.className = 'turn-badge';
+        detail.textContent = players[0].opened 
+          ? '可從手牌出牌，或點擊桌面卡牌進行拆解重組' 
+          : '破冰回合：請從手牌打出大於等於30點的新牌組';
+      } else {
+        badge.textContent = 'AI 回合中';
+        badge.className = 'turn-badge ai-turn';
+        detail.textContent = '請等待 AI 進行思考與出牌...';
+      }
 
-      $('playBtn').disabled = turn !== 0 || gameOver;
+      // 2. Stats
+      $('poolCount').textContent = pool.length; 
+      $('aiCount').textContent = players[1].tiles.length;
+      $('opened0').textContent = players[0].opened ? '是' : '否'; 
+      $('opened1').textContent = players[1].opened ? '是' : '否';
+
+      // 3. Buttons Disabled State
       $('undoBtn').disabled = turn !== 0 || gameOver || !playedThisTurn;
       $('drawBtn').disabled = turn !== 0 || gameOver || playedThisTurn;
       $('endBtn').disabled = turn !== 0 || gameOver || !playedThisTurn;
 
-      renderTable(); renderRack();
+      // 4. Ice Breaking Progress
+      const progressContainer = $('iceBreakProgressContainer');
+      const progressBar = $('iceBreakProgressBar');
+      const progressText = $('iceBreakProgressText');
+      if (players[0].opened) {
+        progressContainer.style.display = 'none';
+      } else {
+        progressContainer.style.display = 'block';
+        const pct = Math.min(100, (turnPoints / 30) * 100);
+        progressBar.style.width = `${pct}%`;
+        progressText.textContent = `${turnPoints} / 30`;
+      }
+
+      renderDraft();
+      renderTable(); 
+      renderRack();
+    }
+
+    function renderDraft() {
+      const area = $('draftArea');
+      area.innerHTML = '';
+      draftTiles.forEach(t => {
+        area.appendChild(tileEl(t, 'draft'));
+      });
     }
 
     function renderTable() {
-      $('sets').innerHTML = '';
+      const container = $('sets');
+      container.innerHTML = '';
+      
       tableSets.forEach((set, i) => {
         const m = document.createElement('div');
         m.className = 'meld';
-        m.innerHTML = `<div class="meld-label">第 ${i + 1} 組</div>`;
-        set.tiles.forEach(t => m.appendChild(tileEl(t, false)));
-        m.onclick = () => appendToSet(i);
-        $('sets').appendChild(m);
+        
+        // Highlight invalid set
+        if (invalidSets.includes(i)) {
+          m.classList.add('invalid-set');
+        }
+        
+        const showPlaceButton = (turn === 0 && !gameOver && selected.length > 0 && players[0].opened);
+        
+        const header = document.createElement('div');
+        header.className = 'meld-header';
+        header.innerHTML = `<span class="meld-label">第 ${i + 1} 組</span>`;
+        
+        if (showPlaceButton) {
+          const placeBtn = document.createElement('button');
+          placeBtn.className = 'btn-place';
+          placeBtn.textContent = '+ 放入';
+          placeBtn.onclick = (e) => {
+            e.stopPropagation();
+            appendToSet(i);
+          };
+          header.appendChild(placeBtn);
+        }
+        
+        m.appendChild(header);
+        
+        set.tiles.forEach(t => {
+          m.appendChild(tileEl(t, `table-set-${i}`));
+        });
+        
+        container.appendChild(m);
       });
-      if (tableSets.length === 0) $('sets').innerHTML = '<div class="help">桌面尚無組合。</div>';
-
-      // Update interactive UI for appending
-      if (selected.length > 0 && players[0].opened && turn === 0 && !gameOver) {
-        $('sets').classList.add('can-append');
-      } else {
-        $('sets').classList.remove('can-append');
-      }
     }
 
     function renderRack() {
-      $('rack').innerHTML = '';
-      players[0].tiles.forEach(t => $('rack').appendChild(tileEl(t, true)));
+      const rack = $('rack');
+      rack.innerHTML = '';
+      players[0].tiles.forEach(t => {
+        rack.appendChild(tileEl(t, 'rack'));
+      });
     }
 
-    function selectedTiles() { return players[0].tiles.filter(t => selected.includes(t.id)); }
+    // Helper to get selected tile objects from hand/draft
+    function getSelectedTiles() {
+      const handTiles = players[0].tiles.filter(t => selected.includes(t.id));
+      const draftSelected = draftTiles.filter(t => selected.includes(t.id));
+      return [...handTiles, ...draftSelected];
+    }
 
+    // Helper to remove selected tiles from hand/draft
+    function removeSelectedFromSources() {
+      players[0].tiles = players[0].tiles.filter(t => !selected.includes(t.id));
+      draftTiles = draftTiles.filter(t => !selected.includes(t.id));
+    }
+
+    // Validate a set of tiles
     function validate(tiles) {
       if (tiles.length < 3) return null;
       const jokers = tiles.filter(t => t.joker).length;
       const normal = tiles.filter(t => !t.joker);
-      if (normal.length === 0) return null; // Edge case: all jokers rejected
+      if (normal.length === 0) return null;
 
+      // Group: Same values, different colors, max 4 cards
       const sameValue = normal.every(t => t.value === normal[0].value);
       const distinctColors = new Set(normal.map(t => t.color)).size === normal.length;
-      if (sameValue && distinctColors && tiles.length <= 4) return { type: 'group', points: (normal[0].value) * tiles.length };
+      if (sameValue && distinctColors && tiles.length <= 4) {
+        return { type: 'group', points: (normal[0].value) * tiles.length };
+      }
 
+      // Run: Same color, consecutive values, max 13 cards
       const sameColor = normal.every(t => t.color === normal[0].color);
       if (sameColor && tiles.length <= 13) {
         const vals = normal.map(t => t.value).sort((a, b) => a - b);
@@ -465,97 +1441,264 @@
       return (L * (2 * max_S + L - 1)) / 2;
     }
 
-    function playSelected() {
-      const tiles = selectedTiles(), valid = validate(tiles), p = players[0];
-      if (!valid) { log('這不是合法組合。'); return; }
+    // Smart sort sets automatically
+    function autoSortSet(tiles) {
+      if (tiles.length < 2) return tiles;
+      const normal = tiles.filter(t => !t.joker);
+      if (normal.length === 0) return tiles;
+
+      // Group check
+      const isGroup = normal.every(t => t.value === normal[0].value);
+      if (isGroup) {
+        const sortedNormal = [...normal].sort((a, b) => COLORS.indexOf(a.color) - COLORS.indexOf(b.color));
+        const jokers = tiles.filter(t => t.joker);
+        return [...sortedNormal, ...jokers];
+      }
+
+      // Run check
+      const isRun = normal.every(t => t.color === normal[0].color);
+      if (isRun) {
+        const sortedNormal = [...normal].sort((a, b) => a.value - b.value);
+        const result = [];
+        const jokers = tiles.filter(t => t.joker);
+        let jokerCount = jokers.length;
+
+        if (sortedNormal.length > 0) {
+          let curr = sortedNormal[0].value;
+          result.push(sortedNormal[0]);
+          for (let i = 1; i < sortedNormal.length; i++) {
+            const nextTile = sortedNormal[i];
+            const gap = nextTile.value - curr - 1;
+            if (gap > 0 && jokerCount >= gap) {
+              for (let g = 0; g < gap; g++) {
+                result.push(jokers[--jokerCount]);
+              }
+            }
+            result.push(nextTile);
+            curr = nextTile.value;
+          }
+          while (jokerCount > 0) {
+            if (result[0].value > 1) {
+              result.unshift(jokers[--jokerCount]);
+            } else {
+              result.push(jokers[--jokerCount]);
+            }
+          }
+          return result;
+        }
+      }
+      return tiles;
+    }
+
+    // Play selected cards to form a new set
+    function playNewSet() {
+      if (turn !== 0 || gameOver || selected.length === 0) return;
+      const tiles = getSelectedTiles();
       
-      if (!p.opened) {
-         turnPoints += valid.points;
-         tableSets.push({ owner: 0, type: valid.type, tiles });
-         p.tiles = p.tiles.filter(t => !selected.includes(t.id));
-         selected = [];
-         playedThisTurn = true;
-         log(`你打出 ${valid.type === 'group' ? '同數組' : '順子'}，獲得 ${valid.points} 點。 (破冰累積: ${turnPoints}/30)`);
-         if (turnPoints >= 30) {
-             p.opened = true;
-             log('成功破冰！');
-         }
-         checkWin(); render();
+      if (!players[0].opened) {
+        // Must use only hand tiles for first ice breaking
+        const hasDraftTiles = draftTiles.some(t => selected.includes(t.id));
+        if (hasDraftTiles) {
+          log('未破冰前，您不能移動或使用桌面上的牌！', 'error');
+          SoundManager.playError();
+          return;
+        }
+        
+        const valid = validate(tiles);
+        if (!valid) {
+          log('這不是合法的牌組！', 'error');
+          SoundManager.playError();
+          return;
+        }
+        
+        turnPoints += valid.points;
+        tableSets.push({ owner: 0, type: valid.type, tiles: autoSortSet(tiles) });
+        removeSelectedFromSources();
+        selected = [];
+        playedThisTurn = true;
+        log(`您打出新牌組（${valid.type === 'group' ? '同數組' : '順子'}），獲得 ${valid.points} 點。 (破冰累積: ${turnPoints}/30)`, 'player');
+        if (turnPoints >= 30) {
+          log('已達到 30 點破冰門檻！結束回合後即可成功破冰。', 'system');
+        }
+        SoundManager.playChime();
+        render();
       } else {
-         tableSets.push({ owner: 0, type: valid.type, tiles });
-         p.tiles = p.tiles.filter(t => !selected.includes(t.id));
-         selected = [];
-         playedThisTurn = true;
-         log(`你打出 ${valid.type === 'group' ? '同數組' : '順子'}。`);
-         checkWin(); render();
+        // Already opened, allow building any arbitrary set (validate on end turn)
+        tableSets.push({ owner: 0, type: 'unknown', tiles: autoSortSet(tiles) });
+        removeSelectedFromSources();
+        selected = [];
+        playedThisTurn = true;
+        SoundManager.playChime();
+        log('您在桌面上建立了新牌組。', 'player');
+        render();
       }
     }
 
+    // Append selected cards to an existing set
     function appendToSet(setIndex) {
       if (turn !== 0 || gameOver || selected.length === 0) return;
       const p = players[0];
       if (!p.opened) {
-        log('必須先破冰（打出總和30點以上的牌組）才能接牌！');
+        log('未破冰前，您不能重組或接牌！', 'error');
+        SoundManager.playError();
         return;
       }
-      const tilesToAdd = selectedTiles();
+      
+      const tilesToAdd = getSelectedTiles();
       const targetSet = tableSets[setIndex];
-      const combined = [...targetSet.tiles, ...tilesToAdd];
-      const valid = validate(combined);
-
-      if (valid) {
-        targetSet.tiles = combined;
-        targetSet.type = valid.type;
-        p.tiles = p.tiles.filter(t => !selected.includes(t.id));
-        selected = [];
-        playedThisTurn = true;
-        log(`你成功將牌接到了第 ${setIndex + 1} 組。`);
-        checkWin(); render();
-      } else {
-        log('無法接牌，組合不合法！');
-      }
+      targetSet.tiles.push(...tilesToAdd);
+      removeSelectedFromSources();
+      
+      // Auto sort the set
+      targetSet.tiles = autoSortSet(targetSet.tiles);
+      
+      selected = [];
+      playedThisTurn = true;
+      SoundManager.playSlide();
+      log(`您將牌移入了第 ${setIndex + 1} 組。`, 'player');
+      render();
     }
 
+    // Player draws a card and ends their turn
     function drawAndEnd() {
       if (pool.length === 0) { 
-          log('牌池已空，你無法抽牌，跳過回合。'); 
-          consecutivePasses++;
+        log('牌池已空，您無法抽牌，跳過回合。', 'system'); 
+        consecutivePasses++;
       } else {
-          draw(players[0], 1);
-          log('你抽 1 張牌。');
-          consecutivePasses = 0;
+        draw(players[0], 1);
+        log('您抽取 1 張牌。', 'player');
+        consecutivePasses = 0;
       }
-      selected = []; playedThisTurn = false; turnPoints = 0; render();
+      selected = []; 
+      draftTiles = [];
+      invalidSets = [];
+      playedThisTurn = false; 
+      turnPoints = 0; 
+      
       checkWin();
-      if(!gameOver) setTimeout(aiTurn, 450);
+      if (!gameOver) {
+        turn = 1;
+        render();
+        setTimeout(aiTurn, 600);
+      }
     }
 
+    // Validate the entire board at the end of the turn
+    function validateAllBoard() {
+      // 1. Check draft area empty
+      if (draftTiles.length > 0) {
+        log('暫存區不能留有卡牌，請將所有卡牌歸入牌組！', 'error');
+        return false;
+      }
+      
+      // 2. Validate every table set
+      invalidSets = [];
+      let isBoardValid = true;
+      for (let i = 0; i < tableSets.length; i++) {
+        const set = tableSets[i];
+        const res = validate(set.tiles);
+        if (!res) {
+          invalidSets.push(i);
+          isBoardValid = false;
+        } else {
+          set.type = res.type;
+        }
+      }
+      if (!isBoardValid) {
+        log('桌面上存在不合法的牌組（已以紅框標示），請修正！', 'error');
+        return false;
+      }
+
+      // 3. Ensure player played at least one tile from hand
+      const originalHandCount = backupState.tiles.length;
+      const currentHandCount = players[0].tiles.length;
+      if (currentHandCount >= originalHandCount) {
+        log('您在本回合必須從手牌打出至少一張牌！若無牌可出，請點擊「抽牌」。', 'error');
+        return false;
+      }
+
+      // 4. Ice Break Check
+      if (!players[0].opened) {
+        const originalSetCount = backupState.tableSets.length;
+        let newSetsPoints = 0;
+        for (let i = originalSetCount; i < tableSets.length; i++) {
+          const set = tableSets[i];
+          const val = validate(set.tiles);
+          if (val) {
+            newSetsPoints += val.points;
+          }
+        }
+        if (newSetsPoints < 30) {
+          log(`破冰失敗：本回合打出的新牌組點數總和必須 $\ge 30$ 點！目前為 ${newSetsPoints} 點。`, 'error');
+          return false;
+        }
+        players[0].opened = true;
+        log('恭喜！您成功完成了破冰。', 'system');
+      }
+
+      return true;
+    }
+
+    // Player finishes their turn
     function endTurn() {
-      if (!players[0].opened && turnPoints > 0 && turnPoints < 30) {
-         log('破冰失敗，總點數不足 30 點！已自動復原操作。');
-         restoreState();
-         return; 
+      if (!validateAllBoard()) {
+        SoundManager.playError();
+        render();
+        return;
       }
-      if (playedThisTurn) {
-         consecutivePasses = 0;
-      } else if (pool.length === 0) {
-         consecutivePasses++;
-      }
-      selected = []; playedThisTurn = false; turnPoints = 0; render();
+      
+      consecutivePasses = 0;
+      selected = []; 
+      playedThisTurn = false; 
+      turnPoints = 0; 
+      invalidSets = [];
+      
+      SoundManager.playChime();
+      render();
       checkWin();
-      if(!gameOver) setTimeout(aiTurn, 450);
+      
+      if (!gameOver) {
+        turn = 1;
+        render();
+        setTimeout(aiTurn, 600);
+      }
     }
 
-    function sortValue() { players[0].tiles.sort((a, b) => (a.joker - b.joker) || a.value - b.value || COLORS.indexOf(a.color) - COLORS.indexOf(b.color)); renderRack(); }
-    function sortColor() { players[0].tiles.sort((a, b) => (a.joker - b.joker) || COLORS.indexOf(a.color) - COLORS.indexOf(b.color) || a.value - b.value); renderRack(); }
+    // Sorting Rack
+    function sortValue() { 
+      players[0].tiles.sort((a, b) => (a.joker - b.joker) || a.value - b.value || COLORS.indexOf(a.color) - COLORS.indexOf(b.color)); 
+      SoundManager.playClick();
+      renderRack(); 
+    }
+    
+    function sortColor() { 
+      players[0].tiles.sort((a, b) => (a.joker - b.joker) || COLORS.indexOf(a.color) - COLORS.indexOf(b.color) || a.value - b.value); 
+      SoundManager.playClick();
+      renderRack(); 
+    }
 
+    // Rules Modal Toggle
+    function toggleRules() {
+      const modal = $('rulesModal');
+      modal.classList.toggle('show');
+    }
+
+    // Close rules if clicked outside
+    window.onclick = function(e) {
+      const modal = $('rulesModal');
+      if (e.target === modal) {
+        modal.classList.remove('show');
+      }
+    };
+
+    // AI logic search functions
     function findBestSet(p) {
       let bestSet = null;
       let bestPoints = 0;
       const normalTiles = p.tiles.filter(t => !t.joker);
       const jokers = p.tiles.filter(t => t.joker);
 
-      // 搜尋同數組 (Groups)
+      // Search Groups
       for (let v = 1; v <= 13; v++) {
         const availableColors = COLORS.map(c => normalTiles.find(t => t.value === v && t.color === c)).filter(Boolean);
         for (let size = 3; size <= 4; size++) {
@@ -565,7 +1708,8 @@
               if (set.length === size) {
                 const pts = v * size;
                 if (pts > bestPoints && (p.opened || pts >= 30)) {
-                  bestPoints = pts; bestSet = set;
+                  bestPoints = pts; 
+                  bestSet = set;
                 }
               }
             }
@@ -573,7 +1717,7 @@
         }
       }
 
-      // 搜尋順子 (Runs)
+      // Search Runs
       for (const c of COLORS) {
         const colorTiles = normalTiles.filter(t => t.color === c);
         const vals = [...new Set(colorTiles.map(t => t.value))].sort((a, b) => a - b);
@@ -604,6 +1748,7 @@
       return bestSet;
     }
 
+    // AI Appending
     function aiAppend() {
       if (!players[1].opened) return false;
       const p = players[1];
@@ -612,9 +1757,9 @@
           const combined = [...tableSets[j].tiles, p.tiles[i]];
           const valid = validate(combined);
           if (valid) {
-            tableSets[j].tiles = combined;
+            tableSets[j].tiles = autoSortSet(combined);
             tableSets[j].type = valid.type;
-            log(`AI 將 1 張牌接到了第 ${j + 1} 組。`);
+            log(`AI 將 1 張牌接到了第 ${j + 1} 組。`, 'ai');
             p.tiles.splice(i, 1);
             return true;
           }
@@ -623,113 +1768,179 @@
       return false;
     }
 
+    // AI Turn Controller
     function aiTurn() {
       if (gameOver) return;
-      turn = 1; render();
+      
       const p = players[1];
       let played = false;
 
-      // 1. AI 嘗試接牌
+      // 1. AI tries to append tiles
       if (p.opened) {
-        while (aiAppend()) { played = true; if (p.tiles.length === 0) break; }
+        while (aiAppend()) { 
+          played = true; 
+          if (p.tiles.length === 0) break; 
+        }
       }
 
-      // 2. AI 嘗試出新牌組
+      // 2. AI plays new sets
       if (!p.opened) {
-          let tempTiles = p.tiles.map(t=>({...t}));
-          let setsToPlay = [];
-          let totalPts = 0;
-          while(true) {
-              let bestSet = findBestSet({tiles: tempTiles, opened: true});
-              if(bestSet) {
-                  let v = validate(bestSet);
-                  setsToPlay.push({set: bestSet, type: v.type, points: v.points});
-                  totalPts += v.points;
-                  tempTiles = tempTiles.filter(t => !bestSet.some(s => s.id === t.id));
-              } else {
-                  break;
-              }
-          }
-          if (totalPts >= 30) {
-              p.opened = true;
-              setsToPlay.forEach(s => {
-                  tableSets.push({ owner: 1, type: s.type, tiles: s.set });
-                  p.tiles = p.tiles.filter(t => !s.set.some(st => st.id === t.id));
-                  log(`AI 打出新牌組（${s.type === 'group' ? '同數組' : '順子'}）。`);
-              });
-              played = true;
-          }
-      } else {
-          while (p.tiles.length > 0) {
-            const set = findBestSet(p);
-            if (set) {
-              const valid = validate(set);
-              if (valid) {
-                tableSets.push({ owner: 1, type: valid.type, tiles: set });
-                p.tiles = p.tiles.filter(t => !set.some(s => s.id === t.id));
-                log(`AI 打出新牌組（${valid.type === 'group' ? '同數組' : '順子'}）。`);
-                played = true;
-                continue;
-              }
-            }
+        let tempTiles = p.tiles.map(t => ({...t}));
+        let setsToPlay = [];
+        let totalPts = 0;
+        
+        while (true) {
+          let bestSet = findBestSet({tiles: tempTiles, opened: true});
+          if (bestSet) {
+            let v = validate(bestSet);
+            setsToPlay.push({set: bestSet, type: v.type, points: v.points});
+            totalPts += v.points;
+            tempTiles = tempTiles.filter(t => !bestSet.some(s => s.id === t.id));
+          } else {
             break;
           }
+        }
+        
+        if (totalPts >= 30) {
+          p.opened = true;
+          setsToPlay.forEach(s => {
+            tableSets.push({ owner: 1, type: s.type, tiles: autoSortSet(s.set) });
+            p.tiles = p.tiles.filter(t => !s.set.some(st => st.id === t.id));
+            log(`AI 打出新牌組（${s.type === 'group' ? '同數組' : '順子'}）。`, 'ai');
+          });
+          played = true;
+        }
+      } else {
+        while (p.tiles.length > 0) {
+          const set = findBestSet(p);
+          if (set) {
+            const valid = validate(set);
+            if (valid) {
+              tableSets.push({ owner: 1, type: valid.type, tiles: autoSortSet(set) });
+              p.tiles = p.tiles.filter(t => !set.some(s => s.id === t.id));
+              log(`AI 打出新牌組（${valid.type === 'group' ? '同數組' : '順子'}）。`, 'ai');
+              played = true;
+              continue;
+            }
+          }
+          break;
+        }
       }
 
-      // 3. AI 無牌可出則抽牌
+      // 3. AI draws if no moves made
       if (!played) {
         if (pool.length > 0) {
-          draw(p, 1); log('AI 抽 1 張牌。');
+          draw(p, 1); 
+          log('AI 抽 1 張牌。', 'ai');
           consecutivePasses = 0;
         } else {
-          log('牌池已空，AI 無法抽牌，跳過回合。');
+          log('牌池已空，AI 無法抽牌，跳過回合。', 'system');
           consecutivePasses++;
         }
       } else {
-          consecutivePasses = 0;
+        consecutivePasses = 0;
       }
 
       checkWin();
+      
       if (!gameOver) { 
-          turn = 0; 
-          playedThisTurn = false;
-          turnPoints = 0;
-          saveState(); 
-          log('輪到你。'); 
-          render(); 
+        turn = 0; 
+        playedThisTurn = false;
+        turnPoints = 0;
+        saveState(); 
+        log('輪到您出牌。', 'system'); 
+        render(); 
       }
     }
 
+    // Win condition check
     function checkWin() {
-      if (players[0].tiles.length === 0) { gameOver = true; log('你清空牌架，獲勝！'); }
-      else if (players[1].tiles.length === 0) { gameOver = true; log('AI 清空牌架，AI 勝出。'); }
-      else if (consecutivePasses >= 2 && !gameOver) {
+      if (players[0].tiles.length === 0) { 
+        gameOver = true; 
+        log('您清空了牌架，獲得勝利！', 'system');
+        triggerVictory('恭喜獲勝！', '您率先清空了手牌，贏得了這場拉密對決！');
+      } else if (players[1].tiles.length === 0) { 
+        gameOver = true; 
+        log('AI 清空了牌架，AI 勝出。', 'system'); 
+        triggerVictory('AI 獲得勝利', 'AI 率先清空了手牌。繼續加油，再挑戰一局吧！');
+      } else if (consecutivePasses >= 2 && !gameOver) {
         gameOver = true;
-        const a = scoreLeft(players[0]), b = scoreLeft(players[1]);
-        let resultStr = a < b ? '你贏了！' : (b < a ? 'AI 勝出！' : '平手！');
-        log(`雙方皆無法出牌，遊戲結束。你 ${a} / AI ${b}。${resultStr}`);
+        const a = scoreLeft(players[0]); 
+        const b = scoreLeft(players[1]);
+        let resultStr = a < b ? '您贏了！' : (b < a ? 'AI 勝出！' : '平手！');
+        const detailedStr = `雙方皆無法出牌，對局結束。您的手牌剩餘 ${a} 點 / AI 剩餘 ${b} 點。${resultStr}`;
+        log(detailedStr, 'system');
+        triggerVictory('對局結束 (牌池空)', detailedStr);
       }
     }
 
-    function scoreLeft(p) { return p.tiles.reduce((a, t) => a + (t.joker ? 30 : t.value), 0); }
-    function log(msg) { $('log').innerHTML = `<div>${msg}</div>` + $('log').innerHTML; }
+    function triggerVictory(title, desc) {
+      $('victoryTitle').textContent = title;
+      $('victoryDesc').textContent = desc;
+      $('victoryModal').classList.add('show');
+      
+      if (title.includes('恭喜') || title.includes('您贏了')) {
+        SoundManager.playVictory();
+        Confetti.start();
+      } else {
+        SoundManager.playError();
+      }
+    }
 
-    $('playBtn').onclick = playSelected;
+    function closeVictoryAndReset() {
+      $('victoryModal').classList.remove('show');
+      Confetti.stop();
+      newGame();
+    }
+
+    function scoreLeft(p) { 
+      return p.tiles.reduce((a, t) => a + (t.joker ? 30 : t.value), 0); 
+    }
+
+    // Custom Logger
+    function log(msg, type = 'system') { 
+      const logBox = $('log'); 
+      const div = document.createElement('div');
+      div.className = `log-item ${type}`;
+      div.textContent = msg;
+      logBox.insertBefore(div, logBox.firstChild); 
+    }
+
+    // Event Bindings
+    $('newSetBtn').onclick = playNewSet;
+    
     $('undoBtn').onclick = () => {
-       if (turn !== 0 || gameOver || !playedThisTurn) return;
-       restoreState();
-       log('已復原本回合操作。');
+      if (turn !== 0 || gameOver || !playedThisTurn) return;
+      restoreState();
+      log('已還原為本回合初始狀態。', 'system');
+      SoundManager.playClick();
     };
-    $('drawBtn').onclick = drawAndEnd;
-    $('endBtn').onclick = endTurn;
+    
+    $('drawBtn').onclick = () => {
+      SoundManager.playClick();
+      drawAndEnd();
+    };
+    
+    $('endBtn').onclick = () => {
+      endTurn();
+    };
+    
     $('sortValueBtn').onclick = sortValue;
     $('sortColorBtn').onclick = sortColor;
-    $('newBtn').onclick = newGame;
+    $('rulesBtn').onclick = toggleRules;
+    
+    $('newBtn').onclick = () => {
+      SoundManager.playClick();
+      newGame();
+    };
 
-    newGame();
+    // Auto-init game on load
+    window.onload = () => {
+      newGame();
+    };
   </script>
 
-    <script src="../assets/common/random_bg.js"></script>
+  <script src="../assets/common/random_bg.js"></script>
 </body>
 
 </html>
