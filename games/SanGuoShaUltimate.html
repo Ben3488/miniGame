@@ -2330,7 +2330,10 @@
     <!-- History Sidebar -->
     <div class="history-sidebar" id="historySidebar">
         <div class="history-header">
-            <span>📜 戰局日誌</span>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span>📜 戰局日誌</span>
+                <button onclick="UI.exportLog()" style="padding: 2px 8px; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--theme-gold); background: rgba(245, 158, 11, 0.15); color: var(--theme-gold); cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(245, 158, 11, 0.35)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(245, 158, 11, 0.15)'; this.style.color='var(--theme-gold)';">匯出 LOG</button>
+            </div>
             <button class="history-close" onclick="UI.toggleHistoryLog()">×</button>
         </div>
         <div class="history-content" id="historyLogContent">
@@ -4219,7 +4222,7 @@
                 if (player.equips[slot]) await this.loseEquip(player, slot, 'discard');
                 player.equips[slot] = card;
                 UI.showEquipEffect(player, card, slot);
-                this.log(`【${player.hero.name}】裝備了 ${card.name}`);
+                this.log(`【${player.hero.name}】裝備了【${card.name}】`);
                 UI.updateAll(); await this.sleep(600);
             }
 
@@ -4508,7 +4511,7 @@
                 }
 
                 if (flashed >= requireTwo) {
-                    this.log(`【${target.hero.name}】閃避了攻擊！`);
+                    this.log(`【${target.hero.name}】打出【閃】避開了【${source.hero.name}】的【殺】攻擊！`);
                     if (source.hero.skills.includes('咆哮') && source.hero.id === 'jie_zhang_fei') {
                         await this.drawCards(source, 1, '發動【咆哮】摸了');
                     }
@@ -4932,7 +4935,7 @@
                                 let card = p.hand.splice(i, 1)[0];
                                 target.judges.push(card);
                                 UI.showActiveCard(p, card);
-                                this.log(`【${p.hero.name}】對【${target.hero.name}】使用了 樂不思蜀`);
+                                this.log(`【${p.hero.name}】對【${target.hero.name}】使用了【樂不思蜀】`);
                                 UI.updateAll(); await this.sleep(800);
                             }
                         } else if (c.name === '兵糧寸斷') {
@@ -4941,7 +4944,7 @@
                                 let card = p.hand.splice(i, 1)[0];
                                 target.judges.push(card);
                                 UI.showActiveCard(p, card);
-                                this.log(`【${p.hero.name}】對【${target.hero.name}】使用了 兵糧寸斷`);
+                                this.log(`【${p.hero.name}】對【${target.hero.name}】使用了【兵糧寸斷】`);
                                 UI.updateAll(); await this.sleep(800);
                             }
                         } else {
@@ -4949,7 +4952,7 @@
                                 let card = p.hand.splice(i, 1)[0];
                                 p.judges.push(card);
                                 UI.showActiveCard(p, card);
-                                this.log(`【${p.hero.name}】使用了 閃電`);
+                                this.log(`【${p.hero.name}】裝備了【閃電】`);
                                 UI.updateAll(); await this.sleep(800);
                             }
                         }
@@ -4987,7 +4990,7 @@
                             let card = p.hand.splice(i, 1)[0];
                             this.discardPile.push(card);
                             UI.showActiveCard(p, card);
-                            this.log(`【${p.hero.name}】對【${target.hero.name}】使用了 水淹七軍`);
+                            this.log(`【${p.hero.name}】對【${target.hero.name}】使用了【水淹七軍】`);
                             UI.updateAll(); await this.sleep(800);
                             let w = await this.askWuxie(card, target);
                             if (!w && !target.isDead) {
@@ -5023,7 +5026,7 @@
                             let card = p.hand.splice(i, 1)[0];
                             this.discardPile.push(card);
                             UI.showActiveCard(p, card);
-                            this.log(`【${p.hero.name}】對【${target.hero.name}】使用了 兵臨城下`);
+                            this.log(`【${p.hero.name}】對【${target.hero.name}】使用了【兵臨城下】`);
                             UI.updateAll(); await this.sleep(800);
                             let w = await this.askWuxie(card, target);
                             if (!w && !target.isDead) {
@@ -5042,11 +5045,11 @@
                             let card = p.hand.splice(i, 1)[0];
                             this.discardPile.push(card);
                             UI.showActiveCard(p, card);
-                            this.log(`【${p.hero.name}】對【${target.hero.name}】使用了 知己知彼`);
+                            this.log(`【${p.hero.name}】對【${target.hero.name}】使用了【知己知彼】`);
                             UI.updateAll(); await this.sleep(800);
                             let w = await this.askWuxie(card, target);
                             if (!w && !target.isDead) {
-                                this.log(`【${p.hero.name}】觀觀看了【${target.hero.name}】的手牌！`);
+                                this.log(`【${p.hero.name}】對【${target.hero.name}】使用了【知己知彼】並觀看了其手牌和資訊。`);
                                 await this.sleep(1000);
                             }
                         }
@@ -5056,7 +5059,7 @@
                             let card = p.hand.splice(i, 1)[0];
                             this.discardPile.push(card);
                             UI.showActiveCard(p, card);
-                            this.log(`【${p.hero.name}】對【${target.hero.name}】使用了 遠交近攻`);
+                            this.log(`【${p.hero.name}】對【${target.hero.name}】使用了【遠交近攻】`);
                             UI.updateAll(); await this.sleep(800);
                             let w = await this.askWuxie(card, target);
                             if (!w && !target.isDead && !p.isDead) {
@@ -5083,7 +5086,7 @@
                             this.discardPile.push(card);
                             UI.showActiveCard(p, card);
                             p.flags.usedSha++;
-                            this.log(`【${p.hero.name}】對【${target.hero.name}】使用了 ${card.name}！`);
+                            this.log(`【${p.hero.name}】對【${target.hero.name}】使用了【${card.name}】！`);
                             UI.updateAll(); await this.sleep(800);
                             await this.resolveAttack(p, target, card);
                         }
@@ -5375,6 +5378,7 @@
                             this.discardPile.push(c);
                             UI.showActiveCard(player, c);
                         });
+                        this.log(`【${player.hero.name}】打出了 ${discardedCards.map(c => `【${c.name}】`).join('、')}`);
                         return discardedCards;
                     }
                     return false;
@@ -5451,7 +5455,11 @@
                 }
 
                 target.hp -= amount;
-                this.log(`【${target.hero.name}】受到 ${amount} 點【${damageType === 'fire' ? '火焰' : damageType === 'lightning' ? '雷電' : '普通'}】傷害`);
+                if (source) {
+                    this.log(`【${source.hero.name}】對【${target.hero.name}】造成了 ${amount} 點【${damageType === 'fire' ? '火焰' : damageType === 'lightning' ? '雷電' : '普通'}】傷害`);
+                } else {
+                    this.log(`【${target.hero.name}】受到 ${amount} 點【${damageType === 'fire' ? '火焰' : damageType === 'lightning' ? '雷電' : '普通'}】傷害`);
+                }
 
                 if (source && source.hero.skills.includes('狂暴')) {
                     source.flags.wrath = (source.flags.wrath || 0) + amount;
@@ -5660,7 +5668,7 @@
                                     this.log(`主公技【救援】生效！【${rescuer.hero.name}】救助主公，回復體力加倍！`);
                                 }
                                 target.hp += hpGain; rescued = true;
-                                this.log(`你對【${target.hero.name}】使用了回復卡牌！`);
+                                this.log(`【${rescuer.hero.name}】對【${target.hero.name}】使用了【${played[0].name}】！`);
                                 UI.updateAll(); await this.sleep(800);
                             }
                         } else {
@@ -5679,7 +5687,7 @@
                                         this.log(`主公技【救援】生效！【${rescuer.hero.name}】救助主公，回復體力加倍！`);
                                     }
                                     target.hp += hpGain; rescued = true;
-                                    this.log(`【${rescuer.hero.name}】對【${target.hero.name}】使用了 ${c.name}！`);
+                                    this.log(`【${rescuer.hero.name}】對【${target.hero.name}】使用了【${c.name}】！`);
                                     UI.updateAll(); await this.sleep(800);
                                 }
                             }
@@ -5709,6 +5717,11 @@
                             faction: effectData.faction,
                             quote: effectData.quote
                         });
+                    }
+                    if (myCardsCount < diff) {
+                        this.log(`【${p.hero.name}】的牌不足！需要棄置 ${diff} 張牌`);
+                        this.state = 'PLAYING'; UI.updateAll();
+                        return;
                     }
 
                     // Discard all hand cards
@@ -5785,7 +5798,7 @@
             async onSkillClick() {
                 let p = this.players[0];
                 if (p.flags.yiJueLoss) {
-                    this.log(`你處於義絕狀態，無法使用/發動技能！`);
+                    this.log(`【${p.hero.name}】處於義絕狀態，無法使用/發動技能！`);
                     return;
                 }
                 let activeSkills = [];
@@ -6505,7 +6518,7 @@
             async onCardClick(cardId) {
                 let p = this.players[0];
                 if (p.flags.yiJueLoss) {
-                    this.log(`你處於義絕狀態，無法使用/打出手牌！`);
+                    this.log(`【${p.hero.name}】處於義絕狀態，無法使用/打出手牌！`);
                     return;
                 }
                 let card = p.hand.find(c => c.id === cardId);
@@ -6544,7 +6557,29 @@
                         }
                         this.discardPile.push(p.hand.splice(p.hand.findIndex(c => c.id === cardId), 1)[0]);
                         p.hp++;
-                        this.log('你使用【桃】回復1點體力');
+                        this.log(`【${p.hero.name}】使用【桃】回復 1 點體力`);
+                        if (this.state === 'WAITING') {
+                            this.state = 'PLAYING';
+                            this.log('請出牌或結束回合');
+                        }
+                        UI.updateAll();
+                        return;
+                    }
+                    if (card.name === '閃電') {
+                        if (p.judges.some(j => j.name === '閃電')) {
+                            this.log("你已裝備了【閃電】！");
+                            if (this.state === 'WAITING') {
+                                this.state = 'PLAYING';
+                                this.log('請出牌或結束回合');
+                            }
+                            UI.updateAll();
+                            return;
+                        }
+                        let idx = p.hand.findIndex(c => c.id === cardId);
+                        let c = p.hand.splice(idx, 1)[0];
+                        p.judges.push(c);
+                        UI.showActiveCard(p, c);
+                        this.log(`【${p.hero.name}】裝備了【閃電】！`);
                         if (this.state === 'WAITING') {
                             this.state = 'PLAYING';
                             this.log('請出牌或結束回合');
@@ -6564,7 +6599,7 @@
                         }
                         this.discardPile.push(p.hand.splice(p.hand.findIndex(c => c.id === cardId), 1)[0]);
                         p.flags.drunk = true;
-                        this.log('你使用了【酒】，下一張【殺】造成的傷害+1！');
+                        this.log(`【${p.hero.name}】使用了【酒】，下一張【殺】造成的傷害+1！`);
                         if (this.state === 'WAITING') {
                             this.state = 'PLAYING';
                             this.log('請出牌或結束回合');
@@ -6777,11 +6812,12 @@
                     let idx = p.hand.findIndex(c => c.id === card.id);
                     let isSha = card.name === '殺' || card.name === '雷殺' || card.name === '火殺' || card.name === '雷殺' || card.name === '火殺' || (p.hero.skills.includes('龍膽') && card.name === '閃') || (p.hero.skills.includes('武聖') && card.color === COLOR.RED) || (p.hero.skills.includes('武神') && card.suit === SUIT.HEART);
 
+                    let targetNames = targets.map(t => `【${t.hero.name}】`).join('、');
                     if (card.name === '樂不思蜀' || card.name === '兵糧寸斷') {
                         let c = p.hand.splice(idx, 1)[0];
                         target.judges.push(c);
                         UI.showActiveCard(p, c);
-                        this.log(`你對【${target.hero.name}】使用了 ${card.name}！`);
+                        this.log(`【${p.hero.name}】對${targetNames}使用了【${card.name}】！`);
                         this.state = 'PLAYING';
                     } else {
                         if (idx >= 0) {
@@ -6792,7 +6828,11 @@
                             p.flags.tuntian = (p.flags.tuntian || 0) - 1;
                             this.log(`【${p.hero.name}】發動【急襲】，消耗 1 個「田」！(剩餘 ${p.flags.tuntian} 個)`);
                         }
-                        this.log(`你使用了 ${card.name}！`);
+                        if (targets.length > 0) {
+                            this.log(`【${p.hero.name}】對${targetNames}使用了【${card.name}】！`);
+                        } else {
+                            this.log(`【${p.hero.name}】使用了【${card.name}】！`);
+                        }
                         this.state = 'WAITING';
                     }
                     this.selectedCardIds = [];
@@ -6905,7 +6945,7 @@
                         if (this.state === 'RESPONDING') {
                             respondedCards.forEach(c => UI.showActiveCard(p, c));
                         }
-                        this.log(this.state === 'DISCARDING' ? `你棄置了 ${this.pendingAction.count} 張牌` : `你打出了卡牌！`);
+                        this.log(this.state === 'DISCARDING' ? `【${p.hero.name}】棄置了 ${this.pendingAction.count} 張牌` : `【${p.hero.name}】打出了 ${respondedCards.map(c => `【${c.name}】`).join('、')}`);
                         let res = this.pendingAction.resolve;
                         let action = this.pendingAction;
                         this.state = 'WAITING';
@@ -6994,24 +7034,24 @@
                 // 1. Target shows a card
                 let shownCardIdx = Math.floor(Math.random() * target.hand.length);
                 let shownCard = target.hand[shownCardIdx];
-                this.log(`【${target.hero.name}】展示了手牌：${shownCard.name}，花色為【${shownCard.suit}】`);
+                this.log(`【${target.hero.name}】展示了手牌：【${shownCard.name}】，花色為【${shownCard.suit}】`);
                 await this.sleep(1200);
 
                 // 2. Attacker decides to discard a card of the same suit
                 if (source.id === 0) {
                     let hasSameSuit = source.hand.some(c => c.suit === shownCard.suit);
                     if (!hasSameSuit) {
-                        this.log(`你沒有與【${shownCard.suit}】相同花色的手牌，火攻失敗。`);
+                        this.log(`【${source.hero.name}】沒有與【${shownCard.suit}】相同花色的手牌，火攻失敗。`);
                         await this.sleep(800);
                         return;
                     }
 
                     let discarded = await this.askForCard(source, [], 1, `請選擇一張【${shownCard.suit}】花色的手牌棄置以發動火攻`, true, shownCard.suit);
                     if (discarded && discarded.length > 0) {
-                        this.log(`你棄置了 ${discarded[0].name}，火攻成功！`);
+                        this.log(`【${source.hero.name}】棄置了【${discarded[0].name}】，火攻成功！`);
                         await this.dealDamage(source, target, 1, card, 'fire');
                     } else {
-                        this.log(`你取消了棄牌，火攻失敗。`);
+                        this.log(`【${source.hero.name}】取消了棄牌，火攻失敗。`);
                         await this.sleep(800);
                     }
                 } else {
@@ -7020,7 +7060,7 @@
                     if (discardedIdx !== -1) {
                         let disc = source.hand.splice(discardedIdx, 1)[0];
                         this.discardPile.push(disc);
-                        this.log(`【${source.hero.name}】棄置了手牌 ${disc.name}，火攻成功！`);
+                        this.log(`【${source.hero.name}】棄置了手牌【${disc.name}】，火攻成功！`);
                         await this.sleep(800);
                         await this.dealDamage(source, target, 1, card, 'fire');
                     } else {
@@ -7563,6 +7603,22 @@
                 if (sidebar) {
                     sidebar.classList.toggle('open');
                 }
+            },
+            exportLog: function () {
+                let historyContent = document.getElementById('historyLogContent');
+                if (!historyContent) return;
+                let logEntries = historyContent.getElementsByClassName('log-entry');
+                let logText = Array.from(logEntries).map(entry => entry.innerText).join('\n');
+                
+                let blob = new Blob([logText], { type: 'text/plain;charset=utf-8' });
+                let url = URL.createObjectURL(blob);
+                let a = document.createElement('a');
+                a.href = url;
+                a.download = `sanguosha_ultimate_log_${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '_')}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
             },
             showActiveCard: function (source, card) {
                 let el = document.getElementById('activeCardShow');
