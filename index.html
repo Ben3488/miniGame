@@ -478,6 +478,53 @@
             transform: scale(1.05);
         }
 
+        .category-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3.5rem;
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 6px;
+            border-radius: 50px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            padding: 12px 28px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: 'Outfit', 'Noto Serif TC', sans-serif;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            color: #fff;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.3);
+        }
+
+        .tab-icon {
+            font-size: 1.25rem;
+        }
+
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-30px); }
             to { opacity: 1; transform: translateY(0); }
@@ -497,9 +544,24 @@
         <div class="subtitle">經典對弈 ‧ 智慧傳承</div>
     </div>
 
+    <div class="category-tabs">
+        <button class="tab-btn active" data-tab="all">
+            <span class="tab-icon">🎮</span>
+            <span>全部遊戲</span>
+        </button>
+        <button class="tab-btn" data-tab="basic">
+            <span class="tab-icon">✨</span>
+            <span>基礎入門</span>
+        </button>
+        <button class="tab-btn" data-tab="advanced">
+            <span class="tab-icon">🧠</span>
+            <span>策略進階</span>
+        </button>
+    </div>
+
     <div class="games-container">
         <!-- Gomoku Card -->
-        <a href="games/Gomoku.html" class="game-card gomoku" style="animation-delay: 0.1s;">
+        <a href="games/Gomoku.html" class="game-card gomoku" data-category="basic" style="animation-delay: 0.1s;">
             <div class="card-content">
                 <div class="icon-container">
                     ⚫⚪
@@ -511,7 +573,7 @@
         </a>
 
         <!-- Xiangqi Card -->
-        <a href="games/Xiangqi.html" class="game-card xiangqi" style="animation-delay: 0.3s;">
+        <a href="games/Xiangqi.html" class="game-card xiangqi" data-category="basic" style="animation-delay: 0.3s;">
             <div class="card-content">
                 <div class="icon-container">
                     帥
@@ -523,7 +585,7 @@
         </a>
 
         <!-- Go Card -->
-        <a href="games/Go.html" class="game-card go" style="animation-delay: 0.5s;">
+        <a href="games/Go.html" class="game-card go" data-category="advanced" style="animation-delay: 0.5s;">
             <div class="card-content">
                 <div class="icon-container">
                     圍
@@ -535,7 +597,7 @@
         </a>
 
         <!-- Chinese Checkers Card -->
-        <a href="games/ChineseCheckers.html" class="game-card chinese-checkers" style="animation-delay: 0.7s;">
+        <a href="games/ChineseCheckers.html" class="game-card chinese-checkers" data-category="basic" style="animation-delay: 0.7s;">
             <div class="card-content">
                 <div class="icon-container">
                     跳
@@ -547,7 +609,7 @@
         </a>
 
         <!-- Minesweeper Card -->
-        <a href="games/Minesweeper.html" class="game-card minesweeper" style="animation-delay: 0.9s;">
+        <a href="games/Minesweeper.html" class="game-card minesweeper" data-category="basic" style="animation-delay: 0.9s;">
             <div class="card-content">
                 <div class="icon-container">
                     💣
@@ -559,7 +621,7 @@
         </a>
 
         <!-- Sudoku Card -->
-        <a href="games/Sudoku.html" class="game-card sudoku" style="animation-delay: 1.1s;">
+        <a href="games/Sudoku.html" class="game-card sudoku" data-category="basic" style="animation-delay: 1.1s;">
             <div class="card-content">
                 <div class="icon-container">
                     🔢
@@ -571,7 +633,7 @@
         </a>
 
         <!-- UNO Card -->
-        <a href="games/Uno.html" class="game-card uno" style="animation-delay: 1.3s;">
+        <a href="games/Uno.html" class="game-card uno" data-category="basic" style="animation-delay: 1.3s;">
             <div class="card-content">
                 <div class="icon-container" style="font-size: 2.5rem;">
                     UNO
@@ -583,7 +645,7 @@
         </a>
 
         <!-- Carcassonne Card -->
-        <a href="games/Carcassonne.html" class="game-card carcassonne" style="animation-delay: 1.5s;">
+        <a href="games/Carcassonne.html" class="game-card carcassonne" data-category="advanced" style="animation-delay: 1.5s;">
             <div class="card-content">
                 <div class="icon-container">
                     🏰
@@ -595,7 +657,7 @@
         </a>
 
         <!-- Catan Card -->
-        <a href="games/Catan.html" class="game-card catan" style="animation-delay: 1.7s;">
+        <a href="games/Catan.html" class="game-card catan" data-category="advanced" style="animation-delay: 1.7s;">
             <div class="card-content">
                 <div class="icon-container">
                     🎲
@@ -607,7 +669,7 @@
         </a>
 
         <!-- Rummikub Card -->
-        <a href="games/Rummikub.html" class="game-card rummikub" style="animation-delay: 1.9s;">
+        <a href="games/Rummikub.html" class="game-card rummikub" data-category="basic" style="animation-delay: 1.9s;">
             <div class="card-content">
                 <div class="icon-container" style="font-size: 2.5rem;">
                     123
@@ -619,7 +681,7 @@
         </a>
 
         <!-- Saboteur Card -->
-        <a href="games/Saboteur.html" class="game-card saboteur" style="animation-delay: 2.1s;">
+        <a href="games/Saboteur.html" class="game-card saboteur" data-category="advanced" style="animation-delay: 2.1s;">
             <div class="card-content">
                 <div class="icon-container">
                     ⛏️
@@ -631,7 +693,7 @@
         </a>
 
         <!-- SanGuoSha Standard Card -->
-        <a href="games/SanGuoShaStandard.html" class="game-card sanguosha" style="animation-delay: 2.3s;">
+        <a href="games/SanGuoShaStandard.html" class="game-card sanguosha" data-category="advanced" style="animation-delay: 2.3s;">
             <div class="card-content">
                 <div class="icon-container">
                     殺
@@ -643,7 +705,7 @@
         </a>
 
         <!-- SanGuoSha Ultimate Card -->
-        <a href="games/SanGuoShaUltimate.html" class="game-card sanguosha-ultimate" style="animation-delay: 2.5s;">
+        <a href="games/SanGuoShaUltimate.html" class="game-card sanguosha-ultimate" data-category="advanced" style="animation-delay: 2.5s;">
             <div class="card-content">
                 <div class="icon-container">
                     神
@@ -655,7 +717,7 @@
         </a>
 
         <!-- Tic-Tac-Toe Card -->
-        <a href="games/TicTacToe.html" class="game-card tictactoe" style="animation-delay: 2.7s;">
+        <a href="games/TicTacToe.html" class="game-card tictactoe" data-category="basic" style="animation-delay: 2.7s;">
             <div class="card-content">
                 <div class="icon-container">
                     ❌⭕
@@ -695,6 +757,35 @@
             
             card.addEventListener('mouseenter', () => {
                 card.style.transition = 'transform 0.1s ease';
+            });
+        });
+
+        // Tab switcher and filter logic
+        const tabs = document.querySelectorAll('.tab-btn');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Update active tab class
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const targetTab = tab.dataset.tab;
+                let visibleIndex = 0;
+
+                cards.forEach(card => {
+                    const category = card.dataset.category;
+                    if (targetTab === 'all' || category === targetTab) {
+                        card.style.display = 'flex';
+                        // Re-trigger entrance animation
+                        card.style.animation = 'none';
+                        card.offsetHeight; // trigger reflow
+                        card.style.animation = `fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards`;
+                        card.style.animationDelay = `${visibleIndex * 0.08}s`;
+                        visibleIndex++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
             });
         });
     </script>
