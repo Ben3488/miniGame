@@ -25,6 +25,7 @@
             --rummikub-color: #3b82f6;
             --saboteur-color: #78716c;
             --sanguosha-color: #dc2626;
+            --tictactoe-color: #00f2fe;
         }
 
         body {
@@ -190,6 +191,11 @@
             border-color: rgba(234, 179, 8, 0.4);
         }
 
+        .game-card.tictactoe:hover {
+            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 242, 254, 0.2);
+            border-color: rgba(0, 242, 254, 0.4);
+        }
+
         .card-content {
             position: relative;
             z-index: 1;
@@ -332,6 +338,15 @@
             text-shadow: 0 0 10px rgba(234, 179, 8, 0.5);
         }
 
+        .tictactoe .icon-container {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(255, 0, 127, 0.2));
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.3);
+            border: 2px solid rgba(0, 242, 254, 0.5);
+            font-family: 'Outfit', sans-serif;
+            color: #00f2fe;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+        }
+
         .game-title {
             font-size: 2.5rem;
             margin: 0;
@@ -416,6 +431,12 @@
             -webkit-text-fill-color: transparent;
         }
 
+        .tictactoe .game-title {
+            background: linear-gradient(to right, #00f2fe, #ff007f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
         .game-desc {
             color: var(--text-sub);
             font-size: 1.1rem;
@@ -450,10 +471,58 @@
         .saboteur .play-btn { border: 1px solid rgba(120, 113, 108, 0.3); }
         .sanguosha .play-btn { border: 1px solid rgba(220, 38, 38, 0.3); }
         .sanguosha-ultimate .play-btn { border: 1px solid rgba(234, 179, 8, 0.3); }
+        .tictactoe .play-btn { border: 1px solid rgba(0, 242, 254, 0.3); }
 
         .game-card:hover .play-btn {
             background: rgba(255,255,255,0.2);
             transform: scale(1.05);
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3.5rem;
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 6px;
+            border-radius: 50px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            padding: 12px 28px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: 'Outfit', 'Noto Serif TC', sans-serif;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            color: #fff;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.3);
+        }
+
+        .tab-icon {
+            font-size: 1.25rem;
         }
 
         @keyframes fadeInDown {
@@ -475,9 +544,24 @@
         <div class="subtitle">經典對弈 ‧ 智慧傳承</div>
     </div>
 
+    <div class="category-tabs">
+        <button class="tab-btn active" data-tab="all">
+            <span class="tab-icon">🎮</span>
+            <span>全部遊戲</span>
+        </button>
+        <button class="tab-btn" data-tab="basic">
+            <span class="tab-icon">✨</span>
+            <span>基礎入門</span>
+        </button>
+        <button class="tab-btn" data-tab="advanced">
+            <span class="tab-icon">🧠</span>
+            <span>策略進階</span>
+        </button>
+    </div>
+
     <div class="games-container">
-        <!-- Gomoku Card -->
-        <a href="games/Gomoku.html" class="game-card gomoku" style="animation-delay: 0.1s;">
+        <!-- Gomoku Card (basic) -->
+        <a href="games/Gomoku.html" class="game-card gomoku" data-category="basic" style="animation-delay: 0.1s;">
             <div class="card-content">
                 <div class="icon-container">
                     ⚫⚪
@@ -488,8 +572,8 @@
             </div>
         </a>
 
-        <!-- Xiangqi Card -->
-        <a href="games/Xiangqi.html" class="game-card xiangqi" style="animation-delay: 0.3s;">
+        <!-- Xiangqi Card (basic) -->
+        <a href="games/Xiangqi.html" class="game-card xiangqi" data-category="basic" style="animation-delay: 0.3s;">
             <div class="card-content">
                 <div class="icon-container">
                     帥
@@ -500,20 +584,8 @@
             </div>
         </a>
 
-        <!-- Go Card -->
-        <a href="games/Go.html" class="game-card go" style="animation-delay: 0.5s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    圍
-                </div>
-                <h2 class="game-title">圍棋</h2>
-                <p class="game-desc">黑白交錯的方寸之戰，體驗氣與圍地的極致策略。</p>
-                <div class="play-btn">開始遊戲</div>
-            </div>
-        </a>
-
-        <!-- Chinese Checkers Card -->
-        <a href="games/ChineseCheckers.html" class="game-card chinese-checkers" style="animation-delay: 0.7s;">
+        <!-- Chinese Checkers Card (basic) -->
+        <a href="games/ChineseCheckers.html" class="game-card chinese-checkers" data-category="basic" style="animation-delay: 0.5s;">
             <div class="card-content">
                 <div class="icon-container">
                     跳
@@ -524,8 +596,8 @@
             </div>
         </a>
 
-        <!-- Minesweeper Card -->
-        <a href="games/Minesweeper.html" class="game-card minesweeper" style="animation-delay: 0.9s;">
+        <!-- Minesweeper Card (basic) -->
+        <a href="games/Minesweeper.html" class="game-card minesweeper" data-category="basic" style="animation-delay: 0.7s;">
             <div class="card-content">
                 <div class="icon-container">
                     💣
@@ -536,8 +608,8 @@
             </div>
         </a>
 
-        <!-- Sudoku Card -->
-        <a href="games/Sudoku.html" class="game-card sudoku" style="animation-delay: 1.1s;">
+        <!-- Sudoku Card (basic) -->
+        <a href="games/Sudoku.html" class="game-card sudoku" data-category="basic" style="animation-delay: 0.9s;">
             <div class="card-content">
                 <div class="icon-container">
                     🔢
@@ -548,8 +620,8 @@
             </div>
         </a>
 
-        <!-- UNO Card -->
-        <a href="games/Uno.html" class="game-card uno" style="animation-delay: 1.3s;">
+        <!-- UNO Card (basic) -->
+        <a href="games/Uno.html" class="game-card uno" data-category="basic" style="animation-delay: 1.1s;">
             <div class="card-content">
                 <div class="icon-container" style="font-size: 2.5rem;">
                     UNO
@@ -560,32 +632,8 @@
             </div>
         </a>
 
-        <!-- Carcassonne Card -->
-        <a href="games/Carcassonne.html" class="game-card carcassonne" style="animation-delay: 1.5s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    🏰
-                </div>
-                <h2 class="game-title">卡卡頌</h2>
-                <p class="game-desc">經典板塊拼放，在中古世紀的法國打造城堡與草原的版圖。</p>
-                <div class="play-btn">進入遊戲</div>
-            </div>
-        </a>
-
-        <!-- Catan Card -->
-        <a href="games/Catan.html" class="game-card catan" style="animation-delay: 1.7s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    🎲
-                </div>
-                <h2 class="game-title">卡坦島</h2>
-                <p class="game-desc">探索未知島嶼，收集資源、建設城鎮，成為卡坦島的霸主。</p>
-                <div class="play-btn">進入遊戲</div>
-            </div>
-        </a>
-
-        <!-- Rummikub Card -->
-        <a href="games/Rummikub.html" class="game-card rummikub" style="animation-delay: 1.9s;">
+        <!-- Rummikub Card (basic) -->
+        <a href="games/Rummikub.html" class="game-card rummikub" data-category="basic" style="animation-delay: 1.3s;">
             <div class="card-content">
                 <div class="icon-container" style="font-size: 2.5rem;">
                     123
@@ -596,8 +644,56 @@
             </div>
         </a>
 
-        <!-- Saboteur Card -->
-        <a href="games/Saboteur.html" class="game-card saboteur" style="animation-delay: 2.1s;">
+        <!-- Tic-Tac-Toe Card (basic) -->
+        <a href="games/TicTacToe.html" class="game-card tictactoe" data-category="basic" style="animation-delay: 1.5s;">
+            <div class="card-content">
+                <div class="icon-container">
+                    ❌⭕
+                </div>
+                <h2 class="game-title">井字棋</h2>
+                <p class="game-desc">流光霓虹風格的經典井字棋，支援雙人對戰與地獄級 AI 挑戰。</p>
+                <div class="play-btn">開始遊戲</div>
+            </div>
+        </a>
+
+        <!-- Go Card (advanced) -->
+        <a href="games/Go.html" class="game-card go" data-category="advanced" style="animation-delay: 1.7s;">
+            <div class="card-content">
+                <div class="icon-container">
+                    圍
+                </div>
+                <h2 class="game-title">圍棋</h2>
+                <p class="game-desc">黑白交錯的方寸之戰，體驗氣與圍地的極致策略。</p>
+                <div class="play-btn">開始遊戲</div>
+            </div>
+        </a>
+
+        <!-- Carcassonne Card (advanced) -->
+        <a href="games/Carcassonne.html" class="game-card carcassonne" data-category="advanced" style="animation-delay: 1.9s;">
+            <div class="card-content">
+                <div class="icon-container">
+                    🏰
+                </div>
+                <h2 class="game-title">卡卡頌</h2>
+                <p class="game-desc">經典板塊拼放，在中古世紀的法國打造城堡與草原的版圖。</p>
+                <div class="play-btn">進入遊戲</div>
+            </div>
+        </a>
+
+        <!-- Catan Card (advanced) -->
+        <a href="games/Catan.html" class="game-card catan" data-category="advanced" style="animation-delay: 2.1s;">
+            <div class="card-content">
+                <div class="icon-container">
+                    🎲
+                </div>
+                <h2 class="game-title">卡坦島</h2>
+                <p class="game-desc">探索未知島嶼，收集資源、建設城鎮，成為卡坦島的霸主。</p>
+                <div class="play-btn">進入遊戲</div>
+            </div>
+        </a>
+
+        <!-- Saboteur Card (advanced) -->
+        <a href="games/Saboteur.html" class="game-card saboteur" data-category="advanced" style="animation-delay: 2.3s;">
             <div class="card-content">
                 <div class="icon-container">
                     ⛏️
@@ -608,8 +704,8 @@
             </div>
         </a>
 
-        <!-- SanGuoSha Standard Card -->
-        <a href="games/SanGuoShaStandard.html" class="game-card sanguosha" style="animation-delay: 2.3s;">
+        <!-- SanGuoSha Standard Card (advanced) -->
+        <a href="games/SanGuoShaStandard.html" class="game-card sanguosha" data-category="advanced" style="animation-delay: 2.5s;">
             <div class="card-content">
                 <div class="icon-container">
                     殺
@@ -620,8 +716,8 @@
             </div>
         </a>
 
-        <!-- SanGuoSha Ultimate Card -->
-        <a href="games/SanGuoShaUltimate.html" class="game-card sanguosha-ultimate" style="animation-delay: 2.5s;">
+        <!-- SanGuoSha Ultimate Card (advanced) -->
+        <a href="games/SanGuoShaUltimate.html" class="game-card sanguosha-ultimate" data-category="advanced" style="animation-delay: 2.7s;">
             <div class="card-content">
                 <div class="icon-container">
                     神
@@ -661,6 +757,35 @@
             
             card.addEventListener('mouseenter', () => {
                 card.style.transition = 'transform 0.1s ease';
+            });
+        });
+
+        // Tab switcher and filter logic
+        const tabs = document.querySelectorAll('.tab-btn');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Update active tab class
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const targetTab = tab.dataset.tab;
+                let visibleIndex = 0;
+
+                cards.forEach(card => {
+                    const category = card.dataset.category;
+                    if (targetTab === 'all' || category === targetTab) {
+                        card.style.display = 'flex';
+                        // Re-trigger entrance animation
+                        card.style.animation = 'none';
+                        card.offsetHeight; // trigger reflow
+                        card.style.animation = `fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards`;
+                        card.style.animationDelay = `${visibleIndex * 0.08}s`;
+                        visibleIndex++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
             });
         });
     </script>
