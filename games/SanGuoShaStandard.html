@@ -2022,7 +2022,8 @@
                 this.deck = generateDeck();
                 this.discardPile = [];
                 this.currentPlayerIdx = 0;
-                this.state = 'INIT'; // INIT, PLAYING, TARGETING, RESPONDING, DISCARDING, WAITING, GAME_OVER
+                this._state = 'INIT'; // INIT, PLAYING, TARGETING, RESPONDING, DISCARDING, WAITING, GAME_OVER
+                this.turnTransitioned = false;
                 this.currentPhase = '';
                 this.pendingAction = null;
                 this.selectedCardIds = [];
@@ -2035,6 +2036,22 @@
                     onDamage: [],
                     onLoseEquip: []
                 };
+            }
+
+            get state() {
+                return this._state;
+            }
+
+            set state(val) {
+                if (val === 'PLAYING') {
+                    let p = this.players[this.currentPlayerIdx];
+                    if (p && p.isDead) {
+                        this._state = 'WAITING';
+                        this.nextTurn();
+                        return;
+                    }
+                }
+                this._state = val;
             }
 
             updateLobbyMode() {
@@ -2797,6 +2814,7 @@
             }
 
             async startTurn(playerIdx) {
+                this.turnTransitioned = false;
                 this.currentPlayerIdx = playerIdx;
                 let p = this.players[playerIdx];
                 if(p.isDead) { this.nextTurn(); return; }
@@ -2915,7 +2933,10 @@
                 this.currentPhase = '判定';
                 UI.updateAll();
                 await this.judgePhase(p);
-                if(p.isDead || this.state === 'GAME_OVER') return;
+                if(p.isDead || this.state === 'GAME_OVER') {
+                    if (p.isDead && this.state !== 'GAME_OVER') this.nextTurn();
+                    return;
+                }
                 
                 let skipPlay = p.flags.skipPlay;
                 let skipDraw = p.flags.skipDraw;
@@ -2929,6 +2950,11 @@
                     await this.sleep(800);
                 }
                 
+                if(p.isDead || this.state === 'GAME_OVER') {
+                    if (p.isDead && this.state !== 'GAME_OVER') this.nextTurn();
+                    return;
+                }
+                
                 if(!skipPlay) {
                     await this.playPhase(p);
                 } else {
@@ -2937,6 +2963,11 @@
                     this.log(`【${p.hero.name}】跳過出牌階段`);
                     await this.sleep(800);
                     await this.discardPhase(p);
+                }
+                
+                if(p.isDead || this.state === 'GAME_OVER') {
+                    if (p.isDead && this.state !== 'GAME_OVER') this.nextTurn();
+                    return;
                 }
             }
             
@@ -4123,7 +4154,7 @@
             }
 
             shouldAIWuxie(player, target, trickCard, negated) {
-                let harmful = ['決鬥', '南蠻入侵', '萬箭齊發', '樂不思蜀', '兵糧寸斷', '閃電', '過河拆橋', '順手牽羊'].includes(trickCard.name);
+                let harmful = ['決鬥', '南蠻入侵', '萬箭齊發', '樂不思蜀', '兵糧寸斷', '閃電', '過河拆橋', '順手牽羊', '兵臨城下', '水淹七軍', '借刀殺人'].includes(trickCard.name);
                 let sameSide = this.isSameSide(player, target);
                 return negated ? ((harmful && !sameSide) || (!harmful && sameSide)) : ((harmful && sameSide) || (!harmful && !sameSide));
             }
@@ -4137,7 +4168,9 @@
                     if(!p.isDead && p.hand.some(c => c.name === '無懈可擊')) {
                         let used = false;
                         if(p.id === 0) {
-                            used = await this.askForCard(p, ['無懈可擊'], 1, `【${trickCard.name}】${negated ? '已被無懈，是否再用無懈使其生效？' : `即將對【${target.hero.name}】生效，是否使用無懈可擊？`}`, true);
+                            if (this.shouldAIWuxie(p, target, trickCard, negated)) {
+                                used = await this.askForCard(p, ['無懈可擊'], 1, `【${trickCard.name}】${negated ? '已被無懈，是否再用無懈使其生效？' : `即將對【${target.hero.name}】生效，是否使用無懈可擊？`}`, true);
+                            }
                         } else if(this.shouldAIWuxie(p, target, trickCard, negated)) {
                             let ok = await this.askForCard(p, ['無懈可擊'], 1, ``, false);
                             used = !!ok;
@@ -4156,6 +4189,7 @@
             }
 
             async askForCard(player, validCardNames, count, promptMsg, optional = false, suitConstraint = null, colorConstraint = null) {
+                if (player.isDead) return false;
                 if (player.flags.yiJueLoss) {
                     this.log(`【${player.hero.name}】處於義絕狀態，無法出牌/打出牌！`);
                     await this.sleep(600);
@@ -4329,6 +4363,7 @@
             }
 
             async askForSkill(player, skillName, promptMsg) {
+                if (player.isDead) return false;
                 if(player.id === 0) {
                     return new Promise(resolve => {
                         this.state = 'ASK_SKILL';
@@ -6075,6 +6110,8 @@
 
             nextTurn() {
                 if(this.state === 'GAME_OVER') return;
+                if(this.turnTransitioned) return;
+                this.turnTransitioned = true;
                 this.currentPhase = '';
                 this.players.forEach(p => { p.flags.yiJueLoss = false; });
                 let next = (this.currentPlayerIdx + 1) % this.players.length;
