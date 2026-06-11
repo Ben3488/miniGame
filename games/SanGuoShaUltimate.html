@@ -3276,7 +3276,7 @@
 
                     if (targets.length === 0) continue;
 
-                    let shaIdx = player.hand.findIndex(c => c.name === '殺' || (player.hero.skills.includes('龍膽') && c.name === '閃') || (player.hero.skills.includes('武聖') && c.color === COLOR.RED) || (player.hero.skills.includes('武神') && c.suit === SUIT.HEART));
+                    let shaIdx = player.hand.findIndex(c => ['殺', '雷殺', '火殺'].includes(c.name) || (player.hero.skills.includes('龍膽') && c.name === '閃') || (player.hero.skills.includes('武聖') && c.color === COLOR.RED) || (player.hero.skills.includes('武神') && c.suit === SUIT.HEART));
                     let hasSha = (shaIdx !== -1);
 
                     let usedSha = false;
@@ -4884,7 +4884,7 @@
                             UI.updateAll(); await this.sleep(800);
                         }
                     } else if (c.name === '酒') {
-                        let hasSha = p.hand.some(c => c.name === '殺' || (p.hero.skills.includes('龍膽') && c.name === '閃') || (p.hero.skills.includes('武聖') && c.color === COLOR.RED) || (p.hero.skills.includes('武神') && c.suit === SUIT.HEART));
+                        let hasSha = p.hand.some(c => ['殺', '雷殺', '火殺'].includes(c.name) || (p.hero.skills.includes('龍膽') && c.name === '閃') || (p.hero.skills.includes('武聖') && c.color === COLOR.RED) || (p.hero.skills.includes('武神') && c.suit === SUIT.HEART));
                         let inRange = enemies.filter(o => !o.isDead).some(o => this.getDistance(p.id, o.id) <= this.getAttackRange(p));
                         if (hasSha && inRange && !p.flags.drunk) {
                             let card = p.hand.splice(i, 1)[0];
@@ -5040,7 +5040,7 @@
                 let canSha = (p.flags.usedSha < (p.equips.weapon && p.equips.weapon.name === '諸葛連弩' ? 99 : 1));
                 if (p.hero.skills.includes('咆哮')) canSha = true;
                 if (canSha) {
-                    let idx = p.hand.findIndex(c => c.name === '殺' || (p.hero.skills.includes('龍膽') && c.name === '閃') || (p.hero.skills.includes('武聖') && c.color === COLOR.RED) || (p.hero.skills.includes('武神') && c.suit === SUIT.HEART));
+                    let idx = p.hand.findIndex(c => ['殺', '雷殺', '火殺'].includes(c.name) || (p.hero.skills.includes('龍膽') && c.name === '閃') || (p.hero.skills.includes('武聖') && c.color === COLOR.RED) || (p.hero.skills.includes('武神') && c.suit === SUIT.HEART));
                     if (idx !== -1) {
                         let card = p.hand[idx];
                         let noRangeLimit = p.hero.skills.includes('怒斬') && card.color === COLOR.RED && card.type === 'equip';
@@ -6325,7 +6325,7 @@
                         let cardName = this.pendingAction.card.name;
                         let dist = this.getDistance(0, targetIdx);
                         if (cardName === '順手牽羊' && dist > 1 && !p.hero.skills.includes('奇才')) { this.log("距離過遠！"); return; }
-                        let isSha = cardName === '殺' ||
+                        let isSha = ['殺', '雷殺', '火殺'].includes(cardName) ||
                             (p.hero.skills.includes('龍膽') && cardName === '閃') ||
                             (p.hero.skills.includes('武聖') && this.pendingAction.card.color === COLOR.RED) ||
                             (p.hero.skills.includes('武神') && this.pendingAction.card.suit === SUIT.HEART);
@@ -6354,7 +6354,7 @@
                         }
                         if (this.players[targetIdx].hero.skills.includes('謙遜') && (cardName === '順手牽羊' || cardName === '樂不思蜀')) { this.log("該角色擁有謙遜，不能被指定！"); return; }
                         if (this.players[targetIdx].hero.skills.includes('帷幕') && this.pendingAction.card.color === COLOR.BLACK && this.pendingAction.card.type === 'trick') { this.log("該角色擁有帷幕，不受黑色錦囊牌影響！"); return; }
-                        if (this.players[targetIdx].hero.skills.includes('空城') && this.players[targetIdx].hand.length === 0 && (cardName === '殺' || cardName === '決鬥')) { this.log("該角色處於空城狀態，不能被指定！"); return; }
+                        if (this.players[targetIdx].hero.skills.includes('空城') && this.players[targetIdx].hand.length === 0 && (['殺', '雷殺', '火殺'].includes(cardName) || cardName === '決鬥')) { this.log("該角色處於空城狀態，不能被指定！"); return; }
                     }
 
                     // 2. Skill target checks
@@ -6529,13 +6529,13 @@
                         this.useImmediateCard(p, card);
                         return;
                     }
-                    let isSha = card.name === '殺' ||
+                    let isSha = ['殺', '雷殺', '火殺'].includes(card.name) ||
                         (p.hero.skills.includes('龍膽') && card.name === '閃') ||
                         (p.hero.skills.includes('武聖') && card.color === COLOR.RED) ||
                         (p.hero.skills.includes('武神') && card.suit === SUIT.HEART);
                     let needsTarget = ['決鬥', '過河拆橋', '順手牽羊', '樂不思蜀', '火攻', '兵糧寸斷', '水淹七軍', '兵臨城下', '知己知彼', '遠交近攻'].includes(card.name) || isSha;
                     if (needsTarget) {
-                        let isSha = card.name === '殺' || (p.hero.skills.includes('龍膽') && card.name === '閃') || (p.hero.skills.includes('武聖') && card.color === COLOR.RED) || (p.hero.skills.includes('武神') && card.suit === SUIT.HEART);
+                        let isSha = ['殺', '雷殺', '火殺'].includes(card.name) || (p.hero.skills.includes('龍膽') && card.name === '閃') || (p.hero.skills.includes('武聖') && card.color === COLOR.RED) || (p.hero.skills.includes('武神') && card.suit === SUIT.HEART);
                         let maxTargets = isSha && p.equips.weapon && p.equips.weapon.name === '方天畫戟' && p.hand.length === 1 ? 3 : 1;
                         this.state = 'TARGETING';
                         this.pendingAction = { type: 'USE_CARD', card, maxTargets };
@@ -6549,7 +6549,8 @@
                         let validNames = this.pendingAction.names;
                         let validSuit = this.pendingAction.suit;
                         isValid = validNames.length === 0 || validNames.includes(card.name) ||
-                            (validNames.includes('閃') && p.hero.skills.includes('龍膽') && card.name === '殺') ||
+                            (validNames.includes('殺') && ['殺', '雷殺', '火殺'].includes(card.name)) ||
+                            (validNames.includes('閃') && p.hero.skills.includes('龍膽') && ['殺', '雷殺', '火殺'].includes(card.name)) ||
                             (validNames.includes('殺') && p.hero.skills.includes('龍膽') && card.name === '閃') ||
                             (validNames.includes('殺') && p.hero.skills.includes('武聖') && card.color === COLOR.RED) ||
                             (validNames.includes('閃') && p.hero.skills.includes('傾國') && card.color === COLOR.BLACK) ||
@@ -6681,6 +6682,21 @@
                         return;
                     }
 
+                    if (['LUAN_WU_TARGET', 'LI_LI'].includes(type)) {
+                        let resolve = this.pendingAction.resolve;
+                        let targetId = this.selectedTargets[0];
+                        this.state = 'WAITING';
+                        this.pendingAction = null;
+                        this.selectedTargets = [];
+                        UI.updateAll();
+                        if (type === 'LI_LI') {
+                            await resolve(this.players[targetId]);
+                        } else {
+                            await resolve(targetId);
+                        }
+                        return;
+                    }
+
                     if (['REN_DE', 'JIE_YIN', 'LI_JIAN', 'FAN_JIAN', 'QU_HU', 'QU_HU_DAMAGE', 'DI_MENG', 'YI_JUE', 'LEI_JI', 'JIE_MING', 'TIAO_XIN', 'HAOSHI', 'SAN_JIAN', 'YIN_YUE'].includes(type)) {
                         let resolve = this.pendingAction.resolve;
                         let targets = this.selectedTargets;
@@ -6705,7 +6721,7 @@
                     let target = targets[0];
                     let card = this.pendingAction.card;
                     let idx = p.hand.findIndex(c => c.id === card.id);
-                    let isSha = card.name === '殺' || (p.hero.skills.includes('龍膽') && card.name === '閃') || (p.hero.skills.includes('武聖') && card.color === COLOR.RED) || (p.hero.skills.includes('武神') && card.suit === SUIT.HEART);
+                    let isSha = ['殺', '雷殺', '火殺'].includes(card.name) || (p.hero.skills.includes('龍膽') && card.name === '閃') || (p.hero.skills.includes('武聖') && card.color === COLOR.RED) || (p.hero.skills.includes('武神') && card.suit === SUIT.HEART);
 
                     if (card.name === '樂不思蜀' || card.name === '兵糧寸斷') {
                         let c = p.hand.splice(idx, 1)[0];
@@ -7821,6 +7837,8 @@
 
                 if (Engine.state === 'TARGETING' || Engine.state === 'RESPONDING' || Engine.state === 'ASK_SKILL') {
                     if (Engine.state === 'RESPONDING' && !Engine.pendingAction.optional) {
+                        document.getElementById('btnCancel').style.display = 'none';
+                    } else if (Engine.state === 'TARGETING' && Engine.pendingAction && ['LUAN_WU_TARGET', 'LI_LI'].includes(Engine.pendingAction.type)) {
                         document.getElementById('btnCancel').style.display = 'none';
                     } else {
                         document.getElementById('btnCancel').style.display = 'inline-block';
