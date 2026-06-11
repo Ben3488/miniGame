@@ -2121,15 +2121,15 @@
 
             <div class="equip-section" id="equip0">
                 <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqWeapon0"
-                    onclick="UI.showEquipInfo('weapon')">武器: 無</div>
+                    onclick="Engine.onEquipClick('weapon')">武器: 無</div>
                 <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqArmor0"
-                    onclick="UI.showEquipInfo('armor')">防具: 無</div>
+                    onclick="Engine.onEquipClick('armor')">防具: 無</div>
                 <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqDefMount0"
-                    onclick="UI.showEquipInfo('defMount')">+1馬: 無</div>
+                    onclick="Engine.onEquipClick('defMount')">+1馬: 無</div>
                 <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqOffMount0"
-                    onclick="UI.showEquipInfo('offMount')">-1馬: 無</div>
+                    onclick="Engine.onEquipClick('offMount')">-1馬: 無</div>
                 <div style="border:1px solid #777; padding:5px; border-radius:4px; cursor:pointer;" id="eqTreasure0"
-                    onclick="UI.showEquipInfo('treasure')">寶物: 無</div>
+                    onclick="Engine.onEquipClick('treasure')">寶物: 無</div>
             </div>
         </div>
 
@@ -6512,6 +6512,43 @@
                         this.selectedTargets = [targetIdx];
                     }
                     UI.updateAll();
+                }
+            }
+
+            onEquipClick(slot) {
+                if (this.state === 'RESPONDING' || this.state === 'DISCARDING') {
+                    let p = this.players[0];
+                    let card = p.equips[slot];
+                    if (!card) return;
+
+                    let isValid = this.state === 'DISCARDING';
+                    if (this.state === 'RESPONDING') {
+                        let validNames = this.pendingAction.names;
+                        let validSuit = this.pendingAction.suit;
+                        let validColor = this.pendingAction.color;
+                        isValid = validNames.length === 0 || validNames.includes(card.name) ||
+                            (validNames.includes('桃') && p.hero.skills.includes('急救') && card.color === COLOR.RED && this.currentPlayerIdx !== p.id) ||
+                            (validNames.includes('殺') && p.hero.skills.includes('武聖') && card.color === COLOR.RED);
+                        if (validSuit && card.suit !== validSuit) isValid = false;
+                        if (validColor && card.color !== validColor) isValid = false;
+                    }
+
+                    if (isValid) {
+                        let cardId = card.id;
+                        if (this.selectedCardIds.includes(cardId)) {
+                            this.selectedCardIds = this.selectedCardIds.filter(id => id !== cardId);
+                        } else {
+                            if (this.selectedCardIds.length >= this.pendingAction.count) {
+                                this.selectedCardIds.shift();
+                            }
+                            this.selectedCardIds.push(cardId);
+                        }
+                        UI.updateAll();
+                    } else {
+                        this.log("該裝備牌在此時無效！");
+                    }
+                } else {
+                    UI.showEquipInfo(slot);
                 }
             }
 

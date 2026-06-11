@@ -2790,6 +2790,7 @@
             }
 
             isSameSide(a, b) {
+                if(a.id === b.id) return true;
                 if(a.role === ROLE.SPY || b.role === ROLE.SPY) return false;
                 if(a.role === b.role) return true;
                 return (a.role === ROLE.LORD && b.role === ROLE.LOYAL) || (a.role === ROLE.LOYAL && b.role === ROLE.LORD);
@@ -2851,7 +2852,7 @@
 
                 // --- Awakening Skills & Start-of-turn Skills ---
                 // 1. 鄧艾: 鑿險
-                if (p.hero.skills.includes('屯田') && !p.flags.zaoxianAwakened && (p.flags.tuntian || 0) >= 3) {
+                if (p.hero.skills.includes('鑿險') && !p.flags.zaoxianAwakened && (p.flags.tuntian || 0) >= 3) {
                     p.flags.zaoxianAwakened = true;
                     p.maxHp--;
                     if (p.hp > p.maxHp) p.hp = p.maxHp;
@@ -2862,7 +2863,7 @@
                 }
 
                 // 2. 姜維: 志繼
-                if (p.hero.skills.includes('挑釁') && !p.flags.zhijiAwakened && p.hand.length === 0) {
+                if (p.hero.skills.includes('志繼') && !p.flags.zhijiAwakened && p.hand.length === 0) {
                     p.flags.zhijiAwakened = true;
                     p.maxHp--;
                     if (p.hp > p.maxHp) p.hp = p.maxHp;
@@ -2884,7 +2885,9 @@
                     while (use) {
                         let judge = await this.performJudge(p, '洛神');
                         if (judge.color === COLOR.BLACK) {
-                            p.hand.push(judge);
+                            if (!p.hero.skills.includes('天妒')) {
+                                p.hand.push(judge);
+                            }
                             this.log(`【${p.hero.name}】發動【洛神】獲得判定牌：${judge.name}`);
                             UI.updateAll(); await this.sleep(800);
                             use = await this.askForSkill(p, '洛神', '是否繼續發動【洛神】？');
