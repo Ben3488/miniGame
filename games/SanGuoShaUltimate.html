@@ -3276,7 +3276,7 @@
 
                     if (targets.length === 0) continue;
 
-                    let shaIdx = player.hand.findIndex(c => c.name === '殺' || (player.hero.skills.includes('龍膽') && c.name === '閃') || (player.hero.skills.includes('武聖') && c.color === COLOR.RED) || (player.hero.skills.includes('武神') && c.suit === SUIT.HEART));
+                    let shaIdx = player.hand.findIndex(c => (c.name === '殺' || c.name === '雷殺' || c.name === '火殺') || (player.hero.skills.includes('龍膽') && c.name === '閃') || (player.hero.skills.includes('武聖') && c.color === COLOR.RED) || (player.hero.skills.includes('武神') && c.suit === SUIT.HEART));
                     let hasSha = (shaIdx !== -1);
 
                     let usedSha = false;
@@ -3436,7 +3436,7 @@
                         const cardName = cardMatch[2].replace(/[【】]/g, '');
                         const effect = SIGNATURE_EFFECTS[heroName];
                         if (effect) {
-                            if (heroName === '關羽' && cardName === '殺') {
+                            if (heroName === '關羽' && (cardName === '殺' || cardName === '雷殺' || cardName === '火殺')) {
                                 UI.showPremiumEffect('skill', {
                                     heroId: effect.heroId,
                                     heroName: heroName,
@@ -3452,7 +3452,7 @@
                                     quote: '「看我方天畫戟的厲害！」',
                                     faction: effect.faction
                                 });
-                            } else if (heroName === '張飛' && cardName === '殺') {
+                            } else if (heroName === '張飛' && (cardName === '殺' || cardName === '雷殺' || cardName === '火殺')) {
                                 UI.showPremiumEffect('skill', {
                                     heroId: effect.heroId,
                                     heroName: heroName,
@@ -4456,7 +4456,7 @@
                             dodgePlayed = await this.askForCard(target, ['閃'], 1, `【${source.hero.name}】對你出殺，請打出 1 張閃！`, true);
                             if (dodgePlayed) {
                                 await this.onPlayDodge(target, source);
-                                if (target.hero.skills.includes('衝陣') && dodgePlayed[0].name === '殺' && source.hand.length > 0) {
+                                if (target.hero.skills.includes('衝陣') && ['殺', '雷殺', '火殺'].includes(dodgePlayed[0].name) && source.hand.length > 0) {
                                     let use = await this.askForSkill(target, '衝陣', `是否發動【衝陣】獲得【${source.hero.name}】的一張手牌？`);
                                     if (use) {
                                         let stolen = source.hand.splice(Math.floor(Math.random() * source.hand.length), 1)[0];
@@ -4884,7 +4884,7 @@
                             UI.updateAll(); await this.sleep(800);
                         }
                     } else if (c.name === '酒') {
-                        let hasSha = p.hand.some(c => c.name === '殺' || (p.hero.skills.includes('龍膽') && c.name === '閃') || (p.hero.skills.includes('武聖') && c.color === COLOR.RED) || (p.hero.skills.includes('武神') && c.suit === SUIT.HEART));
+                        let hasSha = p.hand.some(c => (c.name === '殺' || c.name === '雷殺' || c.name === '火殺') || (p.hero.skills.includes('龍膽') && c.name === '閃') || (p.hero.skills.includes('武聖') && c.color === COLOR.RED) || (p.hero.skills.includes('武神') && c.suit === SUIT.HEART));
                         let inRange = enemies.filter(o => !o.isDead).some(o => this.getDistance(p.id, o.id) <= this.getAttackRange(p));
                         if (hasSha && inRange && !p.flags.drunk) {
                             let card = p.hand.splice(i, 1)[0];
@@ -5040,7 +5040,7 @@
                 let canSha = (p.flags.usedSha < (p.equips.weapon && p.equips.weapon.name === '諸葛連弩' ? 99 : 1));
                 if (p.hero.skills.includes('咆哮')) canSha = true;
                 if (canSha) {
-                    let idx = p.hand.findIndex(c => c.name === '殺' || (p.hero.skills.includes('龍膽') && c.name === '閃') || (p.hero.skills.includes('武聖') && c.color === COLOR.RED) || (p.hero.skills.includes('武神') && c.suit === SUIT.HEART));
+                    let idx = p.hand.findIndex(c => (c.name === '殺' || c.name === '雷殺' || c.name === '火殺') || (p.hero.skills.includes('龍膽') && c.name === '閃') || (p.hero.skills.includes('武聖') && c.color === COLOR.RED) || (p.hero.skills.includes('武神') && c.suit === SUIT.HEART));
                     if (idx !== -1) {
                         let card = p.hand[idx];
                         let noRangeLimit = p.hero.skills.includes('怒斬') && card.color === COLOR.RED && card.type === 'equip';
@@ -5052,7 +5052,7 @@
                             this.discardPile.push(card);
                             UI.showActiveCard(p, card);
                             p.flags.usedSha++;
-                            this.log(`【${p.hero.name}】對【${target.hero.name}】使用了 殺！`);
+                            this.log(`【${p.hero.name}】對【${target.hero.name}】使用了 ${card.name}！`);
                             UI.updateAll(); await this.sleep(800);
                             await this.resolveAttack(p, target, card);
                         }
@@ -5306,7 +5306,7 @@
                     let found = [];
                     for (let i = player.hand.length - 1; i >= 0; i--) {
                         let c = player.hand[i];
-                        let isValid = validCardNames.length === 0 || validCardNames.includes(c.name) ||
+                        let isValid = validCardNames.length === 0 || validCardNames.includes(c.name) || (validCardNames.includes('殺') && (c.name === '殺' || c.name === '雷殺' || c.name === '火殺')) ||
                             (validCardNames.includes('閃') && player.hero.skills.includes('龍膽') && c.name === '殺') ||
                             (validCardNames.includes('殺') && player.hero.skills.includes('龍膽') && c.name === '閃') ||
                             (validCardNames.includes('殺') && player.hero.skills.includes('武聖') && c.color === COLOR.RED) ||
@@ -5357,7 +5357,7 @@
                     });
                 } else {
                     if (skillName === '八卦陣') return true;
-                    if (skillName === '青龍偃月刀' && player.hand.some(c => c.name === '殺' || (player.hero.skills.includes('龍膽') && c.name === '閃') || (player.hero.skills.includes('武聖') && c.color === COLOR.RED))) return true;
+                    if (skillName === '青龍偃月刀' && player.hand.some(c => (c.name === '殺' || c.name === '雷殺' || c.name === '火殺') || (player.hero.skills.includes('龍膽') && c.name === '閃') || (player.hero.skills.includes('武聖') && c.color === COLOR.RED))) return true;
                     if (skillName === '貫石斧' && player.hand.length >= 2) return true;
                     if (skillName === '雌雄雙股劍') return true;
                     if (skillName === '麒麟弓') return true;
@@ -5502,7 +5502,7 @@
                 }
 
                 // Hua Xiong (耀武)
-                if (target.hero.skills.includes('耀武') && source && damageCard && damageCard.name === '殺' && damageCard.color === COLOR.RED) {
+                if (target.hero.skills.includes('耀武') && source && damageCard && ['殺', '雷殺', '火殺'].includes(damageCard.name) && damageCard.color === COLOR.RED) {
                     if (source.hp < source.maxHp) source.hp++; else source.hand.push(this.drawCard());
                     this.log(`【華雄】耀武觸發，【${source.hero.name}】獲得收益`);
                     UI.updateAll(); await this.sleep(800);
@@ -6325,7 +6325,7 @@
                         let cardName = this.pendingAction.card.name;
                         let dist = this.getDistance(0, targetIdx);
                         if (cardName === '順手牽羊' && dist > 1 && !p.hero.skills.includes('奇才')) { this.log("距離過遠！"); return; }
-                        let isSha = cardName === '殺' ||
+                        let isSha = cardName === '殺' || cardName === '雷殺' || cardName === '火殺' ||
                             (p.hero.skills.includes('龍膽') && cardName === '閃') ||
                             (p.hero.skills.includes('武聖') && this.pendingAction.card.color === COLOR.RED) ||
                             (p.hero.skills.includes('武神') && this.pendingAction.card.suit === SUIT.HEART);
@@ -6488,25 +6488,49 @@
                     if (card.type === 'equip') {
                         let idx = p.hand.findIndex(c => c.id === cardId);
                         this.equipCard(p, p.hand.splice(idx, 1)[0]);
+                        if (this.state === 'WAITING') {
+                            this.state = 'PLAYING';
+                            this.log('請出牌或結束回合');
+                        }
                         UI.updateAll();
                         return;
                     }
                     if (card.name === '桃') {
-                        if (p.hp >= p.maxHp) return;
+                        if (p.hp >= p.maxHp) {
+                            if (this.state === 'WAITING') {
+                                this.state = 'PLAYING';
+                                this.log('請出牌或結束回合');
+                                UI.updateAll();
+                            }
+                            return;
+                        }
                         this.discardPile.push(p.hand.splice(p.hand.findIndex(c => c.id === cardId), 1)[0]);
                         p.hp++;
                         this.log('你使用【桃】回復1點體力');
+                        if (this.state === 'WAITING') {
+                            this.state = 'PLAYING';
+                            this.log('請出牌或結束回合');
+                        }
                         UI.updateAll();
                         return;
                     }
                     if (card.name === '酒') {
                         if (p.flags.drunk) {
                             this.log("你本回合已經喝過酒了！");
+                            if (this.state === 'WAITING') {
+                                this.state = 'PLAYING';
+                                this.log('請出牌或結束回合');
+                                UI.updateAll();
+                            }
                             return;
                         }
                         this.discardPile.push(p.hand.splice(p.hand.findIndex(c => c.id === cardId), 1)[0]);
                         p.flags.drunk = true;
                         this.log('你使用了【酒】，下一張【殺】造成的傷害+1！');
+                        if (this.state === 'WAITING') {
+                            this.state = 'PLAYING';
+                            this.log('請出牌或結束回合');
+                        }
                         UI.updateAll();
                         return;
                     }
@@ -6515,6 +6539,8 @@
                         if (recast) {
                             this.discardPile.push(p.hand.splice(p.hand.findIndex(c => c.id === cardId), 1)[0]);
                             await this.drawCards(p, 1, '重鑄摸了');
+                            this.state = 'PLAYING';
+                            this.log('請出牌或結束回合');
                             UI.updateAll();
                             return;
                         }
@@ -6529,26 +6555,32 @@
                         this.useImmediateCard(p, card);
                         return;
                     }
-                    let isSha = card.name === '殺' ||
+                    let isSha = card.name === '殺' || card.name === '雷殺' || card.name === '火殺' ||
                         (p.hero.skills.includes('龍膽') && card.name === '閃') ||
                         (p.hero.skills.includes('武聖') && card.color === COLOR.RED) ||
                         (p.hero.skills.includes('武神') && card.suit === SUIT.HEART);
                     let needsTarget = ['決鬥', '過河拆橋', '順手牽羊', '樂不思蜀', '火攻', '兵糧寸斷', '水淹七軍', '兵臨城下', '知己知彼', '遠交近攻'].includes(card.name) || isSha;
                     if (needsTarget) {
-                        let isSha = card.name === '殺' || (p.hero.skills.includes('龍膽') && card.name === '閃') || (p.hero.skills.includes('武聖') && card.color === COLOR.RED) || (p.hero.skills.includes('武神') && card.suit === SUIT.HEART);
+                        let isSha = card.name === '殺' || card.name === '雷殺' || card.name === '火殺' || (p.hero.skills.includes('龍膽') && card.name === '閃') || (p.hero.skills.includes('武聖') && card.color === COLOR.RED) || (p.hero.skills.includes('武神') && card.suit === SUIT.HEART);
                         let maxTargets = isSha && p.equips.weapon && p.equips.weapon.name === '方天畫戟' && p.hand.length === 1 ? 3 : 1;
                         this.state = 'TARGETING';
                         this.pendingAction = { type: 'USE_CARD', card, maxTargets };
                         this.selectedTargets = [];
                         this.log(maxTargets > 1 ? '請選擇最多三名目標' : '請選擇一名目標');
                         UI.updateAll();
+                    } else {
+                        if (this.state === 'WAITING') {
+                            this.state = 'PLAYING';
+                            this.log('請出牌或結束回合');
+                            UI.updateAll();
+                        }
                     }
                 } else if (this.state === 'RESPONDING' || this.state === 'DISCARDING') {
                     let isValid = this.state === 'DISCARDING';
                     if (this.state === 'RESPONDING') {
                         let validNames = this.pendingAction.names;
                         let validSuit = this.pendingAction.suit;
-                        isValid = validNames.length === 0 || validNames.includes(card.name) ||
+                        isValid = validNames.length === 0 || validNames.includes(card.name) || (validNames.includes('殺') && (card.name === '殺' || card.name === '雷殺' || card.name === '火殺')) ||
                             (validNames.includes('閃') && p.hero.skills.includes('龍膽') && card.name === '殺') ||
                             (validNames.includes('殺') && p.hero.skills.includes('龍膽') && card.name === '閃') ||
                             (validNames.includes('殺') && p.hero.skills.includes('武聖') && card.color === COLOR.RED) ||
@@ -6631,7 +6663,7 @@
                                     await this.dealDamage(source, target, 1, card);
                                 } else {
                                     await this.onPlayDodge(target, source);
-                                    if (target.hero.skills.includes('衝陣') && ok[0].name === '殺' && source.hand.length > 0) {
+                                    if (target.hero.skills.includes('衝陣') && ['殺', '雷殺', '火殺'].includes(ok[0].name) && source.hand.length > 0) {
                                         let use = await this.askForSkill(target, '衝陣', `是否發動【衝陣】獲得【${source.hero.name}】的一張手牌？`);
                                         if (use) {
                                             let stolen = source.hand.splice(Math.floor(Math.random() * source.hand.length), 1)[0];
@@ -6705,7 +6737,7 @@
                     let target = targets[0];
                     let card = this.pendingAction.card;
                     let idx = p.hand.findIndex(c => c.id === card.id);
-                    let isSha = card.name === '殺' || (p.hero.skills.includes('龍膽') && card.name === '閃') || (p.hero.skills.includes('武聖') && card.color === COLOR.RED) || (p.hero.skills.includes('武神') && card.suit === SUIT.HEART);
+                    let isSha = card.name === '殺' || card.name === '雷殺' || card.name === '火殺' || card.name === '雷殺' || card.name === '火殺' || (p.hero.skills.includes('龍膽') && card.name === '閃') || (p.hero.skills.includes('武聖') && card.color === COLOR.RED) || (p.hero.skills.includes('武神') && card.suit === SUIT.HEART);
 
                     if (card.name === '樂不思蜀' || card.name === '兵糧寸斷') {
                         let c = p.hand.splice(idx, 1)[0];
@@ -7749,7 +7781,7 @@
                     if (Engine.state === 'PLAYING') {
                         let maxSha = (p0.equips.weapon && p0.equips.weapon.name === '諸葛連弩' ? 99 : 1) + (p0.flags.extraShaCount || 0);
                         let canUseSha = p0.flags.usedSha < maxSha || p0.hero.skills.includes('咆哮');
-                        let isShaCard = c.name === '殺' ||
+                        let isShaCard = c.name === '殺' || c.name === '雷殺' || c.name === '火殺' ||
                             (p0.hero.skills.includes('龍膽') && c.name === '閃') ||
                             (p0.hero.skills.includes('武聖') && c.color === COLOR.RED) ||
                             (p0.hero.skills.includes('武神') && c.suit === SUIT.HEART) ||
@@ -7767,7 +7799,7 @@
                         let validNames = Engine.pendingAction.names;
                         let validSuit = Engine.pendingAction.suit;
                         let validColor = Engine.pendingAction.color;
-                        let valid = validNames.length === 0 || validNames.includes(c.name) ||
+                        let valid = validNames.length === 0 || validNames.includes(c.name) || (validNames.includes('殺') && (c.name === '殺' || c.name === '雷殺' || c.name === '火殺')) ||
                             (validNames.includes('閃') && p0.hero.skills.includes('龍膽') && c.name === '殺') ||
                             (validNames.includes('殺') && p0.hero.skills.includes('龍膽') && c.name === '閃') ||
                             (validNames.includes('殺') && p0.hero.skills.includes('武聖') && c.color === COLOR.RED) ||
