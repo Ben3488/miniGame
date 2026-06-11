@@ -25,6 +25,7 @@
             --rummikub-color: #3b82f6;
             --saboteur-color: #78716c;
             --sanguosha-color: #dc2626;
+            --tictactoe-color: #00f2fe;
         }
 
         body {
@@ -190,6 +191,11 @@
             border-color: rgba(234, 179, 8, 0.4);
         }
 
+        .game-card.tictactoe:hover {
+            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 242, 254, 0.2);
+            border-color: rgba(0, 242, 254, 0.4);
+        }
+
         .card-content {
             position: relative;
             z-index: 1;
@@ -332,6 +338,15 @@
             text-shadow: 0 0 10px rgba(234, 179, 8, 0.5);
         }
 
+        .tictactoe .icon-container {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(255, 0, 127, 0.2));
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.3);
+            border: 2px solid rgba(0, 242, 254, 0.5);
+            font-family: 'Outfit', sans-serif;
+            color: #00f2fe;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+        }
+
         .game-title {
             font-size: 2.5rem;
             margin: 0;
@@ -416,6 +431,12 @@
             -webkit-text-fill-color: transparent;
         }
 
+        .tictactoe .game-title {
+            background: linear-gradient(to right, #00f2fe, #ff007f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
         .game-desc {
             color: var(--text-sub);
             font-size: 1.1rem;
@@ -450,6 +471,7 @@
         .saboteur .play-btn { border: 1px solid rgba(120, 113, 108, 0.3); }
         .sanguosha .play-btn { border: 1px solid rgba(220, 38, 38, 0.3); }
         .sanguosha-ultimate .play-btn { border: 1px solid rgba(234, 179, 8, 0.3); }
+        .tictactoe .play-btn { border: 1px solid rgba(0, 242, 254, 0.3); }
 
         .game-card:hover .play-btn {
             background: rgba(255,255,255,0.2);
@@ -629,6 +651,18 @@
                 <h2 class="game-title">三國殺</h2>
                 <p class="game-desc">終極優化版！包含軍爭、神話再臨、界限突破及SP擴充包。</p>
                 <div class="play-btn">終極優化版</div>
+            </div>
+        </a>
+
+        <!-- Tic-Tac-Toe Card -->
+        <a href="games/TicTacToe.html" class="game-card tictactoe" style="animation-delay: 2.7s;">
+            <div class="card-content">
+                <div class="icon-container">
+                    ❌⭕
+                </div>
+                <h2 class="game-title">井字棋</h2>
+                <p class="game-desc">流光霓虹風格的經典井字棋，支援雙人對戰與地獄級 AI 挑戰。</p>
+                <div class="play-btn">開始遊戲</div>
             </div>
         </a>
     </div>

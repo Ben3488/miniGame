@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="一個精緻、現代且具備強大 AI 的霓虹玻璃擬態井字棋遊戲（Tic-Tac-Toe）。提供雙人對決及智慧 AI（簡單、中等、終極）模式，內建合成音效與粒子特效。">
+    <title>極光霓虹井字棋 | Neon Tic-Tac-Toe</title>
+    
+    <!-- Google Fonts: Outfit for display, Inter for UI text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for modern icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Custom Premium CSS design system for Neon Tic-Tac-Toe */
+
+        :root {
+            /* Color Palette */
+            --bg-dark: #090d16;
+            --card-bg: rgba(13, 20, 35, 0.6);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --cyan-neon: #00f2fe;
+            --cyan-glow: rgba(0, 242, 254, 0.4);
+            --pink-neon: #ff007f;
+            --pink-glow: rgba(255, 0, 127, 0.4);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --transition-speed: 0.3s;
+        }
+
+        /* Global Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Background Ambient Glows */
+        .ambient-glow {
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: 0;
+            opacity: 0.45;
+            pointer-events: none;
+            animation: pulse-glow 8s infinite alternate ease-in-out;
+        }
+
+        .cyan-glow {
+            background-color: var(--cyan-neon);
+            top: 10%;
+            left: 10%;
+        }
+
+        .pink-glow {
+            background-color: var(--pink-neon);
+            bottom: 10%;
+            right: 10%;
+            animation-delay: 4s;
+        }
+
+        @keyframes pulse-glow {
+            0% {
+                transform: scale(1) translate(0, 0);
+                opacity: 0.35;
+            }
+            100% {
+                transform: scale(1.3) translate(30px, 20px);
+                opacity: 0.55;
+            }
+        }
+
+        /* Particle Canvas Overlay */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        /* Main App Container */
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            padding: 24px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* Premium Card Glassmorphism */
+        .card-glass {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* Screen Transitions */
+        .screen {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            animation: fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Menu Screen Styles --- */
+        .game-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: 2px;
+            color: var(--text-primary);
+        }
+
+        .logo-text .highlight {
+            background: linear-gradient(135deg, var(--cyan-neon), var(--pink-neon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 242, 254, 0.2);
+        }
+
+        .tagline {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            letter-spacing: 4px;
+            margin-top: 12px;
+            text-transform: uppercase;
+        }
+
+        .menu-box {
+            padding: 32px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .subsection-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        /* Modern Mode Options */
+        .mode-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn {
+            border: none;
+            outline: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 16px;
+            transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .btn-mode {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            padding: 18px;
+            justify-content: flex-start;
+            padding-left: 24px;
+        }
+
+        .btn-mode i {
+            font-size: 1.25rem;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-mode:hover {
+            background: rgba(255, 255, 255, 0.07);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .btn-mode.active {
+            background: rgba(0, 242, 254, 0.1);
+            border-color: var(--cyan-neon);
+            color: var(--cyan-neon);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+        }
+
+        .btn-mode.active i {
+            transform: scale(1.1);
+        }
+
+        /* Difficulty Options (Collapsible) */
+        .difficulty-section {
+            max-height: 200px;
+            opacity: 1;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-top: 4px;
+        }
+
+        .difficulty-section.hidden {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+            pointer-events: none;
+        }
+
+        .difficulty-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .btn-diff {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            padding: 12px;
+            font-size: 0.9rem;
+            border-radius: 12px;
+        }
+
+        .btn-diff:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-primary);
+        }
+
+        .btn-diff.active {
+            background: rgba(255, 0, 127, 0.1);
+            border-color: var(--pink-neon);
+            color: var(--pink-neon);
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.25);
+        }
+
+        /* Primary Glow Button */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cyan-neon), #00d2ff);
+            color: #030712;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 8px;
+            box-shadow: 0 4px 20px rgba(0, 242, 254, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.4),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 242, 254, 0.6);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        /* --- Game Screen Styles --- */
+
+        /* Top Navigation Bar */
+        .game-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            width: 100%;
+        }
+
+        .btn-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+        }
+
+        .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            transform: scale(1.05);
+        }
+
+        .nav-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-title span {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .badge-diff {
+            font-size: 0.75rem !important;
+            background: rgba(255, 0, 127, 0.15);
+            border: 1px solid var(--pink-neon);
+            color: var(--pink-neon);
+            padding: 2px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px !important;
+        }
+
+        /* Scoreboard */
+        .scoreboard-container {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr 1.2fr;
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 24px;
+        }
+
+        .score-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .score-card .player-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .score-card .player-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .score-card .player-name {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .score-card .player-score-num {
+            font-size: 1.25rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Active Turn Scorecard Indicators */
+        .score-card.x-score.active-turn {
+            border-color: var(--cyan-neon);
+            box-shadow: 0 0 15px var(--cyan-glow);
+            background: rgba(0, 242, 254, 0.05);
+        }
+
+        .score-card.o-score.active-turn {
+            border-color: var(--pink-neon);
+            box-shadow: 0 0 15px var(--pink-glow);
+            background: rgba(255, 0, 127, 0.05);
+        }
+
+        /* Status Announcement Bar */
+        .status-announcement {
+            text-align: center;
+            font-size: 1.15rem;
+            font-weight: 500;
+            margin-bottom: 24px;
+            min-height: 28px;
+            letter-spacing: 0.5px;
+        }
+
+        .font-bold {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            display: inline-block;
+            animation: scale-bounce 0.3s ease;
+        }
+
+        @keyframes scale-bounce {
+            0% { transform: scale(0.6); }
+            100% { transform: scale(1); }
+        }
+
+        /* Game Board Wrapper & Grid */
+        .board-wrapper {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            position: relative;
+            margin-bottom: 28px;
+        }
+
+        .board {
+            width: 100%;
+            height: 100%;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        /* Board Cells */
+        .cell {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cell::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .cell:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .cell:hover::before {
+            opacity: 1;
+        }
+
+        .cell:active {
+            transform: scale(0.95);
+        }
+
+        /* Cell content states */
+        .cell.x-marked::after {
+            content: 'X';
+            color: var(--cyan-neon);
+            text-shadow: 0 0 15px var(--cyan-glow);
+            font-size: 3.25rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            animation: zoom-in-glow 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .cell.o-marked::after {
+            content: 'O';
+            color: var(--pink-neon);
+            text-shadow: 0 0 15px var(--pink-glow);
+            font-size: 3.25rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            animation: zoom-in-glow 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Disable pointer events on occupied cells */
+        .cell.x-marked, .cell.o-marked {
+            pointer-events: none;
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        @keyframes zoom-in-glow {
+            from {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Winning cell flash highlight */
+        .cell.winning-cell-x {
+            background: rgba(0, 242, 254, 0.15);
+            border-color: var(--cyan-neon);
+            box-shadow: 0 0 20px var(--cyan-glow);
+            animation: flash-cyan 1.5s infinite alternate ease-in-out;
+        }
+
+        .cell.winning-cell-o {
+            background: rgba(255, 0, 127, 0.15);
+            border-color: var(--pink-neon);
+            box-shadow: 0 0 20px var(--pink-glow);
+            animation: flash-pink 1.5s infinite alternate ease-in-out;
+        }
+
+        @keyframes flash-cyan {
+            0% {
+                box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+            }
+            100% {
+                box-shadow: 0 0 25px rgba(0, 242, 254, 0.8);
+            }
+        }
+
+        @keyframes flash-pink {
+            0% {
+                box-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
+            }
+            100% {
+                box-shadow: 0 0 25px rgba(255, 0, 127, 0.8);
+            }
+        }
+
+        /* Game Controls Footer */
+        .game-controls {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .btn-secondary {
+            flex: 1.3;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 14px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary-danger {
+            flex: 0.7;
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            padding: 14px;
+        }
+
+        .btn-secondary-danger:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* Text Colors */
+        .cyan-text { color: var(--cyan-neon); }
+        .pink-text { color: var(--pink-neon); }
+        .gray-text { color: var(--text-secondary); }
+
+        /* Responsive adjustments */
+        @media (max-width: 400px) {
+            .app-container {
+                padding: 16px;
+            }
+            
+            .logo-text {
+                font-size: 2.5rem;
+            }
+            
+            .menu-box {
+                padding: 20px;
+            }
+            
+            .cell.x-marked::after, .cell.o-marked::after {
+                font-size: 2.75rem;
+            }
+            
+            .board {
+                padding: 10px;
+                gap: 8px;
+            }
+            
+            .score-card {
+                padding: 8px;
+                gap: 6px;
+            }
+            
+            .score-card .player-avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas for winning particle celebration effects -->
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="app-container">
+        <!-- Background decorative ambient lights -->
+        <div class="ambient-glow cyan-glow"></div>
+        <div class="ambient-glow pink-glow"></div>
+
+        <!-- Start Menu Screen -->
+        <div id="menu-screen" class="screen active">
+            <header class="game-header">
+                <h1 class="logo-text">NEON<br><span class="highlight">TIC-TAC-TOE</span></h1>
+                <p class="tagline">流光霓虹 ‧ 智慧對決</p>
+            </header>
+
+            <div class="menu-box card-glass">
+                <h2 class="section-title">選擇遊戲模式</h2>
+                
+                <div class="mode-options">
+                    <button id="btn-pvp" class="btn btn-mode active" data-mode="pvp">
+                        <i class="fa-solid fa-users"></i>
+                        <span>雙人對決 (PvP)</span>
+                    </button>
+                    <button id="btn-pve" class="btn btn-mode" data-mode="pve">
+                        <i class="fa-solid fa-robot"></i>
+                        <span>挑戰 AI (PvE)</span>
+                    </button>
+                </div>
+
+                <!-- Difficulty selection (collapsible / fades in when PvE is active) -->
+                <div id="difficulty-section" class="difficulty-section hidden">
+                    <h3 class="subsection-title">AI 難度</h3>
+                    <div class="difficulty-options">
+                        <button class="btn btn-diff" data-diff="easy">輕鬆</button>
+                        <button class="btn btn-diff active" data-diff="medium">聰明</button>
+                        <button class="btn btn-diff" data-diff="impossible">地獄</button>
+                    </div>
+                </div>
+
+                <button id="btn-start" class="btn btn-primary glow-btn">
+                    <span>開始遊戲</span>
+                    <i class="fa-solid fa-play"></i>
+                </button>
+                
+                <a href="../index.html" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; margin-top: 8px;">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>返回遊戲大廳</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <!-- Game Top Nav -->
+            <div class="game-nav">
+                <button id="btn-back-menu" class="btn btn-icon" title="返回主選單">
+                    <i class="fa-solid fa-house"></i>
+                </button>
+                <div class="nav-title">
+                    <span id="game-mode-display">雙人對決</span>
+                    <span id="game-diff-display" class="badge-diff hidden">聰明</span>
+                </div>
+                <button id="btn-sound-toggle" class="btn btn-icon" title="切換音效">
+                    <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+
+            <!-- Scoreboard -->
+            <div class="scoreboard-container">
+                <div class="score-card x-score active-turn" id="score-card-x">
+                    <div class="player-avatar cyan-text">
+                        <span class="symbol-marker">X</span>
+                    </div>
+                    <div class="player-info">
+                        <span class="player-name" id="name-x">玩家 X</span>
+                        <span class="player-score-num" id="score-x">0</span>
+                    </div>
+                </div>
+
+                <div class="score-card tie-score">
+                    <div class="player-avatar gray-text">
+                        <i class="fa-solid fa-handshake"></i>
+                    </div>
+                    <div class="player-info">
+                        <span class="player-name">平手</span>
+                        <span class="player-score-num" id="score-ties">0</span>
+                    </div>
+                </div>
+
+                <div class="score-card o-score" id="score-card-o">
+                    <div class="player-avatar pink-text">
+                        <span class="symbol-marker">O</span>
+                    </div>
+                    <div class="player-info">
+                        <span class="player-name" id="name-o">玩家 O</span>
+                        <span class="player-score-num" id="score-o">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Announcement Bar -->
+            <div class="status-announcement" id="status-text">
+                輪到 <span class="cyan-text font-bold">X</span> 的回合
+            </div>
+
+            <!-- Tic Tac Toe Board -->
+            <div class="board-wrapper">
+                <div class="board card-glass" id="board">
+                    <div class="cell" data-index="0"></div>
+                    <div class="cell" data-index="1"></div>
+                    <div class="cell" data-index="2"></div>
+                    <div class="cell" data-index="3"></div>
+                    <div class="cell" data-index="4"></div>
+                    <div class="cell" data-index="5"></div>
+                    <div class="cell" data-index="6"></div>
+                    <div class="cell" data-index="7"></div>
+                    <div class="cell" data-index="8"></div>
+                </div>
+            </div>
+
+            <!-- Game Control Buttons -->
+            <div class="game-controls">
+                <button id="btn-reset" class="btn btn-secondary">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>重新此局</span>
+                </button>
+                <button id="btn-reset-scores" class="btn btn-secondary-danger">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>重設比分</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Web Application Logic -->
+    <script>
+        // Neon Tic-Tac-Toe - Game Engine
+
+        // Game Constants
+        const WINNING_COMBINATIONS = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Horizontal
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Vertical
+            [0, 4, 8], [2, 4, 6]             // Diagonal
+        ];
+
+        // Audio Manager (Web Audio API)
+        const SoundManager = {
+            ctx: null,
+            enabled: true,
+
+            init() {
+                // Init context on first user click to satisfy browser policies
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            },
+
+            toggle() {
+                this.enabled = !this.enabled;
+                localStorage.setItem('neon_ttt_sound', this.enabled);
+                return this.enabled;
+            },
+
+            playTone(freqs, duration, type = 'sine', slide = false, endFreq = 0) {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gainNode = this.ctx.createGain();
+
+                osc.type = type;
+                osc.connect(gainNode);
+                gainNode.connect(this.ctx.destination);
+
+                if (Array.isArray(freqs)) {
+                    // Arpeggio / Melody
+                    freqs.forEach((f, index) => {
+                        const noteTime = now + (duration / freqs.length) * index;
+                        osc.frequency.setValueAtTime(f, noteTime);
+                    });
+                } else {
+                    osc.frequency.setValueAtTime(freqs, now);
+                    if (slide && endFreq > 0) {
+                        osc.frequency.exponentialRampToValueAtTime(endFreq, now + duration);
+                    }
+                }
+
+                gainNode.gain.setValueAtTime(0.15, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+                osc.start(now);
+                osc.stop(now + duration);
+            },
+
+            playClick() {
+                this.playTone(800, 0.08, 'sine');
+            },
+
+            playMove(player) {
+                if (player === 'X') {
+                    // High slide up for X (cyan)
+                    this.playTone(350, 0.12, 'triangle', true, 700);
+                } else {
+                    // Deep slide down for O (pink)
+                    this.playTone(600, 0.12, 'triangle', true, 300);
+                }
+            },
+
+            playWin(isAIWin = false) {
+                // Happy arpeggio or electronic sequence
+                const freqs = isAIWin ? [440, 349, 293, 220] : [261.63, 329.63, 392.00, 523.25];
+                const type = isAIWin ? 'sawtooth' : 'triangle';
+                this.playTone(freqs, 0.45, type);
+            },
+
+            playTie() {
+                // Quirky detuned retro slide for a draw
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const now = this.ctx.currentTime;
+                const osc1 = this.ctx.createOscillator();
+                const osc2 = this.ctx.createOscillator();
+                const gainNode = this.ctx.createGain();
+
+                osc1.type = 'sawtooth';
+                osc2.type = 'sawtooth';
+                osc2.frequency.setValueAtTime(147, now); // Detuned slightly
+                osc1.frequency.setValueAtTime(150, now);
+
+                osc1.frequency.linearRampToValueAtTime(100, now + 0.35);
+                osc2.frequency.linearRampToValueAtTime(97, now + 0.35);
+
+                osc1.connect(gainNode);
+                osc2.connect(gainNode);
+                gainNode.connect(this.ctx.destination);
+
+                gainNode.gain.setValueAtTime(0.15, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+                osc1.start(now);
+                osc2.start(now);
+                osc1.stop(now + 0.35);
+                osc2.stop(now + 0.35);
+            }
+        };
+
+        // Canvas Celebrate Particle System
+        const ParticleSystem = {
+            canvas: null,
+            ctx: null,
+            particles: [],
+            animationId: null,
+
+            init() {
+                this.canvas = document.getElementById('particle-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+            },
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            },
+
+            createExplosion(x, y, color) {
+                const count = 40;
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 8 + 3;
+                    this.particles.push({
+                        x: x,
+                        y: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed - Math.random() * 3, // slightly upward force
+                        size: Math.random() * 4 + 2,
+                        color: color,
+                        alpha: 1,
+                        decay: Math.random() * 0.02 + 0.015,
+                        gravity: 0.15
+                    });
+                }
+                if (!this.animationId) {
+                    this.update();
+                }
+            },
+
+            update() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const p = this.particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += p.gravity;
+                    p.alpha -= p.decay;
+
+                    if (p.alpha <= 0) {
+                        this.particles.splice(i, 1);
+                        continue;
+                    }
+
+                    this.ctx.save();
+                    this.ctx.globalAlpha = p.alpha;
+                    this.ctx.shadowBlur = 10;
+                    this.ctx.shadowColor = p.color;
+                    this.ctx.fillStyle = p.color;
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    this.ctx.restore();
+                }
+
+                if (this.particles.length > 0) {
+                    this.animationId = requestAnimationFrame(() => this.update());
+                } else {
+                    this.animationId = null;
+                }
+            }
+        };
+
+        // Game Engine Controller
+        const Game = {
+            boardState: Array(9).fill(null),
+            gameActive: false,
+            currentPlayer: 'X', // X always goes first
+            gameMode: 'pvp', // 'pvp' or 'pve'
+            difficulty: 'medium', // 'easy', 'medium', 'impossible'
+            scores: { X: 0, O: 0, ties: 0 },
+
+            // DOM Elements
+            elements: {},
+
+            init() {
+                // Elements lookup
+                this.elements = {
+                    menuScreen: document.getElementById('menu-screen'),
+                    gameScreen: document.getElementById('game-screen'),
+                    btnPvP: document.getElementById('btn-pvp'),
+                    btnPvE: document.getElementById('btn-pve'),
+                    btnStart: document.getElementById('btn-start'),
+                    btnBackMenu: document.getElementById('btn-back-menu'),
+                    btnSoundToggle: document.getElementById('btn-sound-toggle'),
+                    soundIcon: document.getElementById('sound-icon'),
+                    btnReset: document.getElementById('btn-reset'),
+                    btnResetScores: document.getElementById('btn-reset-scores'),
+                    difficultySection: document.getElementById('difficulty-section'),
+                    board: document.getElementById('board'),
+                    cells: document.querySelectorAll('.cell'),
+                    statusText: document.getElementById('status-text'),
+                    scoreX: document.getElementById('score-x'),
+                    scoreO: document.getElementById('score-o'),
+                    scoreTies: document.getElementById('score-ties'),
+                    nameX: document.getElementById('name-x'),
+                    nameO: document.getElementById('name-o'),
+                    gameModeDisplay: document.getElementById('game-mode-display'),
+                    gameDiffDisplay: document.getElementById('game-diff-display'),
+                    scoreCardX: document.getElementById('score-card-x'),
+                    scoreCardO: document.getElementById('score-card-o')
+                };
+
+                // Load Settings & Scores
+                this.loadSettings();
+
+                // Register Event Listeners
+                this.bindEvents();
+
+                // Initialize Canvas
+                ParticleSystem.init();
+            },
+
+            loadSettings() {
+                // Sound Setting
+                const savedSound = localStorage.getItem('neon_ttt_sound');
+                if (savedSound !== null) {
+                    SoundManager.enabled = savedSound === 'true';
+                }
+                this.updateSoundIcon();
+
+                // Load Persistent Scores
+                const savedScores = localStorage.getItem('neon_ttt_scores');
+                if (savedScores) {
+                    try {
+                        this.scores = JSON.parse(savedScores);
+                        this.updateScoreboardUI();
+                    } catch (e) {
+                        console.error("Failed to parse scores from localStorage", e);
+                    }
+                }
+            },
+
+            saveScores() {
+                localStorage.setItem('neon_ttt_scores', JSON.stringify(this.scores));
+            },
+
+            bindEvents() {
+                // Mode buttons
+                this.elements.btnPvP.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.setGameMode('pvp');
+                });
+                
+                this.elements.btnPvE.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.setGameMode('pve');
+                });
+
+                // Difficulty selection
+                document.querySelectorAll('.btn-diff').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        SoundManager.playClick();
+                        document.querySelectorAll('.btn-diff').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.difficulty = e.target.dataset.diff;
+                    });
+                });
+
+                // Start Game
+                this.elements.btnStart.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.startGame();
+                });
+
+                // Back to Menu
+                this.elements.btnBackMenu.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.showMenu();
+                });
+
+                // Sound Toggle
+                this.elements.btnSoundToggle.addEventListener('click', () => {
+                    SoundManager.toggle();
+                    this.updateSoundIcon();
+                    // Tiny buzzer feedback on enable
+                    if (SoundManager.enabled) {
+                        SoundManager.playTone(600, 0.08);
+                    }
+                });
+
+                // Reset Round & Scores
+                this.elements.btnReset.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.resetRound();
+                });
+
+                this.elements.btnResetScores.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.resetScores();
+                });
+
+                // Cell Clicks
+                this.elements.cells.forEach(cell => {
+                    cell.addEventListener('click', (e) => this.handleCellClick(e));
+                });
+            },
+
+            setGameMode(mode) {
+                this.gameMode = mode;
+                if (mode === 'pvp') {
+                    this.elements.btnPvP.classList.add('active');
+                    this.elements.btnPvE.classList.remove('active');
+                    this.elements.difficultySection.classList.add('hidden');
+                } else {
+                    this.elements.btnPvE.classList.add('active');
+                    this.elements.btnPvP.classList.remove('active');
+                    this.elements.difficultySection.classList.remove('hidden');
+                }
+            },
+
+            updateSoundIcon() {
+                if (SoundManager.enabled) {
+                    this.elements.soundIcon.className = 'fa-solid fa-volume-high';
+                } else {
+                    this.elements.soundIcon.className = 'fa-solid fa-volume-xmark';
+                }
+            },
+
+            startGame() {
+                // Transition screens
+                this.elements.menuScreen.classList.remove('active');
+                this.elements.gameScreen.classList.add('active');
+
+                // Dynamic Text Adjustments
+                if (this.gameMode === 'pvp') {
+                    this.elements.nameX.textContent = '玩家 X';
+                    this.elements.nameO.textContent = '玩家 O';
+                    this.elements.gameModeDisplay.textContent = '雙人對決 (PvP)';
+                    this.elements.gameDiffDisplay.classList.add('hidden');
+                } else {
+                    this.elements.nameX.textContent = '玩家';
+                    this.elements.nameO.textContent = 'AI 機器人';
+                    this.elements.gameModeDisplay.textContent = '挑戰 AI (PvE)';
+                    this.elements.gameDiffDisplay.classList.remove('hidden');
+                    
+                    // Set difficulty badge text
+                    const diffMap = { easy: '輕鬆', medium: '聰明', impossible: '地獄' };
+                    this.elements.gameDiffDisplay.textContent = diffMap[this.difficulty];
+                }
+
+                this.resetRound();
+            },
+
+            showMenu() {
+                this.elements.gameScreen.classList.remove('active');
+                this.elements.menuScreen.classList.add('active');
+                this.gameActive = false;
+            },
+
+            resetRound() {
+                this.boardState.fill(null);
+                this.currentPlayer = 'X';
+                this.gameActive = true;
+
+                // Reset DOM Cells
+                this.elements.cells.forEach(cell => {
+                    cell.className = 'cell';
+                });
+
+                this.updateTurnIndicator();
+                this.updateStatusText(`輪到 <span class="cyan-text font-bold">X</span> 的回合`);
+            },
+
+            resetScores() {
+                this.scores = { X: 0, O: 0, ties: 0 };
+                this.saveScores();
+                this.updateScoreboardUI();
+            },
+
+            updateScoreboardUI() {
+                this.elements.scoreX.textContent = this.scores.X;
+                this.elements.scoreO.textContent = this.scores.O;
+                this.elements.scoreTies.textContent = this.scores.ties;
+            },
+
+            updateStatusText(htmlContent) {
+                this.elements.statusText.innerHTML = htmlContent;
+            },
+
+            updateTurnIndicator() {
+                if (this.currentPlayer === 'X') {
+                    this.elements.scoreCardX.classList.add('active-turn');
+                    this.elements.scoreCardO.classList.remove('active-turn');
+                } else {
+                    this.elements.scoreCardO.classList.add('active-turn');
+                    this.elements.scoreCardX.classList.remove('active-turn');
+                }
+            },
+
+            handleCellClick(e) {
+                const cell = e.target;
+                const index = parseInt(cell.dataset.index);
+
+                // Block clicks if game not active, space occupied, or it's AI's turn
+                if (!this.gameActive || this.boardState[index] !== null) return;
+                if (this.gameMode === 'pve' && this.currentPlayer === 'O') return;
+
+                this.makeMove(index);
+            },
+
+            makeMove(index) {
+                // Record Move
+                this.boardState[index] = this.currentPlayer;
+                
+                // Visual cell update
+                const cell = this.elements.cells[index];
+                cell.classList.add(this.currentPlayer === 'X' ? 'x-marked' : 'o-marked');
+
+                // Play SFX
+                SoundManager.playMove(this.currentPlayer);
+
+                // Check Round Ending
+                if (this.checkWinCondition()) {
+                    this.handleGameWin();
+                    return;
+                }
+
+                if (this.checkDrawCondition()) {
+                    this.handleGameDraw();
+                    return;
+                }
+
+                // Switch Turn
+                this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+                this.updateTurnIndicator();
+
+                if (this.gameMode === 'pvp') {
+                    const activeColor = this.currentPlayer === 'X' ? 'cyan-text' : 'pink-text';
+                    this.updateStatusText(`輪到 <span class="${activeColor} font-bold">${this.currentPlayer}</span> 的回合`);
+                } else {
+                    // CHALLENGE AI MODE
+                    if (this.currentPlayer === 'O') {
+                        this.updateStatusText(`AI 思考中...`);
+                        // Add brief modern thinking latency for realism
+                        setTimeout(() => this.triggerAIMove(), 600);
+                    } else {
+                        this.updateStatusText(`輪到你的回合`);
+                    }
+                }
+            },
+
+            checkWinCondition() {
+                return WINNING_COMBINATIONS.some(comb => {
+                    return comb.every(idx => this.boardState[idx] === this.currentPlayer);
+                });
+            },
+
+            checkDrawCondition() {
+                return this.boardState.every(cell => cell !== null);
+            },
+
+            getWinningCombination() {
+                return WINNING_COMBINATIONS.find(comb => {
+                    return comb.every(idx => this.boardState[idx] === this.currentPlayer);
+                });
+            },
+
+            handleGameWin() {
+                this.gameActive = false;
+                
+                // Highlighting Winning Cells
+                const winningComb = this.getWinningCombination();
+                const winningColor = this.currentPlayer === 'X' ? '#00f2fe' : '#ff007f';
+                const winClass = this.currentPlayer === 'X' ? 'winning-cell-x' : 'winning-cell-o';
+
+                winningComb.forEach(idx => {
+                    this.elements.cells[idx].classList.add(winClass);
+                    
+                    // Visual Explode from cell centers
+                    const rect = this.elements.cells[idx].getBoundingClientRect();
+                    const x = rect.left + rect.width / 2;
+                    const y = rect.top + rect.height / 2;
+                    ParticleSystem.createExplosion(x, y, winningColor);
+                });
+
+                // Award points
+                this.scores[this.currentPlayer]++;
+                this.saveScores();
+                this.updateScoreboardUI();
+
+                // Audio trigger
+                const isAIWin = this.gameMode === 'pve' && this.currentPlayer === 'O';
+                SoundManager.playWin(isAIWin);
+
+                // Status update
+                const winColorClass = this.currentPlayer === 'X' ? 'cyan-text' : 'pink-text';
+                let victorName = this.currentPlayer === 'X' ? this.elements.nameX.textContent : this.elements.nameO.textContent;
+                this.updateStatusText(`<span class="${winColorClass} font-bold">${victorName}</span> 獲得勝利！ 🎉`);
+            },
+
+            handleGameDraw() {
+                this.gameActive = false;
+                this.scores.ties++;
+                this.saveScores();
+                this.updateScoreboardUI();
+
+                // Sound trigger
+                SoundManager.playTie();
+
+                // Status update
+                this.updateStatusText(`<span class="gray-text font-bold">雙方平手！</span> 握手言和 🤝`);
+            },
+
+            // --- AI Logic Engine ---
+            triggerAIMove() {
+                if (!this.gameActive) return;
+
+                let selectedMove = -1;
+
+                if (this.difficulty === 'easy') {
+                    selectedMove = this.getRandomMove();
+                } else if (this.difficulty === 'medium') {
+                    // Medium AI: 60% smart moves, 40% random
+                    if (Math.random() < 0.6) {
+                        selectedMove = this.getHeuristicSmartMove();
+                    } else {
+                        selectedMove = this.getRandomMove();
+                    }
+                } else {
+                    // Impossible: Unbeatable Minimax
+                    selectedMove = this.getMinimaxBestMove();
+                }
+
+                if (selectedMove !== -1) {
+                    this.makeMove(selectedMove);
+                }
+            },
+
+            getRandomMove() {
+                const availableMoves = this.getAvailableMoves(this.boardState);
+                if (availableMoves.length === 0) return -1;
+                return availableMoves[Math.floor(Math.random() * availableMoves.length)];
+            },
+
+            getAvailableMoves(board) {
+                return board.map((val, idx) => val === null ? idx : null).filter(val => val !== null);
+            },
+
+            // Rules-based smart move for Medium difficulty
+            getHeuristicSmartMove() {
+                // 1. Can AI (O) win in 1 move?
+                for (let i = 0; i < 9; i++) {
+                    if (this.boardState[i] === null) {
+                        this.boardState[i] = 'O';
+                        const win = this.checkBoardWin(this.boardState, 'O');
+                        this.boardState[i] = null;
+                        if (win) return i;
+                    }
+                }
+
+                // 2. Can Player (X) win in 1 move? Block them!
+                for (let i = 0; i < 9; i++) {
+                    if (this.boardState[i] === null) {
+                        this.boardState[i] = 'X';
+                        const win = this.checkBoardWin(this.boardState, 'X');
+                        this.boardState[i] = null;
+                        if (win) return i;
+                    }
+                }
+
+                // 3. Take center if available
+                if (this.boardState[4] === null) return 4;
+
+                // 4. Random otherwise
+                return this.getRandomMove();
+            },
+
+            checkBoardWin(board, player) {
+                return WINNING_COMBINATIONS.some(comb => {
+                    return comb.every(idx => board[idx] === player);
+                });
+            },
+
+            // Unbeatable Minimax Algorithm
+            getMinimaxBestMove() {
+                let bestVal = -Infinity;
+                let bestMoves = [];
+
+                for (let i = 0; i < 9; i++) {
+                    if (this.boardState[i] === null) {
+                        // Try move
+                        this.boardState[i] = 'O';
+                        let moveVal = this.minimax(this.boardState, 0, false);
+                        // Backtrack
+                        this.boardState[i] = null;
+
+                        if (moveVal > bestVal) {
+                            bestVal = moveVal;
+                            bestMoves = [i];
+                        } else if (moveVal === bestVal) {
+                            bestMoves.push(i);
+                        }
+                    }
+                }
+
+                // Select randomly among equally best values for gameplay variation
+                return bestMoves[Math.floor(Math.random() * bestMoves.length)];
+            },
+
+            minimax(board, depth, isMax) {
+                const score = this.evaluateBoardState(board);
+
+                // Base cases (Win, Loss, Draw)
+                if (score === 10) return score - depth; // Deduct depth to prefer quick wins
+                if (score === -10) return score + depth; // Add depth to delay losses
+                if (!board.includes(null)) return 0;
+
+                if (isMax) {
+                    let best = -Infinity;
+                    for (let i = 0; i < 9; i++) {
+                        if (board[i] === null) {
+                            board[i] = 'O';
+                            best = Math.max(best, this.minimax(board, depth + 1, false));
+                            board[i] = null;
+                        }
+                    }
+                    return best;
+                } else {
+                    let best = Infinity;
+                    for (let i = 0; i < 9; i++) {
+                        if (board[i] === null) {
+                            board[i] = 'X';
+                            best = Math.min(best, this.minimax(board, depth + 1, true));
+                            board[i] = null;
+                        }
+                    }
+                    return best;
+                }
+            },
+
+            evaluateBoardState(board) {
+                if (this.checkBoardWin(board, 'O')) return 10;
+                if (this.checkBoardWin(board, 'X')) return -10;
+                return 0;
+            }
+        };
+
+        // Start application when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => Game.init());
+    </script>
+</body>
+</html>
