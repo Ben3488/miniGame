@@ -3690,13 +3690,13 @@
             async startTurn(playerIdx) {
                 this.currentPlayerIdx = playerIdx;
                 let p = this.players[playerIdx];
-                if (p.isDead) { this.nextTurn(); return; }
+                if (p.isDead) { this.nextTurn(p); return; }
 
                 if (p.flags.turnedOver) {
                     p.flags.turnedOver = false;
                     this.log(`【${p.hero.name}】翻回正面，跳過此回合`);
                     UI.updateAll(); await this.sleep(800);
-                    this.nextTurn();
+                    this.nextTurn(p);
                     return;
                 }
 
@@ -4148,7 +4148,7 @@
                 UI.updateAll();
                 await this.triggerHook('onPhaseStart', { player: p, phase: 'end' });
                 if (p.hero.skills.includes('閉月') && !p.isDead) await this.drawCards(p, 1, '發動【閉月】摸了');
-                this.nextTurn();
+                this.nextTurn(p);
             }
 
             getDistance(fromIdx, toIdx) {
@@ -5741,6 +5741,9 @@
                         }
                     }
                     await this.checkGameOver();
+                    if (this.players[this.currentPlayerIdx].isDead && this.state !== 'GAME_OVER') {
+                        this.nextTurn(this.players[this.currentPlayerIdx]);
+                    }
                 }
             }
 
@@ -6992,8 +6995,9 @@
                 }
             }
 
-            nextTurn() {
+            nextTurn(fromPlayer = null) {
                 if (this.state === 'GAME_OVER') return;
+                if (fromPlayer && fromPlayer.id !== this.currentPlayerIdx) return;
                 this.currentPhase = '';
                 this.players.forEach(p => { p.flags.yiJueLoss = false; });
                 let next = (this.currentPlayerIdx + 1) % this.players.length;
