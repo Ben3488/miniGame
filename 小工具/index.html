@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛠️ 智慧小工具包 - Unified Premium Toolbox</title>
+    <meta name="description" content="集合計分板、AI 圖片去背、及多功能影片下載的高質感小工具包。">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Main Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Floating colorful glow bubbles in background -->
+        <div class="bg-bubble bg-bubble-1"></div>
+        <div class="bg-bubble bg-bubble-2"></div>
+        <div class="bg-bubble bg-bubble-3"></div>
+
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar glass-panel">
+            <div class="sidebar-header">
+                <div class="logo-icon">🛠️</div>
+                <div class="logo-text">
+                    <h2>智慧工具包</h2>
+                    <span class="logo-subtitle">Smart Toolbox v1.0</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-target="計分板" data-url="./計分板/index.html" id="nav-btn-scoreboard">
+                    <span class="nav-icon">🏆</span>
+                    <span class="nav-label">兒童表現計分板</span>
+                    <span class="nav-indicator"></span>
+                </button>
+                <button class="nav-item" data-target="圖片去背" data-url="./圖片去背功能/index.html" id="nav-btn-bgremover">
+                    <span class="nav-icon">✨</span>
+                    <span class="nav-label">智慧圖片去背</span>
+                    <span class="nav-indicator"></span>
+                </button>
+                <button class="nav-item" data-target="影片下載" data-url="./影片下載/index.html" id="nav-btn-downloader">
+                    <span class="nav-icon">📥</span>
+                    <span class="nav-label">極速影片下載</span>
+                    <span class="nav-indicator"></span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>💡 提示：所有工具的資料皆會自動儲存於您的瀏覽器中。</p>
+                <div class="divider"></div>
+                <div class="footer-meta">
+                    <span>© 2026 Smart Toolbox</span>
+                    <button class="btn-pop-tab" id="btn-open-new-tab" title="在新分頁打開目前工具">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Viewport -->
+        <main class="dashboard-main glass-panel">
+            <div class="iframe-wrapper" id="iframe-container">
+                <iframe src="./計分板/index.html" id="tool-viewport" name="tool-viewport" title="工具內容"></iframe>
+                <!-- Subtle loading animation layer for tool switching -->
+                <div class="tool-loader hidden" id="tool-loader">
+                    <div class="loader-spinner"></div>
+                    <span>工具載入中...</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Script File -->
+    <script src="app.js"></script>
+</body>
+</html>

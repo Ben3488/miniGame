@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TubeFlow - 現代化 YouTube 影片與音訊下載器</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <!-- Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-gradient bg-grad-1"></div>
+    <div class="bg-gradient bg-grad-2"></div>
+    <div class="bg-gradient bg-grad-3"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <i data-lucide="play-circle" class="logo-icon"></i>
+                <span class="logo-text">Tube<span>Flow</span></span>
+            </div>
+            <p class="subtitle">極速、乾淨、高畫質的線上影片/音訊下載工具</p>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <!-- Downloader Form Card -->
+            <section class="glass-card download-card">
+                <div class="server-status-pill" id="server-status-pill">
+                    <span class="status-indicator pinging"></span>
+                    <span class="status-text">正在檢測最佳節點...</span>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-wrapper">
+                        <i data-lucide="link" class="input-icon"></i>
+                        <input type="text" id="video-url" placeholder="請貼入 YouTube 影片或播放清單連結..." autocomplete="off">
+                        <button class="icon-btn" id="paste-btn" title="貼上連結">
+                            <i data-lucide="clipboard"></i>
+                        </button>
+                    </div>
+                    <button class="primary-btn" id="download-btn">
+                        <span>開始解析</span>
+                        <i data-lucide="arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Fast Settings Panel -->
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <i data-lucide="video"></i>
+                            <span>下載模式</span>
+                        </label>
+                        <div class="segmented-control">
+                            <button class="segment-btn active" data-value="video">影片 (Video)</button>
+                            <button class="segment-btn" data-value="audio">僅音訊 (Audio)</button>
+                        </div>
+                    </div>
+
+                    <div class="setting-item" id="quality-selector-container">
+                        <label class="setting-label" for="video-quality">
+                            <i data-lucide="sliders"></i>
+                            <span>影片畫質</span>
+                        </label>
+                        <div class="custom-select-wrapper">
+                            <select id="video-quality">
+                                <option value="max">最高畫質 (Best Quality)</option>
+                                <option value="1080" selected>1080p Full HD</option>
+                                <option value="720">720p HD</option>
+                                <option value="480">480p SD</option>
+                                <option value="360">360p</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="setting-item hidden" id="audio-format-container">
+                        <label class="setting-label" for="audio-format">
+                            <i data-lucide="music"></i>
+                            <span>音訊格式</span>
+                        </label>
+                        <div class="custom-select-wrapper">
+                            <select id="audio-format">
+                                <option value="mp3" selected>MP3 (相容性最佳)</option>
+                                <option value="m4a">M4A (高音質)</option>
+                                <option value="opus">Opus (低延遲高壓縮)</option>
+                                <option value="wav">WAV (無損音質)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <i data-lucide="server"></i>
+                            <span>下載節點</span>
+                        </label>
+                        <div class="node-selector-wrapper">
+                            <div class="custom-select-wrapper">
+                                <select id="api-node">
+                                    <option value="auto" selected>自動分配最快節點</option>
+                                </select>
+                            </div>
+                            <button class="icon-btn settings-trigger" id="custom-node-btn" title="進階節點設定">
+                                <i data-lucide="settings"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Loading Status Indicator -->
+            <section class="glass-card loader-card hidden" id="loader-card">
+                <div class="loader-content">
+                    <div class="spinner-ring">
+                        <div></div><div></div><div></div><div></div>
+                    </div>
+                    <h3 id="loader-title">正在進行連線解析...</h3>
+                    <p id="loader-subtitle">請稍候，這通常需要幾秒鐘時間</p>
+                </div>
+            </section>
+
+            <!-- Result Card -->
+            <section class="glass-card result-card hidden" id="result-card">
+                <button class="close-btn" id="close-result" title="關閉">
+                    <i data-lucide="x"></i>
+                </button>
+                <div class="result-grid">
+                    <div class="video-thumbnail-wrapper">
+                        <img src="" alt="影片縮圖" id="result-thumbnail" class="video-thumbnail">
+                        <span class="video-duration" id="result-duration">0:00</span>
+                    </div>
+                    <div class="video-info">
+                        <h2 class="video-title" id="result-title">影片標題讀取中...</h2>
+                        <div class="video-metadata">
+                            <span class="meta-tag" id="result-type-tag">影片</span>
+                            <span class="meta-tag" id="result-quality-tag">1080p</span>
+                            <span class="meta-tag server-tag" id="result-server-tag">伺服器: 自動</span>
+                        </div>
+                        
+                        <div class="result-actions">
+                            <a href="#" target="_blank" rel="noopener noreferrer" class="action-btn download-action-btn" id="save-file-btn">
+                                <i data-lucide="download"></i>
+                                <span>立即下載檔案</span>
+                            </a>
+                        </div>
+                        <div class="guide-box">
+                            <i data-lucide="help-circle"></i>
+                            <span>如果點選後直接播放，請在影片上點擊<strong>滑鼠右鍵選擇「另存影片/音訊」</strong>。</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Download History Section -->
+            <section class="glass-card history-card">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i data-lucide="history"></i>
+                        <h2>下載歷史記錄</h2>
+                    </div>
+                    <button class="text-btn" id="clear-history-btn">
+                        <i data-lucide="trash-2"></i>
+                        <span>清空歷史</span>
+                    </button>
+                </div>
+                <div class="history-list-empty" id="history-empty">
+                    <i data-lucide="folder-open" class="empty-icon"></i>
+                    <p>尚無下載記錄，趕快貼上連結下載吧！</p>
+                </div>
+                <div class="history-grid hidden" id="history-grid">
+                    <!-- History items will be injected here -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>設計專案 © 2026 TubeFlow Studio. 基於 Cobalt 開源技術開發。</p>
+            <p class="disclaimer">聲明：本程式僅限個人學習與合理使用，請勿用於侵犯版權之商業下載行為。</p>
+        </footer>
+    </div>
+
+    <!-- Custom Server / Settings Modal -->
+    <div class="modal-backdrop hidden" id="settings-modal">
+        <div class="glass-card modal-content">
+            <div class="modal-header">
+                <h3>進階節點設定</h3>
+                <button class="close-btn modal-close" title="關閉">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-intro">如果公共節點下載緩慢或發生錯誤，您可以自訂私有的 Cobalt API 伺服器。</p>
+                
+                <div class="form-group">
+                    <label class="form-label" for="custom-api-url">自訂 Cobalt API 端點 (URL)</label>
+                    <input type="text" id="custom-api-url" placeholder="例如: https://your-cobalt-instance.com/api/json">
+                    <span class="form-help">結尾通常為 <code>/api/json</code> 或是伺服器的根目錄。</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="custom-api-key">API 金鑰 (選填，若伺服器需要認證)</label>
+                    <input type="password" id="custom-api-key" placeholder="輸入 API 金鑰 或 權杖">
+                </div>
+
+                <div class="modal-actions">
+                    <button class="sec-btn modal-close">取消</button>
+                    <button class="primary-btn" id="save-modal-btn">儲存設定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Wrapper -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Script File -->
+    <script src="app.js"></script>
+</body>
+</html>

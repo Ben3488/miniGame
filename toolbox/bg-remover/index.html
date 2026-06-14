@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧圖片去背工坊 - Professional Background Remover</title>
+    <meta name="description" content="高品質、完全瀏覽器端運作的圖片去背工具。支援 AI 一鍵去背、魔術棒容差去背、色彩橡皮擦及手動擦除還原。">
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Top Bar -->
+        <header class="app-header">
+            <div class="header-logo">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="8" fill="url(#logo-grad)" />
+                    <path d="M9 16C9 12.134 12.134 9 16 9C19.866 9 23 12.134 23 16C23 19.866 19.866 23 16 23" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M12 20L8 24M20 12L24 8" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="16" cy="16" r="2" fill="white"/>
+                    <defs>
+                        <linearGradient id="logo-grad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#8B5CF6"/>
+                            <stop offset="1" stop-color="#EC4899"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <h1>智慧圖片去背工坊</h1>
+            </div>
+            
+            <div class="header-actions">
+                <button id="btn-undo" class="action-btn" title="復原 (Ctrl+Z)" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+                </button>
+                <button id="btn-redo" class="action-btn" title="重做 (Ctrl+Y)" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
+                </button>
+                <div class="divider"></div>
+                <button id="btn-compare" class="action-btn toggle-btn" title="對比原圖" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v20"/></svg>
+                    <span>對比原圖</span>
+                </button>
+                <button id="btn-reset-image" class="action-btn danger-btn" title="清除所有編輯" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                    <span>清除</span>
+                </button>
+                <button id="btn-download" class="primary-btn" title="儲存去背圖片" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                    <span>儲存圖片</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="app-workspace">
+            <!-- Left Sidebar: Tools & Settings -->
+            <aside class="app-sidebar">
+                <!-- File Input Panel (Shown when no image is loaded) -->
+                <div id="panel-upload" class="sidebar-section">
+                    <h3>1. 選擇圖片</h3>
+                    <div id="drop-zone" class="upload-dropzone">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                            <circle cx="9" cy="9" r="2"/>
+                            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                        </svg>
+                        <p>拖曳圖片至此，或</p>
+                        <div class="upload-actions" style="display: flex; gap: 10px; justify-content: center; width: 100%;">
+                            <button id="btn-browse-file" class="secondary-btn">瀏覽檔案</button>
+                            <button id="btn-sample-image" class="secondary-btn accent-btn" style="padding: 10px 16px;">使用範例圖片</button>
+                        </div>
+                        <span class="upload-tip">支援 PNG, JPG, JPEG, WEBP 格式</span>
+                        <input type="file" id="file-input" accept="image/*" style="display: none;">
+                    </div>
+                </div>
+
+                <!-- Editing Tools (Hidden when no image is loaded) -->
+                <div id="panel-editor" class="sidebar-section hidden">
+                    <h3>2. 去背工具</h3>
+                    
+                    <div class="tool-grid">
+                        <button id="tool-ai" class="tool-btn special" title="AI 自動偵測並移除背景">
+                            <span class="sparkle-icon">✨</span>
+                            <span>AI 一鍵去背</span>
+                        </button>
+                        
+                        <button id="tool-wand" class="tool-btn active" title="點擊清除相連的相似顏色">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 4-2 2M19 8l-2 2M20.5 4.5 18 7M11.5 9.5 4 17v3h3l7.5-7.5M16 14l2 2M14 16l2 2"/></svg>
+                            <span>魔術棒</span>
+                        </button>
+                        
+                        <button id="tool-chroma" class="tool-btn" title="點擊清除全圖相同的顏色">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+                            <span>色彩去背</span>
+                        </button>
+                        
+                        <button id="tool-eraser" class="tool-btn" title="手動塗抹擦除背景">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m20 20-5-5M20 20h-5M20 20v-5M14 4h6v6M14 4l6 6M4 20h6v-6M4 20l6-6M4 4h6v6M4 4l6 6"/></svg>
+                            <span>橡皮擦</span>
+                        </button>
+                        
+                        <button id="tool-brush" class="tool-btn" title="手動塗抹還原影像">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M7.5 10.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zM11.5 7.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zM16.5 9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zM6.5 15.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5z"/></svg>
+                            <span>還原畫筆</span>
+                        </button>
+                        
+                        <button id="tool-hand" class="tool-btn" title="拖曳並平移畫面 (空白鍵)">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v5M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v6M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8.5M6 14.5V11a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v7.5a6.5 6.5 0 0 0 13 0v-6.5"/></svg>
+                            <span>拖曳平移</span>
+                        </button>
+                    </div>
+
+                    <!-- Tool Dynamic Settings -->
+                    <div class="tool-settings">
+                        <!-- Magic Wand / Chroma settings -->
+                        <div id="settings-tolerance" class="setting-group">
+                            <div class="setting-header">
+                                <label for="input-tolerance">顏色接近度 (容差)</label>
+                                <span id="val-tolerance" class="setting-val">20</span>
+                            </div>
+                            <input type="range" id="input-tolerance" min="0" max="100" value="20" class="custom-slider">
+                            <span class="setting-desc">值越高，去背範圍會包含更多接近的顏色</span>
+                        </div>
+
+                        <!-- Chroma Key specific Edge Smoothing (Feather) -->
+                        <div id="settings-feather" class="setting-group hidden">
+                            <div class="setting-header">
+                                <label for="input-feather">邊緣羽化 (平滑度)</label>
+                                <span id="val-feather" class="setting-val">0 px</span>
+                            </div>
+                            <input type="range" id="input-feather" min="0" max="30" value="0" class="custom-slider">
+                        </div>
+
+                        <!-- Brush Settings -->
+                        <div id="settings-brush" class="setting-group hidden">
+                            <div class="setting-header">
+                                <label for="input-brush-size">筆刷大小</label>
+                                <span id="val-brush-size" class="setting-val">30 px</span>
+                            </div>
+                            <input type="range" id="input-brush-size" min="1" max="200" value="30" class="custom-slider">
+
+                            <div class="setting-header" style="margin-top: 15px;">
+                                <label for="input-brush-hardness">筆刷硬度</label>
+                                <span id="val-brush-hardness" class="setting-val">80%</span>
+                            </div>
+                            <input type="range" id="input-brush-hardness" min="0" max="100" value="80" class="custom-slider">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Background Replacement (Hidden when no image is loaded) -->
+                <div id="panel-background" class="sidebar-section hidden">
+                    <h3>3. 更換背景</h3>
+                    <div class="bg-selector-tabs">
+                        <button class="bg-tab active" data-type="transparent">透明</button>
+                        <button class="bg-tab" data-type="color">純色</button>
+                        <button class="bg-tab" data-type="gradient">漸層</button>
+                        <button class="bg-tab" data-type="image">自訂圖片</button>
+                    </div>
+
+                    <div class="bg-settings-container">
+                        <!-- Solid color choices -->
+                        <div id="bg-content-color" class="bg-tab-content hidden">
+                            <div class="color-presets">
+                                <button class="color-preset-btn active" style="background-color: transparent;" title="無背景"></button>
+                                <button class="color-preset-btn" style="background-color: #ffffff;" title="白色"></button>
+                                <button class="color-preset-btn" style="background-color: #f3f4f6;" title="淺灰"></button>
+                                <button class="color-preset-btn" style="background-color: #111827;" title="暗黑"></button>
+                                <button class="color-preset-btn" style="background-color: #00ff00;" title="綠幕"></button>
+                                <button class="color-preset-btn" style="background-color: #3b82f6;" title="藍色"></button>
+                                <button class="color-preset-btn" style="background-color: #ef4444;" title="紅色"></button>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="bg-custom-color" value="#ffffff" title="自訂顏色">
+                                    <label for="bg-custom-color" class="color-picker-label">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"/><path d="M7.5 10.5C8.32843 10.5 9 9.82843 9 9C9 8.17157 8.32843 7.5 7.5 7.5C6.67157 7.5 6 8.17157 6 9C6 9.82843 6.67157 10.5 7.5 10.5Z"/><path d="M11.5 7.5C12.3284 7.5 13 6.82843 13 6C13 5.17157 12.3284 4.5 11.5 4.5C10.6716 4.5 10 5.17157 10 6C10 6.82843 10.6716 7.5 11.5 7.5Z"/><path d="M16.5 9.5C17.3284 9.5 18 8.82843 18 8C18 7.17157 17.3284 6.5 16.5 6.5C15.6716 6.5 15 7.17157 15 8C15 8.82843 15.6716 9.5 16.5 9.5Z"/><path d="M6 14C6 14 8 13 12 13C16 13 18 14 18 14C18 14 17 18 12 18C7 18 6 14 6 14Z"/></svg>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gradient choices -->
+                        <div id="bg-content-gradient" class="bg-tab-content hidden">
+                            <div class="gradient-presets">
+                                <button class="grad-preset-btn" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);" data-grad="linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)"></button>
+                                <button class="grad-preset-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" data-grad="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"></button>
+                                <button class="grad-preset-btn" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);" data-grad="linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)"></button>
+                                <button class="grad-preset-btn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);" data-grad="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"></button>
+                                <button class="grad-preset-btn" style="background: linear-gradient(135deg, #5ee7df 0%, #b490ca 100%);" data-grad="linear-gradient(135deg, #5ee7df 0%, #b490ca 100%)"></button>
+                                <button class="grad-preset-btn" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);" data-grad="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"></button>
+                                <button class="grad-preset-btn" style="background: linear-gradient(135deg, #434343 0%, #000000 100%);" data-grad="linear-gradient(135deg, #434343 0%, #000000 100%)"></button>
+                            </div>
+                        </div>
+
+                        <!-- Image choices -->
+                        <div id="bg-content-image" class="bg-tab-content hidden">
+                            <div class="bg-image-uploader">
+                                <button id="btn-upload-bg" class="secondary-btn btn-sm">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                                    <span>上傳背景圖片</span>
+                                </button>
+                                <input type="file" id="bg-file-input" accept="image/*" style="display: none;">
+                                <div id="bg-image-preview" class="hidden">
+                                    <img src="" alt="背景預覽">
+                                    <button id="btn-remove-bg" class="remove-btn-sm" title="移除背景圖片">&times;</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Canvas Viewport -->
+            <section class="app-canvas-container">
+                <!-- Drop-to-replace zone overlay (only active when dragging files over container) -->
+                <div id="drag-overlay" class="drag-overlay-hidden">
+                    <div class="overlay-content">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                        </svg>
+                        <h2>放開以載入新圖片</h2>
+                    </div>
+                </div>
+
+                <!-- Empty State prompt inside the canvas area -->
+                <div id="canvas-empty-state" class="empty-state">
+                    <div class="empty-state-card">
+                        <div class="glow-effect"></div>
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                            <circle cx="9" cy="9" r="2"/>
+                            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                        </svg>
+                        <h2>開始您的去背工作</h2>
+                        <p>將圖片拖曳至此處，或使用左側面板選擇圖片</p>
+                        <button id="btn-empty-upload" class="accent-btn">載入圖片</button>
+                    </div>
+                </div>
+
+                <!-- Active Canvas Workspace -->
+                <div id="canvas-viewport" class="canvas-viewport hidden">
+                    <!-- The transparent grid background is styled via CSS on canvas-viewport -->
+                    <div id="bg-rendering-layer" class="bg-rendering-layer"></div>
+                    <div id="canvas-transform-wrapper" class="canvas-transform-wrapper">
+                        <!-- Canvas layers -->
+                        <canvas id="display-canvas"></canvas>
+                        <!-- Floating brush circle cursor -->
+                        <div id="brush-cursor" class="brush-cursor hidden"></div>
+                    </div>
+                    
+                    <!-- Floating canvas tools (Zoom indicator & controls) -->
+                    <div class="floating-controls">
+                        <button id="btn-zoom-out" class="float-btn" title="縮小 (Ctrl + -)">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </button>
+                        <span id="zoom-indicator" class="zoom-value" title="雙擊重設縮放">100%</span>
+                        <button id="btn-zoom-in" class="float-btn" title="放大 (Ctrl + =)">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </button>
+                        <div class="float-divider"></div>
+                        <button id="btn-zoom-fit" class="float-btn" title="調整為視窗大小 (Ctrl + 0)">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AI Processing Overlay -->
+                <div id="ai-loading-overlay" class="overlay-loading hidden">
+                    <div class="loading-card">
+                        <div class="spinner"></div>
+                        <h3>AI 智慧去背處理中...</h3>
+                        <p>正在分析圖片輪廓，首次使用需要下載輕量級 AI 模型，請耐心等候。</p>
+                        <div class="progress-bar-container">
+                            <div id="ai-progress-bar" class="progress-bar" style="width: 0%;"></div>
+                        </div>
+                        <span id="ai-progress-text" class="progress-text">準備中 0%</span>
+                        <button id="btn-cancel-ai" class="secondary-btn btn-sm">取消 AI 去背</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Load imgly-background-removal CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.6/dist/bundle.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

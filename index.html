@@ -26,6 +26,10 @@
             --saboteur-color: #78716c;
             --sanguosha-color: #dc2626;
             --tictactoe-color: #00f2fe;
+            --toolbox-color: #a78bfa;
+            --scoreboard-color: #fbbf24;
+            --bgremover-color: #ec4899;
+            --downloader-color: #3b82f6;
         }
 
         body {
@@ -196,6 +200,26 @@
             border-color: rgba(0, 242, 254, 0.4);
         }
 
+        .game-card.toolbox:hover {
+            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px rgba(167, 139, 250, 0.2);
+            border-color: rgba(167, 139, 250, 0.4);
+        }
+
+        .game-card.scoreboard:hover {
+            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px rgba(251, 191, 36, 0.2);
+            border-color: rgba(251, 191, 36, 0.4);
+        }
+
+        .game-card.bgremover:hover {
+            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px rgba(236, 72, 153, 0.2);
+            border-color: rgba(236, 72, 153, 0.4);
+        }
+
+        .game-card.downloader:hover {
+            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
         .card-content {
             position: relative;
             z-index: 1;
@@ -347,6 +371,38 @@
             text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
         }
 
+        .toolbox .icon-container {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.2), rgba(139, 92, 246, 0.2));
+            box-shadow: 0 0 30px rgba(167, 139, 250, 0.3);
+            border: 2px solid rgba(167, 139, 250, 0.5);
+            color: var(--toolbox-color);
+            text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+        }
+
+        .scoreboard .icon-container {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2));
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
+            border: 2px solid rgba(251, 191, 36, 0.5);
+            color: var(--scoreboard-color);
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+        }
+
+        .bgremover .icon-container {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(244, 114, 182, 0.2));
+            box-shadow: 0 0 30px rgba(236, 72, 153, 0.3);
+            border: 2px solid rgba(236, 72, 153, 0.5);
+            color: var(--bgremover-color);
+            text-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+        }
+
+        .downloader .icon-container {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(96, 165, 250, 0.2));
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+            border: 2px solid rgba(59, 130, 246, 0.5);
+            color: var(--downloader-color);
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
         .game-title {
             font-size: 2.5rem;
             margin: 0;
@@ -437,6 +493,30 @@
             -webkit-text-fill-color: transparent;
         }
 
+        .toolbox .game-title {
+            background: linear-gradient(to right, #a78bfa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .scoreboard .game-title {
+            background: linear-gradient(to right, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .bgremover .game-title {
+            background: linear-gradient(to right, #ec4899, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .downloader .game-title {
+            background: linear-gradient(to right, #3b82f6, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
         .game-desc {
             color: var(--text-sub);
             font-size: 1.1rem;
@@ -472,6 +552,11 @@
         .sanguosha .play-btn { border: 1px solid rgba(220, 38, 38, 0.3); }
         .sanguosha-ultimate .play-btn { border: 1px solid rgba(234, 179, 8, 0.3); }
         .tictactoe .play-btn { border: 1px solid rgba(0, 242, 254, 0.3); }
+
+        .toolbox .play-btn { border: 1px solid rgba(167, 139, 250, 0.3); }
+        .scoreboard .play-btn { border: 1px solid rgba(251, 191, 36, 0.3); }
+        .bgremover .play-btn { border: 1px solid rgba(236, 72, 153, 0.3); }
+        .downloader .play-btn { border: 1px solid rgba(59, 130, 246, 0.3); }
 
         .game-card:hover .play-btn {
             background: rgba(255,255,255,0.2);
@@ -547,7 +632,7 @@
     <div class="category-tabs">
         <button class="tab-btn active" data-tab="all">
             <span class="tab-icon">🎮</span>
-            <span>全部遊戲</span>
+            <span>全部項目</span>
         </button>
         <button class="tab-btn" data-tab="basic">
             <span class="tab-icon">✨</span>
@@ -556,6 +641,10 @@
         <button class="tab-btn" data-tab="advanced">
             <span class="tab-icon">🧠</span>
             <span>策略進階</span>
+        </button>
+        <button class="tab-btn" data-tab="tools">
+            <span class="tab-icon">🛠️</span>
+            <span>實用工具</span>
         </button>
     </div>
 
@@ -725,6 +814,54 @@
                 <h2 class="game-title">三國殺</h2>
                 <p class="game-desc">終極優化版！包含軍爭、神話再臨、界限突破及SP擴充包。</p>
                 <div class="play-btn">終極優化版</div>
+            </div>
+        </a>
+
+        <!-- Toolbox Dashboard Card (tools) -->
+        <a href="toolbox/index.html" class="game-card toolbox" data-category="tools" style="animation-delay: 2.9s;">
+            <div class="card-content">
+                <div class="icon-container">
+                    🛠️
+                </div>
+                <h2 class="game-title">智慧工具包</h2>
+                <p class="game-desc">集合計分板、AI 圖片去背及多功能影片下載的高質感智慧小工具合集。</p>
+                <div class="play-btn">進入工具包</div>
+            </div>
+        </a>
+
+        <!-- Scoreboard Card (tools) -->
+        <a href="toolbox/scoreboard/index.html" class="game-card scoreboard" data-category="tools" style="animation-delay: 3.1s;">
+            <div class="card-content">
+                <div class="icon-container">
+                    🏆
+                </div>
+                <h2 class="game-title">兒童計分板</h2>
+                <p class="game-desc">簡潔美觀的兒童表現計分板，記錄成長與得分點滴。</p>
+                <div class="play-btn">開始計分</div>
+            </div>
+        </a>
+
+        <!-- Image BG Remover Card (tools) -->
+        <a href="toolbox/bg-remover/index.html" class="game-card bgremover" data-category="tools" style="animation-delay: 3.3s;">
+            <div class="card-content">
+                <div class="icon-container">
+                    ✨
+                </div>
+                <h2 class="game-title">圖片去背</h2>
+                <p class="game-desc">高品質、完全瀏覽器端運作的 AI 圖片一鍵去背與編輯工坊。</p>
+                <div class="play-btn">開始去背</div>
+            </div>
+        </a>
+
+        <!-- Video Downloader Card (tools) -->
+        <a href="toolbox/video-downloader/index.html" class="game-card downloader" data-category="tools" style="animation-delay: 3.5s;">
+            <div class="card-content">
+                <div class="icon-container">
+                    📥
+                </div>
+                <h2 class="game-title">影片下載</h2>
+                <p class="game-desc">支援多個影音平台的極速網頁影片下載與解析工具。</p>
+                <div class="play-btn">開始下載</div>
             </div>
         </a>
     </div>
