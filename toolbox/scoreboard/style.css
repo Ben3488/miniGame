@@ -1396,7 +1396,7 @@ body {
     .kid-card {
         min-height: auto !important;
         height: auto !important;
-        padding: 6px 10px !important;
+        padding: 6px 6px !important;
         gap: 4px !important;
         border-radius: 14px !important;
     }
@@ -1433,14 +1433,14 @@ body {
         padding: 0 !important;
     }
     .avatar-container {
-        width: 55px !important;
-        height: 55px !important;
-        flex: 0 0 55px !important;
+        width: 68px !important;
+        height: 68px !important;
+        flex: 0 0 68px !important;
         flex-shrink: 0 !important;
         box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-color) 15%, transparent) !important;
     }
     .avatar-emoji {
-        font-size: 1.6rem !important;
+        font-size: 1.95rem !important;
     }
     .medal-badge {
         width: 20px !important;
@@ -1454,20 +1454,20 @@ body {
         stroke-width: 2.2px !important;
     }
     .score-circle-wrapper {
-        width: 55px !important;
-        height: 55px !important;
-        flex: 0 0 55px !important;
+        width: 68px !important;
+        height: 68px !important;
+        flex: 0 0 68px !important;
         flex-shrink: 0 !important;
     }
     .score-svg-ring {
-        width: 55px !important;
-        height: 55px !important;
+        width: 68px !important;
+        height: 68px !important;
     }
     .score-number {
-        font-size: 1.4rem !important;
+        font-size: 1.8rem !important;
     }
     .score-unit {
-        font-size: 0.6rem !important;
+        font-size: 0.65rem !important;
         margin-top: 1px !important;
     }
     .milestones-stars {
@@ -1494,7 +1494,7 @@ body {
         height: 10px !important;
     }
     .controls-container {
-        gap: 12px !important;
+        gap: 16px !important;
         margin-top: 0 !important;
     }
     .btn-ctrl {
@@ -1529,12 +1529,23 @@ body {
         grid-column: auto !important;
     }
     .quick-btn {
-        padding: 4px 2px !important;
-        font-size: 0.72rem !important;
+        padding: 4px 1px !important;
+        font-size: 0.63rem !important;
+        letter-spacing: -0.04em !important;
+        gap: 1.5px !important;
         border-radius: 5px !important;
+        white-space: nowrap !important;
     }
     .quick-btn-icon {
-        font-size: 0.85rem !important;
+        font-size: 0.76rem !important;
+    }
+    .quick-btn-label {
+        font-size: 0.63rem !important;
+        text-overflow: clip !important;
+        overflow: visible !important;
+    }
+    .quick-btn-val {
+        font-size: 0.63rem !important;
     }
 }
 
