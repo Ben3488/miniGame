@@ -2350,3 +2350,58 @@ body {
     text-align: center !important;
     font-weight: 700 !important;
 }
+
+/* ==========================================================================
+   累積獎品與兌換按鈕樣式
+   ========================================================================== */
+.kid-prize-badge {
+    background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 99px;
+    margin-left: 6px;
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4);
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.redeem-btn-container {
+    margin: 10px 0 5px;
+    width: 100%;
+}
+
+.btn-redeem {
+    width: 100%;
+    background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+    color: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+    transition: all 0.2s ease;
+    animation: redeem-pulse 1.5s infinite alternate;
+}
+
+.btn-redeem:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(236, 72, 153, 0.6);
+}
+
+.btn-redeem:active {
+    transform: translateY(0);
+}
+
+@keyframes redeem-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.6);
+    }
+    100% {
+        box-shadow: 0 0 12px 6px rgba(139, 92, 246, 0.4);
+    }
+}

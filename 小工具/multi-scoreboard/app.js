@@ -289,6 +289,7 @@ function normalizeKids(loadedKids = []) {
             }),
             avatarGallery,
             score: typeof kid.score === 'number' ? kid.score : 0,
+            prizeCount: typeof kid.prizeCount === 'number' ? kid.prizeCount : 0,
             gradientId: theme.gradientId,
             glowColor: theme.glowColor,
             glowStrong: theme.glowStrong,
@@ -654,6 +655,21 @@ function createKidCardHTML(kid) {
         `;
     });
 
+    const prizeBadgeHTML = kid.prizeCount > 0 
+        ? `<span class="kid-prize-badge" title="累計獲得獎品 ${kid.prizeCount} 次">🎁 x${kid.prizeCount}</span>` 
+        : '';
+
+    let redeemBtnHTML = '';
+    if (kid.score === 100) {
+        redeemBtnHTML = `
+            <div class="redeem-btn-container">
+                <button class="btn-redeem" onclick="redeemPrize('${kid.id}')" title="點擊兌換獎品並重設為 0 分">
+                    🎉 點我兌換大獎 🎁
+                </button>
+            </div>
+        `;
+    }
+
     return `
         <article class="kid-card glass-panel" id="card-${kid.id}" style="--theme-color: ${kid.tagColor};">
             <!-- 編輯按鈕 (三個點) -->
@@ -666,6 +682,7 @@ function createKidCardHTML(kid) {
                 <div class="kid-title-container">
                     <span class="kid-fruit-emoji">${kid.emoji}</span>
                     <h2 class="kid-name">${kid.name}</h2>
+                    ${prizeBadgeHTML}
                 </div>
             </div>
             
@@ -702,6 +719,8 @@ function createKidCardHTML(kid) {
             <div class="milestones-stars" title="每 20 分獲得一顆星星！">
                 ${starsHTML}
             </div>
+
+            ${redeemBtnHTML}
 
             <!-- 常用原因與點數 -->
             <div class="quick-actions-container">
@@ -790,11 +809,39 @@ function updateCardDOM(kid) {
         }
     }
     
-    const fruitEmojiEl = cardEl.querySelector('.kid-fruit-emoji');
-    if (fruitEmojiEl) fruitEmojiEl.textContent = kid.emoji;
+    const titleContainer = cardEl.querySelector('.kid-title-container');
+    if (titleContainer) {
+        const prizeBadgeHTML = kid.prizeCount > 0 
+            ? `<span class="kid-prize-badge" title="累計獲得獎品 ${kid.prizeCount} 次">🎁 x${kid.prizeCount}</span>` 
+            : '';
+        titleContainer.innerHTML = `
+            <span class="kid-fruit-emoji">${kid.emoji}</span>
+            <h2 class="kid-name">${kid.name}</h2>
+            ${prizeBadgeHTML}
+        `;
+    }
 
-    const nameEl = cardEl.querySelector('.kid-name');
-    if (nameEl) nameEl.textContent = kid.name;
+    // 動態更新兌換按鈕顯示狀態
+    let redeemContainer = cardEl.querySelector('.redeem-btn-container');
+    if (kid.score === 100) {
+        if (!redeemContainer) {
+            const starsEl = cardEl.querySelector('.milestones-stars');
+            if (starsEl) {
+                const newRedeem = document.createElement('div');
+                newRedeem.className = 'redeem-btn-container';
+                newRedeem.innerHTML = `
+                    <button class="btn-redeem" onclick="redeemPrize('${kid.id}')" title="點擊兌換獎品並重設為 0 分">
+                        🎉 點我兌換大獎 🎁
+                    </button>
+                `;
+                starsEl.after(newRedeem);
+            }
+        }
+    } else {
+        if (redeemContainer) {
+            redeemContainer.remove();
+        }
+    }
 }
 
 /* ==========================================================================
@@ -925,6 +972,12 @@ window.openEditModal = function(kidId) {
     state.editingKidId = kidId;
     state.selectedEmoji = kid.emoji;
     editNameInput.value = kid.name;
+    
+    const prizeCountInput = document.getElementById('edit-prize-count');
+    if (prizeCountInput) {
+        prizeCountInput.value = kid.prizeCount || 0;
+    }
+    
     uploadedAvatarBase64 = isUploadedPhotoDataUrl(kid.avatarUrl) ? kid.avatarUrl : '';
     uploadedAvatarHistory = dedupeAvatarGallery([
         ...(Array.isArray(kid.avatarGallery) ? kid.avatarGallery : []),
@@ -1072,6 +1125,11 @@ document.getElementById('btn-modal-save')?.addEventListener('click', () => {
     kid.avatarUrl = resolvedAvatarUrl;
     kid.avatarGallery = nextAvatarGallery;
     
+    const prizeCountInput = document.getElementById('edit-prize-count');
+    if (prizeCountInput) {
+        kid.prizeCount = Math.max(0, parseInt(prizeCountInput.value) || 0);
+    }
+    
     if (oldName !== newName || oldEmoji !== state.selectedEmoji || oldAvatar !== resolvedAvatarUrl) {
         let changeDesc = `變更資料：`;
         if (oldName !== newName) changeDesc += `名字由 ${oldName} 改為 ${newName}。`;
@@ -1103,6 +1161,36 @@ editModalEl?.addEventListener('click', (e) => {
         closeEditModal();
     }
 });
+
+// 重設單個兒童分數為 0
+document.getElementById('btn-reset-single-score')?.addEventListener('click', () => {
+    if (!state.editingKidId) return;
+    const kid = state.kids.find(k => k.id === state.editingKidId);
+    if (!kid) return;
+    if (confirm(`確認要將「${kid.name}」的分數重設為 0 嗎？\n(此動作僅重設計分板分數，不影響累計獎品次數)`)) {
+        kid.score = 0;
+        addLog(kid.id, kid.name, 0, '手動重設分數為 0 分。', kid.tagColor);
+        renderAllCards();
+        saveState();
+        closeEditModal();
+    }
+});
+
+// 兌換獎品並歸零分數
+window.redeemPrize = function(kidId) {
+    const kid = state.kids.find(k => k.id === kidId);
+    if (!kid) return;
+    
+    if (confirm(`確認要為「${kid.name}」兌換獎品嗎？\n這會將分數重設為 0 分，且累計增加 1 次獎品次數！`)) {
+        kid.score = 0;
+        kid.prizeCount = (kid.prizeCount || 0) + 1;
+        
+        addLog(kid.id, kid.name, 0, `兌換了滿分大獎！🎁 累計獲得 ${kid.prizeCount} 次獎品！🏆`, kid.tagColor);
+        triggerCelebration();
+        renderAllCards();
+        saveState();
+    }
+};
 
 /* ==========================================================================
    成員管理 Modal 功能 (新增/刪除，最少2人，最多10人)
