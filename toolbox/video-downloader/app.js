@@ -1,11 +1,15 @@
 // Cobalt API Nodes List
 const COBALT_SERVERS = [
-    { name: "Ryz Node (推薦)", url: "https://cobalt.api.ryz.cx" },
-    { name: "Kuko Node", url: "https://api.kuko.work" },
-    { name: "Q7 Node", url: "https://cobalt.q7.cx" },
-    { name: "Lunes Node", url: "https://cobalt-api.lunes.host" },
-    { name: "Morian Node", url: "https://cobalt.morian.one" },
-    { name: "Foxtrot Node", url: "https://cobalt.foxtrot.zone" }
+    { name: "Meowing Subito (推薦)", url: "https://subito-c.meowing.de" },
+    { name: "Meowing Nuko", url: "https://nuko-c.meowing.de" },
+    { name: "Clxxped Grapefruit", url: "https://grapefruit.clxxped.lol" },
+    { name: "Mgytr Node", url: "https://apicobalt.mgytr.top" },
+    { name: "Kittycat Fox", url: "https://fox.kittycat.boo" },
+    { name: "Kittycat Dog", url: "https://dog.kittycat.boo" },
+    { name: "Qwkuns Node", url: "https://api.qwkuns.me" },
+    { name: "Canine Tools", url: "https://cobalt.omega.wolfy.love" },
+    { name: "Clxxped Lime", url: "https://lime.clxxped.lol" },
+    { name: "Squair Node", url: "https://cobaltapi.squair.xyz" }
 ];
 
 // Application State
@@ -167,10 +171,9 @@ async function pingServer(url) {
         });
         clearTimeout(timeoutId);
         
-        if (response.ok || response.status === 200 || response.status === 204) {
-            const end = performance.now();
-            return Math.round(end - start);
-        }
+        // If we got here without throwing, the server is alive and responding (even with 405/404)
+        const end = performance.now();
+        return Math.round(end - start);
     } catch (e) {
         // Suppress console error as pings frequently fail CORS or timeout
     }
@@ -357,17 +360,25 @@ async function analyzeAndDownload(videoUrl) {
         return;
     }
 
-    // Prepare Request Body
+    // Prepare Request Body (Support both v7 and v10+ schemas simultaneously)
     const requestBody = {
         url: videoUrl,
         filenameStyle: "pretty"
     };
 
     if (appState.isAudioOnly) {
+        // v7 keys
         requestBody.isAudioOnly = true;
+        // v10 keys
+        requestBody.downloadMode = "audio";
+        
         requestBody.audioFormat = audioFormatSelect.value;
     } else {
+        // v7 keys
         requestBody.vQuality = videoQualitySelect.value;
+        // v10 keys
+        requestBody.videoQuality = videoQualitySelect.value;
+        requestBody.downloadMode = "auto";
     }
 
     // Load custom authorization key if custom server is active
@@ -380,20 +391,49 @@ async function analyzeAndDownload(videoUrl) {
         headers["Authorization"] = `Bearer ${customServer.key}`;
     }
 
+    // Determine target endpoints (v10 root endpoint '/' takes precedence, fallback to v7 '/api/json')
+    const baseUrl = appState.activeServerUrl.replace(/\/$/, "");
+    let urlsToTry = [];
+    if (appState.activeServerUrl.includes("/api/json")) {
+        urlsToTry = [appState.activeServerUrl, baseUrl.replace("/api/json", "")];
+    } else {
+        urlsToTry = [baseUrl, `${baseUrl}/api/json`];
+    }
+
     try {
-        const response = await fetch(`${appState.activeServerUrl}/api/json`, {
-            method: "POST",
-            headers: headers,
-            body: JSON.stringify(requestBody)
-        });
+        let response = null;
+        let lastError = null;
+
+        for (const url of urlsToTry) {
+            try {
+                response = await fetch(url, {
+                    method: "POST",
+                    headers: headers,
+                    body: JSON.stringify(requestBody)
+                });
+                
+                if (response.status === 404) {
+                    continue;
+                }
+                
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    const errMsg = errData.error && errData.error.code ? errData.error.code : `HTTP 錯誤碼: ${response.status}`;
+                    lastError = new Error(errMsg);
+                    continue;
+                }
+                
+                break;
+            } catch (err) {
+                lastError = err;
+            }
+        }
 
         // Hide Loader
         loaderCard.classList.add("hidden");
 
-        if (!response.ok) {
-            const errData = await response.json().catch(() => ({}));
-            const errMsg = errData.error && errData.error.code ? errData.error.code : `HTTP 錯誤碼: ${response.status}`;
-            throw new Error(errMsg);
+        if (!response || !response.ok) {
+            throw lastError || new Error("無法與下載伺服器建立連線");
         }
 
         const data = await response.json();
