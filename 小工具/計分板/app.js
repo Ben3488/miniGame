@@ -5,6 +5,7 @@
 const STORAGE_VERSION_KEY = 'kids_scoreboard_mockup_version';
 const STORAGE_VERSION = 'scoreboard-mockup-v3';
 const MAX_AVATAR_UPLOADS = 5;
+const SYNC_POLL_INTERVAL_MS = 2000;
 
 // 預設大頭貼 Emoji 列表
 const CURED_EMOJIS = [
@@ -164,6 +165,9 @@ let state = {
     title: '寶貝表現計分板',
     subtitle: '記錄寶貝的日常表現，累積100分拿大獎！'
 };
+let lastServerRevision = null;
+let syncPollTimer = null;
+let pendingRemoteState = null;
 
 function getDefaultState() {
     return {
@@ -202,6 +206,86 @@ function mergeKidsWithDefaults(savedKids = []) {
         const matchedKid = savedKids.find(kid => kid.id === defaultKid.id) || savedKids[index] || defaultKid;
         return normalizeKid(matchedKid, index);
     });
+}
+
+function extractRevision(payload) {
+    return payload?.meta?.revision || null;
+}
+
+function applyLoadedState(sourceData) {
+    state.kids = mergeKidsWithDefaults(sourceData.kids || []);
+    state.history = sourceData.history || [];
+    state.title = sourceData.title || getDefaultState().title;
+    state.subtitle = sourceData.subtitle || getDefaultState().subtitle;
+    lastServerRevision = extractRevision(sourceData) || lastServerRevision;
+}
+
+function renderAllState() {
+    renderScoreboardHeader();
+    renderAllCards();
+    renderHistory();
+}
+
+function hasOpenModal() {
+    return Boolean(document.querySelector('.modal-overlay.show'));
+}
+
+function applyPendingRemoteState() {
+    if (!pendingRemoteState || hasOpenModal()) return;
+    applyLoadedState(pendingRemoteState);
+    saveToLocalStorage();
+    renderAllState();
+    updateSyncStatus('online', '已同步其他裝置的最新變更');
+    pendingRemoteState = null;
+}
+
+async function fetchRemoteState({ silent = false } = {}) {
+    try {
+        const response = await fetch(`api.php?_=${Date.now()}`, {
+            cache: 'no-store'
+        });
+        if (!response.ok) return null;
+        const serverData = await response.json();
+        if (!serverData) {
+            return null;
+        }
+        return serverData;
+    } catch (error) {
+        if (!silent) {
+            console.warn('抓取 NAS 最新資料失敗。', error);
+        }
+        return null;
+    }
+}
+
+async function pollRemoteUpdates() {
+    const serverData = await fetchRemoteState({ silent: true });
+    if (!serverData || serverData.status === 'empty' || !Array.isArray(serverData.kids)) return;
+
+    const incomingRevision = extractRevision(serverData);
+    if (!incomingRevision || incomingRevision === lastServerRevision) {
+        return;
+    }
+
+    if (hasOpenModal()) {
+        pendingRemoteState = serverData;
+        updateSyncStatus('online', '偵測到其他裝置更新，關閉視窗後會自動套用');
+        return;
+    }
+
+    applyLoadedState(serverData);
+    saveToLocalStorage();
+    renderAllState();
+    updateSyncStatus('online', '已同步其他裝置的最新變更');
+}
+
+function startRealtimeSync() {
+    if (syncPollTimer) {
+        clearInterval(syncPollTimer);
+    }
+    syncPollTimer = setInterval(() => {
+        pollRemoteUpdates();
+    }, SYNC_POLL_INTERVAL_MS);
 }
 
 /* ==========================================================================
@@ -254,15 +338,10 @@ async function loadState() {
     
     // 1. 優先嘗試向 NAS 後端讀取資料
     try {
-        const response = await fetch('api.php');
-        if (response.ok) {
-            const serverData = await response.json();
+        const serverData = await fetchRemoteState();
+        if (serverData) {
             if (serverData && serverData.kids && serverData.kids.length > 0) {
-                state.kids = mergeKidsWithDefaults(serverData.kids);
-                state.history = serverData.history || [];
-                state.title = serverData.title || getDefaultState().title;
-                state.subtitle = serverData.subtitle || getDefaultState().subtitle;
-
+                applyLoadedState(serverData);
                 // 舊預設角色升級檢查
                 const isOldDefault = state.kids.length === 3 &&
                                      state.kids.some(k => k.name === '小明' || k.name === '小華' || k.name === '小強');
@@ -375,6 +454,7 @@ async function saveState() {
         if (res.ok) {
             const result = await res.json();
             if (result.success) {
+                lastServerRevision = result.meta?.revision || lastServerRevision;
                 updateSyncStatus('online', '資料已成功儲存於您的 Synology NAS');
             } else {
                 updateSyncStatus('error', 'NAS 寫入權限錯誤：' + (result.message || '檔案寫入失敗'));
@@ -784,6 +864,7 @@ window.openEditModal = function(kidId) {
 function closeEditModal() {
     editModalEl.classList.remove('show');
     state.editingKidId = null;
+    applyPendingRemoteState();
 }
 
 function updateUploadPreview() {
@@ -965,6 +1046,7 @@ document.getElementById('btn-reset-all')?.addEventListener('click', () => {
 
 function closeResetModal() {
     resetModalEl.classList.remove('show');
+    applyPendingRemoteState();
 }
 
 document.getElementById('btn-reset-close')?.addEventListener('click', closeResetModal);
@@ -1020,6 +1102,7 @@ function openTitleModal() {
 
 function closeTitleModal() {
     titleModalEl.classList.remove('show');
+    applyPendingRemoteState();
 }
 
 function renderScoreboardHeader() {
@@ -1067,7 +1150,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadState();
     
     // 渲染 UI
-    renderScoreboardHeader();
-    renderAllCards();
-    renderHistory();
+    renderAllState();
+    startRealtimeSync();
 });
