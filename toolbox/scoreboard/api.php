@@ -4,6 +4,9 @@
    ========================================================================== */
 
 header('Content-Type: application/json; charset=utf-8');
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 
 // 資料儲存設定
 $dataDir = __DIR__ . '/data';
@@ -23,7 +26,12 @@ if (!file_exists($htaccessFile)) {
     @file_put_contents($htaccessFile, "Deny from all");
 }
 
-$method = $_SERVER['REQUEST_METHOD'];
+$method = strtoupper($_SERVER['REQUEST_METHOD']);
+
+if ($method === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
 
 if ($method === 'GET') {
     if (file_exists($dataFile)) {
