@@ -1652,6 +1652,166 @@ body {
     .quick-btn-val {
         font-size: 0.63rem !important;
     }
+
+    /* =======================================================
+       橫屏彈窗 (Modal Overlay & Card) 優化
+       ======================================================= */
+    .modal-overlay {
+        align-items: flex-start !important;
+        overflow-y: auto !important;
+        padding: 12px 10px !important;
+    }
+
+    .modal-card {
+        margin: 12px auto !important;
+        max-height: none !important;
+        width: min(100%, 680px) !important;
+        padding: 16px 20px !important;
+        border-radius: 20px !important;
+    }
+
+    .modal-header {
+        margin-bottom: 12px !important;
+    }
+
+    .modal-header h3 {
+        font-size: 1.15rem !important;
+    }
+
+    .modal-close {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 1.4rem !important;
+    }
+
+    .modal-body {
+        margin-bottom: 12px !important;
+        max-height: none !important;
+        overflow-y: visible !important;
+        padding-right: 0 !important;
+        gap: 10px !important;
+    }
+
+    .modal-card .btn {
+        padding: 8px 16px !important;
+        font-size: 0.9rem !important;
+        border-radius: 12px !important;
+    }
+
+    .modal-footer {
+        gap: 8px !important;
+    }
+
+    /* 「修改寶貝資料」雙欄版面佈局 */
+    #modal-edit-profile .modal-body {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px 16px !important;
+    }
+
+    #modal-edit-profile .modal-body > .form-group:nth-child(1) {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+    }
+
+    #modal-edit-profile .modal-body > .form-group:nth-child(2) {
+        grid-column: 1 !important;
+        grid-row: 2 / 4 !important;
+    }
+
+    #modal-edit-profile .modal-body > .form-group:nth-child(3) {
+        grid-column: 2 !important;
+        grid-row: 1 / 3 !important;
+    }
+
+    #modal-edit-profile .modal-body > .form-group:nth-child(4) {
+        grid-column: 2 !important;
+        grid-row: 3 !important;
+        margin-top: 0 !important;
+    }
+
+    #modal-edit-profile .modal-body > .form-group:nth-child(5) {
+        grid-column: 1 / -1 !important;
+        grid-row: 4 !important;
+        margin-top: 0 !important;
+    }
+
+    /* 快捷 Emoji 選擇器在橫屏的尺寸微調 */
+    .emoji-selector {
+        max-height: 110px !important;
+        grid-template-columns: repeat(6, 1fr) !important;
+        padding: 6px !important;
+        gap: 5px !important;
+    }
+
+    .emoji-option {
+        font-size: 1.35rem !important;
+        padding: 4px 0 !important;
+    }
+
+    /* 自訂頭像上傳區橫屏尺寸微調 */
+    .upload-avatar-wrapper {
+        padding: 8px 10px !important;
+        gap: 8px !important;
+    }
+
+    .upload-preview-row {
+        gap: 8px !important;
+    }
+
+    .avatar-preview-circle {
+        width: 44px !important;
+        height: 44px !important;
+    }
+
+    #upload-preview-status {
+        font-size: 0.8rem !important;
+    }
+
+    .upload-gallery-section {
+        gap: 6px !important;
+    }
+
+    .upload-gallery-header {
+        font-size: 0.8rem !important;
+    }
+
+    .upload-gallery-list {
+        gap: 6px !important;
+    }
+
+    .upload-gallery-item {
+        border-radius: 8px !important;
+    }
+
+    /* 「修改常用原因與點數」雙欄版面佈局 */
+    #presets-edit-list {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px 12px !important;
+    }
+
+    .preset-edit-row {
+        padding: 6px 10px !important;
+        border-radius: 10px !important;
+        gap: 6px !important;
+        grid-template-columns: 24px 44px 1fr 60px !important;
+    }
+
+    .preset-edit-row input {
+        padding: 4px 6px !important;
+        font-size: 0.85rem !important;
+        border-radius: 6px !important;
+    }
+
+    .preset-edit-row input.preset-edit-icon {
+        font-size: 1rem !important;
+    }
+
+    /* 「管理成員人數」彈窗在橫屏的高度限制 */
+    .kids-list-container {
+        max-height: 150px !important;
+    }
 }
 
 @media (max-width: 768px) and (orientation: portrait) {
