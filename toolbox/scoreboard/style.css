@@ -708,6 +708,91 @@ body {
     color: var(--theme-color);
 }
 
+/* =======================================================
+   常用原因與點數快捷鍵樣式
+   ======================================================= */
+.quick-actions-container {
+    width: 100%;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.quick-actions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2px;
+}
+
+.quick-actions-title {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.quick-actions-hint {
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    opacity: 0.8;
+}
+
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+}
+
+.quick-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 2px;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid color-mix(in srgb, var(--theme-color) 24%, transparent);
+    color: var(--text-secondary);
+    transition: var(--transition-smooth);
+    user-select: none;
+    outline: none;
+    white-space: nowrap;
+}
+
+.quick-actions-grid .quick-btn:last-child {
+    grid-column: span 3;
+}
+
+.quick-btn:hover {
+    color: #ffffff;
+    background: color-mix(in srgb, var(--theme-color) 12%, transparent);
+    border-color: var(--theme-color);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--theme-color) 25%, transparent);
+    transform: translateY(-1px);
+}
+
+.quick-btn:active {
+    transform: translateY(0) scale(0.97);
+}
+
+.quick-btn-icon {
+    font-size: 0.82rem;
+}
+
+.quick-btn-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.quick-btn-val {
+    color: var(--theme-color);
+    font-weight: 700;
+}
+
 .controls-container {
     display: flex;
     justify-content: center;
@@ -1311,9 +1396,9 @@ body {
     .kid-card {
         min-height: auto !important;
         height: auto !important;
-        padding: 10px 12px 10px !important;
-        gap: 6px !important;
-        border-radius: 16px !important;
+        padding: 6px 10px !important;
+        gap: 4px !important;
+        border-radius: 14px !important;
     }
     .kid-card::before,
     .kid-card::after {
@@ -1409,17 +1494,47 @@ body {
         height: 10px !important;
     }
     .controls-container {
-        gap: 16px !important;
-        margin-top: 2px !important;
+        gap: 12px !important;
+        margin-top: 0 !important;
     }
     .btn-ctrl {
-        width: 32px !important;
-        height: 32px !important;
+        width: 28px !important;
+        height: 28px !important;
     }
     .btn-ctrl svg {
-        width: 12px !important;
-        height: 12px !important;
+        width: 11px !important;
+        height: 11px !important;
         stroke-width: 2.5px !important;
+    }
+
+    /* 橫屏快捷鍵優化 */
+    .quick-actions-container {
+        margin-top: 4px !important;
+        gap: 3px !important;
+    }
+    .quick-actions-header {
+        font-size: 0.72rem !important;
+    }
+    .quick-actions-title {
+        font-size: 0.7rem !important;
+    }
+    .quick-actions-hint {
+        display: none !important;
+    }
+    .quick-actions-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 3px !important;
+    }
+    .quick-actions-grid .quick-btn:last-child {
+        grid-column: span 3 !important;
+    }
+    .quick-btn {
+        padding: 3px 1px !important;
+        font-size: 0.65rem !important;
+        border-radius: 5px !important;
+    }
+    .quick-btn-icon {
+        font-size: 0.72rem !important;
     }
 }
 
@@ -1628,6 +1743,39 @@ body {
         width: 15px !important;
         height: 15px !important;
         stroke-width: 2.8px !important;
+    }
+
+    /* 直向快捷鍵優化 */
+    .quick-actions-container {
+        margin-top: 6px !important;
+        gap: 4px !important;
+    }
+    .quick-actions-header {
+        font-size: 0.78rem !important;
+    }
+    .quick-actions-title {
+        font-size: 0.75rem !important;
+    }
+    .quick-actions-hint {
+        font-size: 0.65rem !important;
+    }
+    .quick-actions-grid {
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 4px !important;
+    }
+    .quick-actions-grid .quick-btn:last-child {
+        grid-column: span 1 !important;
+    }
+    .quick-btn {
+        padding: 4px 1px !important;
+        font-size: 0.65rem !important;
+        border-radius: 6px !important;
+        white-space: normal !important;
+        line-height: 1.1 !important;
+        height: 100% !important;
+    }
+    .quick-btn-icon {
+        font-size: 0.78rem !important;
     }
 
     /* 歷史紀錄區縮小調整 */

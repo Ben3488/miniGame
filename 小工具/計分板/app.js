@@ -622,6 +622,46 @@ function createKidCardHTML(kid) {
                 </div>
             </div>
 
+            <!-- 常用原因與點數 -->
+            <div class="quick-actions-container">
+                <div class="quick-actions-header">
+                    <span class="quick-actions-title">常用原因與點數</span>
+                    <span class="quick-actions-hint">✦ 點擊後自動填入原因並立即加分</span>
+                </div>
+                <div class="quick-actions-grid">
+                    <button class="quick-btn" onclick="quickScore('${kid.id}', '做家務', 3)" title="做家務 +3">
+                        <span class="quick-btn-icon">🧹</span><span class="quick-btn-label">做家務</span><span class="quick-btn-val">+3</span>
+                    </button>
+                    <button class="quick-btn" onclick="quickScore('${kid.id}', '收拾玩具', 2)" title="收拾玩具 +2">
+                        <span class="quick-btn-icon">🧸</span><span class="quick-btn-label">收拾玩具</span><span class="quick-btn-val">+2</span>
+                    </button>
+                    <button class="quick-btn" onclick="quickScore('${kid.id}', '主動摺被子', 1)" title="主動摺被子 +1">
+                        <span class="quick-btn-icon">🛌</span><span class="quick-btn-label">主動摺被子</span><span class="quick-btn-val">+1</span>
+                    </button>
+                    <button class="quick-btn" onclick="quickScore('${kid.id}', '考滿分', 10)" title="考滿分 +10">
+                        <span class="quick-btn-icon">💯</span><span class="quick-btn-label">考滿分</span><span class="quick-btn-val">+10</span>
+                    </button>
+                    <button class="quick-btn" onclick="quickScore('${kid.id}', '完成作業', 2)" title="完成作業 +2">
+                        <span class="quick-btn-icon">📝</span><span class="quick-btn-label">完成作業</span><span class="quick-btn-val">+2</span>
+                    </button>
+                    <button class="quick-btn" onclick="quickScore('${kid.id}', '考及格/有進步', 1)" title="考及格/有進步 +1">
+                        <span class="quick-btn-icon">📈</span><span class="quick-btn-label">考及格/有進步</span><span class="quick-btn-val">+1</span>
+                    </button>
+                    <button class="quick-btn" onclick="quickScore('${kid.id}', '主動看書', 2)" title="主動看書 +2">
+                        <span class="quick-btn-icon">📚</span><span class="quick-btn-label">主動看書</span><span class="quick-btn-val">+2</span>
+                    </button>
+                    <button class="quick-btn" onclick="quickScore('${kid.id}', '準時睡覺', 1)" title="準時睡覺 +1">
+                        <span class="quick-btn-icon">🌙</span><span class="quick-btn-label">準時睡覺</span><span class="quick-btn-val">+1</span>
+                    </button>
+                    <button class="quick-btn" onclick="quickScore('${kid.id}', '乖乖把飯吃完', 1)" title="乖乖把飯吃完 +1">
+                        <span class="quick-btn-icon">🍙</span><span class="quick-btn-label">乖乖把飯吃完</span><span class="quick-btn-val">+1</span>
+                    </button>
+                    <button class="quick-btn" onclick="quickScore('${kid.id}', '分享禮讓', 2)" title="分享禮讓 +2">
+                        <span class="quick-btn-icon">🤝</span><span class="quick-btn-label">分享禮讓</span><span class="quick-btn-val">+2</span>
+                    </button>
+                </div>
+            </div>
+
             <!-- 控制按鈕 (圓形外框樣式) -->
             <div class="controls-container">
                 <button class="btn-ctrl btn-minus" onclick="changeScore('${kid.id}', -1)" title="扣 1 分">
@@ -822,6 +862,14 @@ window.changeScore = function(kidId, amount) {
     if (inputEl) {
         inputEl.value = '';
     }
+};
+
+window.quickScore = function(kidId, reason, amount) {
+    const inputEl = document.getElementById(`note-${kidId}`);
+    if (inputEl) {
+        inputEl.value = reason;
+    }
+    window.changeScore(kidId, amount);
 };
 
 /* ==========================================================================
