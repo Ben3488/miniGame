@@ -359,15 +359,17 @@ body {
     font-weight: 500;
 }
 
-/* 收合按鈕（預設隱藏，僅橫向時顯示） */
+/* =======================================================
+   收合按鈕（預設隱藏，JS 在橫向時加上 show class）
+   ======================================================= */
 .sidebar-collapse-btn {
-    display: none;
+    display: none; /* JS 控制：.landscape .sidebar-collapse-btn => display:flex */
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     background: rgba(255, 255, 255, 0.06);
     color: var(--text-secondary);
     cursor: pointer;
@@ -376,15 +378,63 @@ body {
 }
 
 .sidebar-collapse-btn:hover {
-    background: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.16);
     color: #ffffff;
+    border-color: rgba(255,255,255,0.24);
 }
 
-.sidebar-collapse-btn svg {
-    transition: transform 0.3s ease;
+/* =======================================================
+   展開 FAB 按鈕（固定定位，全域可見，JS 控制顯示）
+   ======================================================= */
+.sidebar-expand-fab {
+    display: none; /* 預設隱藏，JS 加 .visible class 後顯示 */
+    position: fixed;
+    top: 10px;
+    right: 12px;
+    z-index: 9999;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(139, 92, 246, 0.5);
+    background: rgba(13, 17, 38, 0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    color: #a78bfa;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3), 0 0 0 1px rgba(139, 92, 246, 0.14);
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
 }
 
-/* 響應式佈局 (平板/手機 ≤ 900px，直立模式) */
+.sidebar-expand-fab.visible {
+    display: flex;
+    animation: fabPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.sidebar-expand-fab:hover {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.75);
+    box-shadow: 0 6px 26px rgba(139, 92, 246, 0.42);
+    transform: scale(1.08);
+}
+
+@keyframes fabPop {
+    from { transform: scale(0.65); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+}
+
+/* =======================================================
+   收合狀態 — 全域 class（JS 加在 sidebar 上）
+   用 display:none 確保 grid auto row 完全收縮為 0
+   ======================================================= */
+.dashboard-sidebar.collapsed {
+    display: none !important;
+}
+
+/* =======================================================
+   直立模式（手機 ≤ 900px，portrait）
+   ======================================================= */
 @media (max-width: 900px) and (orientation: portrait) {
     .dashboard-container {
         grid-template-columns: 1fr;
@@ -392,71 +442,62 @@ body {
         padding: 12px;
         gap: 12px;
     }
-    
+
     .dashboard-sidebar {
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
-        padding: 14px 20px;
+        padding: 12px 16px;
         height: auto;
     }
-    
+
     .sidebar-header {
         margin-bottom: 0;
     }
-    
+
     .sidebar-header .logo-text {
         display: none;
     }
-    
+
     .sidebar-nav {
         flex-direction: row;
         flex: 0;
         gap: 8px;
     }
-    
+
     .nav-item {
         padding: 10px 14px;
         font-size: 0.85rem;
     }
-    
+
     .nav-label {
         display: none;
     }
-    
-    .sidebar-footer {
-        display: none;
-    }
 
-    .sidebar-collapse-btn {
+    .sidebar-footer {
         display: none;
     }
 }
 
-/* ============================================================
-   手機橫向模式 — 側邊欄自動收合，最大化內容區
-   ============================================================ */
-@media (max-width: 900px) and (orientation: landscape) {
+/* =======================================================
+   橫向模式（手機 ≤ 950px，landscape）
+   ======================================================= */
+@media (max-width: 950px) and (orientation: landscape) {
     .dashboard-container {
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr;
         padding: 8px;
-        gap: 8px;
+        gap: 6px;
     }
 
-    /* 預設：展開狀態 — 細長的頂部列 */
     .dashboard-sidebar {
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
-        padding: 6px 12px;
+        padding: 5px 12px;
         height: auto;
         min-height: 0;
-        overflow: hidden;
-        transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                    padding 0.35s ease,
-                    opacity 0.25s ease;
-        max-height: 80px; /* 展開高度 */
+        border-radius: 12px;
     }
 
     .sidebar-header {
@@ -464,9 +505,9 @@ body {
         gap: 8px;
     }
 
-    /* 隱藏 logo 文字，只保留 icon */
     .sidebar-header .logo-icon {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
+        animation: none; /* 關閉旋轉節省效能 */
     }
 
     .sidebar-header .logo-text {
@@ -476,92 +517,32 @@ body {
     .sidebar-nav {
         flex-direction: row;
         flex: 1;
-        gap: 6px;
+        gap: 4px;
         justify-content: center;
     }
 
     .nav-item {
-        padding: 6px 10px;
-        font-size: 0.8rem;
-        border-radius: 10px;
-        gap: 6px;
+        padding: 5px 10px;
+        font-size: 0.78rem;
+        border-radius: 8px;
+        gap: 5px;
     }
 
     .nav-icon {
-        font-size: 1.1rem;
+        font-size: 1.05rem;
     }
 
     .nav-label {
-        display: none; /* 橫向時隱藏文字，僅顯示圖示 */
+        display: none;
     }
 
     .sidebar-footer {
         display: none;
     }
 
-    /* 收合按鈕顯示 */
+    /* 在橫向模式顯示收合按鈕 */
     .sidebar-collapse-btn {
         display: flex;
-        margin-left: 8px;
-        flex-shrink: 0;
-    }
-
-    /* 箭頭朝上（展開狀態） */
-    .sidebar-collapse-btn svg {
-        transform: rotate(0deg);
-    }
-
-    /* ── 收合狀態：sidebar 縮到最小，幾乎消失 ── */
-    .dashboard-sidebar.collapsed {
-        max-height: 0;
-        padding-top: 0;
-        padding-bottom: 0;
-        opacity: 0;
-        pointer-events: none;
-    }
-
-    /* 當 sidebar 收合時，用一個懸浮小按鈕來展開 */
-    .sidebar-expand-fab {
-        display: none; /* 預設隱藏 */
-        position: fixed;
-        top: 8px;
-        right: 10px;
-        z-index: 200;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        border: 1px solid rgba(139, 92, 246, 0.45);
-        background: rgba(13, 17, 38, 0.85);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        color: #a78bfa;
-        cursor: pointer;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 18px rgba(139, 92, 246, 0.25), 0 0 0 1px rgba(139, 92, 246, 0.12);
-        transition: var(--transition-smooth);
-        animation: fabPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
-
-    .sidebar-expand-fab:hover {
-        background: rgba(139, 92, 246, 0.22);
-        border-color: rgba(139, 92, 246, 0.7);
-        box-shadow: 0 6px 24px rgba(139, 92, 246, 0.38);
-        transform: scale(1.08);
-    }
-
-    .sidebar-expand-fab.visible {
-        display: flex;
-    }
-
-    @keyframes fabPop {
-        from { transform: scale(0.7); opacity: 0; }
-        to   { transform: scale(1);   opacity: 1; }
-    }
-
-    /* 收合時讓 iframe 區域填滿全部空間 */
-    .dashboard-container.sidebar-hidden {
-        grid-template-rows: 0 1fr;
+        margin-left: 6px;
     }
 }
-
