@@ -126,6 +126,7 @@ body {
     0% {
         transform: translate(0, 0) scale(1);
     }
+
     100% {
         transform: translate(70px, 40px) scale(1.16);
     }
@@ -219,6 +220,7 @@ body {
     0% {
         transform: translateY(0) scale(1);
     }
+
     100% {
         transform: translateY(-2px) scale(1.03);
     }
@@ -962,6 +964,7 @@ body {
         opacity: 0;
         transform: translateY(-8px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1331,9 +1334,11 @@ body {
     body {
         padding: 8px 10px !important;
     }
+
     .app-container {
         gap: 8px !important;
     }
+
     .app-header {
         padding: 8px 16px !important;
         border-radius: 14px !important;
@@ -1342,42 +1347,53 @@ body {
         align-items: center !important;
         justify-content: space-between !important;
     }
+
     .header-title-container {
         width: auto !important;
         display: flex !important;
         align-items: center !important;
         gap: 10px !important;
     }
+
     .header-logo {
-        display: none !important; /* Hide massive trophy logo to save vertical space */
+        display: none !important;
+        /* Hide massive trophy logo to save vertical space */
     }
+
     .app-header h1 {
         font-size: 1.15rem !important;
         margin: 0 !important;
     }
+
     .scoreboard-title-row {
         margin: 0 !important;
         display: flex !important;
         align-items: center !important;
         gap: 8px !important;
     }
+
     .btn-edit-icon {
         width: 28px !important;
         height: 28px !important;
         border-radius: 8px !important;
     }
+
     .btn-edit-icon svg {
         width: 13px !important;
         height: 13px !important;
     }
+
     .sync-status-pill {
         margin-left: 4px !important;
         padding: 0.15rem 0.45rem !important;
         font-size: 0.65rem !important;
     }
+
     .header-subtitle {
-        display: none !important; /* Hide subtitle to save vertical space in landscape */
+        display: none !important;
+        /* Hide subtitle to save vertical space in landscape */
     }
+
     #btn-reset-all {
         width: auto !important;
         padding: 6px 12px !important;
@@ -1385,6 +1401,7 @@ body {
         border-radius: 8px !important;
         margin: 0 !important;
     }
+
     .scoreboard-grid {
         display: grid !important;
         grid-template-columns: repeat(3, 1fr) !important;
@@ -1393,6 +1410,7 @@ body {
         margin: 0 !important;
         padding: 0 !important;
     }
+
     .kid-card {
         min-height: auto !important;
         height: auto !important;
@@ -1400,17 +1418,21 @@ body {
         gap: 4px !important;
         border-radius: 14px !important;
     }
+
     .kid-card::before,
     .kid-card::after {
         border-radius: 16px !important;
     }
+
     .kid-card-header {
         position: static !important;
         min-height: 0 !important;
     }
+
     .kid-title-container {
         position: static !important;
     }
+
     .kid-fruit-emoji {
         position: absolute !important;
         top: 28px !important;
@@ -1418,12 +1440,14 @@ body {
         font-size: 1.25rem !important;
         z-index: 10 !important;
     }
+
     .kid-name {
         position: absolute !important;
         top: 18px !important;
         left: 106px !important;
         font-size: 1.05rem !important;
     }
+
     .btn-edit-profile {
         position: absolute !important;
         top: 28px !important;
@@ -1433,15 +1457,18 @@ body {
         padding: 3px !important;
         z-index: 15 !important;
     }
+
     .btn-edit-profile svg {
         width: 12px !important;
         height: 12px !important;
     }
+
     .kid-card-body-row {
         position: static !important;
         margin: 0 !important;
         padding: 0 !important;
     }
+
     .avatar-container {
         position: absolute !important;
         top: 10px !important;
@@ -1453,20 +1480,24 @@ body {
         box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-color) 15%, transparent) !important;
         z-index: 5 !important;
     }
+
     .avatar-emoji {
         font-size: 1.95rem !important;
     }
+
     .medal-badge {
         width: 20px !important;
         height: 20px !important;
         bottom: -4px !important;
         border-width: 1px !important;
     }
+
     .medal-badge svg {
         width: 9px !important;
         height: 9px !important;
         stroke-width: 2.2px !important;
     }
+
     .score-circle-wrapper {
         position: absolute !important;
         top: 10px !important;
@@ -1476,17 +1507,21 @@ body {
         flex: 0 0 62px !important;
         flex-shrink: 0 !important;
     }
+
     .score-svg-ring {
         width: 62px !important;
         height: 62px !important;
     }
+
     .score-number {
         font-size: 1.8rem !important;
     }
+
     .score-unit {
         font-size: 0.65rem !important;
         margin-top: 1px !important;
     }
+
     .milestones-stars {
         position: absolute !important;
         top: 44px !important;
@@ -1496,32 +1531,39 @@ body {
         justify-content: flex-start !important;
         z-index: 10 !important;
     }
+
     .star-icon {
         width: 12px !important;
         height: 12px !important;
     }
+
     .note-input-container {
         margin: 0 !important;
     }
+
     .note-input {
         min-height: 28px !important;
         padding: 4px 6px 4px 24px !important;
         font-size: 0.75rem !important;
         border-radius: 8px !important;
     }
+
     .note-input-icon {
         left: 8px !important;
         width: 10px !important;
         height: 10px !important;
     }
+
     .controls-container {
         gap: 16px !important;
         margin-top: 0 !important;
     }
+
     .btn-ctrl {
         width: 30px !important;
         height: 30px !important;
     }
+
     .btn-ctrl svg {
         width: 12px !important;
         height: 12px !important;
@@ -1533,22 +1575,28 @@ body {
         margin-top: 4px !important;
         gap: 3px !important;
     }
+
     .quick-actions-header {
         font-size: 0.72rem !important;
     }
+
     .quick-actions-title {
         font-size: 0.7rem !important;
     }
+
     .quick-actions-hint {
         display: none !important;
     }
+
     .quick-actions-grid {
         grid-template-columns: repeat(3, 1fr) !important;
         gap: 3px !important;
     }
+
     .quick-actions-grid .quick-btn:last-child {
         grid-column: auto !important;
     }
+
     .quick-btn {
         padding: 4px 1px !important;
         font-size: 0.63rem !important;
@@ -1557,14 +1605,17 @@ body {
         border-radius: 5px !important;
         white-space: nowrap !important;
     }
+
     .quick-btn-icon {
         font-size: 0.76rem !important;
     }
+
     .quick-btn-label {
         font-size: 0.63rem !important;
         text-overflow: clip !important;
         overflow: visible !important;
     }
+
     .quick-btn-val {
         font-size: 0.63rem !important;
     }
@@ -1590,7 +1641,7 @@ body {
     .header-title-container {
         width: 100% !important;
     }
-    
+
     .scoreboard-title-row {
         display: flex !important;
         align-items: center !important;
@@ -1802,22 +1853,28 @@ body {
         margin-top: 6px !important;
         gap: 4px !important;
     }
+
     .quick-actions-header {
         font-size: 0.78rem !important;
     }
+
     .quick-actions-title {
         font-size: 0.75rem !important;
     }
+
     .quick-actions-hint {
         font-size: 0.65rem !important;
     }
+
     .quick-actions-grid {
         grid-template-columns: repeat(5, 1fr) !important;
         gap: 4px !important;
     }
+
     .quick-actions-grid .quick-btn:last-child {
         grid-column: span 1 !important;
     }
+
     .quick-btn {
         padding: 6px 2px !important;
         font-size: 0.72rem !important;
@@ -1826,6 +1883,7 @@ body {
         line-height: 1.1 !important;
         height: 100% !important;
     }
+
     .quick-btn-icon {
         font-size: 0.88rem !important;
     }
@@ -1855,7 +1913,7 @@ body {
         padding-top: 4px !important;
         margin-top: 2px !important;
     }
-    
+
     .modal-card {
         padding: 16px 14px !important;
         max-width: 94% !important;
@@ -1899,6 +1957,7 @@ body {
     border-color: rgba(16, 185, 129, 0.22);
     color: #34d399;
 }
+
 .sync-status-pill.online .sync-dot {
     background: #10b981;
     box-shadow: 0 0 8px #10b981;
@@ -1911,6 +1970,7 @@ body {
     border-color: rgba(245, 158, 11, 0.22);
     color: #fbbf24;
 }
+
 .sync-status-pill.offline .sync-dot {
     background: #f59e0b;
 }
@@ -1922,6 +1982,7 @@ body {
     color: #f87171;
     cursor: help;
 }
+
 .sync-status-pill.error .sync-dot {
     background: #ef4444;
     box-shadow: 0 0 8px #ef4444;
@@ -1934,18 +1995,35 @@ body {
     border-color: rgba(148, 163, 184, 0.22);
     color: #94a3b8;
 }
+
 .sync-status-pill.loading .sync-dot {
     background: #94a3b8;
     animation: syncFlash 0.8s infinite alternate ease-in-out;
 }
 
 @keyframes syncPulse {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.3); opacity: 0.6; }
-    100% { transform: scale(1); opacity: 1; }
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.3);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 @keyframes syncFlash {
-    0% { opacity: 0.4; }
-    100% { opacity: 1; }
+    0% {
+        opacity: 0.4;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
