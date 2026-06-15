@@ -620,282 +620,650 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* ==========================================
+           Portal View Styling
+           ========================================== */
+        
+        .portal-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 1200px;
+            min-height: 80vh;
+            margin: auto;
+            box-sizing: border-box;
+            animation: fadeIn 1s ease-out;
+            padding: 1rem;
+        }
+
+        .portal-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .portal-header h1 {
+            font-size: 4rem;
+            margin: 0;
+            background: linear-gradient(135deg, #fff 30%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 4px;
+            font-weight: 700;
+            text-shadow: 0 0 30px rgba(255,255,255,0.1);
+        }
+
+        .portal-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-sub);
+            margin-top: 1rem;
+            letter-spacing: 2px;
+        }
+
+        .portal-choices {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3.5rem;
+            width: 100%;
+            max-width: 900px;
+            perspective: 1000px;
+        }
+
+        @media (max-width: 768px) {
+            .portal-choices {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .portal-header h1 {
+                font-size: 2.8rem;
+            }
+        }
+
+        .portal-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 32px;
+            padding: 3.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            height: 440px;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+
+        .portal-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.06) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 0;
+        }
+
+        .portal-card:hover::before {
+            opacity: 1;
+        }
+
+        .portal-card:hover {
+            transform: translateY(-15px) scale(1.03) rotateX(5deg);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Game Card Theme */
+        .portal-card.game-zone-card:hover {
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6), 0 0 50px rgba(56, 189, 248, 0.25);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        /* Toolbox Card Theme */
+        .portal-card.tool-zone-card:hover {
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6), 0 0 50px rgba(167, 139, 250, 0.25);
+            border-color: rgba(167, 139, 250, 0.4);
+        }
+
+        .portal-card-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        .portal-card .icon-container {
+            width: 140px;
+            height: 140px;
+            font-size: 5rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: transform 0.5s ease;
+        }
+
+        .game-zone-card .icon-container {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(99, 102, 241, 0.15));
+            box-shadow: 0 0 40px rgba(56, 189, 248, 0.2);
+            border: 2px solid rgba(56, 189, 248, 0.4);
+        }
+
+        .tool-zone-card .icon-container {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.15), rgba(236, 72, 153, 0.15));
+            box-shadow: 0 0 40px rgba(167, 139, 250, 0.2);
+            border: 2px solid rgba(167, 139, 250, 0.4);
+        }
+
+        .portal-card:hover .icon-container {
+            transform: scale(1.1);
+        }
+        
+        .game-zone-card:hover .icon-container {
+            animation: bounceLight 1s infinite alternate ease-in-out;
+        }
+
+        .tool-zone-card:hover .icon-container {
+            animation: rotateGear 8s infinite linear;
+        }
+
+        @keyframes bounceLight {
+            0% { transform: scale(1.1) translateY(0); }
+            100% { transform: scale(1.1) translateY(-8px); }
+        }
+
+        @keyframes rotateGear {
+            0% { transform: scale(1.1) rotate(0deg); }
+            100% { transform: scale(1.1) rotate(360deg); }
+        }
+
+        .portal-card-title {
+            font-size: 2.2rem;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .game-zone-card .portal-card-title {
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tool-zone-card .portal-card-title {
+            background: linear-gradient(to right, #a78bfa, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .portal-card-desc {
+            color: var(--text-sub);
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin: 0;
+            max-width: 320px;
+        }
+
+        .portal-btn {
+            padding: 10px 36px;
+            border-radius: 40px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border: none;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            margin-top: 1rem;
+        }
+
+        .game-zone-card .portal-btn {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(99, 102, 241, 0.2));
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2);
+        }
+
+        .tool-zone-card .portal-btn {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.2), rgba(236, 72, 153, 0.2));
+            border: 1px solid rgba(167, 139, 250, 0.4);
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.2);
+        }
+
+        .portal-card:hover .portal-btn {
+            transform: scale(1.05);
+        }
+
+        .game-zone-card:hover .portal-btn {
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            color: #0f172a;
+            box-shadow: 0 8px 25px rgba(56, 189, 248, 0.4);
+            border-color: transparent;
+        }
+
+        .tool-zone-card:hover .portal-btn {
+            background: linear-gradient(135deg, #a78bfa, #ec4899);
+            color: #0f172a;
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.4);
+            border-color: transparent;
+        }
+
+        /* Dashboard Wrapper (Games Content) */
+        .dashboard-wrapper {
+            display: none; /* Controlled by JS */
+            width: 100%;
+            max-width: 1400px;
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Header modifications for Dashboard */
+        .dashboard-header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1120px;
+            margin-bottom: 2.5rem;
+            position: relative;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .dashboard-header-container .header {
+            margin-bottom: 0;
+            text-align: left;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-header-container {
+                flex-direction: column;
+                gap: 1.5rem;
+                align-items: center;
+            }
+            .dashboard-header-container .header {
+                text-align: center;
+            }
+        }
+
+        /* Back button */
+        .btn-back-to-portal {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-sub);
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-back-to-portal:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(-4px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>BOARD GAMES</h1>
-        <div class="subtitle">經典對弈 ‧ 智慧傳承</div>
+    <!-- Portal Landing Page -->
+    <div class="portal-wrapper" id="portal-view">
+        <div class="portal-header">
+            <h1>智慧玩樂工坊</h1>
+            <p class="portal-subtitle">精緻經典桌遊對弈 ‧ 實用智慧小工具</p>
+        </div>
+        
+        <div class="portal-choices">
+            <!-- Game Arena Choice -->
+            <div class="portal-card game-zone-card" id="btn-enter-games">
+                <div class="portal-card-content">
+                    <div class="icon-container">
+                        🎮
+                    </div>
+                    <h2 class="portal-card-title">遊戲娛樂區</h2>
+                    <p class="portal-card-desc">收錄五子棋、象棋、跳棋、圍棋、三國殺等 14 款經典對局棋盤遊戲。</p>
+                    <button class="portal-btn">進入遊戲區</button>
+                </div>
+            </div>
+
+            <!-- Toolbox Choice -->
+            <a href="toolbox/index.html" class="portal-card tool-zone-card">
+                <div class="portal-card-content">
+                    <div class="icon-container">
+                        🛠️
+                    </div>
+                    <h2 class="portal-card-title">智慧工具箱</h2>
+                    <p class="portal-card-desc">整合兒童表現計分板、AI 圖片去背及極速影音下載等便捷實用工具。</p>
+                    <button class="portal-btn">開啟工具箱</button>
+                </div>
+            </a>
+        </div>
     </div>
 
-    <div class="category-tabs">
-        <button class="tab-btn active" data-tab="all">
-            <span class="tab-icon">🎮</span>
-            <span>全部項目</span>
-        </button>
-        <button class="tab-btn" data-tab="basic">
-            <span class="tab-icon">✨</span>
-            <span>基礎入門</span>
-        </button>
-        <button class="tab-btn" data-tab="advanced">
-            <span class="tab-icon">🧠</span>
-            <span>策略進階</span>
-        </button>
-        <button class="tab-btn" data-tab="tools">
-            <span class="tab-icon">🛠️</span>
-            <span>實用工具</span>
-        </button>
-    </div>
-
-    <div class="games-container">
-        <!-- Gomoku Card (basic) -->
-        <a href="games/Gomoku.html" class="game-card gomoku" data-category="basic" style="animation-delay: 0.1s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    ⚫⚪
-                </div>
-                <h2 class="game-title">五子棋</h2>
-                <p class="game-desc">極致簡約的五子連線對戰，挑戰你的佈局策略與洞察力。</p>
-                <div class="play-btn">開始遊戲</div>
+    <!-- Games Dashboard View (Hidden by default) -->
+    <div class="dashboard-wrapper" id="dashboard-view">
+        <div class="dashboard-header-container">
+            <div class="header">
+                <h1>BOARD GAMES</h1>
+                <div class="subtitle">經典對弈 ‧ 智慧傳承</div>
             </div>
-        </a>
+            <button class="btn-back-to-portal" id="btn-back-home">
+                <span>↩</span> 返回首頁
+            </button>
+        </div>
 
-        <!-- Xiangqi Card (basic) -->
-        <a href="games/Xiangqi.html" class="game-card xiangqi" data-category="basic" style="animation-delay: 0.3s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    帥
-                </div>
-                <h2 class="game-title">象棋</h2>
-                <p class="game-desc">楚河漢界上的兵馬交鋒，體驗千年智慧的策略博弈。</p>
-                <div class="play-btn">開始遊戲</div>
-            </div>
-        </a>
+        <div class="category-tabs">
+            <button class="tab-btn active" data-tab="all">
+                <span class="tab-icon">🎮</span>
+                <span>全部項目</span>
+            </button>
+            <button class="tab-btn" data-tab="basic">
+                <span class="tab-icon">✨</span>
+                <span>基礎入門</span>
+            </button>
+            <button class="tab-btn" data-tab="advanced">
+                <span class="tab-icon">🧠</span>
+                <span>策略進階</span>
+            </button>
+        </div>
 
-        <!-- Chinese Checkers Card (basic) -->
-        <a href="games/ChineseCheckers.html" class="game-card chinese-checkers" data-category="basic" style="animation-delay: 0.5s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    跳
+        <div class="games-container">
+            <!-- Gomoku Card (basic) -->
+            <a href="games/Gomoku.html" class="game-card gomoku" data-category="basic" style="animation-delay: 0.1s;">
+                <div class="card-content">
+                    <div class="icon-container">
+                        ⚫⚪
+                    </div>
+                    <h2 class="game-title">五子棋</h2>
+                    <p class="game-desc">極致簡約的五子連線對戰，挑戰你的佈局策略與洞察力。</p>
+                    <div class="play-btn">開始遊戲</div>
                 </div>
-                <h2 class="game-title">跳棋</h2>
-                <p class="game-desc">六角星形棋盤上的華麗連跳，考驗你的路徑規劃能力。</p>
-                <div class="play-btn">開始遊戲</div>
-            </div>
-        </a>
+            </a>
 
-        <!-- Minesweeper Card (basic) -->
-        <a href="games/Minesweeper.html" class="game-card minesweeper" data-category="basic" style="animation-delay: 0.7s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    💣
+            <!-- Xiangqi Card (basic) -->
+            <a href="games/Xiangqi.html" class="game-card xiangqi" data-category="basic" style="animation-delay: 0.3s;">
+                <div class="card-content">
+                    <div class="icon-container">
+                        帥
+                    </div>
+                    <h2 class="game-title">象棋</h2>
+                    <p class="game-desc">楚河漢界上的兵馬交鋒，體驗千年智慧的策略博弈。</p>
+                    <div class="play-btn">開始遊戲</div>
                 </div>
-                <h2 class="game-title">踩地雷</h2>
-                <p class="game-desc">步步為營的邏輯推理，在危機四伏的方格中尋找生機。</p>
-                <div class="play-btn">開始遊戲</div>
-            </div>
-        </a>
+            </a>
 
-        <!-- Sudoku Card (basic) -->
-        <a href="games/Sudoku.html" class="game-card sudoku" data-category="basic" style="animation-delay: 0.9s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    🔢
+            <!-- Chinese Checkers Card (basic) -->
+            <a href="games/ChineseCheckers.html" class="game-card chinese-checkers" data-category="basic" style="animation-delay: 0.5s;">
+                <div class="card-content">
+                    <div class="icon-container">
+                        跳
+                    </div>
+                    <h2 class="game-title">跳棋</h2>
+                    <p class="game-desc">六角星形棋盤上的華麗連跳，考驗你的路徑規劃能力。</p>
+                    <div class="play-btn">開始遊戲</div>
                 </div>
-                <h2 class="game-title">數獨</h2>
-                <p class="game-desc">經典九宮格數字推演，激發你的大腦潛能與邏輯極限。</p>
-                <div class="play-btn">開始遊戲</div>
-            </div>
-        </a>
+            </a>
 
-        <!-- UNO Card (basic) -->
-        <a href="games/Uno.html" class="game-card uno" data-category="basic" style="animation-delay: 1.1s;">
-            <div class="card-content">
-                <div class="icon-container" style="font-size: 2.5rem;">
-                    UNO
+            <!-- Minesweeper Card (basic) -->
+            <a href="games/Minesweeper.html" class="game-card minesweeper" data-category="basic" style="animation-delay: 0.7s;">
+                <div class="card-content">
+                    <div class="icon-container">
+                        💣
+                    </div>
+                    <h2 class="game-title">踩地雷</h2>
+                    <p class="game-desc">步步為營的邏輯推理，在危機四伏的方格中尋找生機。</p>
+                    <div class="play-btn">開始遊戲</div>
                 </div>
-                <h2 class="game-title">UNO</h2>
-                <p class="game-desc">經典的卡牌遊戲，與對手鬥智鬥勇，最先出完手牌者獲勝！</p>
-                <div class="play-btn">開始遊戲</div>
-            </div>
-        </a>
+            </a>
 
-        <!-- Rummikub Card (basic) -->
-        <a href="games/Rummikub.html" class="game-card rummikub" data-category="basic" style="animation-delay: 1.3s;">
-            <div class="card-content">
-                <div class="icon-container" style="font-size: 2.5rem;">
-                    123
+            <!-- Sudoku Card (basic) -->
+            <a href="games/Sudoku.html" class="game-card sudoku" data-category="basic" style="animation-delay: 0.9s;">
+                <div class="card-content">
+                    <div class="icon-container">
+                        🔢
+                    </div>
+                    <h2 class="game-title">數獨</h2>
+                    <p class="game-desc">經典九宮格數字推演，激發你的大腦潛能與邏輯極限。</p>
+                    <div class="play-btn">開始遊戲</div>
                 </div>
-                <h2 class="game-title">拉密</h2>
-                <p class="game-desc">數字牌的排列組合，考驗邏輯與觀察力的經典以色列麻將。</p>
-                <div class="play-btn">進入遊戲</div>
-            </div>
-        </a>
+            </a>
 
-        <!-- Tic-Tac-Toe Card (basic) -->
-        <a href="games/TicTacToe.html" class="game-card tictactoe" data-category="basic" style="animation-delay: 1.5s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    ❌⭕
+            <!-- UNO Card (basic) -->
+            <a href="games/Uno.html" class="game-card uno" data-category="basic" style="animation-delay: 1.1s;">
+                <div class="card-content">
+                    <div class="icon-container" style="font-size: 2.5rem;">
+                        UNO
+                    </div>
+                    <h2 class="game-title">UNO</h2>
+                    <p class="game-desc">經典的卡牌遊戲，與對手鬥智鬥勇，最先出完手牌者獲勝！</p>
+                    <div class="play-btn">開始遊戲</div>
                 </div>
-                <h2 class="game-title">井字棋</h2>
-                <p class="game-desc">流光霓虹風格的經典井字棋，支援雙人對戰與地獄級 AI 挑戰。</p>
-                <div class="play-btn">開始遊戲</div>
-            </div>
-        </a>
+            </a>
 
-        <!-- Go Card (advanced) -->
-        <a href="games/Go.html" class="game-card go" data-category="advanced" style="animation-delay: 1.7s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    圍
+            <!-- Rummikub Card (basic) -->
+            <a href="games/Rummikub.html" class="game-card rummikub" data-category="basic" style="animation-delay: 1.3s;">
+                <div class="card-content">
+                    <div class="icon-container" style="font-size: 2.5rem;">
+                        123
+                    </div>
+                    <h2 class="game-title">拉密</h2>
+                    <p class="game-desc">數字牌的排列組合，考驗邏輯與觀察力的經典以色列麻將。</p>
+                    <div class="play-btn">進入遊戲</div>
                 </div>
-                <h2 class="game-title">圍棋</h2>
-                <p class="game-desc">黑白交錯的方寸之戰，體驗氣與圍地的極致策略。</p>
-                <div class="play-btn">開始遊戲</div>
-            </div>
-        </a>
+            </a>
 
-        <!-- Carcassonne Card (advanced) -->
-        <a href="games/Carcassonne.html" class="game-card carcassonne" data-category="advanced" style="animation-delay: 1.9s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    🏰
+            <!-- Tic-Tac-Toe Card (basic) -->
+            <a href="games/TicTacToe.html" class="game-card tictactoe" data-category="basic" style="animation-delay: 1.5s;">
+                <div class="card-content">
+                    <div class="icon-container">
+                        ❌⭕
+                    </div>
+                    <h2 class="game-title">井字棋</h2>
+                    <p class="game-desc">流光霓虹風格的經典井字棋，支援雙人對戰與地獄級 AI 挑戰。</p>
+                    <div class="play-btn">開始遊戲</div>
                 </div>
-                <h2 class="game-title">卡卡頌</h2>
-                <p class="game-desc">經典板塊拼放，在中古世紀的法國打造城堡與草原的版圖。</p>
-                <div class="play-btn">進入遊戲</div>
-            </div>
-        </a>
+            </a>
 
-        <!-- Catan Card (advanced) -->
-        <a href="games/Catan.html" class="game-card catan" data-category="advanced" style="animation-delay: 2.1s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    🎲
+            <!-- Go Card (advanced) -->
+            <a href="games/Go.html" class="game-card go" data-category="advanced" style="animation-delay: 1.7s;">
+                <div class="card-content">
+                    <div class="icon-container">
+                        圍
+                    </div>
+                    <h2 class="game-title">圍棋</h2>
+                    <p class="game-desc">黑白交錯的方寸之戰，體驗氣與圍地的極致策略。</p>
+                    <div class="play-btn">開始遊戲</div>
                 </div>
-                <h2 class="game-title">卡坦島</h2>
-                <p class="game-desc">探索未知島嶼，收集資源、建設城鎮，成為卡坦島的霸主。</p>
-                <div class="play-btn">進入遊戲</div>
-            </div>
-        </a>
+            </a>
 
-        <!-- Saboteur Card (advanced) -->
-        <a href="games/Saboteur.html" class="game-card saboteur" data-category="advanced" style="animation-delay: 2.3s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    ⛏️
+            <!-- Carcassonne Card (advanced) -->
+            <a href="games/Carcassonne.html" class="game-card carcassonne" data-category="advanced" style="animation-delay: 1.9s;">
+                <div class="card-content">
+                    <div class="icon-container">
+                        🏰
+                    </div>
+                    <h2 class="game-title">卡卡頌</h2>
+                    <p class="game-desc">經典板塊拼放，在中古世紀的法國打造城堡與草原的版圖。</p>
+                    <div class="play-btn">進入遊戲</div>
                 </div>
-                <h2 class="game-title">矮人礦坑</h2>
-                <p class="game-desc">心機與合作並存，在黑暗礦坑中尋找金塊，或是暗中破壞！</p>
-                <div class="play-btn">進入遊戲</div>
-            </div>
-        </a>
+            </a>
 
-        <!-- SanGuoSha Standard Card (advanced) -->
-        <a href="games/SanGuoShaStandard.html" class="game-card sanguosha" data-category="advanced" style="animation-delay: 2.5s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    殺
+            <!-- Catan Card (advanced) -->
+            <a href="games/Catan.html" class="game-card catan" data-category="advanced" style="animation-delay: 2.1s;">
+                <div class="card-content">
+                    <div class="icon-container">
+                        🎲
+                    </div>
+                    <h2 class="game-title">卡坦島</h2>
+                    <p class="game-desc">探索未知島嶼，收集資源、建設城鎮，成為卡坦島的霸主。</p>
+                    <div class="play-btn">進入遊戲</div>
                 </div>
-                <h2 class="game-title">三國殺</h2>
-                <p class="game-desc">經典標準版！主公、忠臣、反賊、內奸，運籌帷幄的身分局對戰。</p>
-                <div class="play-btn">標準版</div>
-            </div>
-        </a>
+            </a>
 
-        <!-- SanGuoSha Ultimate Card (advanced) -->
-        <a href="games/SanGuoShaUltimate.html" class="game-card sanguosha-ultimate" data-category="advanced" style="animation-delay: 2.7s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    神
+            <!-- Saboteur Card (advanced) -->
+            <a href="games/Saboteur.html" class="game-card saboteur" data-category="advanced" style="animation-delay: 2.3s;">
+                <div class="card-content">
+                    <div class="icon-container">
+                        ⛏️
+                    </div>
+                    <h2 class="game-title">矮人礦坑</h2>
+                    <p class="game-desc">心機與合作並存，在黑暗礦坑中尋找金塊，或是暗中破壞！</p>
+                    <div class="play-btn">進入遊戲</div>
                 </div>
-                <h2 class="game-title">三國殺</h2>
-                <p class="game-desc">終極優化版！包含軍爭、神話再臨、界限突破及SP擴充包。</p>
-                <div class="play-btn">終極優化版</div>
-            </div>
-        </a>
+            </a>
 
-        <!-- Toolbox Dashboard Card (tools) -->
-        <a href="toolbox/index.html" class="game-card toolbox" data-category="tools" style="animation-delay: 2.9s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    🛠️
+            <!-- SanGuoSha Standard Card (advanced) -->
+            <a href="games/SanGuoShaStandard.html" class="game-card sanguosha" data-category="advanced" style="animation-delay: 2.5s;">
+                <div class="card-content">
+                    <div class="icon-container">
+                        殺
+                    </div>
+                    <h2 class="game-title">三國殺</h2>
+                    <p class="game-desc">經典標準版！主公、忠臣、反賊、內奸，運籌帷幄的身分局對戰。</p>
+                    <div class="play-btn">標準版</div>
                 </div>
-                <h2 class="game-title">智慧工具包</h2>
-                <p class="game-desc">集合計分板、AI 圖片去背及多功能影片下載的高質感智慧小工具合集。</p>
-                <div class="play-btn">進入工具包</div>
-            </div>
-        </a>
+            </a>
 
-        <!-- Scoreboard Card (tools) -->
-        <a href="toolbox/scoreboard/index.html" class="game-card scoreboard" data-category="tools" style="animation-delay: 3.1s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    🏆
+            <!-- SanGuoSha Ultimate Card (advanced) -->
+            <a href="games/SanGuoShaUltimate.html" class="game-card sanguosha-ultimate" data-category="advanced" style="animation-delay: 2.7s;">
+                <div class="card-content">
+                    <div class="icon-container">
+                        神
+                    </div>
+                    <h2 class="game-title">三國殺</h2>
+                    <p class="game-desc">終極優化版！包含軍爭、神話再臨、界限突破及SP擴充包。</p>
+                    <div class="play-btn">終極優化版</div>
                 </div>
-                <h2 class="game-title">兒童計分板</h2>
-                <p class="game-desc">簡潔美觀的兒童表現計分板，記錄成長與得分點滴。</p>
-                <div class="play-btn">開始計分</div>
-            </div>
-        </a>
-
-        <!-- Image BG Remover Card (tools) -->
-        <a href="toolbox/bg-remover/index.html" class="game-card bgremover" data-category="tools" style="animation-delay: 3.3s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    ✨
-                </div>
-                <h2 class="game-title">圖片去背</h2>
-                <p class="game-desc">高品質、完全瀏覽器端運作的 AI 圖片一鍵去背與編輯工坊。</p>
-                <div class="play-btn">開始去背</div>
-            </div>
-        </a>
-
-        <!-- Video Downloader Card (tools) -->
-        <a href="toolbox/video-downloader/index.html" class="game-card downloader" data-category="tools" style="animation-delay: 3.5s;">
-            <div class="card-content">
-                <div class="icon-container">
-                    📥
-                </div>
-                <h2 class="game-title">影片下載</h2>
-                <p class="game-desc">支援多個影音平台的極速網頁影片下載與解析工具。</p>
-                <div class="play-btn">開始下載</div>
-            </div>
-        </a>
+            </a>
+        </div>
     </div>
 
     <script>
-        // Add subtle 3D tilt effect on mouse move
+        // Elements
+        const portalView = document.getElementById('portal-view');
+        const dashboardView = document.getElementById('dashboard-view');
+        const btnEnterGames = document.getElementById('btn-enter-games');
+        const btnBackHome = document.getElementById('btn-back-home');
         const cards = document.querySelectorAll('.game-card');
-        
-        cards.forEach(card => {
-            card.addEventListener('mousemove', e => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
+        const portalCards = document.querySelectorAll('.portal-card');
+
+        // Add subtle 3D tilt effect on mouse move for both game cards and portal cards
+        function addTiltEffect(elements, tiltIntensity = 10, offsetTranslate = -15, scale = 1.05) {
+            elements.forEach(card => {
+                card.addEventListener('mousemove', e => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = ((y - centerY) / centerY) * -tiltIntensity;
+                    const rotateY = ((x - centerX) / centerX) * tiltIntensity;
+                    
+                    card.style.transform = `translateY(${offsetTranslate}px) scale(${scale}) perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                });
                 
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `translateY(0) scale(1) perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    }, 100);
+                });
                 
-                const rotateX = ((y - centerY) / centerY) * -10;
-                const rotateY = ((x - centerX) / centerX) * 10;
-                
-                card.style.transform = `translateY(-15px) scale(1.05) perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                card.addEventListener('mouseenter', () => {
+                    card.style.transition = 'transform 0.1s ease';
+                });
+            });
+        }
+
+        // Apply tilt effect
+        addTiltEffect(cards, 10, -15, 1.05);
+        addTiltEffect(portalCards, 5, -8, 1.02);
+
+        // Transition Logic
+        function showGamesDashboard(instant = false) {
+            portalView.style.display = 'none';
+            dashboardView.style.display = 'flex';
+            
+            // Trigger animation for all active cards
+            const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+            let visibleIndex = 0;
+            
+            cards.forEach(card => {
+                const category = card.dataset.category;
+                if (activeTab === 'all' || category === activeTab) {
+                    card.style.display = 'flex';
+                    card.style.animation = 'none';
+                    card.offsetHeight; // trigger reflow
+                    if (instant) {
+                        card.style.animation = 'none';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    } else {
+                        card.style.animation = `fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards`;
+                        card.style.animationDelay = `${visibleIndex * 0.08}s`;
+                    }
+                    visibleIndex++;
+                } else {
+                    card.style.display = 'none';
+                }
             });
             
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = `translateY(0) scale(1) perspective(1000px) rotateX(0deg) rotateY(0deg)`;
-                setTimeout(() => {
-                    card.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                }, 100);
-            });
+            // Set URL parameter without page reload
+            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?zone=games';
+            window.history.pushState({ path: newUrl }, '', newUrl);
+        }
+
+        function showPortalView() {
+            dashboardView.style.display = 'none';
+            portalView.style.display = 'flex';
             
-            card.addEventListener('mouseenter', () => {
-                card.style.transition = 'transform 0.1s ease';
-            });
-        });
+            // Reset URL parameter without page reload
+            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.pushState({ path: newUrl }, '', newUrl);
+        }
+
+        // Event Listeners
+        btnEnterGames.addEventListener('click', () => showGamesDashboard(false));
+        btnBackHome.addEventListener('click', showPortalView);
+
+        // URL Routing on Load
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('zone') === 'games') {
+            showGamesDashboard(true);
+        } else {
+            showPortalView();
+        }
 
         // Tab switcher and filter logic
         const tabs = document.querySelectorAll('.tab-btn');
