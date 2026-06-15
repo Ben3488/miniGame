@@ -1396,7 +1396,7 @@ body {
     .kid-card {
         min-height: auto !important;
         height: auto !important;
-        padding: 6px 6px !important;
+        padding: 84px 6px 10px !important;
         gap: 4px !important;
         border-radius: 14px !important;
     }
@@ -1405,39 +1405,53 @@ body {
         border-radius: 16px !important;
     }
     .kid-card-header {
-        min-height: 24px !important;
+        position: static !important;
+        min-height: 0 !important;
     }
     .kid-title-container {
-        gap: 6px !important;
+        position: static !important;
     }
     .kid-fruit-emoji {
-        font-size: 1.2rem !important;
+        position: absolute !important;
+        top: 28px !important;
+        left: 8px !important;
+        font-size: 1.25rem !important;
+        z-index: 10 !important;
     }
     .kid-name {
-        font-size: 0.95rem !important;
+        position: absolute !important;
+        top: 18px !important;
+        left: 106px !important;
+        font-size: 1.05rem !important;
     }
     .btn-edit-profile {
-        top: 6px !important;
-        right: 6px !important;
+        position: absolute !important;
+        top: 28px !important;
+        right: 80px !important;
         width: 22px !important;
         height: 22px !important;
         padding: 3px !important;
+        z-index: 15 !important;
     }
     .btn-edit-profile svg {
         width: 12px !important;
         height: 12px !important;
     }
     .kid-card-body-row {
-        gap: 12px !important;
-        margin: 2px 0 !important;
+        position: static !important;
+        margin: 0 !important;
         padding: 0 !important;
     }
     .avatar-container {
-        width: 68px !important;
-        height: 68px !important;
-        flex: 0 0 68px !important;
+        position: absolute !important;
+        top: 10px !important;
+        left: 34px !important;
+        width: 62px !important;
+        height: 62px !important;
+        flex: 0 0 62px !important;
         flex-shrink: 0 !important;
         box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-color) 15%, transparent) !important;
+        z-index: 5 !important;
     }
     .avatar-emoji {
         font-size: 1.95rem !important;
@@ -1454,14 +1468,17 @@ body {
         stroke-width: 2.2px !important;
     }
     .score-circle-wrapper {
-        width: 68px !important;
-        height: 68px !important;
-        flex: 0 0 68px !important;
+        position: absolute !important;
+        top: 10px !important;
+        right: 8px !important;
+        width: 62px !important;
+        height: 62px !important;
+        flex: 0 0 62px !important;
         flex-shrink: 0 !important;
     }
     .score-svg-ring {
-        width: 68px !important;
-        height: 68px !important;
+        width: 62px !important;
+        height: 62px !important;
     }
     .score-number {
         font-size: 1.8rem !important;
@@ -1471,9 +1488,13 @@ body {
         margin-top: 1px !important;
     }
     .milestones-stars {
+        position: absolute !important;
+        top: 44px !important;
+        left: 106px !important;
         gap: 3px !important;
         margin: 0 !important;
-        justify-content: center !important;
+        justify-content: flex-start !important;
+        z-index: 10 !important;
     }
     .star-icon {
         width: 12px !important;
@@ -1619,7 +1640,7 @@ body {
         width: 100% !important;
         flex: none !important;
         min-height: auto !important;
-        padding: 12px 14px !important;
+        padding: 94px 14px 12px !important;
         gap: 8px !important;
         border-radius: 20px !important;
     }
@@ -1630,27 +1651,37 @@ body {
     }
 
     .kid-card-header {
-        min-height: 28px !important;
+        position: static !important;
+        min-height: 0 !important;
     }
 
     .kid-title-container {
-        gap: 8px !important;
+        position: static !important;
     }
 
     .kid-fruit-emoji {
-        font-size: 1.4rem !important;
+        position: absolute !important;
+        top: 32px !important;
+        left: 12px !important;
+        font-size: 1.5rem !important;
+        z-index: 10 !important;
     }
 
     .kid-name {
-        font-size: 1.2rem !important;
+        position: absolute !important;
+        top: 22px !important;
+        left: 125px !important;
+        font-size: 1.25rem !important;
     }
 
     .btn-edit-profile {
-        top: 10px !important;
-        right: 10px !important;
+        position: absolute !important;
+        top: 32px !important;
+        right: 94px !important;
         width: 28px !important;
         height: 28px !important;
         padding: 5px !important;
+        z-index: 15 !important;
     }
 
     .btn-edit-profile svg {
@@ -1659,18 +1690,21 @@ body {
     }
 
     .kid-card-body-row {
-        gap: 14px !important;
-        margin: 4px 0 !important;
+        position: static !important;
+        margin: 0 !important;
         padding: 0 !important;
-        justify-content: center !important;
     }
 
     .avatar-container {
+        position: absolute !important;
+        top: 14px !important;
+        left: 45px !important;
         width: 70px !important;
         height: 70px !important;
         flex: 0 0 70px !important;
         flex-shrink: 0 !important;
         box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-color) 15%, transparent) !important;
+        z-index: 5 !important;
     }
 
     .avatar-emoji {
@@ -1691,6 +1725,9 @@ body {
     }
 
     .score-circle-wrapper {
+        position: absolute !important;
+        top: 14px !important;
+        right: 14px !important;
         width: 70px !important;
         height: 70px !important;
         flex: 0 0 70px !important;
@@ -1703,19 +1740,23 @@ body {
     }
 
     .score-number {
-        font-size: 1.55rem !important;
+        font-size: 1.85rem !important;
     }
 
     .score-unit {
-        font-size: 0.7rem !important;
+        font-size: 0.72rem !important;
         margin-top: 1px !important;
     }
 
     .milestones-stars {
+        position: absolute !important;
+        top: 52px !important;
+        left: 125px !important;
         gap: 4px !important;
         margin: 0 !important;
-        justify-content: flex-end !important;
-        padding-right: 4px !important;
+        justify-content: flex-start !important;
+        padding: 0 !important;
+        z-index: 10 !important;
     }
 
     .star-icon {
