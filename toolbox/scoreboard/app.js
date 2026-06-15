@@ -208,7 +208,47 @@ function mergeKidsWithDefaults(savedKids = []) {
    LocalStorage 資料讀寫
    ========================================================================== */
 
-function loadState() {
+function saveToLocalStorage() {
+    try {
+        localStorage.setItem(STORAGE_VERSION_KEY, STORAGE_VERSION);
+        localStorage.setItem('kids_scoreboard_data', JSON.stringify(state.kids));
+        localStorage.setItem('kids_scoreboard_history', JSON.stringify(state.history));
+        localStorage.setItem('kids_scoreboard_title', state.title);
+        localStorage.setItem('kids_scoreboard_subtitle', state.subtitle);
+    } catch (e) {
+        console.error('儲存至 LocalStorage 失敗。', e);
+    }
+}
+
+async function loadState() {
+    // 1. 優先嘗試向 NAS 後端讀取資料
+    try {
+        const response = await fetch('api.php');
+        if (response.ok) {
+            const serverData = await response.json();
+            if (serverData && serverData.kids && serverData.kids.length > 0) {
+                state.kids = mergeKidsWithDefaults(serverData.kids);
+                state.history = serverData.history || [];
+                state.title = serverData.title || getDefaultState().title;
+                state.subtitle = serverData.subtitle || getDefaultState().subtitle;
+
+                // 舊預設角色升級檢查
+                const isOldDefault = state.kids.length === 3 &&
+                                     state.kids.some(k => k.name === '小明' || k.name === '小華' || k.name === '小強');
+                if (isOldDefault) {
+                    state.kids = getDefaultState().kids;
+                    await saveState();
+                } else {
+                    saveToLocalStorage();
+                }
+                return;
+            }
+        }
+    } catch (e) {
+        console.warn('無法從 NAS api.php 載入資料，將降級使用本機 LocalStorage。', e);
+    }
+
+    // 2. 降級方案：從本機 LocalStorage 載入資料
     try {
         const savedVersion = localStorage.getItem(STORAGE_VERSION_KEY);
         const savedKids = localStorage.getItem('kids_scoreboard_data');
@@ -222,7 +262,7 @@ function loadState() {
             state.history = defaults.history;
             state.title = defaults.title;
             state.subtitle = defaults.subtitle;
-            saveState();
+            saveToLocalStorage();
             return;
         }
 
@@ -232,7 +272,7 @@ function loadState() {
                                  state.kids.some(k => k.name === '小明' || k.name === '小華' || k.name === '小強');
             if (isOldDefault) {
                 state.kids = getDefaultState().kids;
-                saveState();
+                saveToLocalStorage();
             }
         } else {
             state.kids = getDefaultState().kids;
@@ -256,9 +296,8 @@ function loadState() {
             state.subtitle = getDefaultState().subtitle;
         }
 
-        // 升級資料格式時只補新欄位，不覆蓋使用者既有資料。
         if (savedVersion !== STORAGE_VERSION) {
-            saveState();
+            saveToLocalStorage();
         }
     } catch (e) {
         console.error('讀取 LocalStorage 失敗，使用預設值。', e);
@@ -270,15 +309,25 @@ function loadState() {
     }
 }
 
-function saveState() {
+async function saveState() {
+    saveToLocalStorage();
+
     try {
-        localStorage.setItem(STORAGE_VERSION_KEY, STORAGE_VERSION);
-        localStorage.setItem('kids_scoreboard_data', JSON.stringify(state.kids));
-        localStorage.setItem('kids_scoreboard_history', JSON.stringify(state.history));
-        localStorage.setItem('kids_scoreboard_title', state.title);
-        localStorage.setItem('kids_scoreboard_subtitle', state.subtitle);
+        const payload = {
+            kids: state.kids,
+            history: state.history,
+            title: state.title,
+            subtitle: state.subtitle
+        };
+        await fetch('api.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
     } catch (e) {
-        console.error('儲存至 LocalStorage 失敗。', e);
+        console.error('資料同步至 NAS 失敗。', e);
     }
 }
 
@@ -955,9 +1004,9 @@ titleModalEl?.addEventListener('click', (e) => {
    初始化啟動 (Initialization)
    ========================================================================== */
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // 載入狀態
-    loadState();
+    await loadState();
     
     // 渲染 UI
     renderScoreboardHeader();

@@ -2,11 +2,46 @@
    兒童表現計分板 - 核心應用程式邏輯 (app.js)
    ========================================================================== */
 
+const STORAGE_VERSION_KEY = 'kids_scoreboard_mockup_version';
+const STORAGE_VERSION = 'scoreboard-mockup-v3';
+const MAX_AVATAR_UPLOADS = 5;
+
 // 預設大頭貼 Emoji 列表
 const CURED_EMOJIS = [
     '👶', '👧', '👦', '🐱', '🐶', '🦄', '🦖', '🦁', '🐼', '🦊',
     '🐯', '🐰', '🐨', '🐷', '🐸', '🚀', '⭐', '🌈', '🎨', '⚽'
 ];
+
+function createIllustratedAvatar({ bgStart, bgEnd, skin, hair, shirt, accent, eye = '#2d3748' }) {
+    const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+            <defs>
+                <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="${bgStart}" />
+                    <stop offset="100%" stop-color="${bgEnd}" />
+                </linearGradient>
+                <linearGradient id="shirt" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="${shirt}" />
+                    <stop offset="100%" stop-color="${accent}" />
+                </linearGradient>
+            </defs>
+            <rect width="160" height="160" rx="80" fill="url(#bg)" />
+            <circle cx="80" cy="74" r="34" fill="${skin}" />
+            <path d="M46 61c4-26 21-40 44-40 23 0 39 13 43 37-7-7-17-11-28-11-11 0-21 4-29 9-9 6-18 10-30 5z" fill="${hair}" />
+            <path d="M54 106c7 10 16 16 26 16 11 0 21-6 27-16l9 7c-8 16-21 25-36 25-15 0-28-8-37-24z" fill="url(#shirt)" />
+            <circle cx="67" cy="76" r="4.2" fill="${eye}" />
+            <circle cx="95" cy="76" r="4.2" fill="${eye}" />
+            <path d="M69 94c6 6 16 6 22 0" fill="none" stroke="#c05e63" stroke-width="4" stroke-linecap="round" />
+            <circle cx="55" cy="88" r="6" fill="#f5a0a8" opacity="0.45" />
+            <circle cx="105" cy="88" r="6" fill="#f5a0a8" opacity="0.45" />
+            <path d="M43 150c8-22 21-34 38-34 17 0 31 12 38 34" fill="url(#shirt)" opacity="0.95" />
+            <circle cx="121" cy="35" r="10" fill="${accent}" opacity="0.55" />
+            <circle cx="42" cy="43" r="8" fill="#ffffff" opacity="0.16" />
+        </svg>
+    `;
+
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
 
 // 預設兒童資料
 const DEFAULT_KIDS = [
@@ -14,7 +49,15 @@ const DEFAULT_KIDS = [
         id: 'kid-1',
         name: '橘子',
         emoji: '🍊',
-        avatarUrl: '',
+        avatarUrl: createIllustratedAvatar({
+            bgStart: '#ffe5c0',
+            bgEnd: '#ff9f6b',
+            skin: '#ffd5b2',
+            hair: '#2f221d',
+            shirt: '#7dd3fc',
+            accent: '#38bdf8'
+        }),
+        avatarGallery: [],
         score: 0,
         gradientId: 'gradient-orange',
         glowColor: 'rgba(249, 115, 22, 0.15)',
@@ -25,8 +68,16 @@ const DEFAULT_KIDS = [
         id: 'kid-2',
         name: '柚子',
         emoji: '🍈',
-        avatarUrl: '',
-        score: 0,
+        avatarUrl: createIllustratedAvatar({
+            bgStart: '#ffd5ec',
+            bgEnd: '#ff91bf',
+            skin: '#ffd8bf',
+            hair: '#3a241b',
+            shirt: '#c084fc',
+            accent: '#f472b6'
+        }),
+        avatarGallery: [],
+        score: 1,
         gradientId: 'gradient-pink',
         glowColor: 'rgba(236, 72, 153, 0.15)',
         glowStrong: 'rgba(236, 72, 153, 0.45)',
@@ -36,12 +87,68 @@ const DEFAULT_KIDS = [
         id: 'kid-3',
         name: '蘋果',
         emoji: '🍎',
-        avatarUrl: '',
-        score: 0,
+        avatarUrl: createIllustratedAvatar({
+            bgStart: '#d9efff',
+            bgEnd: '#7fb9ff',
+            skin: '#ffd7bc',
+            hair: '#2a1d1b',
+            shirt: '#60a5fa',
+            accent: '#2563eb'
+        }),
+        avatarGallery: [],
+        score: 5,
         gradientId: 'gradient-blue',
         glowColor: 'rgba(59, 130, 246, 0.15)',
         glowStrong: 'rgba(59, 130, 246, 0.45)',
         tagColor: '#3b82f6'
+    }
+];
+
+const DEFAULT_HISTORY = [
+    {
+        kidId: 'kid-2',
+        name: '柚子',
+        typeText: '減 0 分',
+        scoreChange: 0,
+        reason: '變更資料：上傳了自拍大頭照。',
+        time: '08:54:49',
+        tagColor: '#ec4899'
+    },
+    {
+        kidId: 'kid-2',
+        name: '柚子',
+        typeText: '加 1 分',
+        scoreChange: 1,
+        reason: '打掃',
+        time: '08:31:58',
+        tagColor: '#ec4899'
+    },
+    {
+        kidId: 'kid-3',
+        name: '蘋果',
+        typeText: '加 5 分',
+        scoreChange: 5,
+        reason: '主動完成閱讀與收玩具',
+        time: '08:31:38',
+        tagColor: '#3b82f6'
+    },
+    {
+        kidId: 'kid-1',
+        name: '橘子',
+        typeText: '減 1 分',
+        scoreChange: -1,
+        reason: '忘記收玩具',
+        time: '08:29:21',
+        tagColor: '#f97316'
+    },
+    {
+        kidId: 'kid-1',
+        name: '橘子',
+        typeText: '加 1 分',
+        scoreChange: 1,
+        reason: '幫忙洗碗',
+        time: '08:20:03',
+        tagColor: '#f97316'
     }
 ];
 
@@ -55,67 +162,172 @@ let state = {
     editingKidId: null,
     selectedEmoji: '',
     title: '寶貝表現計分板',
-    subtitle: '記錄寶貝的日常好表現，累積 100 分拿大獎！'
+    subtitle: '記錄寶貝的日常表現，累積100分拿大獎！'
 };
+
+function getDefaultState() {
+    return {
+        kids: JSON.parse(JSON.stringify(DEFAULT_KIDS)),
+        history: JSON.parse(JSON.stringify(DEFAULT_HISTORY)),
+        title: '寶貝表現計分板',
+        subtitle: '記錄寶貝的日常表現，累積100分拿大獎！'
+    };
+}
+
+function dedupeAvatarGallery(photos = []) {
+    return [...new Set(photos.filter(Boolean))].slice(0, MAX_AVATAR_UPLOADS);
+}
+
+function isUploadedPhotoDataUrl(photo = '') {
+    return typeof photo === 'string' && photo.startsWith('data:image/jpeg');
+}
+
+function normalizeKid(kid, index) {
+    const fallback = DEFAULT_KIDS[index] || DEFAULT_KIDS[0];
+    const avatarGallery = dedupeAvatarGallery([
+        ...(Array.isArray(kid.avatarGallery) ? kid.avatarGallery : []),
+        isUploadedPhotoDataUrl(kid.avatarUrl) ? kid.avatarUrl : ''
+    ]);
+
+    return {
+        ...fallback,
+        ...kid,
+        avatarUrl: kid.avatarUrl || fallback.avatarUrl,
+        avatarGallery
+    };
+}
+
+function mergeKidsWithDefaults(savedKids = []) {
+    return DEFAULT_KIDS.map((defaultKid, index) => {
+        const matchedKid = savedKids.find(kid => kid.id === defaultKid.id) || savedKids[index] || defaultKid;
+        return normalizeKid(matchedKid, index);
+    });
+}
 
 /* ==========================================================================
    LocalStorage 資料讀寫
    ========================================================================== */
 
-function loadState() {
+function saveToLocalStorage() {
     try {
-        const savedKids = localStorage.getItem('kids_scoreboard_data');
-        const savedHistory = localStorage.getItem('kids_scoreboard_history');
-        const savedTitle = localStorage.getItem('kids_scoreboard_title');
-        const savedSubtitle = localStorage.getItem('kids_scoreboard_subtitle');
-        
-        if (savedKids) {
-            state.kids = JSON.parse(savedKids);
-            // 檢查是否為舊的預設角色，若是，則自動升級為新樣板的角色 (橘子、柚子、蘋果)
-            const isOldDefault = state.kids.length === 3 && 
-                                 state.kids.some(k => k.name === '小明' || k.name === '小華' || k.name === '小強');
-            if (isOldDefault) {
-                state.kids = JSON.parse(JSON.stringify(DEFAULT_KIDS));
-                saveState();
-            }
-        } else {
-            state.kids = JSON.parse(JSON.stringify(DEFAULT_KIDS)); // 深拷貝
-        }
-        
-        if (savedHistory) {
-            state.history = JSON.parse(savedHistory);
-        } else {
-            state.history = [];
-        }
-
-        if (savedTitle) {
-            state.title = savedTitle;
-        } else {
-            state.title = '寶貝表現計分板';
-        }
-
-        if (savedSubtitle) {
-            state.subtitle = savedSubtitle;
-        } else {
-            state.subtitle = '記錄寶貝的日常好表現，累積 100 分拿大獎！';
-        }
-    } catch (e) {
-        console.error('讀取 LocalStorage 失敗，使用預設值。', e);
-        state.kids = JSON.parse(JSON.stringify(DEFAULT_KIDS));
-        state.history = [];
-        state.title = '寶貝表現計分板';
-        state.subtitle = '記錄寶貝的日常好表現，累積 100 分拿大獎！';
-    }
-}
-
-function saveState() {
-    try {
+        localStorage.setItem(STORAGE_VERSION_KEY, STORAGE_VERSION);
         localStorage.setItem('kids_scoreboard_data', JSON.stringify(state.kids));
         localStorage.setItem('kids_scoreboard_history', JSON.stringify(state.history));
         localStorage.setItem('kids_scoreboard_title', state.title);
         localStorage.setItem('kids_scoreboard_subtitle', state.subtitle);
     } catch (e) {
         console.error('儲存至 LocalStorage 失敗。', e);
+    }
+}
+
+async function loadState() {
+    // 1. 優先嘗試向 NAS 後端讀取資料
+    try {
+        const response = await fetch('api.php');
+        if (response.ok) {
+            const serverData = await response.json();
+            if (serverData && serverData.kids && serverData.kids.length > 0) {
+                state.kids = mergeKidsWithDefaults(serverData.kids);
+                state.history = serverData.history || [];
+                state.title = serverData.title || getDefaultState().title;
+                state.subtitle = serverData.subtitle || getDefaultState().subtitle;
+
+                // 舊預設角色升級檢查
+                const isOldDefault = state.kids.length === 3 &&
+                                     state.kids.some(k => k.name === '小明' || k.name === '小華' || k.name === '小強');
+                if (isOldDefault) {
+                    state.kids = getDefaultState().kids;
+                    await saveState();
+                } else {
+                    saveToLocalStorage();
+                }
+                return;
+            }
+        }
+    } catch (e) {
+        console.warn('無法從 NAS api.php 載入資料，將降級使用本機 LocalStorage。', e);
+    }
+
+    // 2. 降級方案：從本機 LocalStorage 載入資料
+    try {
+        const savedVersion = localStorage.getItem(STORAGE_VERSION_KEY);
+        const savedKids = localStorage.getItem('kids_scoreboard_data');
+        const savedHistory = localStorage.getItem('kids_scoreboard_history');
+        const savedTitle = localStorage.getItem('kids_scoreboard_title');
+        const savedSubtitle = localStorage.getItem('kids_scoreboard_subtitle');
+
+        if (!savedKids && !savedHistory && !savedTitle && !savedSubtitle) {
+            const defaults = getDefaultState();
+            state.kids = defaults.kids;
+            state.history = defaults.history;
+            state.title = defaults.title;
+            state.subtitle = defaults.subtitle;
+            saveToLocalStorage();
+            return;
+        }
+
+        if (savedKids) {
+            state.kids = mergeKidsWithDefaults(JSON.parse(savedKids));
+            const isOldDefault = state.kids.length === 3 &&
+                                 state.kids.some(k => k.name === '小明' || k.name === '小華' || k.name === '小強');
+            if (isOldDefault) {
+                state.kids = getDefaultState().kids;
+                saveToLocalStorage();
+            }
+        } else {
+            state.kids = getDefaultState().kids;
+        }
+
+        if (savedHistory) {
+            state.history = JSON.parse(savedHistory);
+        } else {
+            state.history = getDefaultState().history;
+        }
+
+        if (savedTitle) {
+            state.title = savedTitle;
+        } else {
+            state.title = getDefaultState().title;
+        }
+
+        if (savedSubtitle) {
+            state.subtitle = savedSubtitle;
+        } else {
+            state.subtitle = getDefaultState().subtitle;
+        }
+
+        if (savedVersion !== STORAGE_VERSION) {
+            saveToLocalStorage();
+        }
+    } catch (e) {
+        console.error('讀取 LocalStorage 失敗，使用預設值。', e);
+        const defaults = getDefaultState();
+        state.kids = defaults.kids;
+        state.history = defaults.history;
+        state.title = defaults.title;
+        state.subtitle = defaults.subtitle;
+    }
+}
+
+async function saveState() {
+    saveToLocalStorage();
+
+    try {
+        const payload = {
+            kids: state.kids,
+            history: state.history,
+            title: state.title,
+            subtitle: state.subtitle
+        };
+        await fetch('api.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+    } catch (e) {
+        console.error('資料同步至 NAS 失敗。', e);
     }
 }
 
@@ -268,7 +480,7 @@ function createKidCardHTML(kid) {
             <div class="note-input-container">
                 <div class="note-input-wrapper">
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="note-input-icon"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    <input type="text" class="note-input" id="note-${kid.id}" placeholder="輸入加/減分原因 (例如：幫忙洗碗)" maxlength="30">
+                    <input type="text" class="note-input" id="note-${kid.id}" placeholder="輸入加/減分原因（例如：幫忙洗碗）" maxlength="30">
                 </div>
             </div>
 
@@ -481,7 +693,9 @@ window.changeScore = function(kidId, amount) {
 const editModalEl = document.getElementById('modal-edit-profile');
 const editNameInput = document.getElementById('edit-name');
 const emojiGridEl = document.getElementById('emoji-grid');
+const uploadGalleryEl = document.getElementById('upload-gallery');
 let uploadedAvatarBase64 = ''; // 暫存Modal中上傳的 Base64 圖片
+let uploadedAvatarHistory = [];
 
 window.openEditModal = function(kidId) {
     const kid = state.kids.find(k => k.id === kidId);
@@ -490,7 +704,11 @@ window.openEditModal = function(kidId) {
     state.editingKidId = kidId;
     state.selectedEmoji = kid.emoji;
     editNameInput.value = kid.name;
-    uploadedAvatarBase64 = kid.avatarUrl || '';
+    uploadedAvatarBase64 = isUploadedPhotoDataUrl(kid.avatarUrl) ? kid.avatarUrl : '';
+    uploadedAvatarHistory = dedupeAvatarGallery([
+        ...(Array.isArray(kid.avatarGallery) ? kid.avatarGallery : []),
+        isUploadedPhotoDataUrl(kid.avatarUrl) ? kid.avatarUrl : ''
+    ]);
     
     // 重設檔案輸入框的值
     const fileInput = document.getElementById('edit-avatar-file');
@@ -519,13 +737,37 @@ function updateUploadPreview() {
     
     if (uploadedAvatarBase64) {
         previewEl.innerHTML = `<img src="${uploadedAvatarBase64}" alt="頭像預覽">`;
-        statusEl.textContent = '已選擇自訂大頭照';
+        statusEl.textContent = `已保留 ${uploadedAvatarHistory.length} / ${MAX_AVATAR_UPLOADS} 張照片`;
         removeBtn.style.display = 'inline-block';
     } else {
         previewEl.innerHTML = '📷';
-        statusEl.textContent = '尚未上傳自訂圖片';
+        statusEl.textContent = uploadedAvatarHistory.length > 0 ? `已保留 ${uploadedAvatarHistory.length} / ${MAX_AVATAR_UPLOADS} 張照片` : '尚未上傳自訂圖片';
         removeBtn.style.display = 'none';
     }
+
+    renderUploadGallery();
+}
+
+function renderUploadGallery() {
+    if (!uploadGalleryEl) return;
+
+    if (uploadedAvatarHistory.length === 0) {
+        uploadGalleryEl.innerHTML = '<div class="upload-gallery-empty">尚未保留任何照片</div>';
+        return;
+    }
+
+    uploadGalleryEl.innerHTML = uploadedAvatarHistory.map((photo, index) => {
+        const activeClass = photo === uploadedAvatarBase64 ? 'active' : '';
+        return `
+            <button
+                type="button"
+                class="upload-gallery-item ${activeClass}"
+                onclick="selectUploadedPhoto(${index})"
+                title="切換到第 ${index + 1} 張照片">
+                <img src="${photo}" alt="保留照片 ${index + 1}">
+            </button>
+        `;
+    }).join('');
 }
 
 // 檔案上傳觸發
@@ -536,21 +778,36 @@ document.getElementById('btn-upload-trigger')?.addEventListener('click', () => {
 document.getElementById('edit-avatar-file')?.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
+
+    // 每次新上傳都先清掉舊的檔案選取狀態，避免殘留前一張檔案。
+    e.target.value = '';
+
     // 壓縮並調整圖片大小
     compressImage(file, (base64) => {
         uploadedAvatarBase64 = base64;
+        uploadedAvatarHistory = dedupeAvatarGallery([
+            base64,
+            ...uploadedAvatarHistory.filter(photo => photo !== base64)
+        ]);
         updateUploadPreview();
     });
 });
 
 // 移除自訂大頭照
 document.getElementById('btn-remove-uploaded')?.addEventListener('click', () => {
-    uploadedAvatarBase64 = '';
+    uploadedAvatarHistory = uploadedAvatarHistory.filter(photo => photo !== uploadedAvatarBase64);
+    uploadedAvatarBase64 = uploadedAvatarHistory[0] || '';
     const fileInput = document.getElementById('edit-avatar-file');
     if (fileInput) fileInput.value = '';
     updateUploadPreview();
 });
+
+window.selectUploadedPhoto = function(photoIndex) {
+    const selectedPhoto = uploadedAvatarHistory[photoIndex];
+    if (!selectedPhoto) return;
+    uploadedAvatarBase64 = selectedPhoto;
+    updateUploadPreview();
+};
 
 function renderEmojiGrid() {
     if (!emojiGridEl) return;
@@ -595,17 +852,20 @@ document.getElementById('btn-modal-save')?.addEventListener('click', () => {
     const oldName = kid.name;
     const oldEmoji = kid.emoji;
     const oldAvatar = kid.avatarUrl || '';
+    const nextAvatarGallery = dedupeAvatarGallery(uploadedAvatarHistory);
+    const resolvedAvatarUrl = uploadedAvatarBase64 || (!isUploadedPhotoDataUrl(oldAvatar) ? oldAvatar : '');
     
     kid.name = newName;
     kid.emoji = state.selectedEmoji;
-    kid.avatarUrl = uploadedAvatarBase64;
+    kid.avatarUrl = resolvedAvatarUrl;
+    kid.avatarGallery = nextAvatarGallery;
     
     // 寫入更名紀錄
-    if (oldName !== newName || oldEmoji !== state.selectedEmoji || oldAvatar !== uploadedAvatarBase64) {
+    if (oldName !== newName || oldEmoji !== state.selectedEmoji || oldAvatar !== resolvedAvatarUrl) {
         let changeDesc = `變更資料：`;
         if (oldName !== newName) changeDesc += `名字由 ${oldName} 改為 ${newName}。`;
-        if (oldAvatar !== uploadedAvatarBase64) {
-            changeDesc += uploadedAvatarBase64 ? `上傳了自訂大頭照。` : `移除了自訂大頭照。`;
+        if (oldAvatar !== resolvedAvatarUrl) {
+            changeDesc += resolvedAvatarUrl && isUploadedPhotoDataUrl(resolvedAvatarUrl) ? `上傳了自訂大頭照。` : `移除了自訂大頭照。`;
         } else if (oldEmoji !== state.selectedEmoji) {
             changeDesc += `頭像改為 ${state.selectedEmoji}。`;
         }
@@ -744,9 +1004,9 @@ titleModalEl?.addEventListener('click', (e) => {
    初始化啟動 (Initialization)
    ========================================================================== */
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // 載入狀態
-    loadState();
+    await loadState();
     
     // 渲染 UI
     renderScoreboardHeader();
