@@ -7,6 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const iframe = document.getElementById('tool-viewport');
     const loader = document.getElementById('tool-loader');
     const newTabBtn = document.getElementById('btn-open-new-tab');
+    const sidebar = document.getElementById('dashboard-sidebar');
+    const container = document.querySelector('.dashboard-container');
+    const collapseBtn = document.getElementById('btn-sidebar-collapse');
+    const expandFab = document.getElementById('btn-sidebar-expand');
 
     // 切換工具
     function switchTool(targetItem) {
@@ -24,6 +28,55 @@ document.addEventListener('DOMContentLoaded', () => {
         // 變更 iframe 網址
         const toolUrl = targetItem.getAttribute('data-url');
         iframe.src = toolUrl;
+
+        // 切換工具後，在橫向模式自動收合側邊欄
+        if (isLandscapeMobile()) {
+            setTimeout(() => collapseSidebar(), 400);
+        }
+    }
+
+    // 判斷是否為橫向行動裝置
+    function isLandscapeMobile() {
+        return window.innerWidth <= 900 && window.innerWidth > window.innerHeight;
+    }
+
+    // 收合側邊欄
+    function collapseSidebar() {
+        sidebar.classList.add('collapsed');
+        container.classList.add('sidebar-hidden');
+        expandFab.classList.add('visible');
+    }
+
+    // 展開側邊欄
+    function expandSidebar() {
+        sidebar.classList.remove('collapsed');
+        container.classList.remove('sidebar-hidden');
+        expandFab.classList.remove('visible');
+    }
+
+    // 橫向模式自動收合：進入橫向時自動收合
+    function handleOrientationLayout() {
+        if (isLandscapeMobile()) {
+            // 橫向時自動收合
+            collapseSidebar();
+        } else {
+            // 直立或桌面：展開並移除所有收合狀態
+            expandSidebar();
+        }
+    }
+
+    // 收合按鈕（sidebar 內部的 ▲ 按鈕）
+    if (collapseBtn) {
+        collapseBtn.addEventListener('click', () => {
+            collapseSidebar();
+        });
+    }
+
+    // 展開 FAB 按鈕（收合後右上角的 ☰ 按鈕）
+    if (expandFab) {
+        expandFab.addEventListener('click', () => {
+            expandSidebar();
+        });
     }
 
     // 綁定導覽按鈕點擊事件
@@ -67,7 +120,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 監聽 Hash 改變
     window.addEventListener('hashchange', handleHashRoute);
-    
-    // 初始化路徑檢查
+
+    // 監聽螢幕旋轉 / 視窗大小改變，自動調整側邊欄狀態
+    window.addEventListener('resize', handleOrientationLayout);
+
+    // 初始化路徑檢查 & 方向佈局
     handleHashRoute();
+    handleOrientationLayout();
 });
+

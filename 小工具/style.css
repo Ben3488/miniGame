@@ -193,22 +193,29 @@ body {
 }
 
 /* 切換不同項目時的發光效果與按鈕顏色 */
-.nav-item[data-target="計分板"].active {
+.nav-item[data-target="scoreboard"].active {
     background: rgba(59, 130, 246, 0.12);
     border-color: rgba(59, 130, 246, 0.3);
     box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
 }
 
-.nav-item[data-target="圖片去背"].active {
+.nav-item[data-target="bgremover"].active {
     background: rgba(236, 72, 153, 0.12);
     border-color: rgba(236, 72, 153, 0.3);
     box-shadow: 0 4px 20px rgba(236, 72, 153, 0.15);
 }
 
-.nav-item[data-target="影片下載"].active {
+.nav-item[data-target="downloader"].active {
     background: rgba(139, 92, 246, 0.12);
     border-color: rgba(139, 92, 246, 0.3);
     box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15);
+}
+
+.nav-item.btn-back-home:hover {
+    background: rgba(56, 189, 248, 0.08);
+    border-color: rgba(56, 189, 248, 0.25);
+    color: #38bdf8;
+    box-shadow: 0 4px 15px rgba(56, 189, 248, 0.1);
 }
 
 .nav-icon {
@@ -352,8 +359,33 @@ body {
     font-weight: 500;
 }
 
-/* 響應式佈局 (平板/手機轉為頂/底導覽列) */
-@media (max-width: 900px) {
+/* 收合按鈕（預設隱藏，僅橫向時顯示） */
+.sidebar-collapse-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    flex-shrink: 0;
+}
+
+.sidebar-collapse-btn:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+}
+
+.sidebar-collapse-btn svg {
+    transition: transform 0.3s ease;
+}
+
+/* 響應式佈局 (平板/手機 ≤ 900px，直立模式) */
+@media (max-width: 900px) and (orientation: portrait) {
     .dashboard-container {
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr;
@@ -395,4 +427,141 @@ body {
     .sidebar-footer {
         display: none;
     }
+
+    .sidebar-collapse-btn {
+        display: none;
+    }
 }
+
+/* ============================================================
+   手機橫向模式 — 側邊欄自動收合，最大化內容區
+   ============================================================ */
+@media (max-width: 900px) and (orientation: landscape) {
+    .dashboard-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        padding: 8px;
+        gap: 8px;
+    }
+
+    /* 預設：展開狀態 — 細長的頂部列 */
+    .dashboard-sidebar {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 6px 12px;
+        height: auto;
+        min-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                    padding 0.35s ease,
+                    opacity 0.25s ease;
+        max-height: 80px; /* 展開高度 */
+    }
+
+    .sidebar-header {
+        margin-bottom: 0;
+        gap: 8px;
+    }
+
+    /* 隱藏 logo 文字，只保留 icon */
+    .sidebar-header .logo-icon {
+        font-size: 1.4rem;
+    }
+
+    .sidebar-header .logo-text {
+        display: none;
+    }
+
+    .sidebar-nav {
+        flex-direction: row;
+        flex: 1;
+        gap: 6px;
+        justify-content: center;
+    }
+
+    .nav-item {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        border-radius: 10px;
+        gap: 6px;
+    }
+
+    .nav-icon {
+        font-size: 1.1rem;
+    }
+
+    .nav-label {
+        display: none; /* 橫向時隱藏文字，僅顯示圖示 */
+    }
+
+    .sidebar-footer {
+        display: none;
+    }
+
+    /* 收合按鈕顯示 */
+    .sidebar-collapse-btn {
+        display: flex;
+        margin-left: 8px;
+        flex-shrink: 0;
+    }
+
+    /* 箭頭朝上（展開狀態） */
+    .sidebar-collapse-btn svg {
+        transform: rotate(0deg);
+    }
+
+    /* ── 收合狀態：sidebar 縮到最小，幾乎消失 ── */
+    .dashboard-sidebar.collapsed {
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    /* 當 sidebar 收合時，用一個懸浮小按鈕來展開 */
+    .sidebar-expand-fab {
+        display: none; /* 預設隱藏 */
+        position: fixed;
+        top: 8px;
+        right: 10px;
+        z-index: 200;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 1px solid rgba(139, 92, 246, 0.45);
+        background: rgba(13, 17, 38, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        color: #a78bfa;
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 18px rgba(139, 92, 246, 0.25), 0 0 0 1px rgba(139, 92, 246, 0.12);
+        transition: var(--transition-smooth);
+        animation: fabPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .sidebar-expand-fab:hover {
+        background: rgba(139, 92, 246, 0.22);
+        border-color: rgba(139, 92, 246, 0.7);
+        box-shadow: 0 6px 24px rgba(139, 92, 246, 0.38);
+        transform: scale(1.08);
+    }
+
+    .sidebar-expand-fab.visible {
+        display: flex;
+    }
+
+    @keyframes fabPop {
+        from { transform: scale(0.7); opacity: 0; }
+        to   { transform: scale(1);   opacity: 1; }
+    }
+
+    /* 收合時讓 iframe 區域填滿全部空間 */
+    .dashboard-container.sidebar-hidden {
+        grid-template-rows: 0 1fr;
+    }
+}
+
