@@ -1435,8 +1435,8 @@ body {
 
     .kid-fruit-emoji {
         position: absolute !important;
-        top: 28px !important;
-        left: 8px !important;
+        top: 16px !important;
+        left: 100px !important;
         font-size: 1.25rem !important;
         z-index: 10 !important;
     }
@@ -1444,14 +1444,14 @@ body {
     .kid-name {
         position: absolute !important;
         top: 18px !important;
-        left: 106px !important;
+        left: 130px !important;
         font-size: 1.05rem !important;
     }
 
     .btn-edit-profile {
         position: absolute !important;
-        top: 28px !important;
-        right: 80px !important;
+        top: 10px !important;
+        left: 10px !important;
         width: 22px !important;
         height: 22px !important;
         padding: 3px !important;
@@ -1459,8 +1459,8 @@ body {
     }
 
     .btn-edit-profile svg {
-        width: 12px !important;
-        height: 12px !important;
+        width: 16px !important;
+        height: 16px !important;
     }
 
     .kid-card-body-row {
@@ -2099,7 +2099,8 @@ body {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-top: 1px solid rgba(136, 177, 255, 0.12);
-    display: none; /* 預設在電腦版和橫屏隱藏 */
+    display: none;
+    /* 預設在電腦版和橫屏隱藏 */
     justify-content: space-around;
     align-items: center;
     z-index: 1000;
