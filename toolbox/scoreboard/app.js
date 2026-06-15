@@ -4,6 +4,7 @@
 
 const STORAGE_VERSION_KEY = 'kids_scoreboard_mockup_version';
 const STORAGE_VERSION = 'scoreboard-mockup-v3';
+const MAX_AVATAR_UPLOADS = 5;
 
 // 預設大頭貼 Emoji 列表
 const CURED_EMOJIS = [
@@ -56,6 +57,7 @@ const DEFAULT_KIDS = [
             shirt: '#7dd3fc',
             accent: '#38bdf8'
         }),
+        avatarGallery: [],
         score: 0,
         gradientId: 'gradient-orange',
         glowColor: 'rgba(249, 115, 22, 0.15)',
@@ -74,6 +76,7 @@ const DEFAULT_KIDS = [
             shirt: '#c084fc',
             accent: '#f472b6'
         }),
+        avatarGallery: [],
         score: 1,
         gradientId: 'gradient-pink',
         glowColor: 'rgba(236, 72, 153, 0.15)',
@@ -92,6 +95,7 @@ const DEFAULT_KIDS = [
             shirt: '#60a5fa',
             accent: '#2563eb'
         }),
+        avatarGallery: [],
         score: 5,
         gradientId: 'gradient-blue',
         glowColor: 'rgba(59, 130, 246, 0.15)',
@@ -170,6 +174,29 @@ function getDefaultState() {
     };
 }
 
+function dedupeAvatarGallery(photos = []) {
+    return [...new Set(photos.filter(Boolean))].slice(0, MAX_AVATAR_UPLOADS);
+}
+
+function isUploadedPhotoDataUrl(photo = '') {
+    return typeof photo === 'string' && photo.startsWith('data:image/jpeg');
+}
+
+function normalizeKid(kid, index) {
+    const fallback = DEFAULT_KIDS[index] || DEFAULT_KIDS[0];
+    const avatarGallery = dedupeAvatarGallery([
+        ...(Array.isArray(kid.avatarGallery) ? kid.avatarGallery : []),
+        isUploadedPhotoDataUrl(kid.avatarUrl) ? kid.avatarUrl : ''
+    ]);
+
+    return {
+        ...fallback,
+        ...kid,
+        avatarUrl: kid.avatarUrl || fallback.avatarUrl,
+        avatarGallery
+    };
+}
+
 /* ==========================================================================
    LocalStorage 資料讀寫
    ========================================================================== */
@@ -193,7 +220,7 @@ function loadState() {
         }
 
         if (savedKids) {
-            state.kids = JSON.parse(savedKids);
+            state.kids = JSON.parse(savedKids).map(normalizeKid);
             const isOldDefault = state.kids.length === 3 &&
                                  state.kids.some(k => k.name === '小明' || k.name === '小華' || k.name === '小強');
             if (isOldDefault) {
@@ -605,7 +632,9 @@ window.changeScore = function(kidId, amount) {
 const editModalEl = document.getElementById('modal-edit-profile');
 const editNameInput = document.getElementById('edit-name');
 const emojiGridEl = document.getElementById('emoji-grid');
+const uploadGalleryEl = document.getElementById('upload-gallery');
 let uploadedAvatarBase64 = ''; // 暫存Modal中上傳的 Base64 圖片
+let uploadedAvatarHistory = [];
 
 window.openEditModal = function(kidId) {
     const kid = state.kids.find(k => k.id === kidId);
@@ -614,7 +643,11 @@ window.openEditModal = function(kidId) {
     state.editingKidId = kidId;
     state.selectedEmoji = kid.emoji;
     editNameInput.value = kid.name;
-    uploadedAvatarBase64 = kid.avatarUrl || '';
+    uploadedAvatarBase64 = isUploadedPhotoDataUrl(kid.avatarUrl) ? kid.avatarUrl : '';
+    uploadedAvatarHistory = dedupeAvatarGallery([
+        ...(Array.isArray(kid.avatarGallery) ? kid.avatarGallery : []),
+        isUploadedPhotoDataUrl(kid.avatarUrl) ? kid.avatarUrl : ''
+    ]);
     
     // 重設檔案輸入框的值
     const fileInput = document.getElementById('edit-avatar-file');
@@ -643,13 +676,37 @@ function updateUploadPreview() {
     
     if (uploadedAvatarBase64) {
         previewEl.innerHTML = `<img src="${uploadedAvatarBase64}" alt="頭像預覽">`;
-        statusEl.textContent = '已選擇自訂大頭照';
+        statusEl.textContent = `已保留 ${uploadedAvatarHistory.length} / ${MAX_AVATAR_UPLOADS} 張照片`;
         removeBtn.style.display = 'inline-block';
     } else {
         previewEl.innerHTML = '📷';
-        statusEl.textContent = '尚未上傳自訂圖片';
+        statusEl.textContent = uploadedAvatarHistory.length > 0 ? `已保留 ${uploadedAvatarHistory.length} / ${MAX_AVATAR_UPLOADS} 張照片` : '尚未上傳自訂圖片';
         removeBtn.style.display = 'none';
     }
+
+    renderUploadGallery();
+}
+
+function renderUploadGallery() {
+    if (!uploadGalleryEl) return;
+
+    if (uploadedAvatarHistory.length === 0) {
+        uploadGalleryEl.innerHTML = '<div class="upload-gallery-empty">尚未保留任何照片</div>';
+        return;
+    }
+
+    uploadGalleryEl.innerHTML = uploadedAvatarHistory.map((photo, index) => {
+        const activeClass = photo === uploadedAvatarBase64 ? 'active' : '';
+        return `
+            <button
+                type="button"
+                class="upload-gallery-item ${activeClass}"
+                onclick="selectUploadedPhoto(${index})"
+                title="切換到第 ${index + 1} 張照片">
+                <img src="${photo}" alt="保留照片 ${index + 1}">
+            </button>
+        `;
+    }).join('');
 }
 
 // 檔案上傳觸發
@@ -660,21 +717,36 @@ document.getElementById('btn-upload-trigger')?.addEventListener('click', () => {
 document.getElementById('edit-avatar-file')?.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
+
+    // 每次新上傳都先清掉舊的檔案選取狀態，避免殘留前一張檔案。
+    e.target.value = '';
+
     // 壓縮並調整圖片大小
     compressImage(file, (base64) => {
         uploadedAvatarBase64 = base64;
+        uploadedAvatarHistory = dedupeAvatarGallery([
+            base64,
+            ...uploadedAvatarHistory.filter(photo => photo !== base64)
+        ]);
         updateUploadPreview();
     });
 });
 
 // 移除自訂大頭照
 document.getElementById('btn-remove-uploaded')?.addEventListener('click', () => {
-    uploadedAvatarBase64 = '';
+    uploadedAvatarHistory = uploadedAvatarHistory.filter(photo => photo !== uploadedAvatarBase64);
+    uploadedAvatarBase64 = uploadedAvatarHistory[0] || '';
     const fileInput = document.getElementById('edit-avatar-file');
     if (fileInput) fileInput.value = '';
     updateUploadPreview();
 });
+
+window.selectUploadedPhoto = function(photoIndex) {
+    const selectedPhoto = uploadedAvatarHistory[photoIndex];
+    if (!selectedPhoto) return;
+    uploadedAvatarBase64 = selectedPhoto;
+    updateUploadPreview();
+};
 
 function renderEmojiGrid() {
     if (!emojiGridEl) return;
@@ -719,17 +791,20 @@ document.getElementById('btn-modal-save')?.addEventListener('click', () => {
     const oldName = kid.name;
     const oldEmoji = kid.emoji;
     const oldAvatar = kid.avatarUrl || '';
+    const nextAvatarGallery = dedupeAvatarGallery(uploadedAvatarHistory);
+    const resolvedAvatarUrl = uploadedAvatarBase64 || (!isUploadedPhotoDataUrl(oldAvatar) ? oldAvatar : '');
     
     kid.name = newName;
     kid.emoji = state.selectedEmoji;
-    kid.avatarUrl = uploadedAvatarBase64;
+    kid.avatarUrl = resolvedAvatarUrl;
+    kid.avatarGallery = nextAvatarGallery;
     
     // 寫入更名紀錄
-    if (oldName !== newName || oldEmoji !== state.selectedEmoji || oldAvatar !== uploadedAvatarBase64) {
+    if (oldName !== newName || oldEmoji !== state.selectedEmoji || oldAvatar !== resolvedAvatarUrl) {
         let changeDesc = `變更資料：`;
         if (oldName !== newName) changeDesc += `名字由 ${oldName} 改為 ${newName}。`;
-        if (oldAvatar !== uploadedAvatarBase64) {
-            changeDesc += uploadedAvatarBase64 ? `上傳了自訂大頭照。` : `移除了自訂大頭照。`;
+        if (oldAvatar !== resolvedAvatarUrl) {
+            changeDesc += resolvedAvatarUrl && isUploadedPhotoDataUrl(resolvedAvatarUrl) ? `上傳了自訂大頭照。` : `移除了自訂大頭照。`;
         } else if (oldEmoji !== state.selectedEmoji) {
             changeDesc += `頭像改為 ${state.selectedEmoji}。`;
         }
