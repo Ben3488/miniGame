@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔄 線上格式轉換器 - Premium Converter Hub</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="converter-container glass-panel">
+        <div class="tabs-header">
+            <button class="tab-btn active" id="tab-image">📷 圖片轉檔</button>
+            <button class="tab-btn" id="tab-text">📝 文字與 JSON 轉換</button>
+        </div>
+
+        <!-- Image Converter -->
+        <div class="tab-content active" id="image-view">
+            <div class="upload-zone" id="upload-zone">
+                <input type="file" id="image-input" accept="image/*" style="display: none;">
+                <div class="upload-content">
+                    <span class="upload-icon">📤</span>
+                    <p class="upload-text">點擊或拖曳圖片至此處上傳</p>
+                    <p class="upload-subtext">支援 PNG, JPG, WebP, GIF 等格式</p>
+                </div>
+                <div class="preview-wrapper hidden" id="preview-wrapper">
+                    <img id="image-preview" src="#" alt="圖片預覽">
+                    <button class="btn-remove-preview" id="btn-remove-image" title="移除圖片">&times;</button>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div class="settings-panel">
+                <div class="form-group">
+                    <label for="select-format">轉出格式</label>
+                    <select id="select-format">
+                        <option value="image/png">PNG (.png)</option>
+                        <option value="image/jpeg">JPEG (.jpg)</option>
+                        <option value="image/webp" selected>WebP (.webp)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="input-quality">壓縮品質: <span id="val-quality">85</span>%</label>
+                    <input type="range" id="input-quality" min="10" max="100" step="5" value="85">
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="btn-convert-image" disabled>
+                轉換並下載圖片
+            </button>
+        </div>
+
+        <!-- Text/JSON Converter -->
+        <div class="tab-content" id="text-view">
+            <div class="text-editor-container">
+                <div class="editor-block">
+                    <label>輸入內容</label>
+                    <textarea id="text-input" placeholder="在此輸入您的 JSON、Base64 或一般文字..."></textarea>
+                </div>
+
+                <div class="actions-toolbar">
+                    <button class="btn-action" data-action="json-format">✨ JSON 排版</button>
+                    <button class="btn-action" data-action="json-minify">⚡ JSON 壓縮</button>
+                    <button class="btn-action" data-action="b64-encode">🔒 Base64 編碼</button>
+                    <button class="btn-action" data-action="b64-decode">🔓 Base64 解碼</button>
+                    <button class="btn-action" data-action="case-upper">🔠 大寫</button>
+                    <button class="btn-action" data-action="case-lower">🔡 小寫</button>
+                </div>
+
+                <div class="editor-block">
+                    <label>輸出結果</label>
+                    <textarea id="text-output" readonly placeholder="轉換後的結果將顯示於此..."></textarea>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" id="btn-copy-text">
+                複製輸出結果
+            </button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

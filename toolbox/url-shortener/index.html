@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔗 短網址與 QR 碼產生器 - Premium URL Utility</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- QRious CDN for Client-side QR Code Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+</head>
+<body>
+    <div class="shortener-container glass-panel">
+        <div class="tool-header">
+            <span class="tool-icon">🔗</span>
+            <h1>短網址與 QR 碼產生器</h1>
+            <p class="tool-desc">即時縮短長網址，並生成可自訂顏色的高畫質 QR Code 二維碼。</p>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-section">
+            <div class="form-group">
+                <label for="long-url">請輸入原始長網址</label>
+                <div class="url-input-wrapper">
+                    <input type="url" id="long-url" placeholder="https://example.com/very/long/path..." autocomplete="off">
+                    <button class="btn-clear" id="btn-clear-url" title="清除內容">&times;</button>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="btn-shorten">
+                ⚡ 開始產生
+            </button>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-state hidden" id="loading-spinner">
+            <div class="spinner"></div>
+            <p>正在通訊縮短中，請稍候...</p>
+        </div>
+
+        <!-- Result Cards Layout -->
+        <div class="result-layout hidden" id="result-layout">
+            <div class="result-card secondary-panel">
+                <h3>📌 縮網址結果</h3>
+                <div class="short-url-display">
+                    <input type="text" id="short-url-out" readonly>
+                    <button class="btn btn-action" id="btn-copy-url">📋 複製網址</button>
+                </div>
+                <div class="visit-link-wrapper">
+                    <a href="#" target="_blank" id="link-visit" class="visit-link">🌐 測試開啟連結 &rarr;</a>
+                </div>
+            </div>
+
+            <div class="result-card secondary-panel qr-card">
+                <h3>📷 QR 碼二維碼</h3>
+                <div class="qr-preview-area">
+                    <canvas id="qr-canvas"></canvas>
+                </div>
+                
+                <!-- QR Code Settings -->
+                <div class="qr-settings">
+                    <div class="form-group">
+                        <label for="qr-target">條碼網址來源</label>
+                        <select id="qr-target">
+                            <option value="short" selected>使用短網址</option>
+                            <option value="long">使用原始長網址</option>
+                        </select>
+                    </div>
+                    <div class="color-picker-row">
+                        <div class="form-group">
+                            <label for="color-fg">條碼顏色</label>
+                            <input type="color" id="color-fg" value="#0f172a">
+                        </div>
+                        <div class="form-group">
+                            <label for="color-bg">背景顏色</label>
+                            <input type="color" id="color-bg" value="#ffffff">
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="btn-download-qr">
+                    💾 下載 QR 碼圖片
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📝 Notion AI 智慧筆記 - Premium Workspace Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="redirect-container glass-panel">
+        <div class="tool-header">
+            <span class="tool-logo">📝</span>
+            <h1>Notion AI 智慧筆記</h1>
+            <p>使用智慧草稿紙編寫，一鍵複製並自動跳轉至您的 Notion 工作區！</p>
+        </div>
+
+        <div class="composer-card secondary-panel">
+            <!-- Workspace link customizer -->
+            <div class="form-group">
+                <label for="workspace-url">您的 Notion 工作區網址 (選填，可記憶)</label>
+                <input type="text" id="workspace-url" placeholder="https://www.notion.so/..." autocomplete="off">
+            </div>
+
+            <!-- Scratchpad Area -->
+            <div class="form-group">
+                <div class="scratchpad-header">
+                    <label for="scratchpad-text">📝 智慧草稿紙 (自動存檔)</label>
+                    <button class="btn-clear" id="btn-clear-scratch" title="清空草稿">清空</button>
+                </div>
+                <textarea id="scratchpad-text" placeholder="在此處記錄您的靈感或大綱草稿... 點選下方按鈕會自動複製內容並為您打開 Notion！"></textarea>
+            </div>
+
+            <button class="btn btn-primary" id="btn-redirect">
+                🚀 複製草稿並前往 Notion
+            </button>
+        </div>
+
+        <!-- Notification Toast -->
+        <div class="toast hidden" id="toast-notify">
+            🎉 草稿已複製到剪貼簿！正在前往 Notion...
+        </div>
+
+        <div class="info-footer">
+            <p>💡 提示：Notion 設有安全政策限制無法嵌入。點選後系統會在新分頁開啟 Notion，您只需貼上內容並在段落處輸入 <code>/ai</code> 即可喚醒 Notion AI！</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 ChatGPT / Claude - Premium AI Hub</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="redirect-container glass-panel">
+        <div class="tool-header">
+            <span class="tool-logo">🤖</span>
+            <h1>ChatGPT / Claude 助手</h1>
+            <p class="tool-slogan font-bold">快速撰寫電子郵件、文案、會議摘要與翻譯。</p>
+            <p class="tool-desc">由於官方安全政策限制，我們為您設計了極速傳送門。可在下方點選範本或自由輸入，一鍵自動複製並跳轉官方網頁！</p>
+        </div>
+
+        <!-- Target Switcher -->
+        <div class="tabs-header">
+            <button class="tab-btn active" id="btn-chatgpt" data-target="https://chatgpt.com/">ChatGPT 官方</button>
+            <button class="tab-btn" id="btn-claude" data-target="https://claude.ai/">Claude AI 官方</button>
+        </div>
+
+        <div class="composer-card secondary-panel">
+            <div class="templates-section">
+                <label>💡 常用 Prompt 範本</label>
+                <div class="templates-grid">
+                    <button class="btn-template" data-prompt="請幫我草擬一封給客戶的電子郵件，通知他們新產品即將在下週一上市，語氣要專業得體、充滿吸引力。">✉️ 電子郵件</button>
+                    <button class="btn-template" data-prompt="請為一款環保隨行保溫杯，寫一段適合放在社群平台（如 IG）推廣的吸睛行銷文案，需包含標題、內容大綱與相關標籤。">✍️ 文案創作</button>
+                    <button class="btn-template" data-prompt="請將以下會議討論內容，整理成一份結構清晰、包含「討論要點」與「待辦清單」的會議摘要：\n\n- 專案進度回報\n- 行銷預算覆核並於本週內撥款">📋 會議摘要</button>
+                    <button class="btn-template" data-prompt="請幫我將以下段落翻譯成流暢的中英文對照版，語意要自然且符合商務口吻：\n\nWe look forward to collaborating with your team on this project to achieve mutual success.">🌐 專業翻譯</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="prompt-text">您的 Prompt 內容</label>
+                <textarea id="prompt-text" placeholder="在此輸入您的 Prompt，或點選上方範本進行修改..."></textarea>
+            </div>
+
+            <button class="btn btn-primary" id="btn-redirect">
+                ⚡ 複製 Prompt 並開啟 AI 視窗
+            </button>
+        </div>
+
+        <!-- Notification Toast -->
+        <div class="toast hidden" id="toast-notify">
+            🎉 Prompt 已複製到剪貼簿！正在前往網頁...
+        </div>
+
+        <div class="info-footer">
+            <p>💡 提示：點選後系統會將文字自動複製到剪貼簿，您只需在 AI 網頁中直接 Ctrl+V 貼上即可。</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
