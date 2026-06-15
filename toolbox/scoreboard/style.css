@@ -1433,21 +1433,24 @@ body {
         position: static !important;
     }
 
+    /* 橫屏水果位置優化 */
     .kid-fruit-emoji {
         position: absolute !important;
         top: 16px !important;
-        left: 100px !important;
+        left: 90px !important;
         font-size: 1.25rem !important;
         z-index: 10 !important;
     }
 
+    /* 橫屏名字位置優化 */
     .kid-name {
         position: absolute !important;
         top: 18px !important;
-        left: 130px !important;
+        left: 120px !important;
         font-size: 1.05rem !important;
     }
 
+    /* 橫屏快捷鍵位置優化 */
     .btn-edit-profile {
         position: absolute !important;
         top: 10px !important;
@@ -1458,26 +1461,29 @@ body {
         z-index: 15 !important;
     }
 
+    /* 橫屏快捷鍵圖標大小優化 */
     .btn-edit-profile svg {
         width: 16px !important;
         height: 16px !important;
     }
 
+    /* 橫屏快捷鍵內容區域優化 */
     .kid-card-body-row {
         position: static !important;
         margin: 0 !important;
         padding: 0 !important;
     }
 
+    /* 橫屏頭像位置優化 */
     .avatar-container {
         position: absolute !important;
         top: 10px !important;
-        left: 34px !important;
-        width: 62px !important;
-        height: 62px !important;
-        flex: 0 0 62px !important;
+        left: 10px !important;
+        width: 80px !important;
+        height: 80px !important;
+        flex: 0 0 80px !important;
         flex-shrink: 0 !important;
-        box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-color) 15%, transparent) !important;
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--theme-color) 15%, transparent) !important;
         z-index: 5 !important;
     }
 
@@ -1485,6 +1491,7 @@ body {
         font-size: 1.95rem !important;
     }
 
+    /* 橫屏獎牌位置優化 */
     .medal-badge {
         width: 20px !important;
         height: 20px !important;
@@ -1498,19 +1505,20 @@ body {
         stroke-width: 2.2px !important;
     }
 
+    /* 橫屏分數位置優化 */
     .score-circle-wrapper {
         position: absolute !important;
         top: 10px !important;
-        right: 8px !important;
-        width: 62px !important;
-        height: 62px !important;
-        flex: 0 0 62px !important;
+        right: 0px !important;
+        width: 80px !important;
+        height: 80px !important;
+        flex: 0 0 80px !important;
         flex-shrink: 0 !important;
     }
 
     .score-svg-ring {
-        width: 62px !important;
-        height: 62px !important;
+        width: 80px !important;
+        height: 80px !important;
     }
 
     .score-number {
@@ -1522,10 +1530,11 @@ body {
         margin-top: 1px !important;
     }
 
+    /* 橫屏五星位置 */
     .milestones-stars {
         position: absolute !important;
-        top: 44px !important;
-        left: 106px !important;
+        top: 60px !important;
+        left: 90px !important;
         gap: 3px !important;
         margin: 0 !important;
         justify-content: flex-start !important;
