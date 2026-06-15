@@ -127,6 +127,23 @@
                         <!-- Emojis will be dynamically populated -->
                     </div>
                 </div>
+                <div class="form-group">
+                    <label>或 上傳自訂頭像照片</label>
+                    <div class="upload-avatar-wrapper">
+                        <input type="file" id="edit-avatar-file" accept="image/*" style="display: none;">
+                        <button type="button" id="btn-upload-trigger" class="btn btn-secondary" style="width: 100%; justify-content: center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image" style="margin-right: 6px;"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                            選擇圖片上傳
+                        </button>
+                        <div class="upload-preview-row">
+                            <div id="upload-preview" class="avatar-preview-circle">📷</div>
+                            <div class="upload-preview-info">
+                                <span id="upload-preview-status">尚未上傳自訂圖片</span>
+                                <button type="button" id="btn-remove-uploaded" class="btn btn-danger btn-sm" style="display: none;">清除照片</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button id="btn-modal-cancel" class="btn btn-secondary">取消</button>

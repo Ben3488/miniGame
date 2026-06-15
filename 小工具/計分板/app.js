@@ -14,6 +14,7 @@ const DEFAULT_KIDS = [
         id: 'kid-1',
         name: '小明',
         emoji: '👶',
+        avatarUrl: '',
         score: 0,
         gradientId: 'gradient-green',
         glowColor: 'rgba(16, 185, 129, 0.2)',
@@ -24,6 +25,7 @@ const DEFAULT_KIDS = [
         id: 'kid-2',
         name: '小華',
         emoji: '👧',
+        avatarUrl: '',
         score: 0,
         gradientId: 'gradient-pink',
         glowColor: 'rgba(236, 72, 153, 0.2)',
@@ -34,6 +36,7 @@ const DEFAULT_KIDS = [
         id: 'kid-3',
         name: '小強',
         emoji: '👦',
+        avatarUrl: '',
         score: 0,
         gradientId: 'gradient-blue',
         glowColor: 'rgba(59, 130, 246, 0.2)',
@@ -153,6 +156,38 @@ function triggerCelebration() {
    動態 DOM 生成與渲染
    ========================================================================== */
 
+function compressImage(file, callback) {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const max_size = 180; // Resize to max 180x180 px for avatar
+            let width = img.width;
+            let height = img.height;
+            
+            // Calculate new dimensions (crop to square)
+            const size = Math.min(width, height);
+            canvas.width = max_size;
+            canvas.height = max_size;
+            
+            const ctx = canvas.getContext('2d');
+            // Center crop and draw to canvas
+            ctx.drawImage(
+                img,
+                (width - size) / 2, (height - size) / 2, size, size, // source rect
+                0, 0, max_size, max_size // destination rect
+            );
+            
+            // Convert to base64 jpeg with 0.85 quality
+            const base64 = canvas.toDataURL('image/jpeg', 0.85);
+            callback(base64);
+        };
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
 // 建立單個兒童計分板卡片 HTML
 function createKidCardHTML(kid) {
     // 計算 SVG progress offset
@@ -179,13 +214,12 @@ function createKidCardHTML(kid) {
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
             </button>
             
-            <!-- 卡片頭部 -->
+            <!-- 卡片頭部 (只保留姓名) -->
             <div class="kid-card-header">
-                <div class="avatar-container" onclick="openEditModal('${kid.id}')">${kid.emoji}</div>
                 <h2 class="kid-name">${kid.name}</h2>
             </div>
             
-            <!-- 分數環形儀表板 -->
+            <!-- 分數與頭像環形儀表板 -->
             <div class="score-circle-wrapper">
                 <svg class="score-svg-ring" width="160" height="160">
                     <circle class="score-svg-bg" cx="80" cy="80" r="70"></circle>
@@ -194,10 +228,17 @@ function createKidCardHTML(kid) {
                             stroke-dasharray="${RING_CIRCUMFERENCE}" 
                             stroke-dashoffset="${offset}"></circle>
                 </svg>
-                <div class="score-display">
-                    <span class="score-number">${kid.score}</span>
-                    <span class="score-unit">分 / 100</span>
+                
+                <!-- 頭像容器在中間 -->
+                <div class="avatar-container" onclick="openEditModal('${kid.id}')">
+                    ${kid.avatarUrl ? `<img src="${kid.avatarUrl}" class="avatar-img" alt="${kid.name}">` : `<span class="avatar-emoji">${kid.emoji}</span>`}
+                    <!-- 分數疊加在頭像上 -->
+                    <div class="score-overlay">
+                        <span class="score-number">${kid.score}</span>
+                        <span class="score-unit">分</span>
+                    </div>
                 </div>
+                
                 <div class="full-score-badge ${isFullScore ? 'show' : ''}">🏆 滿分 100!</div>
             </div>
 
@@ -250,7 +291,6 @@ function updateCardDOM(kid) {
     // 1. 更新分數文字
     const scoreNumEl = cardEl.querySelector('.score-number');
     if (scoreNumEl) {
-        // 加分減分時有小動畫
         const oldScore = parseInt(scoreNumEl.textContent);
         if (oldScore !== kid.score) {
             scoreNumEl.textContent = kid.score;
@@ -291,7 +331,21 @@ function updateCardDOM(kid) {
 
     // 5. 更新大頭貼和姓名 (如果在 Modal 編輯了)
     const avatarEl = cardEl.querySelector('.avatar-container');
-    if (avatarEl) avatarEl.textContent = kid.emoji;
+    if (avatarEl) {
+        if (kid.avatarUrl) {
+            avatarEl.innerHTML = `<img src="${kid.avatarUrl}" class="avatar-img" alt="${kid.name}">
+                                  <div class="score-overlay">
+                                      <span class="score-number">${kid.score}</span>
+                                      <span class="score-unit">分</span>
+                                  </div>`;
+        } else {
+            avatarEl.innerHTML = `<span class="avatar-emoji">${kid.emoji}</span>
+                                  <div class="score-overlay">
+                                      <span class="score-number">${kid.score}</span>
+                                      <span class="score-unit">分</span>
+                                  </div>`;
+        }
+    }
     
     const nameEl = cardEl.querySelector('.kid-name');
     if (nameEl) nameEl.textContent = kid.name;
@@ -412,6 +466,7 @@ window.changeScore = function(kidId, amount) {
 const editModalEl = document.getElementById('modal-edit-profile');
 const editNameInput = document.getElementById('edit-name');
 const emojiGridEl = document.getElementById('emoji-grid');
+let uploadedAvatarBase64 = ''; // 暫存Modal中上傳的 Base64 圖片
 
 window.openEditModal = function(kidId) {
     const kid = state.kids.find(k => k.id === kidId);
@@ -420,6 +475,13 @@ window.openEditModal = function(kidId) {
     state.editingKidId = kidId;
     state.selectedEmoji = kid.emoji;
     editNameInput.value = kid.name;
+    uploadedAvatarBase64 = kid.avatarUrl || '';
+    
+    // 重設檔案輸入框的值
+    const fileInput = document.getElementById('edit-avatar-file');
+    if (fileInput) fileInput.value = '';
+    
+    updateUploadPreview();
     
     // 生成 Emoji 選擇網格
     renderEmojiGrid();
@@ -432,6 +494,48 @@ function closeEditModal() {
     editModalEl.classList.remove('show');
     state.editingKidId = null;
 }
+
+function updateUploadPreview() {
+    const previewEl = document.getElementById('upload-preview');
+    const statusEl = document.getElementById('upload-preview-status');
+    const removeBtn = document.getElementById('btn-remove-uploaded');
+    
+    if (!previewEl || !statusEl || !removeBtn) return;
+    
+    if (uploadedAvatarBase64) {
+        previewEl.innerHTML = `<img src="${uploadedAvatarBase64}" alt="頭像預覽">`;
+        statusEl.textContent = '已選擇自訂大頭照';
+        removeBtn.style.display = 'inline-block';
+    } else {
+        previewEl.innerHTML = '📷';
+        statusEl.textContent = '尚未上傳自訂圖片';
+        removeBtn.style.display = 'none';
+    }
+}
+
+// 檔案上傳觸發
+document.getElementById('btn-upload-trigger')?.addEventListener('click', () => {
+    document.getElementById('edit-avatar-file')?.click();
+});
+
+document.getElementById('edit-avatar-file')?.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // 壓縮並調整圖片大小
+    compressImage(file, (base64) => {
+        uploadedAvatarBase64 = base64;
+        updateUploadPreview();
+    });
+});
+
+// 移除自訂大頭照
+document.getElementById('btn-remove-uploaded')?.addEventListener('click', () => {
+    uploadedAvatarBase64 = '';
+    const fileInput = document.getElementById('edit-avatar-file');
+    if (fileInput) fileInput.value = '';
+    updateUploadPreview();
+});
 
 function renderEmojiGrid() {
     if (!emojiGridEl) return;
@@ -475,22 +579,32 @@ document.getElementById('btn-modal-save')?.addEventListener('click', () => {
     
     const oldName = kid.name;
     const oldEmoji = kid.emoji;
+    const oldAvatar = kid.avatarUrl || '';
     
     kid.name = newName;
     kid.emoji = state.selectedEmoji;
+    kid.avatarUrl = uploadedAvatarBase64;
     
     // 寫入更名紀錄
-    if (oldName !== newName || oldEmoji !== state.selectedEmoji) {
+    if (oldName !== newName || oldEmoji !== state.selectedEmoji || oldAvatar !== uploadedAvatarBase64) {
+        let changeDesc = `變更資料：`;
+        if (oldName !== newName) changeDesc += `名字由 ${oldName} 改為 ${newName}。`;
+        if (oldAvatar !== uploadedAvatarBase64) {
+            changeDesc += uploadedAvatarBase64 ? `上傳了自訂大頭照。` : `移除了自訂大頭照。`;
+        } else if (oldEmoji !== state.selectedEmoji) {
+            changeDesc += `頭像改為 ${state.selectedEmoji}。`;
+        }
+        
         addLog(
             kid.id, 
             newName, 
             0, 
-            `變更資料：頭像改為 ${state.selectedEmoji}，名字由 ${oldName} 改為 ${newName}`, 
+            changeDesc, 
             kid.tagColor
         );
     }
     
-    updateCardDOM(kid);
+    renderAllCards();
     saveState();
     closeEditModal();
 });

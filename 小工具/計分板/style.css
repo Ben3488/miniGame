@@ -339,24 +339,83 @@ body {
 }
 
 .avatar-container {
-    width: 80px;
-    height: 80px;
+    width: 130px;
+    height: 130px;
     border-radius: 50%;
     background: var(--bg-secondary);
-    border: 3px solid rgba(255, 255, 255, 0.1);
+    border: 3px solid rgba(255, 255, 255, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3rem;
     cursor: pointer;
     box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
     transition: var(--transition-smooth);
+    position: absolute;
+    overflow: hidden;
 }
 
 .avatar-container:hover {
-    transform: scale(1.08);
+    transform: scale(1.05);
     border-color: var(--card-glow);
-    box-shadow: 0 0 15px var(--card-glow);
+    box-shadow: 0 0 20px var(--card-glow-strong);
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition-smooth);
+}
+
+.avatar-emoji {
+    font-size: 4rem;
+    transition: var(--transition-smooth);
+}
+
+.avatar-container:hover .avatar-img {
+    transform: scale(1.1);
+}
+
+.avatar-container:hover .avatar-emoji {
+    transform: scale(1.1);
+}
+
+.score-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(11, 15, 25, 0.55);
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-smooth);
+    pointer-events: none;
+}
+
+.avatar-container:hover .score-overlay {
+    background: rgba(11, 15, 25, 0.35);
+}
+
+.score-number {
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    transition: var(--transition-smooth);
+}
+
+.score-unit {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 600;
+    margin-top: 0.2rem;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
 }
 
 .kid-name {
@@ -396,29 +455,52 @@ body {
     transition: stroke-dashoffset 0.5s ease-out;
 }
 
-.score-display {
-    position: absolute;
+/* Upload Avatar Section */
+.upload-avatar-wrapper {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     flex-direction: column;
+    gap: 0.8rem;
+}
+
+.upload-preview-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.avatar-preview-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 1.2rem;
+    overflow: hidden;
 }
 
-.score-number {
-    font-size: 3.5rem;
-    font-weight: 900;
-    line-height: 1;
-    background: var(--card-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    transition: var(--transition-smooth);
+.avatar-preview-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-.score-unit {
-    font-size: 0.8rem;
+.upload-preview-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+#upload-preview-status {
+    font-size: 0.85rem;
     color: var(--text-secondary);
-    font-weight: 500;
-    margin-top: 0.2rem;
 }
 
 /* 滿分標籤 */
