@@ -12,34 +12,34 @@ const CURED_EMOJIS = [
 const DEFAULT_KIDS = [
     {
         id: 'kid-1',
-        name: '小明',
-        emoji: '👶',
+        name: '橘子',
+        emoji: '🍊',
         avatarUrl: '',
         score: 0,
-        gradientId: 'gradient-green',
-        glowColor: 'rgba(16, 185, 129, 0.2)',
-        glowStrong: 'rgba(16, 185, 129, 0.45)',
-        tagColor: '#059669'
+        gradientId: 'gradient-orange',
+        glowColor: 'rgba(249, 115, 22, 0.15)',
+        glowStrong: 'rgba(249, 115, 22, 0.45)',
+        tagColor: '#f97316'
     },
     {
         id: 'kid-2',
-        name: '小華',
-        emoji: '👧',
+        name: '柚子',
+        emoji: '🍈',
         avatarUrl: '',
         score: 0,
         gradientId: 'gradient-pink',
-        glowColor: 'rgba(236, 72, 153, 0.2)',
+        glowColor: 'rgba(236, 72, 153, 0.15)',
         glowStrong: 'rgba(236, 72, 153, 0.45)',
-        tagColor: '#d946ef'
+        tagColor: '#ec4899'
     },
     {
         id: 'kid-3',
-        name: '小強',
-        emoji: '👦',
+        name: '蘋果',
+        emoji: '🍎',
         avatarUrl: '',
         score: 0,
         gradientId: 'gradient-blue',
-        glowColor: 'rgba(59, 130, 246, 0.2)',
+        glowColor: 'rgba(59, 130, 246, 0.15)',
         glowStrong: 'rgba(59, 130, 246, 0.45)',
         tagColor: '#3b82f6'
     }
@@ -71,6 +71,13 @@ function loadState() {
         
         if (savedKids) {
             state.kids = JSON.parse(savedKids);
+            // 檢查是否為舊的預設角色，若是，則自動升級為新樣板的角色 (橘子、柚子、蘋果)
+            const isOldDefault = state.kids.length === 3 && 
+                                 state.kids.some(k => k.name === '小明' || k.name === '小華' || k.name === '小強');
+            if (isOldDefault) {
+                state.kids = JSON.parse(JSON.stringify(DEFAULT_KIDS));
+                saveState();
+            }
         } else {
             state.kids = JSON.parse(JSON.stringify(DEFAULT_KIDS)); // 深拷貝
         }
@@ -190,8 +197,9 @@ function compressImage(file, callback) {
 
 // 建立單個兒童計分板卡片 HTML
 function createKidCardHTML(kid) {
-    // 計算 SVG progress offset
-    const offset = RING_CIRCUMFERENCE - (kid.score / 100) * RING_CIRCUMFERENCE;
+    // 計算 SVG progress offset (r=42, C = 2 * Math.PI * 42 = 263.89)
+    const RING_CIRCUMFERENCE_100 = 263.89;
+    const offset = RING_CIRCUMFERENCE_100 - (kid.score / 100) * RING_CIRCUMFERENCE_100;
     
     // 生成星星 HTML (5顆星)
     let starsHTML = '';
@@ -208,38 +216,47 @@ function createKidCardHTML(kid) {
     const isFullScore = kid.score === 100;
 
     return `
-        <article class="kid-card glass-panel" id="card-${kid.id}" style="--card-gradient: var(--${kid.id}-gradient, url(#${kid.gradientId})); --card-glow: ${kid.glowColor}; --card-glow-strong: ${kid.glowStrong};">
-            <!-- 編輯按鈕 -->
+        <article class="kid-card glass-panel" id="card-${kid.id}" style="--card-gradient: var(--${kid.id}-gradient, url(#${kid.gradientId})); --card-glow: ${kid.glowColor}; --card-glow-strong: ${kid.glowStrong}; --theme-color: ${kid.tagColor};">
+            <!-- 編輯按鈕 (三個點) -->
             <button class="btn-edit-profile" onclick="openEditModal('${kid.id}')" title="修改大頭貼與名字">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-more-horizontal"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
             </button>
             
-            <!-- 卡片頭部 (只保留姓名) -->
+            <!-- 卡片頭部 (水果 Emoji + 姓名) -->
             <div class="kid-card-header">
-                <h2 class="kid-name">${kid.name}</h2>
+                <div class="kid-title-container">
+                    <span class="kid-fruit-emoji">${kid.emoji}</span>
+                    <h2 class="kid-name">${kid.name}</h2>
+                </div>
             </div>
             
-            <!-- 分數與頭像環形儀表板 -->
-            <div class="score-circle-wrapper">
-                <svg class="score-svg-ring" width="160" height="160">
-                    <circle class="score-svg-bg" cx="80" cy="80" r="70"></circle>
-                    <circle class="score-svg-progress" cx="80" cy="80" r="70" 
-                            stroke="url(#${kid.gradientId})" 
-                            stroke-dasharray="${RING_CIRCUMFERENCE}" 
-                            stroke-dashoffset="${offset}"></circle>
-                </svg>
-                
-                <!-- 頭像容器在中間 -->
+            <!-- 左右並排的儀表板 -->
+            <div class="kid-card-body-row">
+                <!-- 左側：大頭照 + 勳章 -->
                 <div class="avatar-container" onclick="openEditModal('${kid.id}')">
-                    ${kid.avatarUrl ? `<img src="${kid.avatarUrl}" class="avatar-img" alt="${kid.name}">` : `<span class="avatar-emoji">${kid.emoji}</span>`}
-                    <!-- 分數疊加在頭像上 -->
-                    <div class="score-overlay">
+                    <div class="avatar-image-wrapper">
+                        ${kid.avatarUrl ? `<img src="${kid.avatarUrl}" class="avatar-img" alt="${kid.name}">` : `<span class="avatar-emoji">${kid.emoji}</span>`}
+                    </div>
+                    <!-- 勳章 -->
+                    <div class="medal-badge">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-award"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                    </div>
+                </div>
+
+                <!-- 右側：環形進度條與分數 -->
+                <div class="score-circle-wrapper">
+                    <svg class="score-svg-ring" width="100" height="100" viewBox="0 0 100 100">
+                        <circle class="score-svg-bg" cx="50" cy="50" r="42"></circle>
+                        <circle class="score-svg-progress" cx="50" cy="50" r="42" 
+                                stroke="url(#${kid.gradientId})" 
+                                stroke-dasharray="263.89" 
+                                stroke-dashoffset="${offset}"></circle>
+                    </svg>
+                    <div class="score-display">
                         <span class="score-number">${kid.score}</span>
                         <span class="score-unit">分</span>
                     </div>
                 </div>
-                
-                <div class="full-score-badge ${isFullScore ? 'show' : ''}">🏆 滿分 100!</div>
             </div>
 
             <!-- 星星里程碑 -->
@@ -249,16 +266,19 @@ function createKidCardHTML(kid) {
 
             <!-- 備註輸入欄位 -->
             <div class="note-input-container">
-                <input type="text" class="note-input" id="note-${kid.id}" placeholder="輸入加/減分原因 (例如：幫忙洗碗)" maxlength="30">
+                <div class="note-input-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="note-input-icon"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <input type="text" class="note-input" id="note-${kid.id}" placeholder="輸入加/減分原因 (例如：幫忙洗碗)" maxlength="30">
+                </div>
             </div>
 
-            <!-- 控制按鈕 -->
+            <!-- 控制按鈕 (圓形外框樣式) -->
             <div class="controls-container">
                 <button class="btn-ctrl btn-minus" onclick="changeScore('${kid.id}', -1)" title="扣 1 分">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-minus"><path d="M5 12h14"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-minus"><path d="M5 12h14"/></svg>
                 </button>
-                <button class="btn-ctrl btn-plus" onclick="changeScore('${kid.id}', 1)" style="background: url(#${kid.gradientId}); background-color: var(--${kid.id}-start);" title="加 1 分">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                <button class="btn-ctrl btn-plus" onclick="changeScore('${kid.id}', 1)" title="加 1 分">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                 </button>
             </div>
         </article>
@@ -283,7 +303,7 @@ function renderAllCards() {
     container.innerHTML = html;
 }
 
-// 局部更新單個兒童卡片 (保持其他卡片的輸入框文字不受重置影響，並且支援動畫)
+// 局部更新單個兒童卡片
 function updateCardDOM(kid) {
     const cardEl = document.getElementById(`card-${kid.id}`);
     if (!cardEl) return;
@@ -301,24 +321,14 @@ function updateCardDOM(kid) {
         }
     }
     
-    // 2. 更新環形進度條 offset
+    // 2. 更新環形進度條 offset (r=42, C=263.89)
     const progressEl = cardEl.querySelector('.score-svg-progress');
     if (progressEl) {
-        const offset = RING_CIRCUMFERENCE - (kid.score / 100) * RING_CIRCUMFERENCE;
+        const offset = 263.89 - (kid.score / 100) * 263.89;
         progressEl.style.strokeDashoffset = offset;
     }
     
-    // 3. 更新滿分標籤
-    const badgeEl = cardEl.querySelector('.full-score-badge');
-    if (badgeEl) {
-        if (kid.score === 100) {
-            badgeEl.classList.add('show');
-        } else {
-            badgeEl.classList.remove('show');
-        }
-    }
-    
-    // 4. 更新星星
+    // 3. 更新星星
     const starIcons = cardEl.querySelectorAll('.star-icon');
     starIcons.forEach((star, idx) => {
         const milestoneVal = (idx + 1) * 20;
@@ -329,24 +339,19 @@ function updateCardDOM(kid) {
         }
     });
 
-    // 5. 更新大頭貼和姓名 (如果在 Modal 編輯了)
-    const avatarEl = cardEl.querySelector('.avatar-container');
-    if (avatarEl) {
+    // 4. 更新大頭貼和姓名 (如果在 Modal 編輯了)
+    const avatarWrapper = cardEl.querySelector('.avatar-image-wrapper');
+    if (avatarWrapper) {
         if (kid.avatarUrl) {
-            avatarEl.innerHTML = `<img src="${kid.avatarUrl}" class="avatar-img" alt="${kid.name}">
-                                  <div class="score-overlay">
-                                      <span class="score-number">${kid.score}</span>
-                                      <span class="score-unit">分</span>
-                                  </div>`;
+            avatarWrapper.innerHTML = `<img src="${kid.avatarUrl}" class="avatar-img" alt="${kid.name}">`;
         } else {
-            avatarEl.innerHTML = `<span class="avatar-emoji">${kid.emoji}</span>
-                                  <div class="score-overlay">
-                                      <span class="score-number">${kid.score}</span>
-                                      <span class="score-unit">分</span>
-                                  </div>`;
+            avatarWrapper.innerHTML = `<span class="avatar-emoji">${kid.emoji}</span>`;
         }
     }
     
+    const fruitEmojiEl = cardEl.querySelector('.kid-fruit-emoji');
+    if (fruitEmojiEl) fruitEmojiEl.textContent = kid.emoji;
+
     const nameEl = cardEl.querySelector('.kid-name');
     if (nameEl) nameEl.textContent = kid.name;
 }
@@ -392,19 +397,30 @@ function renderHistory() {
     
     let html = '';
     state.history.forEach(log => {
-        const colorStyle = log.tagColor ? `background-color: ${log.tagColor};` : 'background-color: var(--btn-secondary);';
+        const kid = state.kids.find(k => k.id === log.kidId);
+        const avatarHTML = kid 
+            ? (kid.avatarUrl ? `<img src="${kid.avatarUrl}" class="history-avatar-img" alt="${log.name}">` : `<span class="history-avatar-emoji">${kid.emoji}</span>`)
+            : '👶';
+            
+        const borderStyle = log.tagColor ? `background-color: ${log.tagColor}; color: #ffffff;` : 'background-color: var(--btn-secondary); color: var(--text-primary);';
         const scoreStyle = log.scoreChange > 0 ? 'color: #10b981; font-weight: bold;' : 'color: #f43f5e; font-weight: bold;';
         
         html += `
             <li class="history-item">
                 <div class="history-item-content">
-                    <span class="history-kid-tag" style="${colorStyle}">${log.name}</span>
+                    <div class="history-avatar-container">
+                        ${avatarHTML}
+                    </div>
+                    <span class="history-kid-tag" style="${borderStyle}">${log.name}</span>
                     <span class="history-item-text">
                         得到 <span style="${scoreStyle}">${log.typeText}</span>
                     </span>
                     <span class="history-item-reason">(${log.reason})</span>
                 </div>
-                <span class="history-item-time">${log.time}</span>
+                <div class="history-time-container">
+                    <span class="history-item-time">${log.time}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock history-clock-icon"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
             </li>
         `;
     });

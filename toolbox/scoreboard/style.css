@@ -281,12 +281,32 @@ body {
 /* 兒童計分卡 */
 .kid-card {
     position: relative;
-    padding: 2rem;
+    padding: 1.8rem 1.5rem;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
+    gap: 1.2rem;
     overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 12px rgba(255, 255, 255, 0.01);
+    transition: var(--transition-smooth);
+}
+
+.kid-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 24px;
+    border: 1px solid var(--theme-color);
+    opacity: 0.25;
+    pointer-events: none;
+    transition: var(--transition-smooth);
+}
+
+.kid-card:hover::after {
+    opacity: 0.85;
 }
 
 /* 卡片專屬色彩微光與背景 */
@@ -298,66 +318,99 @@ body {
     width: 100%;
     height: 6px;
     background: var(--card-gradient);
+    z-index: 2;
 }
 
 .kid-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 45px 0 rgba(0, 0, 0, 0.5), 0 0 25px 0 var(--card-glow);
+    box-shadow: 0 15px 45px 0 rgba(0, 0, 0, 0.5), 0 0 25px 0 var(--card-glow-strong);
 }
 
 /* 卡片頭部：編輯按鈕、大頭貼、名稱 */
 .kid-card-header {
     width: 100%;
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
     position: relative;
-    gap: 0.8rem;
+}
+
+.kid-title-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.kid-fruit-emoji {
+    font-size: 1.4rem;
+}
+
+.kid-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
 }
 
 .btn-edit-profile {
     position: absolute;
-    top: -5px;
-    right: -5px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
+    top: 1.2rem;
+    right: 1.2rem;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-secondary);
-    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
     transition: var(--transition-smooth);
+    z-index: 10;
 }
 
 .btn-edit-profile:hover {
     color: var(--text-primary);
-    background: rgba(255, 255, 255, 0.15);
-    transform: rotate(15deg);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.kid-card-body-row {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    margin: 0.5rem 0;
+    gap: 1.5rem;
 }
 
 .avatar-container {
-    width: 130px;
-    height: 130px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     background: var(--bg-secondary);
-    border: 3px solid rgba(255, 255, 255, 0.08);
+    border: 3px solid rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
     transition: var(--transition-smooth);
-    position: absolute;
-    overflow: hidden;
+    position: relative;
 }
 
 .avatar-container:hover {
     transform: scale(1.05);
-    border-color: var(--card-glow);
-    box-shadow: 0 0 20px var(--card-glow-strong);
+    border-color: var(--theme-color);
+    box-shadow: 0 0 15px var(--card-glow-strong);
+}
+
+.avatar-image-wrapper {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .avatar-img {
@@ -368,7 +421,7 @@ body {
 }
 
 .avatar-emoji {
-    font-size: 4rem;
+    font-size: 2.8rem;
     transition: var(--transition-smooth);
 }
 
@@ -380,59 +433,39 @@ body {
     transform: scale(1.1);
 }
 
-.score-overlay {
+.medal-badge {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(11, 15, 25, 0.55);
-    backdrop-filter: blur(1px);
-    -webkit-backdrop-filter: blur(1px);
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 28px;
+    height: 28px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--theme-color);
+    border-radius: 50%;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    transition: var(--transition-smooth);
-    pointer-events: none;
-}
-
-.avatar-container:hover .score-overlay {
-    background: rgba(11, 15, 25, 0.35);
-}
-
-.score-number {
-    font-size: 3rem;
-    font-weight: 900;
-    line-height: 1;
-    color: #ffffff;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    color: var(--theme-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 8px var(--card-glow);
+    z-index: 2;
     transition: var(--transition-smooth);
 }
 
-.score-unit {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.8);
-    font-weight: 600;
-    margin-top: 0.2rem;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+.avatar-container:hover .medal-badge {
+    transform: translateX(-50%) scale(1.1);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.6), 0 0 12px var(--card-glow-strong);
 }
 
-.kid-name {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: 0.5px;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
+.medal-badge svg {
+    display: block;
 }
 
 /* 分數顯示區 (大型環形儀表板樣式) */
 .score-circle-wrapper {
     position: relative;
-    width: 160px;
-    height: 160px;
+    width: 100px;
+    height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -440,19 +473,47 @@ body {
 
 .score-svg-ring {
     transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
 }
 
 .score-svg-bg {
     fill: none;
-    stroke: rgba(255, 255, 255, 0.03);
-    stroke-width: 10;
+    stroke: rgba(255, 255, 255, 0.05);
+    stroke-width: 8;
 }
 
 .score-svg-progress {
     fill: none;
-    stroke-width: 10;
+    stroke-width: 8;
     stroke-linecap: round;
-    transition: stroke-dashoffset 0.5s ease-out;
+    transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 0 4px var(--card-glow-strong));
+}
+
+.score-display {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.score-number {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    transition: var(--transition-smooth);
+}
+
+.score-unit {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-top: 2px;
 }
 
 /* Upload Avatar Section */
@@ -536,13 +597,14 @@ body {
     display: flex;
     gap: 0.4rem;
     justify-content: center;
-    margin: 0.3rem 0;
+    margin: 0.2rem 0;
+    width: 100%;
 }
 
 .star-icon {
-    width: 20px;
-    height: 20px;
-    fill: #1e293b;
+    width: 18px;
+    height: 18px;
+    fill: transparent;
     stroke: #334155;
     stroke-width: 1.5;
     transition: var(--transition-smooth);
@@ -557,16 +619,30 @@ body {
 /* 備註與原因輸入框 */
 .note-input-container {
     width: 100%;
-    margin-top: 0.5rem;
+}
+
+.note-input-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.note-input-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--text-muted);
+    pointer-events: none;
+    transition: var(--transition-smooth);
 }
 
 .note-input {
     width: 100%;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     color: var(--text-primary);
-    padding: 0.5rem 0.8rem;
-    border-radius: 10px;
+    padding: 0.6rem 0.8rem 0.6rem 2.2rem;
+    border-radius: 12px;
     font-size: 0.85rem;
     outline: none;
     transition: var(--transition-smooth);
@@ -577,9 +653,14 @@ body {
 }
 
 .note-input:focus {
-    border-color: var(--card-glow);
-    background: rgba(0, 0, 0, 0.35);
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.02);
+    border-color: var(--theme-color);
+    background: rgba(15, 23, 42, 0.6);
+    box-shadow: 0 0 10px var(--card-glow);
+}
+
+.note-input:focus + .note-input-icon,
+.note-input-wrapper:focus-within .note-input-icon {
+    color: var(--theme-color);
 }
 
 /* 分數按鈕控制區 */
@@ -589,55 +670,52 @@ body {
     align-items: center;
     gap: 1.5rem;
     width: 100%;
-    margin-top: 0.5rem;
+    margin-top: 0.2rem;
 }
 
 .btn-ctrl {
-    width: 54px;
-    height: 54px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
+    background: rgba(15, 23, 42, 0.3);
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
-    font-weight: 700;
     color: white;
-    transition: transform 0.1s ease, background 0.3s, box-shadow 0.3s;
+    transition: var(--transition-smooth);
     user-select: none;
 }
 
-.btn-ctrl:active {
-    transform: scale(0.9);
-}
-
 .btn-minus {
-    background: linear-gradient(135deg, #f43f5e, #be123c);
-    box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3);
+    border: 2px solid var(--theme-color);
+    color: var(--theme-color);
+    box-shadow: 0 0 8px var(--card-glow);
 }
 
 .btn-minus:hover {
-    box-shadow: 0 6px 20px rgba(244, 63, 94, 0.5);
+    background: var(--theme-color);
+    color: #0b0f19;
+    box-shadow: 0 0 15px var(--card-glow-strong);
     transform: translateY(-2px);
-}
-
-.btn-minus:active {
-    transform: scale(0.9) translateY(0);
 }
 
 .btn-plus {
-    background: var(--card-gradient);
-    box-shadow: 0 4px 15px var(--card-glow);
+    border: 2px solid #10b981;
+    color: #10b981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.15);
 }
 
 .btn-plus:hover {
-    box-shadow: 0 6px 20px var(--card-glow-strong);
+    background: #10b981;
+    color: #0b0f19;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.45);
     transform: translateY(-2px);
 }
 
-.btn-plus:active {
-    transform: scale(0.9) translateY(0);
+.btn-ctrl:active {
+    transform: scale(0.95) translateY(0) !important;
 }
 
 .btn-ctrl svg {
@@ -707,17 +785,17 @@ body {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 0.8rem;
 }
 
 .history-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.6rem 1rem;
-    background: rgba(255, 255, 255, 0.02);
+    padding: 0.7rem 1.2rem;
+    background: rgba(22, 29, 48, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.04);
-    border-radius: 10px;
+    border-radius: 14px;
     font-size: 0.9rem;
     animation: slideIn 0.3s ease-out;
 }
@@ -736,15 +814,40 @@ body {
 .history-item-content {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.8rem;
+    flex-grow: 1;
+}
+
+.history-avatar-container {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.history-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.history-avatar-emoji {
+    font-size: 1.2rem;
 }
 
 .history-kid-tag {
     font-size: 0.75rem;
     font-weight: 700;
-    padding: 0.15rem 0.5rem;
+    padding: 0.2rem 0.6rem;
     border-radius: 6px;
-    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    border: 1px solid transparent;
 }
 
 .history-item-text {
@@ -754,7 +857,32 @@ body {
 .history-item-reason {
     color: var(--text-secondary);
     font-size: 0.85rem;
+    margin-left: 0.2rem;
+}
+
+.history-time-container {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.history-item-time {
+    font-size: 0.8rem;
+}
+
+.history-clock-icon {
+    color: var(--text-muted);
+}
+
+.history-empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
     font-style: italic;
+    font-size: 0.9rem;
+}-style: italic;
     margin-left: 0.5rem;
 }
 
