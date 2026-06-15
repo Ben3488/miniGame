@@ -1414,3 +1414,86 @@ body {
         width: 100%;
     }
 }
+
+/* ==========================================================================
+   線上同步狀態指示燈 (Sync Status Pill)
+   ========================================================================== */
+
+.sync-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    transition: var(--transition-smooth);
+    margin-left: 0.8rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    user-select: none;
+}
+
+.sync-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Online State (Green) */
+.sync-status-pill.online {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.22);
+    color: #34d399;
+}
+.sync-status-pill.online .sync-dot {
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+    animation: syncPulse 2s infinite ease-in-out;
+}
+
+/* Offline State (Yellow/Orange) */
+.sync-status-pill.offline {
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.22);
+    color: #fbbf24;
+}
+.sync-status-pill.offline .sync-dot {
+    background: #f59e0b;
+}
+
+/* Error/Failed State (Red) */
+.sync-status-pill.error {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.22);
+    color: #f87171;
+    cursor: help;
+}
+.sync-status-pill.error .sync-dot {
+    background: #ef4444;
+    box-shadow: 0 0 8px #ef4444;
+    animation: syncPulse 1.2s infinite ease-in-out;
+}
+
+/* Loading State (Grey/Pulsing) */
+.sync-status-pill.loading {
+    background: rgba(148, 163, 184, 0.08);
+    border-color: rgba(148, 163, 184, 0.22);
+    color: #94a3b8;
+}
+.sync-status-pill.loading .sync-dot {
+    background: #94a3b8;
+    animation: syncFlash 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes syncPulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.6; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes syncFlash {
+    0% { opacity: 0.4; }
+    100% { opacity: 1; }
+}

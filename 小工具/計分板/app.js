@@ -220,7 +220,38 @@ function saveToLocalStorage() {
     }
 }
 
+/* 顯示與更新 UI 同步指示燈 */
+function updateSyncStatus(status, message = '') {
+    const pill = document.getElementById('sync-status');
+    if (!pill) return;
+
+    const dot = pill.querySelector('.sync-dot');
+    const text = pill.querySelector('.sync-text');
+
+    pill.className = 'sync-status-pill';
+
+    if (status === 'online') {
+        pill.classList.add('online');
+        if (text) text.textContent = '已同步 NAS';
+        pill.title = message || '資料已成功儲存於您的 Synology NAS';
+    } else if (status === 'offline') {
+        pill.classList.add('offline');
+        if (text) text.textContent = '本機模式 (離線)';
+        pill.title = message || '目前無法連接 NAS，資料暫存於此瀏覽器中 (LocalStorage)';
+    } else if (status === 'error') {
+        pill.classList.add('error');
+        if (text) text.textContent = '同步失敗';
+        pill.title = message || 'NAS 資料寫入失敗！請檢查資料夾寫入權限';
+    } else if (status === 'loading') {
+        pill.classList.add('loading');
+        if (text) text.textContent = '同步中...';
+        pill.title = message || '正在嘗試與 NAS 同步中...';
+    }
+}
+
 async function loadState() {
+    updateSyncStatus('loading', '正在連線 NAS 載入線上數據...');
+    
     // 1. 優先嘗試向 NAS 後端讀取資料
     try {
         const response = await fetch('api.php');
@@ -240,12 +271,25 @@ async function loadState() {
                     await saveState();
                 } else {
                     saveToLocalStorage();
+                    updateSyncStatus('online', '已成功載入 Synology NAS 線上計分數據');
                 }
+                return;
+            } else if (serverData && serverData.status === 'empty') {
+                // NAS 上無檔案，進行首次存檔初始化
+                const defaults = getDefaultState();
+                state.kids = defaults.kids;
+                state.history = defaults.history;
+                state.title = defaults.title;
+                state.subtitle = defaults.subtitle;
+                await saveState();
+                updateSyncStatus('online', '已成功連線 NAS 並初始化計分數據');
                 return;
             }
         }
+        updateSyncStatus('offline', 'NAS 回傳無效狀態，已自動降級使用本機 LocalStorage');
     } catch (e) {
         console.warn('無法從 NAS api.php 載入資料，將降級使用本機 LocalStorage。', e);
+        updateSyncStatus('offline', '連線 NAS 失敗，已自動降級為本機模式 (資料保存在此瀏覽器)');
     }
 
     // 2. 降級方案：從本機 LocalStorage 載入資料
@@ -311,6 +355,7 @@ async function loadState() {
 
 async function saveState() {
     saveToLocalStorage();
+    updateSyncStatus('loading', '正在儲存資料至 NAS...');
 
     try {
         const payload = {
@@ -319,15 +364,28 @@ async function saveState() {
             title: state.title,
             subtitle: state.subtitle
         };
-        await fetch('api.php', {
+        const res = await fetch('api.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(payload)
         });
+
+        if (res.ok) {
+            const result = await res.json();
+            if (result.success) {
+                updateSyncStatus('online', '資料已成功儲存於您的 Synology NAS');
+            } else {
+                updateSyncStatus('error', 'NAS 寫入權限錯誤：' + (result.message || '檔案寫入失敗'));
+                console.error('NAS 後端錯誤：', result.message);
+            }
+        } else {
+            updateSyncStatus('error', 'NAS 連線回應錯誤 (HTTP ' + res.status + ')');
+        }
     } catch (e) {
         console.error('資料同步至 NAS 失敗。', e);
+        updateSyncStatus('offline', '連線 NAS 失敗，資料已暫存於本機 (LocalStorage)');
     }
 }
 
