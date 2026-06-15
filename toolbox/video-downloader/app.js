@@ -149,7 +149,7 @@ async function initServerPing() {
         autoOpt.textContent = `自動分配: ${fastest.name} (${fastest.latency}ms)`;
     } else {
         updateServerPill("error", "所有公共節點皆無回應！請設定自訂節點。");
-        showToast("error", "連線警報", "無法連線至 any 公共下載節點，請前往設定自訂伺服器端點。");
+        showToast("error", "連線警報", "無法連線至任何公共下載節點，請前往設定自訂伺服器端點。");
     }
 }
 
@@ -159,6 +159,7 @@ async function pingServer(url) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout
         
+        // Pinging is usually a GET or OPTIONS to root
         const response = await fetch(url, {
             method: 'GET',
             mode: 'cors',
@@ -171,7 +172,7 @@ async function pingServer(url) {
             return Math.round(end - start);
         }
     } catch (e) {
-        // Suppress
+        // Suppress console error as pings frequently fail CORS or timeout
     }
     return -1;
 }
@@ -311,19 +312,22 @@ function initEventListeners() {
 
 /* --- Core Downloader Logic --- */
 async function analyzeAndDownload(videoUrl) {
+    // Clear old result
     resultCard.classList.add("hidden");
     
+    // Show Loader
     loaderCard.classList.remove("hidden");
     loaderTitle.textContent = "正在取得影片資訊...";
     loaderSubtitle.textContent = "正在聯絡 YouTube 伺服器取得中繼資料...";
 
     let videoMetadata = {
         title: "YouTube 影片",
-        thumbnail: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?q=80&w=600&auto=format&fit=crop", 
+        thumbnail: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?q=80&w=600&auto=format&fit=crop", // placeholder
         duration: "未知長度",
         videoId: extractVideoId(videoUrl)
     };
 
+    // 1. Try to fetch rich metadata via YouTube oEmbed (CORS-friendly)
     if (videoMetadata.videoId) {
         try {
             const oEmbedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoMetadata.videoId}&format=json`;
@@ -334,14 +338,17 @@ async function analyzeAndDownload(videoUrl) {
                 videoMetadata.thumbnail = metaData.thumbnail_url || `https://img.youtube.com/vi/${videoMetadata.videoId}/mqdefault.jpg`;
                 videoMetadata.author = metaData.author_name;
             } else {
+                // Fallback to direct thumbnail url
                 videoMetadata.thumbnail = `https://img.youtube.com/vi/${videoMetadata.videoId}/mqdefault.jpg`;
             }
         } catch (e) {
+            // Fallback to direct thumbnail url
             videoMetadata.thumbnail = `https://img.youtube.com/vi/${videoMetadata.videoId}/mqdefault.jpg`;
         }
     }
 
-    loaderTitle.textContent = "開此解析影片下載流...";
+    // 2. Call Cobalt API for Download Link
+    loaderTitle.textContent = "解析影片下載流...";
     loaderSubtitle.textContent = `伺服器: ${appState.activeServerUrl || "自動分配"}`;
 
     if (!appState.activeServerUrl) {
@@ -350,6 +357,7 @@ async function analyzeAndDownload(videoUrl) {
         return;
     }
 
+    // Prepare Request Body
     const requestBody = {
         url: videoUrl,
         filenameStyle: "pretty"
@@ -362,6 +370,7 @@ async function analyzeAndDownload(videoUrl) {
         requestBody.vQuality = videoQualitySelect.value;
     }
 
+    // Load custom authorization key if custom server is active
     const headers = {
         "Accept": "application/json",
         "Content-Type": "application/json"
@@ -378,6 +387,7 @@ async function analyzeAndDownload(videoUrl) {
             body: JSON.stringify(requestBody)
         });
 
+        // Hide Loader
         loaderCard.classList.add("hidden");
 
         if (!response.ok) {
@@ -394,11 +404,14 @@ async function analyzeAndDownload(videoUrl) {
         }
 
         if (data.status === "redirect" || data.status === "stream") {
+            // Success!
             const downloadUrl = data.url;
             
+            // Build UI displays
             resultTitle.textContent = videoMetadata.title;
             resultThumbnail.src = videoMetadata.thumbnail;
             
+            // Format Quality / Type tag
             resultTypeTag.textContent = appState.isAudioOnly ? "音訊" : "影片";
             resultTypeTag.className = `meta-tag ${appState.isAudioOnly ? "audio" : "video"}`;
             
@@ -408,13 +421,17 @@ async function analyzeAndDownload(videoUrl) {
             const serverName = appState.servers.find(s => s.url === appState.activeServerUrl)?.name || "自訂伺服器";
             resultServerTag.textContent = `伺服器: ${serverName}`;
             
+            // Set save button link
             saveFileBtn.href = downloadUrl;
             
+            // Reveal Result Card
             resultCard.classList.remove("hidden");
             resultCard.scrollIntoView({ behavior: 'smooth' });
             
+            // Show Success Notification
             showToast("success", "解析成功！", "已成功取得下載連結，可點選下載按鈕。");
             
+            // Add to history
             addToHistory({
                 title: videoMetadata.title,
                 thumbnail: videoMetadata.thumbnail,
@@ -426,6 +443,7 @@ async function analyzeAndDownload(videoUrl) {
             });
 
         } else if (data.status === "picker") {
+            // For playlists or pickers
             showToast("info", "清單下載", "此連結包含多個媒體項目，將為您下載第一個項目。");
             const downloadUrl = data.picker[0].url;
             resultTitle.textContent = videoMetadata.title;
@@ -490,9 +508,13 @@ function saveHistoryToStorage() {
 }
 
 function addToHistory(item) {
+    // Remove if duplicates exist based on download link or title
     appState.history = appState.history.filter(h => h.downloadUrl !== item.downloadUrl);
+    
+    // Add to top of list
     appState.history.unshift(item);
     
+    // Keep max 15 items
     if (appState.history.length > 15) {
         appState.history.pop();
     }
@@ -543,6 +565,7 @@ function renderHistory() {
             historyGrid.appendChild(card);
         });
         
+        // Re-apply Lucide Icons to injected content
         lucide.createIcons();
     }
 }
@@ -579,10 +602,12 @@ function showToast(type, title, message) {
     toastContainer.appendChild(toast);
     lucide.createIcons();
     
+    // Animate In
     setTimeout(() => {
         toast.style.transform = "translateX(0)";
     }, 10);
     
+    // Auto Remove after 4s
     const hideTimeout = setTimeout(() => {
         toast.classList.add("hide");
         setTimeout(() => {

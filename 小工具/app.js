@@ -3,6 +3,7 @@
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+    const container   = document.querySelector('.dashboard-container');
     const navItems    = document.querySelectorAll('.nav-item');
     const iframe      = document.getElementById('tool-viewport');
     const loader      = document.getElementById('tool-loader');
@@ -23,12 +24,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── 收合側邊欄 ──
     function collapseSidebar() {
         sidebar.classList.add('collapsed');
+        if (container) container.classList.add('sidebar-collapsed');
         expandFab.classList.add('visible');
     }
 
     // ── 展開側邊欄 ──
     function expandSidebar() {
         sidebar.classList.remove('collapsed');
+        if (container) container.classList.remove('sidebar-collapsed');
         expandFab.classList.remove('visible');
     }
 
@@ -106,8 +109,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btn) switchTool(btn);
     }
 
-    // ── 監聽方向改變（matchMedia 事件）──
-    landscapeQuery.addEventListener('change', handleLayout);
+    // ── 監聽方向改變（matchMedia 事件，處理舊版瀏覽器相容性）──
+    if (typeof landscapeQuery.addEventListener === 'function') {
+        landscapeQuery.addEventListener('change', handleLayout);
+    } else if (typeof landscapeQuery.addListener === 'function') {
+        landscapeQuery.addListener(handleLayout);
+    }
 
     // ── 初始化 ──
     handleHashRoute();

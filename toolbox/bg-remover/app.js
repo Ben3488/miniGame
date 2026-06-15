@@ -549,6 +549,7 @@ function runMagicWand(startX, startY, tolVal, isSliderAdjustment = false) {
     const b0 = origData[startIdx+2];
 
     // Tolerance range in RGB distance space (max is ~442)
+    // Map slider 0-100 to range 0-300 (Euclidean distance threshold)
     const maxDistanceThreshold = tolVal * 3.0; 
 
     // Queue-based DFS Flood Fill
@@ -703,6 +704,7 @@ function drawBrushTip(cx, cy) {
 
 function drawBrushStroke(x1, y1, x2, y2) {
     const distance = Math.hypot(x2 - x1, y2 - y1);
+    // Draw brush circles iteratively along mouse path to prevent spacing gaps
     const steps = Math.max(Math.ceil(distance / (brushSize * 0.05)), 1);
 
     for (let i = 0; i <= steps; i++) {
@@ -741,6 +743,7 @@ function renderDisplay() {
 
 function drawSelectedBackground() {
     if (backgroundType === 'transparent') {
+        // Checkerboard is in CSS wrapper, draw nothing
         return;
     }
 
@@ -757,6 +760,7 @@ function drawSelectedBackground() {
             displayCtx.fillRect(0, 0, width, height);
         }
     } else if (backgroundType === 'image' && backgroundImage) {
+        // Draw background image stretched/contained
         displayCtx.drawImage(backgroundImage, 0, 0, width, height);
     }
 }
@@ -861,6 +865,7 @@ function setupBackgroundHandlers() {
 
 // --- HISTORY STATE LOGIC ---
 function saveHistoryState() {
+    // Save state
     const maskData = maskCtx.getImageData(0, 0, width, height);
     history = history.slice(0, historyIndex + 1);
     history.push(maskData);
@@ -878,6 +883,7 @@ function undo() {
         const maskState = history[historyIndex];
         maskCtx.putImageData(maskState, 0, 0);
         
+        // Clear active selection parameters
         lastClickPos = null;
         lastClickedColor = null;
 
@@ -956,6 +962,7 @@ function setupActionButtons() {
 
 function setupKeyboardShortcuts() {
     window.addEventListener('keydown', (e) => {
+        // Space bar panning toggle
         if (e.code === 'Space' && !isSpaceBarHeld) {
             isSpaceBarHeld = true;
             appViewport.classList.add('grab-active');
@@ -963,6 +970,7 @@ function setupKeyboardShortcuts() {
             e.preventDefault();
         }
 
+        // Shortcuts Ctrl+Z / Ctrl+Y
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
             e.preventDefault();
             undo();
@@ -972,6 +980,7 @@ function setupKeyboardShortcuts() {
             redo();
         }
 
+        // Shortcuts Zoom Ctrl+= / Ctrl+- / Ctrl+0
         if ((e.ctrlKey || e.metaKey) && e.key === '=') {
             e.preventDefault();
             zoomIn();
@@ -1005,6 +1014,7 @@ function runAIBackgroundRemoval() {
         return;
     }
 
+    // Prepare loading overlay
     aiCancelled = false;
     aiLoadingOverlay.classList.remove('hidden');
     aiProgressBar.style.width = '0%';
@@ -1015,6 +1025,7 @@ function runAIBackgroundRemoval() {
         aiLoadingOverlay.classList.add('hidden');
     };
 
+    // Use current image data as URL source for imgly
     const imageSource = originalCanvas.toDataURL('image/png');
 
     const config = {
@@ -1044,18 +1055,23 @@ function runAIBackgroundRemoval() {
             const url = URL.createObjectURL(blob);
             const tempImg = new Image();
             tempImg.onload = () => {
+                // Apply the returned image's alpha mask
                 maskCtx.clearRect(0, 0, width, height);
                 maskCtx.drawImage(tempImg, 0, 0);
 
+                // Process the alpha channel into a clean binary white-mask
                 const maskDataObj = maskCtx.getImageData(0, 0, width, height);
                 const maskData = maskDataObj.data;
                 for (let i = 0; i < maskData.length; i += 4) {
                     const alpha = maskData[i + 3];
                     if (alpha > 10) {
+                        // Make pixels white (opaque background) for keeping
                         maskData[i] = 255;
                         maskData[i+1] = 255;
                         maskData[i+2] = 255;
+                        // Retain alpha for smooth edges!
                     } else {
+                        // Completely erase
                         maskData[i] = 0;
                         maskData[i+1] = 0;
                         maskData[i+2] = 0;
@@ -1064,6 +1080,7 @@ function runAIBackgroundRemoval() {
                 }
                 maskCtx.putImageData(maskDataObj, 0, 0);
                 
+                // Clear selection states
                 lastClickPos = null;
                 lastClickedColor = null;
 
@@ -1084,9 +1101,11 @@ function runAIBackgroundRemoval() {
 
 // --- SAMPLE IMAGE GENERATOR FOR TESTING ---
 function loadSampleImage() {
+    // Generate a 800x600 mock image with distinct shapes
     width = 800;
     height = 600;
 
+    // Resize canvases
     originalCanvas.width = width;
     originalCanvas.height = height;
     maskCanvas.width = width;
@@ -1096,32 +1115,40 @@ function loadSampleImage() {
     tempCanvas.width = width;
     tempCanvas.height = height;
 
+    // Draw a nice subject on a distinct solid background
+    // Background: a bright green (so they can test Chroma Key green screen!)
     originalCtx.fillStyle = '#00ff00'; 
     originalCtx.fillRect(0, 0, width, height);
 
+    // Let's draw a nice character (a cute chick/duck)
+    // 1. Draw a cute yellow circular face
     originalCtx.fillStyle = '#ffcc00'; // Yellow
     originalCtx.beginPath();
     originalCtx.arc(400, 300, 150, 0, Math.PI * 2);
     originalCtx.fill();
 
+    // 2. Draw pink cheeks
     originalCtx.fillStyle = '#ff9999'; // Pink
     originalCtx.beginPath();
     originalCtx.arc(300, 320, 25, 0, Math.PI * 2);
     originalCtx.arc(500, 320, 25, 0, Math.PI * 2);
     originalCtx.fill();
 
+    // 3. Draw eyes
     originalCtx.fillStyle = '#222222'; // Dark grey
     originalCtx.beginPath();
     originalCtx.arc(340, 260, 15, 0, Math.PI * 2);
     originalCtx.arc(460, 260, 15, 0, Math.PI * 2);
     originalCtx.fill();
     
+    // Eye shines
     originalCtx.fillStyle = '#ffffff';
     originalCtx.beginPath();
     originalCtx.arc(345, 255, 6, 0, Math.PI * 2);
     originalCtx.arc(465, 255, 6, 0, Math.PI * 2);
     originalCtx.fill();
 
+    // 4. Draw orange beak
     originalCtx.fillStyle = '#ff6600'; // Orange
     originalCtx.beginPath();
     originalCtx.moveTo(370, 290);
@@ -1130,6 +1157,7 @@ function loadSampleImage() {
     originalCtx.closePath();
     originalCtx.fill();
 
+    // 5. Draw a red ribbon bow
     originalCtx.fillStyle = '#ff3333';
     originalCtx.beginPath();
     originalCtx.arc(280, 180, 25, 0, Math.PI * 2);
@@ -1140,14 +1168,17 @@ function loadSampleImage() {
     originalCtx.arc(300, 180, 12, 0, Math.PI * 2);
     originalCtx.fill();
 
+    // Convert to Image object to match normal file load pipeline
     const dataUrl = originalCanvas.toDataURL();
     const img = new Image();
     img.onload = () => {
         originalImage = img;
 
+        // Set mask to full opaque white
         maskCtx.fillStyle = '#ffffff';
         maskCtx.fillRect(0, 0, width, height);
 
+        // Reset history
         history = [];
         historyIndex = -1;
         saveHistoryState();
@@ -1155,12 +1186,14 @@ function loadSampleImage() {
         lastClickPos = null;
         lastClickedColor = null;
 
+        // Show UI panels
         panelUpload.classList.add('hidden');
         panelEditor.classList.remove('hidden');
         panelBackground.classList.remove('hidden');
         canvasEmptyState.classList.add('hidden');
         appViewport.classList.remove('hidden');
 
+        // Enable actions
         btnCompare.disabled = false;
         btnResetImage.disabled = false;
         btnDownload.disabled = false;

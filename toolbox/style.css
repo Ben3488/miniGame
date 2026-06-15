@@ -432,6 +432,17 @@ body {
     display: none !important;
 }
 
+.dashboard-container.sidebar-collapsed {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: 1fr !important;
+    padding: 0 !important;
+    gap: 0 !important;
+}
+
+.dashboard-container.sidebar-collapsed .dashboard-main {
+    border-radius: 0 !important;
+}
+
 /* =======================================================
    直立模式（手機 ≤ 900px，portrait）
    ======================================================= */

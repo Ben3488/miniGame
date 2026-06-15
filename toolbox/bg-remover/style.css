@@ -166,7 +166,6 @@ button {
     cursor: not-allowed;
     transform: none !important;
     box-shadow: none !important;
-    /* Allow pointer events so tooltips can still work */
 }
 
 .secondary-btn {

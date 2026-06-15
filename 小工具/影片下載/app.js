@@ -419,7 +419,7 @@ async function analyzeAndDownload(videoUrl) {
             resultQualityTag.textContent = selectedQuality;
             
             const serverName = appState.servers.find(s => s.url === appState.activeServerUrl)?.name || "自訂伺服器";
-            resultServerTag.textContent = `伺iver: ${serverName}`;
+            resultServerTag.textContent = `伺服器: ${serverName}`;
             
             // Set save button link
             saveFileBtn.href = downloadUrl;

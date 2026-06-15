@@ -40,7 +40,21 @@ if ($method === 'GET') {
             echo json_encode(['success' => false, 'message' => '無法讀取資料檔']);
             exit;
         }
-        echo $content;
+        $decoded = json_decode($content, true);
+        if (is_array($decoded)) {
+            if (!isset($decoded['meta']) || !is_array($decoded['meta'])) {
+                $decoded['meta'] = [];
+            }
+            if (empty($decoded['meta']['updatedAt'])) {
+                $decoded['meta']['updatedAt'] = gmdate('c');
+            }
+            if (empty($decoded['meta']['revision'])) {
+                $decoded['meta']['revision'] = sha1($content);
+            }
+            echo json_encode($decoded, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        } else {
+            echo $content;
+        }
     } else {
         // 返回空狀態，讓前端使用預設資料初始化
         echo json_encode(['status' => 'empty']);
@@ -64,6 +78,13 @@ if ($method === 'POST') {
         exit;
     }
 
+    $updatedAt = gmdate('c');
+    $revisionSource = $updatedAt . '|' . json_encode($decoded, JSON_UNESCAPED_UNICODE);
+    $decoded['meta'] = [
+        'updatedAt' => $updatedAt,
+        'revision' => sha1($revisionSource)
+    ];
+
     // 格式化寫入 JSON 檔，保護非 ASCII 字元 (如中文)
     $jsonFlags = JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT;
     $bytesWritten = @file_put_contents($dataFile, json_encode($decoded, $jsonFlags));
@@ -73,7 +94,10 @@ if ($method === 'POST') {
         exit;
     }
 
-    echo json_encode(['success' => true]);
+    echo json_encode([
+        'success' => true,
+        'meta' => $decoded['meta']
+    ]);
     exit;
 }
 
