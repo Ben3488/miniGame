@@ -43,6 +43,11 @@ env/
 .env.test.local
 .env.production.local
 
+# Local app settings / user data snapshots
+toolbox/scoreboard/local-settings.json
+toolbox/scoreboard/local-data.json
+toolbox/scoreboard/*.local.json
+
 # Logs
 logs
 *.log

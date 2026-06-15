@@ -197,6 +197,13 @@ function normalizeKid(kid, index) {
     };
 }
 
+function mergeKidsWithDefaults(savedKids = []) {
+    return DEFAULT_KIDS.map((defaultKid, index) => {
+        const matchedKid = savedKids.find(kid => kid.id === defaultKid.id) || savedKids[index] || defaultKid;
+        return normalizeKid(matchedKid, index);
+    });
+}
+
 /* ==========================================================================
    LocalStorage 資料讀寫
    ========================================================================== */
@@ -209,7 +216,7 @@ function loadState() {
         const savedTitle = localStorage.getItem('kids_scoreboard_title');
         const savedSubtitle = localStorage.getItem('kids_scoreboard_subtitle');
 
-        if (savedVersion !== STORAGE_VERSION || !savedKids || !savedHistory) {
+        if (!savedKids && !savedHistory && !savedTitle && !savedSubtitle) {
             const defaults = getDefaultState();
             state.kids = defaults.kids;
             state.history = defaults.history;
@@ -220,7 +227,7 @@ function loadState() {
         }
 
         if (savedKids) {
-            state.kids = JSON.parse(savedKids).map(normalizeKid);
+            state.kids = mergeKidsWithDefaults(JSON.parse(savedKids));
             const isOldDefault = state.kids.length === 3 &&
                                  state.kids.some(k => k.name === '小明' || k.name === '小華' || k.name === '小強');
             if (isOldDefault) {
@@ -247,6 +254,11 @@ function loadState() {
             state.subtitle = savedSubtitle;
         } else {
             state.subtitle = getDefaultState().subtitle;
+        }
+
+        // 升級資料格式時只補新欄位，不覆蓋使用者既有資料。
+        if (savedVersion !== STORAGE_VERSION) {
+            saveState();
         }
     } catch (e) {
         console.error('讀取 LocalStorage 失敗，使用預設值。', e);
