@@ -1160,6 +1160,23 @@ body {
     border-radius: 16px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.06);
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.emoji-selector::-webkit-scrollbar {
+    width: 6px;
+}
+.emoji-selector::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+}
+.emoji-selector::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+}
+.emoji-selector::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .emoji-option {
@@ -1433,51 +1450,57 @@ body {
         position: static !important;
     }
 
+    /* 橫屏水果位置優化 */
     .kid-fruit-emoji {
         position: absolute !important;
-        top: 28px !important;
-        left: 8px !important;
+        top: 16px !important;
+        left: 90px !important;
         font-size: 1.25rem !important;
         z-index: 10 !important;
     }
 
+    /* 橫屏名字位置優化 */
     .kid-name {
         position: absolute !important;
         top: 18px !important;
-        left: 106px !important;
+        left: 120px !important;
         font-size: 1.05rem !important;
     }
 
+    /* 橫屏快捷鍵位置優化 */
     .btn-edit-profile {
         position: absolute !important;
-        top: 28px !important;
-        right: 80px !important;
+        top: 10px !important;
+        left: 10px !important;
         width: 22px !important;
         height: 22px !important;
         padding: 3px !important;
         z-index: 15 !important;
     }
 
+    /* 橫屏快捷鍵圖標大小優化 */
     .btn-edit-profile svg {
-        width: 12px !important;
-        height: 12px !important;
+        width: 16px !important;
+        height: 16px !important;
     }
 
+    /* 橫屏快捷鍵內容區域優化 */
     .kid-card-body-row {
         position: static !important;
         margin: 0 !important;
         padding: 0 !important;
     }
 
+    /* 橫屏頭像位置優化 */
     .avatar-container {
         position: absolute !important;
         top: 10px !important;
-        left: 34px !important;
-        width: 62px !important;
-        height: 62px !important;
-        flex: 0 0 62px !important;
+        left: 10px !important;
+        width: 80px !important;
+        height: 80px !important;
+        flex: 0 0 80px !important;
         flex-shrink: 0 !important;
-        box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-color) 15%, transparent) !important;
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--theme-color) 15%, transparent) !important;
         z-index: 5 !important;
     }
 
@@ -1485,6 +1508,7 @@ body {
         font-size: 1.95rem !important;
     }
 
+    /* 橫屏獎牌位置優化 */
     .medal-badge {
         width: 20px !important;
         height: 20px !important;
@@ -1498,19 +1522,20 @@ body {
         stroke-width: 2.2px !important;
     }
 
+    /* 橫屏分數位置優化 */
     .score-circle-wrapper {
         position: absolute !important;
         top: 10px !important;
-        right: 8px !important;
-        width: 62px !important;
-        height: 62px !important;
-        flex: 0 0 62px !important;
+        right: 0px !important;
+        width: 80px !important;
+        height: 80px !important;
+        flex: 0 0 80px !important;
         flex-shrink: 0 !important;
     }
 
     .score-svg-ring {
-        width: 62px !important;
-        height: 62px !important;
+        width: 80px !important;
+        height: 80px !important;
     }
 
     .score-number {
@@ -1522,10 +1547,11 @@ body {
         margin-top: 1px !important;
     }
 
+    /* 橫屏五星位置 */
     .milestones-stars {
         position: absolute !important;
-        top: 44px !important;
-        left: 106px !important;
+        top: 60px !important;
+        left: 90px !important;
         gap: 3px !important;
         margin: 0 !important;
         justify-content: flex-start !important;
@@ -1721,7 +1747,7 @@ body {
         border-radius: 20px !important;
         display: grid !important;
         grid-template-columns: 70px 1fr 70px !important;
-        grid-template-rows: auto auto auto auto auto !important;
+        grid-template-rows: auto auto auto auto !important;
         row-gap: 10px !important;
         column-gap: 10px !important;
         align-items: center !important;
@@ -1883,7 +1909,7 @@ body {
     /* 常用快捷鍵：2 欄大按鈕 */
     .quick-actions-container {
         grid-column: 1 / 4 !important;
-        grid-row: 4 !important;
+        grid-row: 3 !important;
         margin-top: 2px !important;
         gap: 4px !important;
     }
@@ -1925,7 +1951,7 @@ body {
     /* 控制加減按鈕固定在底部 */
     .controls-container {
         grid-column: 1 / 4 !important;
-        grid-row: 5 !important;
+        grid-row: 4 !important;
         display: flex !important;
         justify-content: center !important;
         gap: 32px !important;
@@ -2099,7 +2125,8 @@ body {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-top: 1px solid rgba(136, 177, 255, 0.12);
-    display: none; /* 預設在電腦版和橫屏隱藏 */
+    display: none;
+    /* 預設在電腦版和橫屏隱藏 */
     justify-content: space-around;
     align-items: center;
     z-index: 1000;
@@ -2150,4 +2177,78 @@ body {
 /* 確保 Header 中的選單按鈕預設在電腦版隱藏 */
 .btn-menu {
     display: none;
+}
+
+/* ==========================================================================
+   常用原因編輯與右上按鈕樣式
+   ========================================================================== */
+.btn-edit-presets {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.02);
+    transition: var(--transition-smooth);
+}
+
+.btn-edit-presets:hover {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.btn-edit-presets svg {
+    width: 12px;
+    height: 12px;
+}
+
+.preset-edit-row {
+    display: grid;
+    grid-template-columns: 30px 60px 1fr 80px;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    transition: var(--transition-smooth);
+}
+
+.preset-edit-row:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.preset-edit-row input {
+    padding: 8px 10px !important;
+    font-size: 0.95rem !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: rgba(6, 11, 23, 0.8) !important;
+    color: #ffffff !important;
+    outline: none !important;
+    transition: var(--transition-smooth) !important;
+}
+
+.preset-edit-row input:focus {
+    border-color: rgba(86, 164, 255, 0.6) !important;
+    box-shadow: 0 0 0 3px rgba(86, 164, 255, 0.12) !important;
+}
+
+.preset-edit-row input.preset-edit-icon {
+    text-align: center !important;
+    font-size: 1.25rem !important;
+}
+
+.preset-edit-row input.preset-edit-val {
+    text-align: center !important;
+    font-weight: 700 !important;
 }

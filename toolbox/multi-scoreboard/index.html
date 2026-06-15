@@ -21,7 +21,7 @@
         <div class="bubble bubble-3"></div>
     </div>
 
-    <!-- Hidden SVG Definitions for Gradients -->
+    <!-- Hidden SVG Definitions for Gradients (10 Beautiful Themes) -->
     <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
         <defs>
             <linearGradient id="gradient-orange" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -36,6 +36,34 @@
                 <stop offset="0%" stop-color="#3b82f6" />
                 <stop offset="100%" stop-color="#00f2fe" />
             </linearGradient>
+            <linearGradient id="gradient-green" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#10b981" />
+                <stop offset="100%" stop-color="#6ee7b7" />
+            </linearGradient>
+            <linearGradient id="gradient-purple" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8b5cf6" />
+                <stop offset="100%" stop-color="#d8b4fe" />
+            </linearGradient>
+            <linearGradient id="gradient-teal" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0d9488" />
+                <stop offset="100%" stop-color="#2dd4bf" />
+            </linearGradient>
+            <linearGradient id="gradient-red" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ef4444" />
+                <stop offset="100%" stop-color="#f87171" />
+            </linearGradient>
+            <linearGradient id="gradient-indigo" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#6366f1" />
+                <stop offset="100%" stop-color="#a5b4fc" />
+            </linearGradient>
+            <linearGradient id="gradient-amber" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#d97706" />
+                <stop offset="100%" stop-color="#fbbf24" />
+            </linearGradient>
+            <linearGradient id="gradient-rose" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f43f5e" />
+                <stop offset="100%" stop-color="#fda4af" />
+            </linearGradient>
         </defs>
     </svg>
 
@@ -46,7 +74,7 @@
                 <span class="header-logo">🏆</span>
                 <div>
                     <div class="scoreboard-title-row">
-                        <h1 id="scoreboard-title-text">寶貝表現計分板</h1>
+                        <h1 id="scoreboard-title-text">兒童表現計分板</h1>
                         <button id="btn-edit-scoreboard-title" class="btn-edit-icon" title="修改計分板名稱">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                         </button>
@@ -59,6 +87,10 @@
                 </div>
             </div>
             <div class="header-right-buttons">
+                <button id="btn-manage-kids" class="btn btn-secondary" title="成員設定與人數管理 (最少 2 人，最多 10 人)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span>管理成員</span>
+                </button>
                 <button id="btn-reset-all" class="btn btn-danger" title="重設所有兒童的分數與紀錄">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-ccw"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                     <span>重設全部</span>
@@ -114,6 +146,30 @@
             <div class="modal-footer">
                 <button id="btn-title-modal-cancel" class="btn btn-secondary">取消</button>
                 <button id="btn-title-modal-save" class="btn btn-primary">儲存修改</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Members Modal -->
+    <div id="modal-manage-kids" class="modal-overlay">
+        <div class="modal-card glass-panel">
+            <div class="modal-header">
+                <h3>👥 管理成員人數</h3>
+                <button class="modal-close" id="btn-manage-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="manage-desc" style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 12px; line-height: 1.4;">
+                    設定目前參與的兒童名單，並自動指派專屬的主題色彩（最少 2 人，最多 10 人）。
+                </p>
+                <div class="kids-list-container" id="manage-kids-list" style="max-height: 280px; overflow-y: auto; margin-bottom: 16px; display: flex; flex-direction: column; gap: 10px; padding-right: 4px;">
+                    <!-- Kids rows will be dynamically populated -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-add-kid" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-plus" style="margin-right: 6px;"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+                    <span>新增成員</span>
+                </button>
             </div>
         </div>
     </div>
@@ -216,11 +272,28 @@
             </div>
             <div class="modal-body">
                 <p>此動作將會把**所有寶貝的分數歸零**，並**清空所有歷史紀錄**！</p>
-                <p class="text-muted">（注意：寶貝的姓名與頭像仍會保留）</p>
+                <p class="text-muted">（注意：成員與其頭像設定仍會保留）</p>
             </div>
             <div class="modal-footer">
                 <button id="btn-reset-cancel" class="btn btn-secondary">取消</button>
                 <button id="btn-reset-confirm" class="btn btn-danger">確認重設</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div id="modal-delete-confirm" class="modal-overlay">
+        <div class="modal-card glass-panel alert-modal">
+            <div class="modal-header">
+                <h3>⚠️ 確認刪除成員？</h3>
+                <button class="modal-close" id="btn-delete-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>此動作將會把成員「<strong id="delete-confirm-name">寶貝</strong>」從計分板中移除，其**分數與紀錄也將一併被清空且無法復原**！</p>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-delete-cancel" class="btn btn-secondary">取消</button>
+                <button id="btn-delete-confirm" class="btn btn-danger">確認刪除</button>
             </div>
         </div>
     </div>
@@ -235,17 +308,13 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clipboard-list"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22h6"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h6"/></svg>
             <span>動態紀錄</span>
         </a>
-        <a href="#" class="bottom-nav-item">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bar-chart-3"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
-            <span>統計報表</span>
+        <a href="#" class="bottom-nav-item" onclick="document.getElementById('btn-manage-kids').click(); return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>成員設定</span>
         </a>
         <a href="#" class="bottom-nav-item" onclick="document.getElementById('btn-edit-scoreboard-title').click(); return false;">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
             <span>設定</span>
-        </a>
-        <a href="#" class="bottom-nav-item" id="btn-more-trigger">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-more-horizontal"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-            <span>更多</span>
         </a>
     </nav>
 

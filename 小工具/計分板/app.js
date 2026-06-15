@@ -7,10 +7,32 @@ const STORAGE_VERSION = 'scoreboard-mockup-v3';
 const MAX_AVATAR_UPLOADS = 5;
 const SYNC_POLL_INTERVAL_MS = 2000;
 
-// 預設大頭貼 Emoji 列表
+// 預設常用原因與點數 (9 個項目)
+const DEFAULT_PRESETS = [
+    { icon: '🧹', label: '做家務', val: 3 },
+    { icon: '🧸', label: '收拾玩具', val: 2 },
+    { icon: '🛌', label: '摺被子', val: 1 },
+    { icon: '💯', label: '考滿分', val: 10 },
+    { icon: '📝', label: '寫作業', val: 2 },
+    { icon: '🍙', label: '乖乖吃飯', val: 1 },
+    { icon: '📚', label: '主動看書', val: 2 },
+    { icon: '🌙', label: '準時睡覺', val: 1 },
+    { icon: '🤝', label: '分享禮讓', val: 2 }
+];
+
+// 預設大頭貼 Emoji 列表 (收錄 80 款可愛兒童表情、笑臉、可愛動物及美食水果系列)
 const CURED_EMOJIS = [
-    '👶', '👧', '👦', '🐱', '🐶', '🦄', '🦖', '🦁', '🐼', '🦊',
-    '🐯', '🐰', '🐨', '🐷', '🐸', '🚀', '⭐', '🌈', '🎨', '⚽'
+    // 笑臉與人物 (Smiles & Kids) - 20款
+    '👶', '👧', '👦', '🧒', '👱', '😀', '😃', '😄', '😁', '😆',
+    '😊', '😍', '🥰', '🥳', '😎', '🤩', '👽', '🤖', '🦸', '🧙',
+    // 可愛動物 (Animals) - 30款
+    '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯',
+    '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🦆', '🦉', '🦄',
+    '🦖', '🦕', '🐙', '🦑', '🐠', '🐬', '🐳', '🐢', '🦋', '🐞',
+    // 美食與水果 (Food & Fruit) - 30款
+    '🍎', '🍊', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭',
+    '🍍', '🥥', '🥝', '🍅', '🥑', '🍔', '🍟', '🍕', '🍩', '🍪',
+    '🧁', '🍫', '🍬', '🍭', '🍦', '🍨', '🍧', '🍰', '🎂', '🍙'
 ];
 
 function createIllustratedAvatar({ bgStart, bgEnd, skin, hair, shirt, accent, eye = '#2d3748' }) {
@@ -160,6 +182,7 @@ const RING_CIRCUMFERENCE = 439.82;
 let state = {
     kids: [],
     history: [],
+    presets: [],
     editingKidId: null,
     selectedEmoji: '',
     title: '寶貝表現計分板',
@@ -173,9 +196,26 @@ function getDefaultState() {
     return {
         kids: JSON.parse(JSON.stringify(DEFAULT_KIDS)),
         history: JSON.parse(JSON.stringify(DEFAULT_HISTORY)),
+        presets: JSON.parse(JSON.stringify(DEFAULT_PRESETS)),
         title: '寶貝表現計分板',
         subtitle: '記錄寶貝的日常表現，累積100分拿大獎！'
     };
+}
+
+function normalizePresets(loadedPresets = []) {
+    if (!Array.isArray(loadedPresets) || loadedPresets.length < 9) {
+        const presets = Array.isArray(loadedPresets) ? [...loadedPresets] : [];
+        while (presets.length < 9) {
+            const fallback = DEFAULT_PRESETS[presets.length] || DEFAULT_PRESETS[0];
+            presets.push(JSON.parse(JSON.stringify(fallback)));
+        }
+        return presets.slice(0, 9);
+    }
+    return loadedPresets.slice(0, 9).map(p => ({
+        icon: p.icon || '⭐',
+        label: p.label || '事件',
+        val: typeof p.val === 'number' ? p.val : 1
+    }));
 }
 
 function dedupeAvatarGallery(photos = []) {
@@ -215,6 +255,7 @@ function extractRevision(payload) {
 function applyLoadedState(sourceData) {
     state.kids = mergeKidsWithDefaults(sourceData.kids || []);
     state.history = sourceData.history || [];
+    state.presets = normalizePresets(sourceData.presets || []);
     state.title = sourceData.title || getDefaultState().title;
     state.subtitle = sourceData.subtitle || getDefaultState().subtitle;
     lastServerRevision = extractRevision(sourceData) || lastServerRevision;
@@ -297,6 +338,7 @@ function saveToLocalStorage() {
         localStorage.setItem(STORAGE_VERSION_KEY, STORAGE_VERSION);
         localStorage.setItem('kids_scoreboard_data', JSON.stringify(state.kids));
         localStorage.setItem('kids_scoreboard_history', JSON.stringify(state.history));
+        localStorage.setItem('kids_scoreboard_presets', JSON.stringify(state.presets));
         localStorage.setItem('kids_scoreboard_title', state.title);
         localStorage.setItem('kids_scoreboard_subtitle', state.subtitle);
     } catch (e) {
@@ -376,6 +418,7 @@ async function loadState() {
         const savedVersion = localStorage.getItem(STORAGE_VERSION_KEY);
         const savedKids = localStorage.getItem('kids_scoreboard_data');
         const savedHistory = localStorage.getItem('kids_scoreboard_history');
+        const savedPresets = localStorage.getItem('kids_scoreboard_presets');
         const savedTitle = localStorage.getItem('kids_scoreboard_title');
         const savedSubtitle = localStorage.getItem('kids_scoreboard_subtitle');
 
@@ -383,6 +426,7 @@ async function loadState() {
             const defaults = getDefaultState();
             state.kids = defaults.kids;
             state.history = defaults.history;
+            state.presets = defaults.presets;
             state.title = defaults.title;
             state.subtitle = defaults.subtitle;
             saveToLocalStorage();
@@ -405,6 +449,12 @@ async function loadState() {
             state.history = JSON.parse(savedHistory);
         } else {
             state.history = getDefaultState().history;
+        }
+
+        if (savedPresets) {
+            state.presets = normalizePresets(JSON.parse(savedPresets));
+        } else {
+            state.presets = normalizePresets([]);
         }
 
         if (savedTitle) {
@@ -440,6 +490,7 @@ async function saveState() {
         const payload = {
             kids: state.kids,
             history: state.history,
+            presets: state.presets,
             title: state.title,
             subtitle: state.subtitle
         };
@@ -563,7 +614,17 @@ function createKidCardHTML(kid) {
         `;
     }
 
-    const isFullScore = kid.score === 100;
+    let presetsHTML = '';
+    state.presets.forEach(preset => {
+        const valText = preset.val >= 0 ? `+${preset.val}` : `${preset.val}`;
+        presetsHTML += `
+            <button class="quick-btn" onclick="quickScore('${kid.id}', '${preset.label}', ${preset.val})" title="${preset.label} ${valText}">
+                <span class="quick-btn-icon">${preset.icon}</span>
+                <span class="quick-btn-label">${preset.label}</span>
+                <span class="quick-btn-val">${valText}</span>
+            </button>
+        `;
+    });
 
     return `
         <article class="kid-card glass-panel" id="card-${kid.id}" style="--card-gradient: var(--${kid.id}-gradient, url(#${kid.gradientId})); --card-glow: ${kid.glowColor}; --card-glow-strong: ${kid.glowStrong}; --theme-color: ${kid.tagColor};">
@@ -614,51 +675,17 @@ function createKidCardHTML(kid) {
                 ${starsHTML}
             </div>
 
-            <!-- 備註輸入欄位 -->
-            <div class="note-input-container">
-                <div class="note-input-wrapper">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="note-input-icon"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    <input type="text" class="note-input" id="note-${kid.id}" placeholder="輸入加/減分原因（例如：幫忙洗碗）" maxlength="30">
-                </div>
-            </div>
-
             <!-- 常用原因與點數 -->
             <div class="quick-actions-container">
                 <div class="quick-actions-header">
                     <span class="quick-actions-title">常用原因與點數</span>
-                    <span class="quick-actions-hint">✦ 點擊後自動填入原因並立即加分</span>
+                    <button class="btn-edit-presets" onclick="openPresetsModal()" title="修改常用原因與點數">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <span>設定</span>
+                    </button>
                 </div>
                 <div class="quick-actions-grid">
-                    <button class="quick-btn" onclick="quickScore('${kid.id}', '做家務', 3)" title="做家務 +3">
-                        <span class="quick-btn-icon">🧹</span><span class="quick-btn-label">做家務</span><span class="quick-btn-val">+3</span>
-                    </button>
-                    <button class="quick-btn" onclick="quickScore('${kid.id}', '收拾玩具', 2)" title="收拾玩具 +2">
-                        <span class="quick-btn-icon">🧸</span><span class="quick-btn-label">收拾玩具</span><span class="quick-btn-val">+2</span>
-                    </button>
-                    <button class="quick-btn" onclick="quickScore('${kid.id}', '主動摺被子', 1)" title="主動摺被子 +1">
-                        <span class="quick-btn-icon">🛌</span><span class="quick-btn-label">主動摺被子</span><span class="quick-btn-val">+1</span>
-                    </button>
-                    <button class="quick-btn" onclick="quickScore('${kid.id}', '考滿分', 10)" title="考滿分 +10">
-                        <span class="quick-btn-icon">💯</span><span class="quick-btn-label">考滿分</span><span class="quick-btn-val">+10</span>
-                    </button>
-                    <button class="quick-btn" onclick="quickScore('${kid.id}', '完成作業', 2)" title="完成作業 +2">
-                        <span class="quick-btn-icon">📝</span><span class="quick-btn-label">完成作業</span><span class="quick-btn-val">+2</span>
-                    </button>
-                    <button class="quick-btn" onclick="quickScore('${kid.id}', '考及格/有進步', 1)" title="考及格/有進步 +1">
-                        <span class="quick-btn-icon">📈</span><span class="quick-btn-label">考及格/有進步</span><span class="quick-btn-val">+1</span>
-                    </button>
-                    <button class="quick-btn" onclick="quickScore('${kid.id}', '主動看書', 2)" title="主動看書 +2">
-                        <span class="quick-btn-icon">📚</span><span class="quick-btn-label">主動看書</span><span class="quick-btn-val">+2</span>
-                    </button>
-                    <button class="quick-btn" onclick="quickScore('${kid.id}', '準時睡覺', 1)" title="準時睡覺 +1">
-                        <span class="quick-btn-icon">🌙</span><span class="quick-btn-label">準時睡覺</span><span class="quick-btn-val">+1</span>
-                    </button>
-                    <button class="quick-btn" onclick="quickScore('${kid.id}', '乖乖把飯吃完', 1)" title="乖乖把飯吃完 +1">
-                        <span class="quick-btn-icon">🍙</span><span class="quick-btn-label">乖乖把飯吃完</span><span class="quick-btn-val">+1</span>
-                    </button>
-                    <button class="quick-btn" onclick="quickScore('${kid.id}', '分享禮讓', 2)" title="分享禮讓 +2">
-                        <span class="quick-btn-icon">🤝</span><span class="quick-btn-label">分享禮讓</span><span class="quick-btn-val">+2</span>
-                    </button>
+                    ${presetsHTML}
                 </div>
             </div>
 
@@ -822,7 +849,7 @@ function renderHistory() {
    互動邏輯：分數操作
    ========================================================================== */
 
-window.changeScore = function(kidId, amount) {
+window.changeScore = function(kidId, amount, reason = '') {
     const kid = state.kids.find(k => k.id === kidId);
     if (!kid) return;
     
@@ -837,10 +864,6 @@ window.changeScore = function(kidId, amount) {
     if (newScore === prevScore) return;
     
     kid.score = newScore;
-    
-    // 獲取輸入原因備註
-    const inputEl = document.getElementById(`note-${kidId}`);
-    const reason = inputEl ? inputEl.value : '';
     
     // 新增歷史紀錄
     addLog(kid.id, kid.name, amount, reason, kid.tagColor);
@@ -857,19 +880,10 @@ window.changeScore = function(kidId, amount) {
             addLog(kid.id, kid.name, 0, '恭喜達到 100 分滿分！🎉🏆 太棒了！', '#d97706');
         }, 300);
     }
-    
-    // 清空該卡片的備註輸入框
-    if (inputEl) {
-        inputEl.value = '';
-    }
 };
 
 window.quickScore = function(kidId, reason, amount) {
-    const inputEl = document.getElementById(`note-${kidId}`);
-    if (inputEl) {
-        inputEl.value = reason;
-    }
-    window.changeScore(kidId, amount);
+    window.changeScore(kidId, amount, reason);
 };
 
 /* ==========================================================================
@@ -1186,6 +1200,169 @@ document.getElementById('btn-title-modal-save')?.addEventListener('click', () =>
 titleModalEl?.addEventListener('click', (e) => {
     if (e.target === titleModalEl) {
         closeTitleModal();
+    }
+});
+
+/* ==========================================================================
+   常用原因與點數 (Presets) 編輯 Modal 功能
+   ========================================================================== */
+const presetsModalEl = document.getElementById('modal-edit-presets');
+const presetsEditListEl = document.getElementById('presets-edit-list');
+const presetEmojiPickerModalEl = document.getElementById('modal-preset-emoji-picker');
+const presetEmojiCategoriesEl = document.getElementById('preset-emoji-categories');
+
+let tempPresets = [];
+let activePresetIndexForEmoji = null;
+
+const PRESET_EMOJI_CATEGORIES = [
+    {
+        name: '🧹 家務與生活 (Chores & Life)',
+        emojis: ['🧹', '🧼', '🧽', '🧺', '💦', '🛌', '🛀', '⏰', '💤', '🍳', '🗑️', '🌱', '🍽️', '🥛', '🍼', '🦷', '👕', '🧦', '👟', '🚪', '🔑', '🛋️', '🪞', '🧸', '🚿', '🧴', '🪮', '🩹', '🚽', '🏡']
+    },
+    {
+        name: '📚 學習與學校 (Studies & School)',
+        emojis: ['📚', '✏️', '📝', '💯', '🎒', '🎨', '🎹', '💻', '🧪', '🏫', '🧮', '📐', '🧠', '🧩', '🗣️', '📖', '💡', '🎓', '🎭', '🎼', '🎻', '🎷', '🎸', '🎺', '🎤', '🎬', '🖌️', '📏', '📎', '📎']
+    },
+    {
+        name: '⚽ 運動與遊樂 (Sports & Activities)',
+        emojis: ['⚽', '🏀', '🏸', '🚲', '🏆', '🥇', '🥈', '🥉', '🏅', '🎮', '🛹', '🏊', '🏃', '🧗', '🥊', '🎪', '🎲', '🧩', '🪁', '🛝', '🛴', '🛼', '🎳', '🎯', '🎣', '⛺', '🎠', '🎡', '🎢', '🎟️']
+    },
+    {
+        name: '⭐ 表現與禮貌 (Behavior & Manners)',
+        emojis: ['⭐', '❤️', '👍', '🎉', '🤝', '🎁', '😇', '😀', '😊', '😍', '🥰', '🥳', '😎', '🤩', '👏', '💖', '🌈', '☀️', '🌸', '🍀', '🌟', '💎', '🔥', '🤟', '✨', '🎈', '🔔', '🎗️', '💌', '☮️']
+    },
+    {
+        name: '⚠️ 提醒與常規 (Warnings & Regulars)',
+        emojis: ['⚠️', '❌', '🛑', '😭', '😡', '😠', '😤', '🥺', '🤐', '🙅', '👎', '💔', '🌧️', '💩', '🤡', '👻', '👿', '😾', '🩹', '🧻', '🚫', '🔇', '⏳', '💤', '🥀', '🥱', '😰', '🔌', '🪫', '💣']
+    },
+    {
+        name: '🐱 動物與寵物 (Animals & Pets)',
+        emojis: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🦆', '🦉', '🦄', '🦖', '🦕', '🐙', '🦑', '🐠', '🐬', '🐳', '🐢', '🦋', '🐞']
+    },
+    {
+        name: '🍎 美食與點心 (Food & Snacks)',
+        emojis: ['🍎', '🍊', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🥑', '🍔', '🍟', '🍕', '🍩', '🍪', '🧁', '🍫', '🍬', '🍭', '🍦', '🍨', '🍧', '🍰', '🎂', '🍙']
+    }
+];
+
+window.openPresetsModal = function() {
+    renderPresetsEditList();
+    presetsModalEl.classList.add('show');
+};
+
+function closePresetsModal() {
+    presetsModalEl.classList.remove('show');
+    applyPendingRemoteState();
+}
+
+function renderPresetsEditList() {
+    if (!presetsEditListEl) return;
+    
+    // 複製全域 preset 到暫存陣列以供編輯
+    tempPresets = JSON.parse(JSON.stringify(state.presets));
+    
+    let html = '';
+    tempPresets.forEach((preset, idx) => {
+        html += `
+            <div class="preset-edit-row">
+                <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: bold; text-align: center;">#${idx + 1}</span>
+                <button type="button" class="preset-edit-icon-btn" onclick="openPresetEmojiPicker(${idx})" title="點擊選擇圖標">${preset.icon}</button>
+                <input type="text" class="preset-edit-label" value="${preset.label}" placeholder="原因說明" maxlength="10">
+                <input type="number" class="preset-edit-val" value="${preset.val}" placeholder="點數">
+            </div>
+        `;
+    });
+    
+    presetsEditListEl.innerHTML = html;
+}
+
+window.openPresetEmojiPicker = function(idx) {
+    activePresetIndexForEmoji = idx;
+    renderPresetEmojiPicker();
+    presetEmojiPickerModalEl.classList.add('show');
+};
+
+function closePresetEmojiPicker() {
+    presetEmojiPickerModalEl.classList.remove('show');
+    activePresetIndexForEmoji = null;
+}
+
+function renderPresetEmojiPicker() {
+    if (!presetEmojiCategoriesEl) return;
+    
+    let html = '';
+    PRESET_EMOJI_CATEGORIES.forEach(category => {
+        html += `
+            <div class="preset-emoji-category" style="margin-bottom: 14px;">
+                <h4 style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 8px; font-weight: bold;">${category.name}</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); gap: 6px;">
+                    ${category.emojis.map(emoji => `
+                        <button type="button" class="preset-emoji-pick-btn" onclick="selectPresetEmoji('${emoji}')">
+                            ${emoji}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    });
+    presetEmojiCategoriesEl.innerHTML = html;
+}
+
+window.selectPresetEmoji = function(emoji) {
+    if (activePresetIndexForEmoji !== null) {
+        tempPresets[activePresetIndexForEmoji].icon = emoji;
+        // 僅更新對應列的按鈕文字，保留輸入框內已輸入的自訂內容
+        const rows = presetsEditListEl.querySelectorAll('.preset-edit-row');
+        const targetBtn = rows[activePresetIndexForEmoji].querySelector('.preset-edit-icon-btn');
+        if (targetBtn) {
+            targetBtn.textContent = emoji;
+        }
+    }
+    closePresetEmojiPicker();
+};
+
+document.getElementById('btn-presets-modal-save')?.addEventListener('click', () => {
+    if (!presetsEditListEl) return;
+    const rows = presetsEditListEl.querySelectorAll('.preset-edit-row');
+    const newPresets = [];
+    let hasError = false;
+    
+    rows.forEach((row, idx) => {
+        const icon = tempPresets[idx].icon;
+        const label = row.querySelector('.preset-edit-label').value.trim();
+        const val = parseInt(row.querySelector('.preset-edit-val').value, 10);
+        
+        if (!icon || !label || isNaN(val)) {
+            hasError = true;
+            return;
+        }
+        
+        newPresets.push({ icon, label, val });
+    });
+    
+    if (hasError) {
+        alert('請填寫所有欄位且點數必須是有效的數字！');
+        return;
+    }
+    
+    state.presets = newPresets;
+    saveState();
+    renderAllCards();
+    closePresetsModal();
+});
+
+document.getElementById('btn-presets-modal-close')?.addEventListener('click', closePresetsModal);
+document.getElementById('btn-presets-modal-cancel')?.addEventListener('click', closePresetsModal);
+presetsModalEl?.addEventListener('click', (e) => {
+    if (e.target === presetsModalEl) {
+        closePresetsModal();
+    }
+});
+
+document.getElementById('btn-preset-emoji-close')?.addEventListener('click', closePresetEmojiPicker);
+presetEmojiPickerModalEl?.addEventListener('click', (e) => {
+    if (e.target === presetEmojiPickerModalEl) {
+        closePresetEmojiPicker();
     }
 });
 

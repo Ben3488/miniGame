@@ -102,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const idMap = {
             '#scoreboard': 'nav-btn-scoreboard',
+            '#multiscoreboard': 'nav-btn-multiscoreboard',
             '#remover':    'nav-btn-bgremover',
             '#downloader': 'nav-btn-downloader',
         };

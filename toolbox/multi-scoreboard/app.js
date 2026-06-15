@@ -1,9 +1,9 @@
 /* ==========================================================================
-   兒童表現計分板 - 核心應用程式邏輯 (app.js)
+   兒童表現計分板 (自訂人數版) - 核心應用程式邏輯 (app.js)
    ========================================================================== */
 
-const STORAGE_VERSION_KEY = 'kids_scoreboard_mockup_version';
-const STORAGE_VERSION = 'scoreboard-mockup-v3';
+const STORAGE_VERSION_KEY = 'kids_multi_scoreboard_version';
+const STORAGE_VERSION = 'multi-scoreboard-v2';
 const MAX_AVATAR_UPLOADS = 5;
 const SYNC_POLL_INTERVAL_MS = 2000;
 
@@ -33,6 +33,70 @@ const CURED_EMOJIS = [
     '🍎', '🍊', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭',
     '🍍', '🥥', '🥝', '🍅', '🥑', '🍔', '🍟', '🍕', '🍩', '🍪',
     '🧁', '🍫', '🍬', '🍭', '🍦', '🍨', '🍧', '🍰', '🎂', '🍙'
+];
+
+// 10 組美麗主題色彩配置，對應 index.html 裡的 SVG 漸層
+const THEME_CONFIGS = [
+    {
+        gradientId: 'gradient-orange',
+        glowColor: 'rgba(249, 115, 22, 0.15)',
+        glowStrong: 'rgba(249, 115, 22, 0.45)',
+        tagColor: '#f97316'
+    },
+    {
+        gradientId: 'gradient-pink',
+        glowColor: 'rgba(236, 72, 153, 0.15)',
+        glowStrong: 'rgba(236, 72, 153, 0.45)',
+        tagColor: '#ec4899'
+    },
+    {
+        gradientId: 'gradient-blue',
+        glowColor: 'rgba(59, 130, 246, 0.15)',
+        glowStrong: 'rgba(59, 130, 246, 0.45)',
+        tagColor: '#3b82f6'
+    },
+    {
+        gradientId: 'gradient-green',
+        glowColor: 'rgba(16, 185, 129, 0.15)',
+        glowStrong: 'rgba(16, 185, 129, 0.45)',
+        tagColor: '#10b981'
+    },
+    {
+        gradientId: 'gradient-purple',
+        glowColor: 'rgba(139, 92, 246, 0.15)',
+        glowStrong: 'rgba(139, 92, 246, 0.45)',
+        tagColor: '#8b5cf6'
+    },
+    {
+        gradientId: 'gradient-teal',
+        glowColor: 'rgba(13, 148, 136, 0.15)',
+        glowStrong: 'rgba(13, 148, 136, 0.45)',
+        tagColor: '#0d9488'
+    },
+    {
+        gradientId: 'gradient-red',
+        glowColor: 'rgba(239, 68, 68, 0.15)',
+        glowStrong: 'rgba(239, 68, 68, 0.45)',
+        tagColor: '#ef4444'
+    },
+    {
+        gradientId: 'gradient-indigo',
+        glowColor: 'rgba(99, 102, 241, 0.15)',
+        glowStrong: 'rgba(99, 102, 241, 0.45)',
+        tagColor: '#6366f1'
+    },
+    {
+        gradientId: 'gradient-amber',
+        glowColor: 'rgba(217, 119, 6, 0.15)',
+        glowStrong: 'rgba(217, 119, 6, 0.45)',
+        tagColor: '#d97706'
+    },
+    {
+        gradientId: 'gradient-rose',
+        glowColor: 'rgba(244, 63, 94, 0.15)',
+        glowStrong: 'rgba(244, 63, 94, 0.45)',
+        tagColor: '#f43f5e'
+    }
 ];
 
 function createIllustratedAvatar({ bgStart, bgEnd, skin, hair, shirt, accent, eye = '#2d3748' }) {
@@ -66,7 +130,7 @@ function createIllustratedAvatar({ bgStart, bgEnd, skin, hair, shirt, accent, ey
     return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
-// 預設兒童資料
+// 預設兒童資料 (初次載入 3 人，可調整至 2~10 人)
 const DEFAULT_KIDS = [
     {
         id: 'kid-1',
@@ -82,10 +146,7 @@ const DEFAULT_KIDS = [
         }),
         avatarGallery: [],
         score: 0,
-        gradientId: 'gradient-orange',
-        glowColor: 'rgba(249, 115, 22, 0.15)',
-        glowStrong: 'rgba(249, 115, 22, 0.45)',
-        tagColor: '#f97316'
+        ...THEME_CONFIGS[0]
     },
     {
         id: 'kid-2',
@@ -101,10 +162,7 @@ const DEFAULT_KIDS = [
         }),
         avatarGallery: [],
         score: 1,
-        gradientId: 'gradient-pink',
-        glowColor: 'rgba(236, 72, 153, 0.15)',
-        glowStrong: 'rgba(236, 72, 153, 0.45)',
-        tagColor: '#ec4899'
+        ...THEME_CONFIGS[1]
     },
     {
         id: 'kid-3',
@@ -120,10 +178,7 @@ const DEFAULT_KIDS = [
         }),
         avatarGallery: [],
         score: 5,
-        gradientId: 'gradient-blue',
-        glowColor: 'rgba(59, 130, 246, 0.15)',
-        glowStrong: 'rgba(59, 130, 246, 0.45)',
-        tagColor: '#3b82f6'
+        ...THEME_CONFIGS[2]
     }
 ];
 
@@ -131,18 +186,9 @@ const DEFAULT_HISTORY = [
     {
         kidId: 'kid-2',
         name: '柚子',
-        typeText: '減 0 分',
-        scoreChange: 0,
-        reason: '變更資料：上傳了自拍大頭照。',
-        time: '08:54:49',
-        tagColor: '#ec4899'
-    },
-    {
-        kidId: 'kid-2',
-        name: '柚子',
         typeText: '加 1 分',
         scoreChange: 1,
-        reason: '打掃',
+        reason: '打掃房間',
         time: '08:31:58',
         tagColor: '#ec4899'
     },
@@ -154,24 +200,6 @@ const DEFAULT_HISTORY = [
         reason: '主動完成閱讀與收玩具',
         time: '08:31:38',
         tagColor: '#3b82f6'
-    },
-    {
-        kidId: 'kid-1',
-        name: '橘子',
-        typeText: '減 1 分',
-        scoreChange: -1,
-        reason: '忘記收玩具',
-        time: '08:29:21',
-        tagColor: '#f97316'
-    },
-    {
-        kidId: 'kid-1',
-        name: '橘子',
-        typeText: '加 1 分',
-        scoreChange: 1,
-        reason: '幫忙洗碗',
-        time: '08:20:03',
-        tagColor: '#f97316'
     }
 ];
 
@@ -185,8 +213,8 @@ let state = {
     presets: [],
     editingKidId: null,
     selectedEmoji: '',
-    title: '寶貝表現計分板',
-    subtitle: '記錄寶貝的日常表現，累積100分拿大獎！'
+    title: '兒童表現計分板',
+    subtitle: '記錄兒童的日常表現，累積100分拿大獎！'
 };
 let lastServerRevision = null;
 let syncPollTimer = null;
@@ -197,8 +225,8 @@ function getDefaultState() {
         kids: JSON.parse(JSON.stringify(DEFAULT_KIDS)),
         history: JSON.parse(JSON.stringify(DEFAULT_HISTORY)),
         presets: JSON.parse(JSON.stringify(DEFAULT_PRESETS)),
-        title: '寶貝表現計分板',
-        subtitle: '記錄寶貝的日常表現，累積100分拿大獎！'
+        title: '兒童表現計分板',
+        subtitle: '記錄兒童的日常表現，累積100分拿大獎！'
     };
 }
 
@@ -226,25 +254,46 @@ function isUploadedPhotoDataUrl(photo = '') {
     return typeof photo === 'string' && photo.startsWith('data:image/jpeg');
 }
 
-function normalizeKid(kid, index) {
-    const fallback = DEFAULT_KIDS[index] || DEFAULT_KIDS[0];
-    const avatarGallery = dedupeAvatarGallery([
-        ...(Array.isArray(kid.avatarGallery) ? kid.avatarGallery : []),
-        isUploadedPhotoDataUrl(kid.avatarUrl) ? kid.avatarUrl : ''
-    ]);
+function normalizeKids(loadedKids = []) {
+    if (!Array.isArray(loadedKids) || loadedKids.length === 0) {
+        return JSON.parse(JSON.stringify(DEFAULT_KIDS));
+    }
 
-    return {
-        ...fallback,
-        ...kid,
-        avatarUrl: kid.avatarUrl || fallback.avatarUrl,
-        avatarGallery
-    };
-}
+    let kids = loadedKids.slice(0, 10);
+    if (kids.length < 2) {
+        while (kids.length < 2) {
+            const index = kids.length;
+            const fallback = DEFAULT_KIDS[index] || DEFAULT_KIDS[0];
+            kids.push(JSON.parse(JSON.stringify(fallback)));
+        }
+    }
 
-function mergeKidsWithDefaults(savedKids = []) {
-    return DEFAULT_KIDS.map((defaultKid, index) => {
-        const matchedKid = savedKids.find(kid => kid.id === defaultKid.id) || savedKids[index] || defaultKid;
-        return normalizeKid(matchedKid, index);
+    return kids.map((kid, index) => {
+        const theme = THEME_CONFIGS[index % THEME_CONFIGS.length];
+        const avatarGallery = dedupeAvatarGallery([
+            ...(Array.isArray(kid.avatarGallery) ? kid.avatarGallery : []),
+            isUploadedPhotoDataUrl(kid.avatarUrl) ? kid.avatarUrl : ''
+        ]);
+
+        return {
+            id: kid.id || `kid-${Date.now()}-${index}`,
+            name: kid.name || `成員 ${index + 1}`,
+            emoji: kid.emoji || '👶',
+            avatarUrl: kid.avatarUrl || createIllustratedAvatar({
+                bgStart: '#ffe5c0',
+                bgEnd: '#ff9f6b',
+                skin: '#ffd5b2',
+                hair: '#2f221d',
+                shirt: '#7dd3fc',
+                accent: '#38bdf8'
+            }),
+            avatarGallery,
+            score: typeof kid.score === 'number' ? kid.score : 0,
+            gradientId: theme.gradientId,
+            glowColor: theme.glowColor,
+            glowStrong: theme.glowStrong,
+            tagColor: theme.tagColor
+        };
     });
 }
 
@@ -253,7 +302,7 @@ function extractRevision(payload) {
 }
 
 function applyLoadedState(sourceData) {
-    state.kids = mergeKidsWithDefaults(sourceData.kids || []);
+    state.kids = normalizeKids(sourceData.kids || []);
     state.history = sourceData.history || [];
     state.presets = normalizePresets(sourceData.presets || []);
     state.title = sourceData.title || getDefaultState().title;
@@ -336,11 +385,11 @@ function startRealtimeSync() {
 function saveToLocalStorage() {
     try {
         localStorage.setItem(STORAGE_VERSION_KEY, STORAGE_VERSION);
-        localStorage.setItem('kids_scoreboard_data', JSON.stringify(state.kids));
-        localStorage.setItem('kids_scoreboard_history', JSON.stringify(state.history));
-        localStorage.setItem('kids_scoreboard_presets', JSON.stringify(state.presets));
-        localStorage.setItem('kids_scoreboard_title', state.title);
-        localStorage.setItem('kids_scoreboard_subtitle', state.subtitle);
+        localStorage.setItem('kids_multi_scoreboard_data', JSON.stringify(state.kids));
+        localStorage.setItem('kids_multi_scoreboard_history', JSON.stringify(state.history));
+        localStorage.setItem('kids_multi_scoreboard_presets', JSON.stringify(state.presets));
+        localStorage.setItem('kids_multi_scoreboard_title', state.title);
+        localStorage.setItem('kids_multi_scoreboard_subtitle', state.subtitle);
     } catch (e) {
         console.error('儲存至 LocalStorage 失敗。', e);
     }
@@ -384,16 +433,8 @@ async function loadState() {
         if (serverData) {
             if (serverData && serverData.kids && serverData.kids.length > 0) {
                 applyLoadedState(serverData);
-                // 舊預設角色升級檢查
-                const isOldDefault = state.kids.length === 3 &&
-                                     state.kids.some(k => k.name === '小明' || k.name === '小華' || k.name === '小強');
-                if (isOldDefault) {
-                    state.kids = getDefaultState().kids;
-                    await saveState();
-                } else {
-                    saveToLocalStorage();
-                    updateSyncStatus('online', '已成功載入 Synology NAS 線上計分數據');
-                }
+                saveToLocalStorage();
+                updateSyncStatus('online', '已成功載入 Synology NAS 線上計分數據');
                 return;
             } else if (serverData && serverData.status === 'empty') {
                 // NAS 上無檔案，進行首次存檔初始化
@@ -416,11 +457,11 @@ async function loadState() {
     // 2. 降級方案：從本機 LocalStorage 載入資料
     try {
         const savedVersion = localStorage.getItem(STORAGE_VERSION_KEY);
-        const savedKids = localStorage.getItem('kids_scoreboard_data');
-        const savedHistory = localStorage.getItem('kids_scoreboard_history');
-        const savedPresets = localStorage.getItem('kids_scoreboard_presets');
-        const savedTitle = localStorage.getItem('kids_scoreboard_title');
-        const savedSubtitle = localStorage.getItem('kids_scoreboard_subtitle');
+        const savedKids = localStorage.getItem('kids_multi_scoreboard_data');
+        const savedHistory = localStorage.getItem('kids_multi_scoreboard_history');
+        const savedPresets = localStorage.getItem('kids_multi_scoreboard_presets');
+        const savedTitle = localStorage.getItem('kids_multi_scoreboard_title');
+        const savedSubtitle = localStorage.getItem('kids_multi_scoreboard_subtitle');
 
         if (!savedKids && !savedHistory && !savedTitle && !savedSubtitle) {
             const defaults = getDefaultState();
@@ -434,13 +475,7 @@ async function loadState() {
         }
 
         if (savedKids) {
-            state.kids = mergeKidsWithDefaults(JSON.parse(savedKids));
-            const isOldDefault = state.kids.length === 3 &&
-                                 state.kids.some(k => k.name === '小明' || k.name === '小華' || k.name === '小強');
-            if (isOldDefault) {
-                state.kids = getDefaultState().kids;
-                saveToLocalStorage();
-            }
+            state.kids = normalizeKids(JSON.parse(savedKids));
         } else {
             state.kids = getDefaultState().kids;
         }
@@ -537,7 +572,6 @@ function getFormattedTime() {
    ========================================================================== */
 
 function triggerCelebration() {
-    // 噴灑多次創造華麗感
     const duration = 2.5 * 1000;
     const animationEnd = Date.now() + duration;
     const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
@@ -554,7 +588,6 @@ function triggerCelebration() {
         }
 
         const particleCount = 50 * (timeLeft / duration);
-        // 隨機在左右兩側噴灑
         confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
         confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
     }, 250);
@@ -570,24 +603,21 @@ function compressImage(file, callback) {
         const img = new Image();
         img.onload = () => {
             const canvas = document.createElement('canvas');
-            const max_size = 180; // Resize to max 180x180 px for avatar
+            const max_size = 180;
             let width = img.width;
             let height = img.height;
             
-            // Calculate new dimensions (crop to square)
             const size = Math.min(width, height);
             canvas.width = max_size;
             canvas.height = max_size;
             
             const ctx = canvas.getContext('2d');
-            // Center crop and draw to canvas
             ctx.drawImage(
                 img,
-                (width - size) / 2, (height - size) / 2, size, size, // source rect
-                0, 0, max_size, max_size // destination rect
+                (width - size) / 2, (height - size) / 2, size, size,
+                0, 0, max_size, max_size
             );
             
-            // Convert to base64 jpeg with 0.85 quality
             const base64 = canvas.toDataURL('image/jpeg', 0.85);
             callback(base64);
         };
@@ -598,11 +628,9 @@ function compressImage(file, callback) {
 
 // 建立單個兒童計分板卡片 HTML
 function createKidCardHTML(kid) {
-    // 計算 SVG progress offset (r=42, C = 2 * Math.PI * 42 = 263.89)
     const RING_CIRCUMFERENCE_100 = 263.89;
     const offset = RING_CIRCUMFERENCE_100 - (kid.score / 100) * RING_CIRCUMFERENCE_100;
     
-    // 生成星星 HTML (5顆星)
     let starsHTML = '';
     for (let i = 1; i <= 5; i++) {
         const milestoneVal = i * 20;
@@ -627,13 +655,13 @@ function createKidCardHTML(kid) {
     });
 
     return `
-        <article class="kid-card glass-panel" id="card-${kid.id}" style="--card-gradient: var(--${kid.id}-gradient, url(#${kid.gradientId})); --card-glow: ${kid.glowColor}; --card-glow-strong: ${kid.glowStrong}; --theme-color: ${kid.tagColor};">
+        <article class="kid-card glass-panel" id="card-${kid.id}" style="--theme-color: ${kid.tagColor};">
             <!-- 編輯按鈕 (三個點) -->
             <button class="btn-edit-profile" onclick="openEditModal('${kid.id}')" title="修改大頭貼與名字">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-more-horizontal"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
             </button>
             
-            <!-- 卡片頭部 (水果 Emoji + 姓名) -->
+            <!-- 卡片頭部 (Emoji + 姓名) -->
             <div class="kid-card-header">
                 <div class="kid-title-container">
                     <span class="kid-fruit-emoji">${kid.emoji}</span>
@@ -689,7 +717,7 @@ function createKidCardHTML(kid) {
                 </div>
             </div>
 
-            <!-- 控制按鈕 (圓形外框樣式) -->
+            <!-- 控制按鈕 -->
             <div class="controls-container">
                 <button class="btn-ctrl btn-minus" onclick="changeScore('${kid.id}', -1)" title="扣 1 分">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-minus"><path d="M5 12h14"/></svg>
@@ -708,7 +736,7 @@ function renderAllCards() {
     if (!container) return;
     
     if (state.kids.length === 0) {
-        container.innerHTML = '<div class="card-loading">目前無資料。</div>';
+        container.innerHTML = '<div class="card-loading">目前無成員。請點擊「管理成員」來新增。</div>';
         return;
     }
     
@@ -725,7 +753,6 @@ function updateCardDOM(kid) {
     const cardEl = document.getElementById(`card-${kid.id}`);
     if (!cardEl) return;
     
-    // 1. 更新分數文字
     const scoreNumEl = cardEl.querySelector('.score-number');
     if (scoreNumEl) {
         const oldScore = parseInt(scoreNumEl.textContent);
@@ -738,14 +765,12 @@ function updateCardDOM(kid) {
         }
     }
     
-    // 2. 更新環形進度條 offset (r=42, C=263.89)
     const progressEl = cardEl.querySelector('.score-svg-progress');
     if (progressEl) {
         const offset = 263.89 - (kid.score / 100) * 263.89;
         progressEl.style.strokeDashoffset = offset;
     }
     
-    // 3. 更新星星
     const starIcons = cardEl.querySelectorAll('.star-icon');
     starIcons.forEach((star, idx) => {
         const milestoneVal = (idx + 1) * 20;
@@ -756,7 +781,6 @@ function updateCardDOM(kid) {
         }
     });
 
-    // 4. 更新大頭貼和姓名 (如果在 Modal 編輯了)
     const avatarWrapper = cardEl.querySelector('.avatar-image-wrapper');
     if (avatarWrapper) {
         if (kid.avatarUrl) {
@@ -779,22 +803,20 @@ function updateCardDOM(kid) {
 
 function addLog(kidId, name, scoreChange, reason, kidTagColor) {
     const time = getFormattedTime();
-    const typeText = scoreChange > 0 ? `加 ${scoreChange} 分` : `減 ${Math.abs(scoreChange)} 分`;
+    const typeText = scoreChange > 0 ? `加 ${scoreChange} 分` : (scoreChange < 0 ? `減 ${Math.abs(scoreChange)} 分` : '變更');
     
     const newLog = {
         kidId,
         name,
         typeText,
         scoreChange,
-        reason: reason.trim() || (scoreChange > 0 ? '表現良好！' : '仍需加油！'),
+        reason: reason.trim() || (scoreChange > 0 ? '表現良好！' : (scoreChange < 0 ? '仍需加油！' : '修改資料')),
         time,
         tagColor: kidTagColor
     };
     
-    // 新增至陣列開頭
     state.history.unshift(newLog);
     
-    // 限制最多 50 筆紀錄
     if (state.history.length > 50) {
         state.history.pop();
     }
@@ -820,7 +842,13 @@ function renderHistory() {
             : '👶';
             
         const borderStyle = log.tagColor ? `background-color: ${log.tagColor}; color: #ffffff;` : 'background-color: var(--btn-secondary); color: var(--text-primary);';
-        const scoreStyle = log.scoreChange > 0 ? 'color: #10b981; font-weight: bold;' : 'color: #f43f5e; font-weight: bold;';
+        
+        let scoreStyle = 'color: #94a3b8; font-weight: bold;';
+        if (log.scoreChange > 0) {
+            scoreStyle = 'color: #10b981; font-weight: bold;';
+        } else if (log.scoreChange < 0) {
+            scoreStyle = 'color: #f43f5e; font-weight: bold;';
+        }
         
         html += `
             <li class="history-item">
@@ -856,26 +884,19 @@ window.changeScore = function(kidId, amount, reason = '') {
     const prevScore = kid.score;
     let newScore = prevScore + amount;
     
-    // 限制在 0-100 分之間
     if (newScore > 100) newScore = 100;
     if (newScore < 0) newScore = 0;
     
-    // 若分數無實質變動則直接返回
     if (newScore === prevScore) return;
     
     kid.score = newScore;
     
-    // 新增歷史紀錄
     addLog(kid.id, kid.name, amount, reason, kid.tagColor);
-    
-    // 觸發局部更新 DOM
     updateCardDOM(kid);
     saveState();
     
-    // 如果分數變成 100，則啟動慶祝 Confetti！
     if (newScore === 100 && prevScore < 100) {
         triggerCelebration();
-        // 額外新增一筆滿分賀詞紀錄
         setTimeout(() => {
             addLog(kid.id, kid.name, 0, '恭喜達到 100 分滿分！🎉🏆 太棒了！', '#d97706');
         }, 300);
@@ -894,7 +915,7 @@ const editModalEl = document.getElementById('modal-edit-profile');
 const editNameInput = document.getElementById('edit-name');
 const emojiGridEl = document.getElementById('emoji-grid');
 const uploadGalleryEl = document.getElementById('upload-gallery');
-let uploadedAvatarBase64 = ''; // 暫存Modal中上傳的 Base64 圖片
+let uploadedAvatarBase64 = '';
 let uploadedAvatarHistory = [];
 
 window.openEditModal = function(kidId) {
@@ -910,16 +931,12 @@ window.openEditModal = function(kidId) {
         isUploadedPhotoDataUrl(kid.avatarUrl) ? kid.avatarUrl : ''
     ]);
     
-    // 重設檔案輸入框的值
     const fileInput = document.getElementById('edit-avatar-file');
     if (fileInput) fileInput.value = '';
     
     updateUploadPreview();
-    
-    // 生成 Emoji 選擇網格
     renderEmojiGrid();
     
-    // 顯示 Modal
     editModalEl.classList.add('show');
 };
 
@@ -971,7 +988,6 @@ function renderUploadGallery() {
     }).join('');
 }
 
-// 檔案上傳觸發
 document.getElementById('btn-upload-trigger')?.addEventListener('click', () => {
     document.getElementById('edit-avatar-file')?.click();
 });
@@ -980,10 +996,8 @@ document.getElementById('edit-avatar-file')?.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // 每次新上傳都先清掉舊的檔案選取狀態，避免殘留前一張檔案。
     e.target.value = '';
 
-    // 壓縮並調整圖片大小
     compressImage(file, (base64) => {
         uploadedAvatarBase64 = base64;
         uploadedAvatarHistory = dedupeAvatarGallery([
@@ -994,7 +1008,6 @@ document.getElementById('edit-avatar-file')?.addEventListener('change', (e) => {
     });
 });
 
-// 移除自訂大頭照
 document.getElementById('btn-remove-uploaded')?.addEventListener('click', () => {
     uploadedAvatarHistory = uploadedAvatarHistory.filter(photo => photo !== uploadedAvatarBase64);
     uploadedAvatarBase64 = uploadedAvatarHistory[0] || '';
@@ -1027,13 +1040,11 @@ function renderEmojiGrid() {
 }
 
 window.selectEmoji = function(element, emoji) {
-    // 清除舊的選擇狀態
     const selected = emojiGridEl.querySelector('.emoji-option.selected');
     if (selected) {
         selected.classList.remove('selected');
     }
     
-    // 設定新的選擇狀態
     element.classList.add('selected');
     state.selectedEmoji = emoji;
 };
@@ -1046,7 +1057,7 @@ document.getElementById('btn-modal-save')?.addEventListener('click', () => {
     const newName = editNameInput.value.trim();
     
     if (!newName) {
-        alert('請輸入寶貝名字！');
+        alert('請輸入姓名！');
         return;
     }
     
@@ -1061,7 +1072,6 @@ document.getElementById('btn-modal-save')?.addEventListener('click', () => {
     kid.avatarUrl = resolvedAvatarUrl;
     kid.avatarGallery = nextAvatarGallery;
     
-    // 寫入更名紀錄
     if (oldName !== newName || oldEmoji !== state.selectedEmoji || oldAvatar !== resolvedAvatarUrl) {
         let changeDesc = `變更資料：`;
         if (oldName !== newName) changeDesc += `名字由 ${oldName} 改為 ${newName}。`;
@@ -1085,14 +1095,192 @@ document.getElementById('btn-modal-save')?.addEventListener('click', () => {
     closeEditModal();
 });
 
-// 取消與關閉 Modal
 document.getElementById('btn-modal-close')?.addEventListener('click', closeEditModal);
 document.getElementById('btn-modal-cancel')?.addEventListener('click', closeEditModal);
 
-// 點擊 Modal 背景關閉
 editModalEl?.addEventListener('click', (e) => {
     if (e.target === editModalEl) {
         closeEditModal();
+    }
+});
+
+/* ==========================================================================
+   成員管理 Modal 功能 (新增/刪除，最少2人，最多10人)
+   ========================================================================== */
+
+const manageModalEl = document.getElementById('modal-manage-kids');
+const manageKidsListEl = document.getElementById('manage-kids-list');
+const btnAddKidEl = document.getElementById('btn-add-kid');
+
+window.openManageModal = function() {
+    renderManageKidsList();
+    manageModalEl.classList.add('show');
+};
+
+function closeManageModal() {
+    manageModalEl.classList.remove('show');
+    applyPendingRemoteState();
+}
+
+function renderManageKidsList() {
+    if (!manageKidsListEl) return;
+    
+    const count = state.kids.length;
+    let html = '';
+    
+    state.kids.forEach((kid, idx) => {
+        const avatarHTML = kid.avatarUrl 
+            ? `<img src="${kid.avatarUrl}" alt="${kid.name}">` 
+            : `<span class="emoji">${kid.emoji}</span>`;
+            
+        const isDeleteDisabled = count <= 2 ? 'disabled' : '';
+        
+        html += `
+            <div class="manage-kid-row">
+                <div class="manage-kid-info">
+                    <div class="manage-kid-avatar">
+                        ${avatarHTML}
+                    </div>
+                    <span class="manage-kid-name">${kid.name} ${kid.emoji}</span>
+                </div>
+                <button class="btn-delete-kid" ${isDeleteDisabled} onclick="deleteKid('${kid.id}')" title="刪除此成員">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                    <span>刪除</span>
+                </button>
+            </div>
+        `;
+    });
+    
+    manageKidsListEl.innerHTML = html;
+    
+    if (count >= 10) {
+        btnAddKidEl.disabled = true;
+        btnAddKidEl.style.opacity = '0.5';
+        btnAddKidEl.style.cursor = 'not-allowed';
+        btnAddKidEl.querySelector('span').textContent = '成員已達上限 (10人)';
+    } else {
+        btnAddKidEl.disabled = false;
+        btnAddKidEl.style.opacity = '1';
+        btnAddKidEl.style.cursor = 'pointer';
+        btnAddKidEl.querySelector('span').textContent = '新增成員';
+    }
+}
+
+const deleteConfirmModalEl = document.getElementById('modal-delete-confirm');
+const deleteConfirmNameEl = document.getElementById('delete-confirm-name');
+let kidIdToDelete = null;
+
+window.deleteKid = function(kidId) {
+    if (state.kids.length <= 2) {
+        alert('最少需要保留 2 位成員！');
+        return;
+    }
+    
+    const kid = state.kids.find(k => k.id === kidId);
+    if (!kid) return;
+    
+    kidIdToDelete = kidId;
+    if (deleteConfirmNameEl) {
+        deleteConfirmNameEl.textContent = `${kid.name} ${kid.emoji}`;
+    }
+    deleteConfirmModalEl.classList.add('show');
+};
+
+function closeDeleteConfirmModal() {
+    deleteConfirmModalEl.classList.remove('show');
+    kidIdToDelete = null;
+    applyPendingRemoteState();
+}
+
+document.getElementById('btn-delete-close')?.addEventListener('click', closeDeleteConfirmModal);
+document.getElementById('btn-delete-cancel')?.addEventListener('click', closeDeleteConfirmModal);
+deleteConfirmModalEl?.addEventListener('click', (e) => {
+    if (e.target === deleteConfirmModalEl) {
+        closeDeleteConfirmModal();
+    }
+});
+
+document.getElementById('btn-delete-confirm')?.addEventListener('click', () => {
+    if (!kidIdToDelete) return;
+    
+    const kid = state.kids.find(k => k.id === kidIdToDelete);
+    if (kid) {
+        addLog(
+            kid.id,
+            kid.name,
+            0,
+            `移除了成員：${kid.name}。`,
+            kid.tagColor
+        );
+        
+        state.kids = state.kids.filter(k => k.id !== kidIdToDelete);
+        state.kids = normalizeKids(state.kids);
+        
+        renderAllCards();
+        renderManageKidsList();
+        saveState();
+    }
+    
+    closeDeleteConfirmModal();
+});
+
+window.addNewKid = function() {
+    if (state.kids.length >= 10) {
+        alert('最多只能新增 10 位成員！');
+        return;
+    }
+    
+    const currentCount = state.kids.length;
+    const theme = THEME_CONFIGS[currentCount % THEME_CONFIGS.length];
+    
+    const randomEmojis = ['👶', '👧', '👦', '🐱', '🐶', '🦄', '🦖', '🦁', '🐼', '🦊', '🐯', '🐰', '🐨', '🐷', '🐸', '🚀', '⭐', '🌈', '🎨', '⚽'];
+    const randomEmoji = randomEmojis[Math.floor(Math.random() * randomEmojis.length)];
+    const newName = `成員 ${currentCount + 1}`;
+    
+    const newKid = {
+        id: `kid-${Date.now()}`,
+        name: newName,
+        emoji: randomEmoji,
+        avatarUrl: createIllustratedAvatar({
+            bgStart: '#ffe5c0',
+            bgEnd: '#ff9f6b',
+            skin: '#ffd5b2',
+            hair: '#2f221d',
+            shirt: '#7dd3fc',
+            accent: '#38bdf8'
+        }),
+        avatarGallery: [],
+        score: 0,
+        ...theme
+    };
+    
+    state.kids.push(newKid);
+    state.kids = normalizeKids(state.kids);
+    
+    addLog(
+        newKid.id,
+        newName,
+        0,
+        `新增了成員：${newName}。`,
+        newKid.tagColor
+    );
+    
+    renderAllCards();
+    renderManageKidsList();
+    saveState();
+    
+    setTimeout(() => {
+        closeManageModal();
+        openEditModal(newKid.id);
+    }, 300);
+};
+
+document.getElementById('btn-manage-kids')?.addEventListener('click', openManageModal);
+document.getElementById('btn-manage-modal-close')?.addEventListener('click', closeManageModal);
+document.getElementById('btn-add-kid')?.addEventListener('click', addNewKid);
+manageModalEl?.addEventListener('click', (e) => {
+    if (e.target === manageModalEl) {
+        closeManageModal();
     }
 });
 
@@ -1119,27 +1307,21 @@ resetModalEl?.addEventListener('click', (e) => {
     }
 });
 
-// 確認重設全部
 document.getElementById('btn-reset-confirm')?.addEventListener('click', () => {
-    // 1. 所有分數歸零
     state.kids.forEach(kid => {
         kid.score = 0;
     });
     
-    // 2. 清空歷史紀錄
     state.history = [];
     
-    // 3. 儲存與重新渲染
     saveState();
     renderAllCards();
     renderHistory();
-    
-    // 4. 關閉 Modal
     closeResetModal();
 });
 
 /* ==========================================================================
-   清空歷史動態 (僅清空紀錄，不影響分數)
+   清空歷史動態
    ========================================================================== */
 
 document.getElementById('btn-clear-history')?.addEventListener('click', () => {
@@ -1178,7 +1360,6 @@ document.getElementById('btn-edit-scoreboard-title')?.addEventListener('click', 
 document.getElementById('btn-title-modal-close')?.addEventListener('click', closeTitleModal);
 document.getElementById('btn-title-modal-cancel')?.addEventListener('click', closeTitleModal);
 
-// 儲存修改
 document.getElementById('btn-title-modal-save')?.addEventListener('click', () => {
     const newTitle = editTitleInput.value.trim();
     const newSubtitle = editSubtitleInput.value.trim();
@@ -1196,7 +1377,6 @@ document.getElementById('btn-title-modal-save')?.addEventListener('click', () =>
     closeTitleModal();
 });
 
-// 點擊 Modal 背景關閉
 titleModalEl?.addEventListener('click', (e) => {
     if (e.target === titleModalEl) {
         closeTitleModal();
@@ -1371,10 +1551,7 @@ presetEmojiPickerModalEl?.addEventListener('click', (e) => {
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 載入狀態
     await loadState();
-    
-    // 渲染 UI
     renderAllState();
     startRealtimeSync();
 });

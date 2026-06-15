@@ -170,6 +170,43 @@
         </div>
     </div>
 
+    <!-- Edit Presets Modal -->
+    <div id="modal-edit-presets" class="modal-overlay">
+        <div class="modal-card glass-panel" style="width: min(100%, 540px);">
+            <div class="modal-header">
+                <h3>⚙️ 修改常用原因與點數</h3>
+                <button class="modal-close" id="btn-presets-modal-close">&times;</button>
+            </div>
+            <div class="modal-body" style="max-height: 400px; overflow-y: auto; padding-right: 6px;">
+                <p class="manage-desc" style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 12px;">
+                    設定快捷加/減分按鈕的圖標 Emoji、原因以及加/減分點數（點數亦可為負數，例如 -2）。
+                </p>
+                <div id="presets-edit-list" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- 9 rows will be dynamically populated -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-presets-modal-cancel" class="btn btn-secondary">取消</button>
+                <button id="btn-presets-modal-save" class="btn btn-primary">儲存設定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preset Emoji Picker Modal -->
+    <div id="modal-preset-emoji-picker" class="modal-overlay" style="z-index: 1200;">
+        <div class="modal-card glass-panel" style="width: min(100%, 450px);">
+            <div class="modal-header">
+                <h3>🎨 選擇快捷按鈕圖標</h3>
+                <button class="modal-close" id="btn-preset-emoji-close">&times;</button>
+            </div>
+            <div class="modal-body" style="max-height: 400px; overflow-y: auto; padding-right: 6px;">
+                <div class="preset-emoji-categories" id="preset-emoji-categories" style="display: flex; flex-direction: column; gap: 16px;">
+                    <!-- Emojis populated dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Reset Confirm Modal -->
     <div id="modal-reset-confirm" class="modal-overlay">
         <div class="modal-card glass-panel alert-modal">
