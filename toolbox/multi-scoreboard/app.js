@@ -1533,7 +1533,7 @@ function renderPresetsEditList() {
     tempPresets.forEach((preset, idx) => {
         html += `
             <div class="preset-edit-row">
-                <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: bold; text-align: center;">#${idx + 1}</span>
+                <span class="preset-index-badge" style="color: var(--text-muted); font-size: 0.85rem; font-weight: bold; text-align: center;">#${idx + 1}</span>
                 <button type="button" class="preset-edit-icon-btn" onclick="openPresetEmojiPicker(${idx})" title="點擊選擇圖標">${preset.icon}</button>
                 <input type="text" class="preset-edit-label" value="${preset.label}" placeholder="原因說明" maxlength="10">
                 <input type="number" class="preset-edit-val" value="${preset.val}" placeholder="點數">

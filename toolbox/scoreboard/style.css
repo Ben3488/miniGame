@@ -161,8 +161,8 @@ body {
     justify-content: space-between;
     align-items: center;
     gap: 24px;
-    padding: 28px 34px;
-    border-radius: 30px;
+    padding: 16px 22px;
+    border-radius: 24px;
     border: 1px solid rgba(102, 139, 255, 0.18);
     background:
         linear-gradient(120deg, rgba(14, 25, 54, 0.98) 0%, rgba(11, 20, 41, 0.94) 52%, rgba(12, 20, 44, 0.98) 100%);
@@ -193,26 +193,26 @@ body {
 .header-title-container {
     display: flex;
     align-items: center;
-    gap: 22px;
+    gap: 14px;
 }
 
 .header-logo {
-    width: 132px;
-    min-width: 132px;
-    height: 96px;
+    width: 72px;
+    min-width: 72px;
+    height: 72px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 4.2rem;
-    border-radius: 28px;
+    font-size: 2.6rem;
+    border-radius: 18px;
     color: #ffd66d;
-    text-shadow: 0 0 28px rgba(255, 197, 72, 0.4);
+    text-shadow: 0 0 20px rgba(255, 197, 72, 0.4);
     background:
         radial-gradient(circle at 50% 32%, rgba(255, 240, 184, 0.6), transparent 22%),
         linear-gradient(145deg, rgba(255, 187, 68, 0.3), rgba(116, 57, 0, 0.05));
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.24),
-        0 12px 30px rgba(255, 166, 0, 0.12);
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        0 8px 20px rgba(255, 166, 0, 0.12);
     animation: pulseLogo 2.8s infinite alternate ease-in-out;
 }
 
@@ -230,21 +230,21 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .app-header h1 {
-    font-size: clamp(2rem, 2.8vw, 3.3rem);
+    font-size: clamp(1.35rem, 2vw, 1.8rem);
     font-weight: 900;
     letter-spacing: 1px;
     background: linear-gradient(180deg, #ffffff 0%, #eef5ff 50%, #d7e4ff 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 28px rgba(100, 161, 255, 0.12);
+    text-shadow: 0 0 20px rgba(100, 161, 255, 0.12);
 }
 
 .header-subtitle {
-    font-size: clamp(1rem, 1.2vw, 1.35rem);
+    font-size: clamp(0.85rem, 1vw, 0.98rem);
     color: #aab7d4;
     line-height: 1.55;
 }
@@ -831,28 +831,36 @@ body {
 }
 
 .btn-minus {
-    border-color: color-mix(in srgb, var(--theme-color) 72%, #ffffff 10%);
-    color: #fff2f2;
+    border-color: rgba(239, 68, 68, 0.5);
+    background:
+        radial-gradient(circle at 30% 26%, rgba(255, 255, 255, 0.15), transparent 24%),
+        linear-gradient(180deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.05)),
+        rgba(11, 17, 31, 0.94);
+    color: #ff8b8b;
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.1),
-        0 0 0 2px color-mix(in srgb, var(--theme-color) 12%, transparent),
+        0 0 0 2px rgba(239, 68, 68, 0.1),
         0 10px 16px rgba(0, 0, 0, 0.28);
 }
 
 .btn-minus:hover {
     background:
         radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.28), transparent 22%),
-        linear-gradient(180deg, color-mix(in srgb, var(--theme-color) 30%, #ffffff 8%), var(--theme-color));
+        linear-gradient(180deg, #ff6b6b 0%, #ee3535 100%);
     color: #06101d;
     transform: translateY(-2px) scale(1.03);
     box-shadow:
-        0 0 0 3px color-mix(in srgb, var(--theme-color) 18%, transparent),
-        0 12px 18px color-mix(in srgb, var(--theme-color) 24%, transparent);
+        0 0 0 3px rgba(239, 68, 68, 0.16),
+        0 12px 18px rgba(239, 68, 68, 0.24);
 }
 
 .btn-plus {
-    border-color: rgba(61, 223, 134, 0.84);
-    color: #ebfff3;
+    border-color: rgba(45, 223, 130, 0.5);
+    background:
+        radial-gradient(circle at 30% 26%, rgba(255, 255, 255, 0.15), transparent 24%),
+        linear-gradient(180deg, rgba(45, 223, 130, 0.1), rgba(15, 185, 111, 0.05)),
+        rgba(11, 17, 31, 0.94);
+    color: #49f39c;
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.1),
         0 0 0 2px rgba(45, 223, 130, 0.1),
@@ -1332,6 +1340,47 @@ body {
     font-size: 0.9rem;
 }
 
+/* Custom Scrollbars for Modals and Lists */
+.modal-body::-webkit-scrollbar,
+.emoji-selector::-webkit-scrollbar,
+#presets-edit-list::-webkit-scrollbar,
+.preset-emoji-categories::-webkit-scrollbar,
+.kids-list-container::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track,
+.emoji-selector::-webkit-scrollbar-track,
+#presets-edit-list::-webkit-scrollbar-track,
+.preset-emoji-categories::-webkit-scrollbar-track,
+.kids-list-container::-webkit-scrollbar-track {
+    background: rgba(6, 9, 19, 0.4);
+    border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb,
+.emoji-selector::-webkit-scrollbar-thumb,
+#presets-edit-list::-webkit-scrollbar-thumb,
+.preset-emoji-categories::-webkit-scrollbar-thumb,
+.kids-list-container::-webkit-scrollbar-thumb {
+    background: rgba(146, 177, 255, 0.25);
+    border-radius: 10px;
+    transition: var(--transition-smooth);
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover,
+.emoji-selector::-webkit-scrollbar-thumb:hover,
+#presets-edit-list::-webkit-scrollbar-thumb:hover,
+.preset-emoji-categories::-webkit-scrollbar-thumb:hover,
+.kids-list-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(146, 177, 255, 0.5);
+}
+
+.modal-body {
+    overflow-x: hidden !important;
+}
+
 @media (max-width: 1180px) {
     .scoreboard-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1397,14 +1446,14 @@ body {
     }
 
     .btn-edit-icon {
-        width: 28px !important;
-        height: 28px !important;
+        width: 32px !important;
+        height: 32px !important;
         border-radius: 8px !important;
     }
 
     .btn-edit-icon svg {
-        width: 13px !important;
-        height: 13px !important;
+        width: 14px !important;
+        height: 14px !important;
     }
 
     .sync-status-pill {
@@ -1418,12 +1467,38 @@ body {
         /* Hide subtitle to save vertical space in landscape */
     }
 
-    #btn-reset-all {
+    .header-right-buttons {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    .header-right-buttons .btn {
         width: auto !important;
+        height: 32px !important;
         padding: 6px 12px !important;
         font-size: 0.8rem !important;
         border-radius: 8px !important;
         margin: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+    }
+
+    .header-right-buttons .btn svg {
+        width: 14px !important;
+        height: 14px !important;
+    }
+
+    .header-right-buttons .btn-edit-icon,
+    .btn-menu {
+        width: 32px !important;
+        height: 32px !important;
+        border-radius: 8px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 
     .scoreboard-grid {
@@ -1657,56 +1732,58 @@ body {
        橫屏彈窗 (Modal Overlay & Card) 優化
        ======================================================= */
     .modal-overlay {
-        align-items: flex-start !important;
+        align-items: center !important;
         overflow-y: auto !important;
-        padding: 12px 10px !important;
+        padding: 8px 10px !important;
     }
 
     .modal-card {
-        margin: 12px auto !important;
-        max-height: none !important;
+        margin: 8px auto !important;
+        max-height: 94vh !important;
         width: min(100%, 680px) !important;
-        padding: 16px 20px !important;
+        padding: 12px 18px !important;
         border-radius: 20px !important;
+        display: flex !important;
+        flex-direction: column !important;
     }
 
     .modal-header {
-        margin-bottom: 12px !important;
+        margin-bottom: 8px !important;
     }
 
     .modal-header h3 {
-        font-size: 1.15rem !important;
+        font-size: 1.1rem !important;
     }
 
     .modal-close {
-        width: 32px !important;
-        height: 32px !important;
-        font-size: 1.4rem !important;
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 1.2rem !important;
     }
 
     .modal-body {
-        margin-bottom: 12px !important;
-        max-height: none !important;
-        overflow-y: visible !important;
-        padding-right: 0 !important;
-        gap: 10px !important;
+        margin-bottom: 8px !important;
+        max-height: 200px !important;
+        overflow-y: auto !important;
+        padding-right: 6px !important;
+        gap: 8px !important;
     }
 
     .modal-card .btn {
-        padding: 8px 16px !important;
-        font-size: 0.9rem !important;
-        border-radius: 12px !important;
+        padding: 6px 14px !important;
+        font-size: 0.85rem !important;
+        border-radius: 10px !important;
     }
 
     .modal-footer {
-        gap: 8px !important;
+        gap: 6px !important;
     }
 
     /* 「修改寶貝資料」雙欄版面佈局 */
     #modal-edit-profile .modal-body {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
-        gap: 10px 16px !important;
+        gap: 8px 12px !important;
     }
 
     #modal-edit-profile .modal-body > .form-group:nth-child(1) {
@@ -1738,10 +1815,10 @@ body {
 
     /* 快捷 Emoji 選擇器在橫屏的尺寸微調 */
     .emoji-selector {
-        max-height: 110px !important;
-        grid-template-columns: repeat(6, 1fr) !important;
-        padding: 6px !important;
-        gap: 5px !important;
+        max-height: 80px !important;
+        grid-template-columns: repeat(8, 1fr) !important;
+        padding: 4px !important;
+        gap: 4px !important;
     }
 
     .emoji-option {
@@ -1784,10 +1861,10 @@ body {
         border-radius: 8px !important;
     }
 
-    /* 「修改常用原因與點數」雙欄版面佈局 */
+    /* 「修改常用原因與點數」自適應佈局 */
     #presets-edit-list {
         display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
         gap: 8px 12px !important;
     }
 
@@ -1860,14 +1937,14 @@ body {
     }
 
     .btn-edit-icon {
-        width: 28px !important;
-        height: 28px !important;
+        width: 32px !important;
+        height: 32px !important;
         border-radius: 8px !important;
     }
 
     .btn-edit-icon svg {
-        width: 14px !important;
-        height: 14px !important;
+        width: 15px !important;
+        height: 15px !important;
     }
 
     .sync-status-pill {
@@ -1886,16 +1963,35 @@ body {
         gap: 6px !important;
     }
 
-    #btn-reset-all {
-        width: auto !important;
-        padding: 6px 12px !important;
-        font-size: 0.8rem !important;
+    .header-right-buttons .btn span {
+        display: none !important;
+    }
+
+    .header-right-buttons .btn {
+        width: 32px !important;
+        height: 32px !important;
+        padding: 0 !important;
+        justify-content: center !important;
         border-radius: 8px !important;
+        margin: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+
+    .header-right-buttons .btn svg {
+        width: 15px !important;
+        height: 15px !important;
         margin: 0 !important;
     }
 
+    .header-right-buttons .btn-edit-icon,
     .btn-menu {
+        width: 32px !important;
+        height: 32px !important;
+        border-radius: 8px !important;
         display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 
     /* 垂直排列卡片 & Grid 重排佈局 */
@@ -2040,7 +2136,7 @@ body {
         top: auto !important;
         left: auto !important;
         display: flex !important;
-        gap: 4px !important;
+        gap: 6px !important;
         margin: 0 !important;
         padding: 0 !important;
         justify-content: flex-start !important;
@@ -2049,8 +2145,8 @@ body {
     }
 
     .star-icon {
-        width: 14px !important;
-        height: 14px !important;
+        width: 16px !important;
+        height: 16px !important;
     }
 
     /* 原因輸入框 */
@@ -2073,7 +2169,7 @@ body {
         height: 12px !important;
     }
 
-    /* 常用快捷鍵：2 欄大按鈕 */
+    /* 常用快捷鍵：3 欄小按鈕 */
     .quick-actions-container {
         grid-column: 1 / 4 !important;
         grid-row: 3 !important;
@@ -2094,19 +2190,21 @@ body {
     }
 
     .quick-actions-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 6px !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 5px !important;
     }
 
     .quick-actions-grid .quick-btn:last-child {
-        grid-column: span 1 !important;
+        grid-column: auto !important;
     }
 
     .quick-btn {
-        padding: 8px 6px !important;
-        font-size: 0.8rem !important;
-        border-radius: 8px !important;
-        white-space: normal !important;
+        padding: 6px 4px !important;
+        font-size: 0.78rem !important;
+        border-radius: 6px !important;
+        white-space: nowrap !important;
+        text-overflow: ellipsis !important;
+        overflow: hidden !important;
         line-height: 1.2 !important;
         height: auto !important;
     }
@@ -2167,11 +2265,44 @@ body {
     .modal-card {
         padding: 16px 14px !important;
         max-width: 94% !important;
+        max-height: 92vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .modal-body {
+        max-height: calc(92vh - 110px) !important;
+        overflow-y: auto !important;
+        padding-right: 4px !important;
     }
 
     .emoji-selector {
-        grid-template-columns: repeat(5, 1fr) !important;
+        grid-template-columns: repeat(8, 1fr) !important;
+        gap: 5px !important;
+        max-height: 120px !important;
+    }
+
+    .emoji-option {
+        font-size: 1.35rem !important;
+        padding: 4px 0 !important;
+    }
+
+    /* 常用原因與點數手機直向佈局優化 - 隱藏序號並拓寬輸入框 */
+    .preset-edit-row {
+        grid-template-columns: 42px 1fr 65px !important;
         gap: 6px !important;
+        padding: 8px 10px !important;
+        border-radius: 10px !important;
+    }
+
+    .preset-index-badge {
+        display: none !important;
+    }
+
+    .preset-edit-row input {
+        padding: 6px 8px !important;
+        font-size: 0.85rem !important;
+        border-radius: 6px !important;
     }
 }
 
@@ -2395,6 +2526,8 @@ body {
 }
 
 .preset-edit-row input {
+    width: 100% !important;
+    min-width: 0 !important;
     padding: 8px 10px !important;
     font-size: 0.95rem !important;
     border-radius: 8px !important;
@@ -2403,6 +2536,32 @@ body {
     color: #ffffff !important;
     outline: none !important;
     transition: var(--transition-smooth) !important;
+}
+
+.preset-edit-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(6, 11, 23, 0.8);
+    color: #ffffff;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    width: 100%;
+    height: 38px;
+}
+
+.preset-edit-icon-btn:hover {
+    border-color: rgba(86, 164, 255, 0.6);
+    background: rgba(86, 164, 255, 0.08);
+    transform: scale(1.05);
+}
+
+.preset-edit-icon-btn:active {
+    transform: scale(0.95);
 }
 
 .preset-edit-row input:focus {
