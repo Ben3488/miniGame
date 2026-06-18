@@ -101,8 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!hash) return;
 
         const idMap = {
-            '#scoreboard': 'nav-btn-scoreboard',
-            '#multiscoreboard': 'nav-btn-multiscoreboard',
             '#remover':    'nav-btn-bgremover',
             '#downloader': 'nav-btn-downloader',
             '#pomodoro':   'nav-btn-pomodoro',

@@ -193,12 +193,6 @@ body {
 }
 
 /* 切換不同項目時的發光效果與按鈕顏色 */
-.nav-item[data-target="scoreboard"].active {
-    background: rgba(59, 130, 246, 0.12);
-    border-color: rgba(59, 130, 246, 0.3);
-    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
-}
-
 .nav-item[data-target="bgremover"].active {
     background: rgba(236, 72, 153, 0.12);
     border-color: rgba(236, 72, 153, 0.3);
