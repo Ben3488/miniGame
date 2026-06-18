@@ -1004,6 +1004,215 @@
             to { opacity: 1; }
         }
 
+        /* ==========================================
+           Responsive Design Refinements
+           ========================================== */
+
+        /* Tablet View */
+        @media (max-width: 1024px) and (min-width: 768px) {
+            .portal-choices {
+                gap: 2rem !important;
+                max-width: 720px !important;
+            }
+            .portal-card {
+                min-height: 350px !important;
+                padding: 1.8rem 1.5rem !important;
+                border-radius: 24px !important;
+            }
+            .portal-card-title {
+                font-size: 1.8rem !important;
+            }
+            .portal-card-desc {
+                font-size: 1rem !important;
+            }
+            .game-card {
+                width: 280px !important;
+                height: 350px !important;
+                padding: 1.5rem !important;
+            }
+            .game-title {
+                font-size: 2rem !important;
+            }
+            .game-desc {
+                font-size: 0.95rem !important;
+            }
+        }
+
+        /* Mobile View (1-screen portal and compact game tiles) */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem !important;
+                justify-content: flex-start !important;
+                padding-top: 1.5rem !important;
+                min-height: auto !important;
+            }
+
+            .portal-wrapper {
+                min-height: auto !important;
+                padding: 0 !important;
+            }
+
+            .portal-header {
+                margin-bottom: 1.25rem !important;
+            }
+
+            .portal-header h1 {
+                font-size: 2rem !important;
+                letter-spacing: 2px !important;
+            }
+
+            .portal-subtitle {
+                font-size: 0.85rem !important;
+                letter-spacing: 1px !important;
+                margin-top: 0.4rem !important;
+            }
+
+            .portal-choices {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+                max-width: 440px !important;
+                width: 100% !important;
+                margin: 0 auto !important;
+            }
+
+            .portal-card {
+                min-height: 140px !important;
+                height: 140px !important;
+                padding: 0.8rem !important;
+                border-radius: 18px !important;
+                justify-content: center !important;
+                align-items: center !important;
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
+            }
+
+            .portal-card-content {
+                gap: 0.4rem !important;
+                width: 100% !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
+            .portal-card .icon-container {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 2.2rem !important;
+                margin-bottom: 0 !important;
+            }
+
+            .portal-card-title {
+                font-size: 1rem !important;
+                letter-spacing: 0px !important;
+                margin-top: 2px !important;
+            }
+
+            .portal-card-desc,
+            .portal-btn {
+                display: none !important;
+            }
+
+            /* Dashboard & Game Arena Mobile Optimization */
+            .dashboard-wrapper {
+                padding: 0 !important;
+            }
+
+            .dashboard-header-container {
+                margin-bottom: 1rem !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                width: 100% !important;
+                gap: 8px !important;
+            }
+
+            .dashboard-header-container .header h1 {
+                font-size: 1.6rem !important;
+            }
+
+            .dashboard-header-container .header .subtitle {
+                font-size: 0.8rem !important;
+                margin-top: 0.2rem !important;
+            }
+
+            .btn-back-to-portal {
+                font-size: 0.85rem !important;
+                padding: 6px 12px !important;
+                gap: 4px !important;
+                border-radius: 20px !important;
+            }
+
+            .category-tabs {
+                margin-bottom: 1.25rem !important;
+                padding: 4px !important;
+                gap: 4px !important;
+                border-radius: 30px !important;
+                width: 100% !important;
+                justify-content: center !important;
+            }
+
+            .tab-btn {
+                padding: 8px 14px !important;
+                font-size: 0.8rem !important;
+                gap: 4px !important;
+            }
+
+            .tab-icon {
+                font-size: 1rem !important;
+            }
+
+            .games-container {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 8px !important;
+                width: 100% !important;
+                padding: 0 !important;
+            }
+
+            .game-card {
+                width: 100% !important;
+                min-height: 140px !important;
+                height: 140px !important;
+                padding: 0.8rem !important;
+                border-radius: 18px !important;
+                justify-content: center !important;
+                align-items: center !important;
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
+            }
+
+            .game-card .card-content {
+                gap: 0.4rem !important;
+                width: 100% !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
+            .game-card .icon-container {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 2.2rem !important;
+                margin-bottom: 0 !important;
+            }
+
+            .game-title {
+                font-size: 1rem !important;
+                margin: 0 !important;
+                letter-spacing: 0px !important;
+            }
+
+            .game-desc,
+            .game-card .play-btn {
+                display: none !important;
+            }
+        }
+
+        /* Prevent sticky hover effects on touch devices */
+        @media (hover: none) {
+            .portal-card:hover,
+            .game-card:hover {
+                transform: none !important;
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
+            }
+        }
+
     </style>
 </head>
 <body>
