@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎥 自媒體 AI 助手 - Unified Premium AI Suite</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="redirect-container glass-panel">
+        <div class="tool-header">
+            <span class="tool-logo">🎥</span>
+            <h1>自媒體 AI 助手</h1>
+            <p class="tool-slogan font-bold">影片分析、簡報 PPT、文字轉語音及自媒體必備工具集合</p>
+            <p class="tool-desc">由於官方安全政策限制，我們為您設計了智慧複製傳送門。可點選下方範本或自由編輯，一鍵複製並跳轉至官方網頁！</p>
+        </div>
+
+        <!-- 1. 主功能分頁 (Main Category Tabs) -->
+        <div class="main-tabs">
+            <button class="tab-btn active" data-tab="video">🎥 影片分析</button>
+            <button class="tab-btn" data-tab="ppt">📊 簡報 PPT</button>
+            <button class="tab-btn" data-tab="tts">🗣️ 文字轉語音</button>
+            <button class="tab-btn" data-tab="creative">🚀 自媒體常用</button>
+        </div>
+
+        <!-- 2. 子平台切換區 (Platform Selector per Tab) -->
+        <div class="platform-section">
+            <!-- 影片分析 Platforms -->
+            <div class="platform-group" id="platforms-video">
+                <button class="platform-btn active" data-url="https://notegpt.io/youtube-video-summarizer" data-platform="NoteGPT">NoteGPT 影片摘要</button>
+                <button class="platform-btn" data-url="https://bibigpt.co/" data-platform="BibiGPT">BibiGPT 音影助理</button>
+                <button class="platform-btn" data-url="https://www.summarize.tech/" data-platform="Summarize.tech">Summarize.tech</button>
+            </div>
+
+            <!-- 簡報 PPT Platforms -->
+            <div class="platform-group hidden" id="platforms-ppt">
+                <button class="platform-btn active" data-url="https://gamma.app/" data-platform="Gamma App">Gamma AI 簡報</button>
+                <button class="platform-btn" data-url="https://tome.app/" data-platform="Tome AI">Tome 故事簡報</button>
+                <button class="platform-btn" data-url="https://www.mindshow.fun/" data-platform="MindShow">MindShow 秀簡報</button>
+            </div>
+
+            <!-- 文字轉語音 Platforms -->
+            <div class="platform-group hidden" id="platforms-tts">
+                <button class="platform-btn active" data-url="https://ttsmaker.com/zh-tw" data-platform="TTSMaker">TTSMaker 配音員</button>
+                <button class="platform-btn" data-url="https://elevenlabs.io/" data-platform="ElevenLabs">ElevenLabs 擬真語音</button>
+                <button class="platform-btn" data-url="https://lovo.ai/" data-platform="Lovo AI">Lovo.ai 語音合成</button>
+            </div>
+
+            <!-- 自媒體常用 Platforms -->
+            <div class="platform-group hidden" id="platforms-creative">
+                <button class="platform-btn active" data-url="https://www.midjourney.com/" data-platform="Midjourney">Midjourney 畫作</button>
+                <button class="platform-btn" data-url="https://stability.ai/" data-platform="Stable Diffusion">Stable Diffusion</button>
+                <button class="platform-btn" data-url="https://www.capcut.com/" data-platform="CapCut Web">剪映 / CapCut</button>
+                <button class="platform-btn" data-url="https://suno.com/" data-platform="Suno AI">Suno AI 音樂</button>
+            </div>
+        </div>
+
+        <!-- 3. 草稿與範本核心區 -->
+        <div class="composer-card secondary-panel">
+            <!-- 常用範本 -->
+            <div class="templates-section">
+                <label id="templates-label">💡 影片分析常用範本</label>
+                <div class="templates-grid" id="templates-container">
+                    <!-- Dynamic templates populated by JS -->
+                </div>
+            </div>
+
+            <!-- 輸入草稿 -->
+            <div class="form-group">
+                <label for="prompt-text" id="prompt-label">📝 您的 AI Prompt / 創作內容</label>
+                <textarea id="prompt-text" placeholder="選取上方範本或直接在此編輯您的創作內容..."></textarea>
+            </div>
+
+            <button class="btn btn-primary" id="btn-redirect">
+                ⚡ 複製內容並開啟 AI 網頁
+            </button>
+        </div>
+
+        <!-- Toast Notification -->
+        <div class="toast hidden" id="toast-notify">
+            🎉 內容已複製到剪貼簿！正在前往網頁...
+        </div>
+
+        <div class="info-footer">
+            <p>💡 提示：點選複製後系統會將內容存入剪貼簿，並為您在新分頁打開所選的官方網頁，您只需貼上即可開始使用。</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

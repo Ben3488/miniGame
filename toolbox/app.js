@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
             '#deepl':         'nav-btn-deepl',
             '#chatgpt':       'nav-btn-chatgpt',
             '#notionai':      'nav-btn-notionai',
+            '#mediaai':       'nav-btn-mediaai',
         };
         const btn = document.getElementById(idMap[hash]);
         if (btn) switchTool(btn);
