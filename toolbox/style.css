@@ -118,13 +118,43 @@ body {
     padding: 24px;
     height: 100%;
     overflow-y: auto;
+    overflow-x: hidden;
+
+    /* 現代 scrollbar-* 標準屬性（Firefox & 新版 Chromium） */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(139, 92, 246, 0.25) transparent;
+}
+
+/* ── 自訂 Webkit 捲軸 ── */
+.dashboard-sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 12px 0;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.2);
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.45);
+}
+
+/* 沒有捲動時隱藏捲軸，hover 才顯示 */
+.dashboard-sidebar:not(:hover)::-webkit-scrollbar-thumb {
+    background: transparent;
 }
 
 .sidebar-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 32px;
+    margin-bottom: 20px;
 }
 
 .sidebar-header .logo-icon {
@@ -156,27 +186,60 @@ body {
 .sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 4px;
     flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 8px;
+
+    /* 底部漸層淡出提示 */
+    mask-image: linear-gradient(to bottom, #000 0%, #000 88%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 88%, transparent 100%);
+
+    /* 繼承自訂捲軸樣式 */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(139, 92, 246, 0.25) transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.18);
+    border-radius: 10px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.4);
+}
+
+.sidebar-nav:not(:hover)::-webkit-scrollbar-thumb {
+    background: transparent;
 }
 
 .nav-item {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
     width: 100%;
-    padding: 14px 18px;
+    padding: 10px 16px;
     background: transparent;
     border: 1px solid transparent;
-    border-radius: 12px;
+    border-radius: 10px;
     color: var(--text-secondary);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
     text-align: left;
     position: relative;
     overflow: hidden;
     transition: var(--transition-smooth);
+    flex-shrink: 0;
 }
 
 .nav-item:hover {

@@ -866,6 +866,15 @@
             max-width: 320px;
         }
 
+        .portal-card-info {
+            display: flex;
+            flex-direction: column;
+            align-items: inherit;
+            gap: 0.25rem;
+            min-width: 0;
+            flex: 1;
+        }
+
         .portal-btn {
             padding: 10px 36px;
             border-radius: 40px;
@@ -1204,81 +1213,206 @@
             }
         }
 
-        /* Mobile Portrait View (2x2 Grid Layout) */
+        /* Mobile Portrait View — Premium Redesign */
         @media (max-width: 768px) and (orientation: portrait) {
             body {
-                padding: 1rem !important;
+                padding: 0 !important;
                 justify-content: flex-start !important;
-                padding-top: 1.5rem !important;
-                min-height: auto !important;
+                padding-top: 0 !important;
+                min-height: 100vh !important;
+                background-image:
+                    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(56, 189, 248, 0.08), transparent),
+                    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(236, 72, 153, 0.06), transparent),
+                    radial-gradient(circle at top left, #1e293b, #0f172a),
+                    radial-gradient(circle at bottom right, #1e293b, #0f172a) !important;
             }
 
+            /* ── Portal View ── */
             .portal-wrapper {
-                min-height: auto !important;
+                min-height: 100vh !important;
                 padding: 0 !important;
+                justify-content: flex-start !important;
             }
 
             .portal-header {
-                margin-bottom: 1.25rem !important;
+                margin-bottom: 0 !important;
+                padding: 2.5rem 1.5rem 1.5rem !important;
+                width: 100% !important;
+                position: relative !important;
+            }
+
+            .portal-header::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 40px;
+                height: 3px;
+                border-radius: 2px;
+                background: linear-gradient(to right, #38bdf8, #818cf8);
+                opacity: 0.5;
             }
 
             .portal-header h1 {
-                font-size: 2rem !important;
-                letter-spacing: 2px !important;
+                font-size: 1.85rem !important;
+                letter-spacing: 3px !important;
+                font-weight: 700 !important;
             }
 
             .portal-subtitle {
-                font-size: 0.85rem !important;
-                letter-spacing: 1px !important;
-                margin-top: 0.4rem !important;
+                font-size: 0.82rem !important;
+                letter-spacing: 1.5px !important;
+                margin-top: 0.5rem !important;
+                opacity: 0.7 !important;
             }
 
+            /* ── Portal Cards Grid ── */
             .portal-choices {
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 10px !important;
-                max-width: 440px !important;
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+                max-width: 100% !important;
                 width: 100% !important;
-                margin: 0 auto !important;
+                margin: 0 !important;
+                padding: 1rem 1rem 2rem !important;
             }
 
             .portal-card {
-                min-height: 140px !important;
-                height: 140px !important;
-                padding: 0.8rem !important;
-                border-radius: 18px !important;
-                justify-content: center !important;
-                align-items: center !important;
-                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
+                min-height: auto !important;
+                height: auto !important;
+                padding: 1.3rem 1.25rem !important;
+                border-radius: 20px !important;
+                justify-content: flex-start !important;
+                align-items: flex-start !important;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35),
+                            inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+                flex-direction: row !important;
+                border: 1px solid rgba(255, 255, 255, 0.06) !important;
+                position: relative !important;
+                overflow: hidden !important;
+            }
+
+            /* 每張卡片加上微妙的頂部漸層高光 */
+            .portal-card::after {
+                content: '' !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                height: 1px !important;
+                background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent) !important;
+            }
+
+            /* 遊戲區卡片左側裝飾線 */
+            .game-zone-card::before {
+                content: '' !important;
+                position: absolute !important;
+                top: 12px !important;
+                bottom: 12px !important;
+                left: 0 !important;
+                right: auto !important;
+                width: 3px !important;
+                height: auto !important;
+                border-radius: 0 2px 2px 0 !important;
+                background: linear-gradient(to bottom, #38bdf8, #818cf8) !important;
+                opacity: 0.8 !important;
+            }
+
+            .scoreboard-zone-card::before {
+                content: '' !important;
+                position: absolute !important;
+                top: 12px !important;
+                bottom: 12px !important;
+                left: 0 !important;
+                right: auto !important;
+                width: 3px !important;
+                height: auto !important;
+                border-radius: 0 2px 2px 0 !important;
+                background: linear-gradient(to bottom, #fbbf24, #f59e0b) !important;
+                opacity: 0.8 !important;
+            }
+
+            .multiscoreboard-zone-card::before {
+                content: '' !important;
+                position: absolute !important;
+                top: 12px !important;
+                bottom: 12px !important;
+                left: 0 !important;
+                right: auto !important;
+                width: 3px !important;
+                height: auto !important;
+                border-radius: 0 2px 2px 0 !important;
+                background: linear-gradient(to bottom, #a78bfa, #8b5cf6) !important;
+                opacity: 0.8 !important;
+            }
+
+            .tool-zone-card::before {
+                content: '' !important;
+                position: absolute !important;
+                top: 12px !important;
+                bottom: 12px !important;
+                left: 0 !important;
+                right: auto !important;
+                width: 3px !important;
+                height: auto !important;
+                border-radius: 0 2px 2px 0 !important;
+                background: linear-gradient(to bottom, #ec4899, #f472b6) !important;
+                opacity: 0.8 !important;
             }
 
             .portal-card-content {
-                gap: 0.4rem !important;
+                flex-direction: row !important;
+                gap: 1rem !important;
                 width: 100% !important;
                 align-items: center !important;
-                justify-content: center !important;
+                justify-content: flex-start !important;
+                text-align: left !important;
             }
 
             .portal-card .icon-container {
-                width: 50px !important;
-                height: 50px !important;
-                font-size: 2.2rem !important;
+                width: 52px !important;
+                height: 52px !important;
+                font-size: 1.8rem !important;
                 margin-bottom: 0 !important;
+                flex-shrink: 0 !important;
+                border-width: 1.5px !important;
+                box-shadow: none !important;
+            }
+
+            /* 文字區塊（標題 + 描述） */
+            .portal-card-content .portal-card-title,
+            .portal-card-content .portal-card-desc {
+                text-align: left !important;
             }
 
             .portal-card-title {
-                font-size: 1rem !important;
-                letter-spacing: 0px !important;
-                margin-top: 2px !important;
+                font-size: 1.05rem !important;
+                letter-spacing: 0.5px !important;
+                margin-top: 0 !important;
+                line-height: 1.3 !important;
             }
 
-            .portal-card-desc,
+            .portal-card-desc {
+                display: block !important;
+                font-size: 0.75rem !important;
+                line-height: 1.45 !important;
+                margin: 0 !important;
+                margin-top: 3px !important;
+                max-width: none !important;
+                opacity: 0.6 !important;
+                -webkit-line-clamp: 2 !important;
+                -webkit-box-orient: vertical !important;
+                overflow: hidden !important;
+                display: -webkit-box !important;
+            }
+
             .portal-btn {
                 display: none !important;
             }
 
-            /* Dashboard & Game Arena Mobile Optimization */
+            /* ── Dashboard & Game Arena ── */
             .dashboard-wrapper {
-                padding: 0 !important;
+                padding: 0 1rem !important;
             }
 
             .dashboard-header-container {
@@ -1288,10 +1422,11 @@
                 justify-content: space-between !important;
                 width: 100% !important;
                 gap: 8px !important;
+                padding-top: 1.5rem !important;
             }
 
             .dashboard-header-container .header h1 {
-                font-size: 1.6rem !important;
+                font-size: 1.5rem !important;
             }
 
             .dashboard-header-container .header .subtitle {
@@ -1300,48 +1435,61 @@
             }
 
             .btn-back-to-portal {
-                font-size: 0.85rem !important;
-                padding: 6px 12px !important;
-                gap: 4px !important;
+                font-size: 0.82rem !important;
+                padding: 7px 14px !important;
+                gap: 5px !important;
                 border-radius: 20px !important;
             }
 
             .category-tabs {
-                margin-bottom: 1.25rem !important;
-                padding: 4px !important;
-                gap: 4px !important;
-                border-radius: 30px !important;
+                margin-bottom: 1rem !important;
+                padding: 3px !important;
+                gap: 3px !important;
+                border-radius: 25px !important;
                 width: 100% !important;
                 justify-content: center !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                scrollbar-width: none !important;
+            }
+
+            .category-tabs::-webkit-scrollbar {
+                display: none;
             }
 
             .tab-btn {
-                padding: 8px 14px !important;
-                font-size: 0.8rem !important;
+                padding: 7px 12px !important;
+                font-size: 0.78rem !important;
                 gap: 4px !important;
+                white-space: nowrap !important;
+                flex-shrink: 0 !important;
             }
 
             .tab-icon {
-                font-size: 1rem !important;
+                font-size: 0.9rem !important;
             }
 
+            /* ── Game Cards — 2 列網格 ── */
             .games-container {
                 display: grid !important;
                 grid-template-columns: repeat(2, 1fr) !important;
-                gap: 8px !important;
+                gap: 10px !important;
                 width: 100% !important;
                 padding: 0 !important;
+                padding-bottom: 2rem !important;
             }
 
             .game-card {
                 width: 100% !important;
-                min-height: 140px !important;
-                height: 140px !important;
-                padding: 0.8rem !important;
-                border-radius: 18px !important;
+                min-height: 0 !important;
+                height: auto !important;
+                padding: 1.2rem 0.6rem !important;
+                border-radius: 16px !important;
                 justify-content: center !important;
                 align-items: center !important;
-                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3),
+                            inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
             }
 
             .game-card .card-content {
@@ -1352,17 +1500,23 @@
             }
 
             .game-card .icon-container {
-                width: 50px !important;
-                height: 50px !important;
-                font-size: 2.2rem !important;
+                width: 46px !important;
+                height: 46px !important;
+                font-size: 1.7rem !important;
                 margin-bottom: 0 !important;
                 transition: none !important;
+                border-width: 1.5px !important;
             }
 
             .game-title {
-                font-size: 1rem !important;
+                font-size: 0.95rem !important;
                 margin: 0 !important;
-                letter-spacing: 0px !important;
+                letter-spacing: 0.3px !important;
+                line-height: 1.3 !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                max-width: 100% !important;
             }
 
             .game-desc,
@@ -1398,8 +1552,10 @@
                     <div class="icon-container">
                         🎮
                     </div>
-                    <h2 class="portal-card-title">遊戲娛樂區</h2>
-                    <p class="portal-card-desc">收錄五子棋、象棋、跳棋、圍棋、三國殺等 14 款經典對局棋盤遊戲。</p>
+                    <div class="portal-card-info">
+                        <h2 class="portal-card-title">遊戲娛樂區</h2>
+                        <p class="portal-card-desc">收錄五子棋、象棋、跳棋、圍棋、三國殺等 14 款經典對局棋盤遊戲。</p>
+                    </div>
                     <button class="portal-btn">進入遊戲區</button>
                 </div>
             </div>
@@ -1410,8 +1566,10 @@
                     <div class="icon-container">
                         🏆
                     </div>
-                    <h2 class="portal-card-title">寶貝表現計分板</h2>
-                    <p class="portal-card-desc">專為 3 位寶貝設計的表現計分板，支援加減分、常用按鈕自訂與歷史紀錄。</p>
+                    <div class="portal-card-info">
+                        <h2 class="portal-card-title">寶貝表現計分板</h2>
+                        <p class="portal-card-desc">專為 3 位寶貝設計的表現計分板，支援加減分、常用按鈕自訂與歷史紀錄。</p>
+                    </div>
                     <button class="portal-btn">開啟計分板</button>
                 </div>
             </a>
@@ -1422,8 +1580,10 @@
                     <div class="icon-container">
                         👥
                     </div>
-                    <h2 class="portal-card-title">兒童表現計分板</h2>
-                    <p class="portal-card-desc">支援 2 至 10 人自訂成員的表現計分板，支援常用快捷點數與大頭貼自訂。</p>
+                    <div class="portal-card-info">
+                        <h2 class="portal-card-title">兒童表現計分板</h2>
+                        <p class="portal-card-desc">支援 2 至 10 人自訂成員的表現計分板，支援常用快捷點數與大頭貼自訂。</p>
+                    </div>
                     <button class="portal-btn">開啟計分板</button>
                 </div>
             </a>
@@ -1434,8 +1594,10 @@
                     <div class="icon-container">
                         🛠️
                     </div>
-                    <h2 class="portal-card-title">智慧工具箱</h2>
-                    <p class="portal-card-desc">整合 AI 圖片去背及極速影音下載等便捷實用工具。</p>
+                    <div class="portal-card-info">
+                        <h2 class="portal-card-title">智慧工具箱</h2>
+                        <p class="portal-card-desc">整合 AI 圖片去背及極速影音下載等便捷實用工具。</p>
+                    </div>
                     <button class="portal-btn">開啟工具箱</button>
                 </div>
             </a>
