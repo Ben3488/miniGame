@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="一個精緻、現代且具備強大 AI 的霓虹玻璃擬態四子棋遊戲（Connect Four）。提供雙人對決及智慧 AI（輕鬆、聰明、地獄）模式，內建落子動畫、合成音效與粒子特效。">
+    <title>極光霓虹四子棋 | Neon Connect Four</title>
+    
+    <!-- Google Fonts: Outfit for display, Inter for UI text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for modern icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --card-bg: rgba(13, 20, 35, 0.65);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --cyan-neon: #00f2fe;
+            --cyan-glow: rgba(0, 242, 254, 0.45);
+            --pink-neon: #ff007f;
+            --pink-glow: rgba(255, 0, 127, 0.45);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Background Ambient Glows */
+        .ambient-glow {
+            position: fixed;
+            width: 360px;
+            height: 360px;
+            border-radius: 50%;
+            filter: blur(110px);
+            z-index: 0;
+            opacity: 0.42;
+            pointer-events: none;
+            animation: pulse-glow 8s infinite alternate ease-in-out;
+        }
+
+        .cyan-glow {
+            background-color: var(--cyan-neon);
+            top: 8%;
+            left: 10%;
+        }
+
+        .pink-glow {
+            background-color: var(--pink-neon);
+            bottom: 8%;
+            right: 10%;
+            animation-delay: 4s;
+        }
+
+        @keyframes pulse-glow {
+            0% {
+                transform: scale(1) translate(0, 0);
+                opacity: 0.32;
+            }
+            100% {
+                transform: scale(1.25) translate(25px, 20px);
+                opacity: 0.52;
+            }
+        }
+
+        /* Particle Canvas Overlay */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        /* Main App Container */
+        .app-container {
+            width: 100%;
+            max-width: 520px;
+            padding: 20px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .card-glass {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        /* Screen Transitions */
+        .screen {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            animation: fade-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Menu Screen Styles --- */
+        .game-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .logo-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.85rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: 2px;
+            color: var(--text-primary);
+        }
+
+        .logo-text .highlight {
+            background: linear-gradient(135deg, var(--cyan-neon), var(--pink-neon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 242, 254, 0.2);
+        }
+
+        .tagline {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            letter-spacing: 4px;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        .menu-box {
+            padding: 28px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+        }
+
+        .subsection-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .mode-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn {
+            border: none;
+            outline: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 16px;
+            transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-mode {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            padding: 16px 22px;
+            justify-content: flex-start;
+        }
+
+        .btn-mode i {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-mode:hover {
+            background: rgba(255, 255, 255, 0.07);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .btn-mode.active {
+            background: rgba(0, 242, 254, 0.1);
+            border-color: var(--cyan-neon);
+            color: var(--cyan-neon);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+        }
+
+        .btn-mode.active i {
+            transform: scale(1.1);
+        }
+
+        .difficulty-section {
+            max-height: 280px;
+            opacity: 1;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .difficulty-section.hidden {
+            max-height: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .difficulty-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .btn-diff,
+        .btn-order {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            padding: 11px 8px;
+            font-size: 0.88rem;
+            border-radius: 12px;
+        }
+
+        .btn-diff:hover,
+        .btn-order:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-primary);
+        }
+
+        .btn-diff.active {
+            background: rgba(255, 0, 127, 0.12);
+            border-color: var(--pink-neon);
+            color: var(--pink-neon);
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.25);
+        }
+
+        .btn-order.active {
+            background: rgba(0, 242, 254, 0.12);
+            border-color: var(--cyan-neon);
+            color: var(--cyan-neon);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cyan-neon), #00d2ff);
+            color: #030712;
+            padding: 16px;
+            font-size: 1.08rem;
+            font-weight: 700;
+            margin-top: 4px;
+            box-shadow: 0 4px 20px rgba(0, 242, 254, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 8px 25px rgba(0, 242, 254, 0.6);
+        }
+
+        /* --- Game Screen Styles --- */
+        .game-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            width: 100%;
+        }
+
+        .btn-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+        }
+
+        .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            transform: scale(1.05);
+        }
+
+        .nav-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-title span {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .badge-diff {
+            font-size: 0.72rem !important;
+            background: rgba(255, 0, 127, 0.15);
+            border: 1px solid var(--pink-neon);
+            color: var(--pink-neon);
+            padding: 2px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px !important;
+        }
+
+        .badge-diff.hidden {
+            display: none;
+        }
+
+        /* Scoreboard */
+        .scoreboard-container {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr 1.2fr;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 14px;
+        }
+
+        .score-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .score-card .player-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .avatar-p1 {
+            background: radial-gradient(circle at 35% 30%, #67e8f9, #00f2fe 60%, #0284c7);
+            box-shadow: 0 0 12px var(--cyan-glow);
+        }
+
+        .avatar-p2 {
+            background: radial-gradient(circle at 35% 30%, #f472b6, #ff007f 60%, #be185d);
+            box-shadow: 0 0 12px var(--pink-glow);
+        }
+
+        .avatar-tie {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .score-card .player-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .score-card .player-name {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .score-card .player-score-num {
+            font-size: 1.3rem;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            line-height: 1.1;
+        }
+
+        .score-card.p1-score.active-turn {
+            border-color: var(--cyan-neon);
+            box-shadow: 0 0 16px var(--cyan-glow);
+            background: rgba(0, 242, 254, 0.06);
+        }
+
+        .score-card.p2-score.active-turn {
+            border-color: var(--pink-neon);
+            box-shadow: 0 0 16px var(--pink-glow);
+            background: rgba(255, 0, 127, 0.06);
+        }
+
+        /* Status Announcement Bar */
+        .status-announcement {
+            text-align: center;
+            font-size: 1.08rem;
+            font-weight: 500;
+            margin-bottom: 10px;
+            min-height: 26px;
+            letter-spacing: 0.4px;
+        }
+
+        .font-bold {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        /* Column Hover Preview Row */
+        .preview-row {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            padding: 0 12px;
+            height: 38px;
+            margin-bottom: 6px;
+            align-items: center;
+        }
+
+        .preview-cell {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .preview-disc {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            opacity: 0;
+            transform: translateY(-6px) scale(0.75);
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+        }
+
+        .preview-cell.show-p1 .preview-disc {
+            opacity: 0.9;
+            transform: translateY(0) scale(1);
+            background: radial-gradient(circle at 35% 30%, #a5f3fc, var(--cyan-neon) 65%, #0284c7);
+            box-shadow: 0 0 15px var(--cyan-neon);
+        }
+
+        .preview-cell.show-p2 .preview-disc {
+            opacity: 0.9;
+            transform: translateY(0) scale(1);
+            background: radial-gradient(circle at 35% 30%, #fbcfe8, var(--pink-neon) 65%, #be185d);
+            box-shadow: 0 0 15px var(--pink-neon);
+        }
+
+        /* Connect Four 7x6 Board */
+        .board-wrapper {
+            width: 100%;
+            aspect-ratio: 7 / 6;
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .board {
+            width: 100%;
+            height: 100%;
+            padding: 12px;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 8px;
+            background: rgba(13, 23, 42, 0.78);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cell {
+            background: rgba(6, 10, 20, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 50%;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.65);
+            transition: border-color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .cell.col-hover {
+            border-color: rgba(255, 255, 255, 0.24);
+            background: rgba(20, 32, 58, 0.75);
+        }
+
+        /* Disc styles & Drop animation */
+        .disc {
+            width: 88%;
+            height: 88%;
+            border-radius: 50%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .disc.p1 {
+            background: radial-gradient(circle at 32% 28%, #cffafe, var(--cyan-neon) 55%, #0369a1 95%);
+            box-shadow: 0 0 14px var(--cyan-glow), inset 0 2px 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .disc.p2 {
+            background: radial-gradient(circle at 32% 28%, #fce7f3, var(--pink-neon) 55%, #9d174d 95%);
+            box-shadow: 0 0 14px var(--pink-glow), inset 0 2px 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .disc.drop-anim {
+            animation: drop-disc var(--drop-duration, 0.42s) cubic-bezier(0.25, 0.9, 0.35, 1.08) forwards;
+        }
+
+        @keyframes drop-disc {
+            0% {
+                transform: translateY(calc(var(--drop-rows, 6) * -112%));
+                opacity: 0.7;
+            }
+            82% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            91% {
+                transform: translateY(-10%);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        /* Winning 4-in-a-row highlight */
+        .cell.winning-cell-p1 {
+            border-color: #ffffff;
+            box-shadow: 0 0 22px var(--cyan-neon), inset 0 0 12px var(--cyan-neon);
+            animation: win-pulse-p1 1.1s infinite alternate ease-in-out;
+        }
+
+        .cell.winning-cell-p2 {
+            border-color: #ffffff;
+            box-shadow: 0 0 22px var(--pink-neon), inset 0 0 12px var(--pink-neon);
+            animation: win-pulse-p2 1.1s infinite alternate ease-in-out;
+        }
+
+        @keyframes win-pulse-p1 {
+            from { transform: scale(1); box-shadow: 0 0 14px var(--cyan-neon); }
+            to { transform: scale(1.06); box-shadow: 0 0 28px var(--cyan-neon); }
+        }
+
+        @keyframes win-pulse-p2 {
+            from { transform: scale(1); box-shadow: 0 0 14px var(--pink-neon); }
+            to { transform: scale(1.06); box-shadow: 0 0 28px var(--pink-neon); }
+        }
+
+        .board.ai-thinking,
+        .board.ai-thinking .cell {
+            cursor: wait;
+        }
+
+        .board.ai-thinking .cell {
+            pointer-events: none;
+        }
+
+        /* Game Controls Footer */
+        .game-controls {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .btn-secondary {
+            flex: 1.3;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 13px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary-danger {
+            flex: 0.7;
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            padding: 13px;
+        }
+
+        .btn-secondary-danger:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .cyan-text { color: var(--cyan-neon); }
+        .pink-text { color: var(--pink-neon); }
+        .gray-text { color: var(--text-secondary); }
+
+        @media (max-width: 440px) {
+            .app-container {
+                padding: 12px;
+            }
+            .logo-text {
+                font-size: 2.25rem;
+            }
+            .menu-box {
+                padding: 20px;
+            }
+            .board {
+                padding: 8px;
+                gap: 5px;
+            }
+            .preview-row {
+                padding: 0 8px;
+                gap: 5px;
+                height: 30px;
+            }
+            .preview-disc {
+                width: 24px;
+                height: 24px;
+            }
+            .score-card {
+                padding: 8px;
+                gap: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="app-container">
+        <div class="ambient-glow cyan-glow"></div>
+        <div class="ambient-glow pink-glow"></div>
+
+        <!-- Start Menu Screen -->
+        <div id="menu-screen" class="screen active">
+            <header class="game-header">
+                <h1 class="logo-text">NEON<br><span class="highlight">CONNECT FOUR</span></h1>
+                <p class="tagline">極光四子棋 ‧ 四連勝決</p>
+            </header>
+
+            <div class="menu-box card-glass">
+                <h2 class="section-title">選擇遊戲模式</h2>
+                
+                <div class="mode-options">
+                    <button id="btn-pvp" class="btn btn-mode active" data-mode="pvp">
+                        <i class="fa-solid fa-users"></i>
+                        <span>雙人對決 (PvP)</span>
+                    </button>
+                    <button id="btn-pve" class="btn btn-mode" data-mode="pve">
+                        <i class="fa-solid fa-robot"></i>
+                        <span>挑戰 AI (PvE)</span>
+                    </button>
+                </div>
+
+                <!-- Difficulty & First-Turn Order selection -->
+                <div id="difficulty-section" class="difficulty-section hidden">
+                    <h3 class="subsection-title">AI 難度</h3>
+                    <div class="difficulty-options">
+                        <button class="btn btn-diff" data-diff="easy">輕鬆</button>
+                        <button class="btn btn-diff active" data-diff="medium">聰明</button>
+                        <button class="btn btn-diff" data-diff="hard">地獄</button>
+                    </div>
+                    <h3 class="subsection-title" style="margin-top: 14px;">先後手設定</h3>
+                    <div class="difficulty-options">
+                        <button class="btn btn-order active" data-order="player">玩家先手</button>
+                        <button class="btn btn-order" data-order="ai">AI 先手</button>
+                        <button class="btn btn-order" data-order="alternate">輪流先手</button>
+                    </div>
+                </div>
+
+                <button id="btn-start" class="btn btn-primary">
+                    <span>開始遊戲</span>
+                    <i class="fa-solid fa-play"></i>
+                </button>
+                
+                <a href="../index.html?zone=games" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>返回遊戲大廳</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div class="game-nav">
+                <button id="btn-back-menu" class="btn btn-icon" title="返回主選單">
+                    <i class="fa-solid fa-house"></i>
+                </button>
+                <div class="nav-title">
+                    <span id="game-mode-display">雙人對決</span>
+                    <span id="game-diff-display" class="badge-diff hidden">聰明</span>
+                </div>
+                <button id="btn-sound-toggle" class="btn btn-icon" title="切換音效">
+                    <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+
+            <!-- Scoreboard -->
+            <div class="scoreboard-container">
+                <div class="score-card p1-score active-turn" id="score-card-p1">
+                    <div class="player-avatar avatar-p1"></div>
+                    <div class="player-info">
+                        <span class="player-name" id="name-p1">玩家 1</span>
+                        <span class="player-score-num cyan-text" id="score-p1">0</span>
+                    </div>
+                </div>
+
+                <div class="score-card tie-score">
+                    <div class="player-avatar avatar-tie">
+                        <i class="fa-solid fa-handshake"></i>
+                    </div>
+                    <div class="player-info">
+                        <span class="player-name">平手</span>
+                        <span class="player-score-num" id="score-ties">0</span>
+                    </div>
+                </div>
+
+                <div class="score-card p2-score" id="score-card-p2">
+                    <div class="player-avatar avatar-p2"></div>
+                    <div class="player-info">
+                        <span class="player-name" id="name-p2">玩家 2</span>
+                        <span class="player-score-num pink-text" id="score-p2">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Announcement Bar -->
+            <div class="status-announcement" id="status-text">
+                輪到 <span class="cyan-text font-bold">玩家 1</span> 的回合
+            </div>
+
+            <!-- Column Hover Preview Indicator Row -->
+            <div class="preview-row" id="preview-row"></div>
+
+            <!-- 7x6 Connect Four Board -->
+            <div class="board-wrapper">
+                <div class="board card-glass" id="board"></div>
+            </div>
+
+            <!-- Game Control Buttons -->
+            <div class="game-controls">
+                <button id="btn-reset" class="btn btn-secondary">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>重新此局</span>
+                </button>
+                <button id="btn-reset-scores" class="btn btn-secondary-danger">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>重設比分</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Neon Connect Four - 7 Columns x 6 Rows Game & Minimax AI Engine
+
+        const ROWS = 6;
+        const COLS = 7;
+        const COL_SEARCH_ORDER = [3, 2, 4, 1, 5, 0, 6]; // Center-outward column ordering for Alpha-Beta efficiency
+
+        // Audio Manager (Web Audio API)
+        const SoundManager = {
+            ctx: null,
+            enabled: true,
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            },
+
+            toggle() {
+                this.enabled = !this.enabled;
+                localStorage.setItem('neon_c4_sound', this.enabled);
+                return this.enabled;
+            },
+
+            playTone(freqs, duration, type = 'sine', slide = false, endFreq = 0) {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gainNode = this.ctx.createGain();
+
+                osc.type = type;
+                osc.connect(gainNode);
+                gainNode.connect(this.ctx.destination);
+
+                if (Array.isArray(freqs)) {
+                    freqs.forEach((f, index) => {
+                        const noteTime = now + (duration / freqs.length) * index;
+                        osc.frequency.setValueAtTime(f, noteTime);
+                    });
+                } else {
+                    osc.frequency.setValueAtTime(freqs, now);
+                    if (slide && endFreq > 0) {
+                        osc.frequency.exponentialRampToValueAtTime(endFreq, now + duration);
+                    }
+                }
+
+                gainNode.gain.setValueAtTime(0.15, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+                osc.start(now);
+                osc.stop(now + duration);
+            },
+
+            playClick() {
+                this.playTone(800, 0.07, 'sine');
+            },
+
+            playDrop(player) {
+                if (player === 1) {
+                    this.playTone(300, 0.14, 'triangle', true, 620);
+                } else {
+                    this.playTone(540, 0.14, 'triangle', true, 270);
+                }
+            },
+
+            playWin(isAIWin = false) {
+                const freqs = isAIWin ? [440, 349, 293, 220] : [261.63, 329.63, 392.00, 523.25];
+                const type = isAIWin ? 'sawtooth' : 'triangle';
+                this.playTone(freqs, 0.46, type);
+            },
+
+            playTie() {
+                this.playTone([300, 250, 200], 0.35, 'sawtooth');
+            }
+        };
+
+        // Particle Celebration System
+        const ParticleSystem = {
+            canvas: null,
+            ctx: null,
+            particles: [],
+            animationId: null,
+
+            init() {
+                this.canvas = document.getElementById('particle-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+            },
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            },
+
+            createExplosion(x, y, color) {
+                const count = 42;
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 8 + 3;
+                    this.particles.push({
+                        x,
+                        y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed - Math.random() * 3,
+                        size: Math.random() * 4 + 2,
+                        color,
+                        alpha: 1,
+                        decay: Math.random() * 0.02 + 0.014,
+                        gravity: 0.15
+                    });
+                }
+                if (!this.animationId) {
+                    this.update();
+                }
+            },
+
+            update() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const p = this.particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += p.gravity;
+                    p.alpha -= p.decay;
+
+                    if (p.alpha <= 0) {
+                        this.particles.splice(i, 1);
+                        continue;
+                    }
+
+                    this.ctx.save();
+                    this.ctx.globalAlpha = p.alpha;
+                    this.ctx.shadowBlur = 10;
+                    this.ctx.shadowColor = p.color;
+                    this.ctx.fillStyle = p.color;
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    this.ctx.restore();
+                }
+
+                if (this.particles.length > 0) {
+                    this.animationId = requestAnimationFrame(() => this.update());
+                } else {
+                    this.animationId = null;
+                }
+            }
+        };
+
+        // Main Game Controller
+        const Game = {
+            board: [], // 6 rows x 7 cols: 0 = empty, 1 = Player 1 (Cyan), 2 = Player 2 / AI (Pink)
+            gameActive: false,
+            gameMode: 'pvp', // 'pvp' | 'pve'
+            difficulty: 'medium', // 'easy' | 'medium' | 'hard'
+            firstTurnSetting: 'player', // 'player' (1), 'ai' (2), 'alternate'
+            startingPlayer: 1,
+            currentPlayer: 1,
+            hoveredCol: null,
+            aiTimeoutId: null,
+
+            allScores: {
+                pvp: { P1: 0, P2: 0, ties: 0 },
+                pve_easy: { P1: 0, P2: 0, ties: 0 },
+                pve_medium: { P1: 0, P2: 0, ties: 0 },
+                pve_hard: { P1: 0, P2: 0, ties: 0 }
+            },
+
+            elements: {},
+
+            init() {
+                this.elements = {
+                    menuScreen: document.getElementById('menu-screen'),
+                    gameScreen: document.getElementById('game-screen'),
+                    btnPvP: document.getElementById('btn-pvp'),
+                    btnPvE: document.getElementById('btn-pve'),
+                    btnStart: document.getElementById('btn-start'),
+                    btnBackMenu: document.getElementById('btn-back-menu'),
+                    btnSoundToggle: document.getElementById('btn-sound-toggle'),
+                    soundIcon: document.getElementById('sound-icon'),
+                    btnReset: document.getElementById('btn-reset'),
+                    btnResetScores: document.getElementById('btn-reset-scores'),
+                    difficultySection: document.getElementById('difficulty-section'),
+                    previewRow: document.getElementById('preview-row'),
+                    boardEl: document.getElementById('board'),
+                    statusText: document.getElementById('status-text'),
+                    scoreP1: document.getElementById('score-p1'),
+                    scoreP2: document.getElementById('score-p2'),
+                    scoreTies: document.getElementById('score-ties'),
+                    nameP1: document.getElementById('name-p1'),
+                    nameP2: document.getElementById('name-p2'),
+                    gameModeDisplay: document.getElementById('game-mode-display'),
+                    gameDiffDisplay: document.getElementById('game-diff-display'),
+                    scoreCardP1: document.getElementById('score-card-p1'),
+                    scoreCardP2: document.getElementById('score-card-p2')
+                };
+
+                this.buildBoardDOM();
+                this.loadSettings();
+                this.bindEvents();
+                ParticleSystem.init();
+            },
+
+            buildBoardDOM() {
+                this.elements.previewRow.innerHTML = '';
+                for (let c = 0; c < COLS; c++) {
+                    const pCell = document.createElement('div');
+                    pCell.className = 'preview-cell';
+                    pCell.dataset.col = c;
+                    const pDisc = document.createElement('div');
+                    pDisc.className = 'preview-disc';
+                    pCell.appendChild(pDisc);
+
+                    pCell.addEventListener('mouseenter', () => this.setHoveredColumn(c));
+                    pCell.addEventListener('mouseleave', () => this.clearHoveredColumn());
+                    pCell.addEventListener('click', () => this.handleColumnClick(c));
+                    this.elements.previewRow.appendChild(pCell);
+                }
+
+                this.elements.boardEl.innerHTML = '';
+                for (let r = 0; r < ROWS; r++) {
+                    for (let c = 0; c < COLS; c++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.dataset.row = r;
+                        cell.dataset.col = c;
+
+                        cell.addEventListener('mouseenter', () => this.setHoveredColumn(c));
+                        cell.addEventListener('mouseleave', () => this.clearHoveredColumn());
+                        cell.addEventListener('click', () => this.handleColumnClick(c));
+
+                        this.elements.boardEl.appendChild(cell);
+                    }
+                }
+            },
+
+            getCellElement(r, c) {
+                return this.elements.boardEl.children[r * COLS + c];
+            },
+
+            loadSettings() {
+                const savedSound = localStorage.getItem('neon_c4_sound');
+                if (savedSound !== null) {
+                    SoundManager.enabled = savedSound === 'true';
+                }
+                this.updateSoundIcon();
+
+                const savedScores = localStorage.getItem('neon_c4_scores_v1');
+                if (savedScores) {
+                    try {
+                        const parsed = JSON.parse(savedScores);
+                        if (parsed && typeof parsed === 'object') {
+                            this.allScores = { ...this.allScores, ...parsed };
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse Connect Four scores', e);
+                    }
+                }
+                this.updateScoreboardUI();
+            },
+
+            saveScores() {
+                localStorage.setItem('neon_c4_scores_v1', JSON.stringify(this.allScores));
+            },
+
+            getCurrentScoreKey() {
+                return this.gameMode === 'pvp' ? 'pvp' : `pve_${this.difficulty}`;
+            },
+
+            get scores() {
+                const key = this.getCurrentScoreKey();
+                if (!this.allScores[key]) {
+                    this.allScores[key] = { P1: 0, P2: 0, ties: 0 };
+                }
+                return this.allScores[key];
+            },
+
+            clearAITimeout() {
+                if (this.aiTimeoutId !== null) {
+                    clearTimeout(this.aiTimeoutId);
+                    this.aiTimeoutId = null;
+                }
+                if (this.elements.boardEl) {
+                    this.elements.boardEl.classList.remove('ai-thinking');
+                }
+            },
+
+            bindEvents() {
+                this.elements.btnPvP.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.setGameMode('pvp');
+                });
+
+                this.elements.btnPvE.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.setGameMode('pve');
+                });
+
+                document.querySelectorAll('.btn-diff').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        SoundManager.playClick();
+                        const target = e.currentTarget;
+                        document.querySelectorAll('.btn-diff').forEach(b => b.classList.remove('active'));
+                        target.classList.add('active');
+                        this.difficulty = target.dataset.diff;
+                    });
+                });
+
+                document.querySelectorAll('.btn-order').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        SoundManager.playClick();
+                        const target = e.currentTarget;
+                        document.querySelectorAll('.btn-order').forEach(b => b.classList.remove('active'));
+                        target.classList.add('active');
+                        this.firstTurnSetting = target.dataset.order;
+                    });
+                });
+
+                this.elements.btnStart.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.startGame();
+                });
+
+                this.elements.btnBackMenu.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.showMenu();
+                });
+
+                this.elements.btnSoundToggle.addEventListener('click', () => {
+                    SoundManager.toggle();
+                    this.updateSoundIcon();
+                    if (SoundManager.enabled) {
+                        SoundManager.playTone(600, 0.08);
+                    }
+                });
+
+                this.elements.btnReset.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.resetRound();
+                });
+
+                this.elements.btnResetScores.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.resetScores();
+                });
+            },
+
+            setGameMode(mode) {
+                this.gameMode = mode;
+                if (mode === 'pvp') {
+                    this.elements.btnPvP.classList.add('active');
+                    this.elements.btnPvE.classList.remove('active');
+                    this.elements.difficultySection.classList.add('hidden');
+                } else {
+                    this.elements.btnPvE.classList.add('active');
+                    this.elements.btnPvP.classList.remove('active');
+                    this.elements.difficultySection.classList.remove('hidden');
+                }
+            },
+
+            updateSoundIcon() {
+                this.elements.soundIcon.className = SoundManager.enabled
+                    ? 'fa-solid fa-volume-high'
+                    : 'fa-solid fa-volume-xmark';
+            },
+
+            getInitialStartingPlayer() {
+                if (this.gameMode === 'pvp') return 1;
+                if (this.firstTurnSetting === 'ai') return 2;
+                return 1;
+            },
+
+            advanceStartingPlayerForNextRound() {
+                if (this.gameMode === 'pve' && this.firstTurnSetting === 'alternate') {
+                    this.startingPlayer = this.startingPlayer === 1 ? 2 : 1;
+                } else {
+                    this.startingPlayer = this.getInitialStartingPlayer();
+                }
+            },
+
+            startGame() {
+                this.elements.menuScreen.classList.remove('active');
+                this.elements.gameScreen.classList.add('active');
+
+                if (this.gameMode === 'pvp') {
+                    this.elements.nameP1.textContent = '玩家 1';
+                    this.elements.nameP2.textContent = '玩家 2';
+                    this.elements.gameModeDisplay.textContent = '雙人對決 (PvP)';
+                    this.elements.gameDiffDisplay.classList.add('hidden');
+                } else {
+                    this.elements.nameP1.textContent = '玩家';
+                    this.elements.nameP2.textContent = 'AI 機器人';
+                    this.elements.gameModeDisplay.textContent = '挑戰 AI (PvE)';
+                    this.elements.gameDiffDisplay.classList.remove('hidden');
+                    const diffMap = { easy: '輕鬆', medium: '聰明', hard: '地獄' };
+                    this.elements.gameDiffDisplay.textContent = diffMap[this.difficulty];
+                }
+
+                this.startingPlayer = this.getInitialStartingPlayer();
+                this.updateScoreboardUI();
+                this.resetRound();
+            },
+
+            showMenu() {
+                this.clearAITimeout();
+                this.clearHoveredColumn();
+                this.gameActive = false;
+                this.elements.gameScreen.classList.remove('active');
+                this.elements.menuScreen.classList.add('active');
+            },
+
+            resetRound() {
+                this.clearAITimeout();
+                this.board = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+
+                if (this.gameMode === 'pvp' || this.firstTurnSetting !== 'alternate') {
+                    this.startingPlayer = this.getInitialStartingPlayer();
+                }
+                this.currentPlayer = this.startingPlayer;
+                this.gameActive = true;
+
+                for (let r = 0; r < ROWS; r++) {
+                    for (let c = 0; c < COLS; c++) {
+                        const cell = this.getCellElement(r, c);
+                        cell.className = 'cell';
+                        cell.innerHTML = '';
+                    }
+                }
+
+                this.updateTurnIndicator();
+                this.updateStatusText();
+                this.refreshHoverPreview();
+
+                if (this.gameMode === 'pve' && this.currentPlayer === 2) {
+                    this.scheduleAIMove();
+                }
+            },
+
+            resetScores() {
+                this.allScores[this.getCurrentScoreKey()] = { P1: 0, P2: 0, ties: 0 };
+                this.startingPlayer = this.getInitialStartingPlayer();
+                this.saveScores();
+                this.updateScoreboardUI();
+            },
+
+            updateScoreboardUI() {
+                this.elements.scoreP1.textContent = this.scores.P1;
+                this.elements.scoreP2.textContent = this.scores.P2;
+                this.elements.scoreTies.textContent = this.scores.ties;
+            },
+
+            updateTurnIndicator() {
+                if (this.currentPlayer === 1) {
+                    this.elements.scoreCardP1.classList.add('active-turn');
+                    this.elements.scoreCardP2.classList.remove('active-turn');
+                } else {
+                    this.elements.scoreCardP2.classList.add('active-turn');
+                    this.elements.scoreCardP1.classList.remove('active-turn');
+                }
+            },
+
+            updateStatusText(customHtml) {
+                if (customHtml !== undefined) {
+                    this.elements.statusText.innerHTML = customHtml;
+                    return;
+                }
+
+                if (this.gameMode === 'pvp') {
+                    const colorClass = this.currentPlayer === 1 ? 'cyan-text' : 'pink-text';
+                    const name = this.currentPlayer === 1 ? '玩家 1' : '玩家 2';
+                    this.elements.statusText.innerHTML = `輪到 <span class="${colorClass} font-bold">${name}</span> 的回合`;
+                } else {
+                    if (this.currentPlayer === 2) {
+                        this.elements.statusText.innerHTML = `<span class="pink-text font-bold">AI</span> 思考中...`;
+                    } else {
+                        this.elements.statusText.innerHTML = `輪到 <span class="cyan-text font-bold">你的</span> 回合`;
+                    }
+                }
+            },
+
+            // --- Hover Column Preview ---
+            setHoveredColumn(col) {
+                this.hoveredCol = col;
+                this.refreshHoverPreview();
+            },
+
+            clearHoveredColumn() {
+                this.hoveredCol = null;
+                this.refreshHoverPreview();
+            },
+
+            refreshHoverPreview() {
+                const isHumanTurn = this.gameActive && (this.gameMode === 'pvp' || this.currentPlayer === 1);
+
+                for (let c = 0; c < COLS; c++) {
+                    const pCell = this.elements.previewRow.children[c];
+                    pCell.className = 'preview-cell';
+
+                    const canDrop = this.board.length > 0 && this.board[0][c] === 0;
+                    const isHovered = isHumanTurn && this.hoveredCol === c && canDrop;
+
+                    if (isHovered) {
+                        pCell.classList.add(this.currentPlayer === 1 ? 'show-p1' : 'show-p2');
+                    }
+
+                    for (let r = 0; r < ROWS; r++) {
+                        const cell = this.getCellElement(r, c);
+                        if (isHovered) {
+                            cell.classList.add('col-hover');
+                        } else {
+                            cell.classList.remove('col-hover');
+                        }
+                    }
+                }
+            },
+
+            // --- Connect Four Core Mechanics ---
+            getLowestEmptyRow(board, col) {
+                for (let r = ROWS - 1; r >= 0; r--) {
+                    if (board[r][col] === 0) return r;
+                }
+                return -1;
+            },
+
+            getValidColumns(board) {
+                const valid = [];
+                for (const c of COL_SEARCH_ORDER) {
+                    if (board[0][c] === 0) valid.push(c);
+                }
+                return valid;
+            },
+
+            handleColumnClick(col) {
+                if (!this.gameActive) return;
+                if (this.gameMode === 'pve' && this.currentPlayer === 2) return;
+
+                const targetRow = this.getLowestEmptyRow(this.board, col);
+                if (targetRow === -1) return; // Column is full
+
+                this.makeMove(targetRow, col);
+            },
+
+            makeMove(row, col) {
+                const player = this.currentPlayer;
+                this.board[row][col] = player;
+
+                // Render dropped disc with physics animation
+                const cell = this.getCellElement(row, col);
+                const disc = document.createElement('div');
+                disc.className = `disc ${player === 1 ? 'p1' : 'p2'} drop-anim`;
+                disc.style.setProperty('--drop-rows', row + 1);
+                disc.style.setProperty('--drop-duration', `${0.22 + (row + 1) * 0.04}s`);
+                cell.appendChild(disc);
+
+                SoundManager.playDrop(player);
+
+                // Check win condition
+                const winCells = this.findWinningCells(this.board, player);
+                if (winCells) {
+                    this.handleGameWin(winCells);
+                    return;
+                }
+
+                // Check draw condition
+                if (this.getValidColumns(this.board).length === 0) {
+                    this.handleGameDraw();
+                    return;
+                }
+
+                // Switch player
+                this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
+                this.updateTurnIndicator();
+                this.updateStatusText();
+                this.refreshHoverPreview();
+
+                if (this.gameMode === 'pve' && this.currentPlayer === 2) {
+                    this.scheduleAIMove();
+                }
+            },
+
+            findWinningCells(board, player) {
+                // Horizontal
+                for (let r = 0; r < ROWS; r++) {
+                    for (let c = 0; c <= COLS - 4; c++) {
+                        if (
+                            board[r][c] === player &&
+                            board[r][c + 1] === player &&
+                            board[r][c + 2] === player &&
+                            board[r][c + 3] === player
+                        ) {
+                            return [[r, c], [r, c + 1], [r, c + 2], [r, c + 3]];
+                        }
+                    }
+                }
+
+                // Vertical
+                for (let c = 0; c < COLS; c++) {
+                    for (let r = 0; r <= ROWS - 4; r++) {
+                        if (
+                            board[r][c] === player &&
+                            board[r + 1][c] === player &&
+                            board[r + 2][c] === player &&
+                            board[r + 3][c] === player
+                        ) {
+                            return [[r, c], [r + 1, c], [r + 2, c], [r + 3, c]];
+                        }
+                    }
+                }
+
+                // Diagonal down-right
+                for (let r = 0; r <= ROWS - 4; r++) {
+                    for (let c = 0; c <= COLS - 4; c++) {
+                        if (
+                            board[r][c] === player &&
+                            board[r + 1][c + 1] === player &&
+                            board[r + 2][c + 2] === player &&
+                            board[r + 3][c + 3] === player
+                        ) {
+                            return [[r, c], [r + 1, c + 1], [r + 2, c + 2], [r + 3, c + 3]];
+                        }
+                    }
+                }
+
+                // Diagonal up-right
+                for (let r = 3; r < ROWS; r++) {
+                    for (let c = 0; c <= COLS - 4; c++) {
+                        if (
+                            board[r][c] === player &&
+                            board[r - 1][c + 1] === player &&
+                            board[r - 2][c + 2] === player &&
+                            board[r - 3][c + 3] === player
+                        ) {
+                            return [[r, c], [r - 1, c + 1], [r - 2, c + 2], [r - 3, c + 3]];
+                        }
+                    }
+                }
+
+                return null;
+            },
+
+            handleGameWin(winCells) {
+                this.gameActive = false;
+                this.refreshHoverPreview();
+                this.advanceStartingPlayerForNextRound();
+
+                const isP1 = this.currentPlayer === 1;
+                const winClass = isP1 ? 'winning-cell-p1' : 'winning-cell-p2';
+                const particleColor = isP1 ? '#00f2fe' : '#ff007f';
+
+                winCells.forEach(([r, c]) => {
+                    const cell = this.getCellElement(r, c);
+                    cell.classList.add(winClass);
+                    const rect = cell.getBoundingClientRect();
+                    ParticleSystem.createExplosion(rect.left + rect.width / 2, rect.top + rect.height / 2, particleColor);
+                });
+
+                if (isP1) {
+                    this.scores.P1++;
+                } else {
+                    this.scores.P2++;
+                }
+                this.saveScores();
+                this.updateScoreboardUI();
+
+                const isAIWin = this.gameMode === 'pve' && !isP1;
+                SoundManager.playWin(isAIWin);
+
+                const colorClass = isP1 ? 'cyan-text' : 'pink-text';
+                const victorName = isP1 ? this.elements.nameP1.textContent : this.elements.nameP2.textContent;
+                this.updateStatusText(`<span class="${colorClass} font-bold">${victorName}</span> 四連勝出！ 🎉`);
+            },
+
+            handleGameDraw() {
+                this.gameActive = false;
+                this.refreshHoverPreview();
+                this.advanceStartingPlayerForNextRound();
+
+                this.scores.ties++;
+                this.saveScores();
+                this.updateScoreboardUI();
+
+                SoundManager.playTie();
+                this.updateStatusText(`<span class="gray-text font-bold">棋盤已滿，雙方平手！</span> 🤝`);
+            },
+
+            // --- Connect Four AI Engine (Minimax with Alpha-Beta Pruning & Window Scoring) ---
+            scheduleAIMove() {
+                this.clearAITimeout();
+                this.elements.boardEl.classList.add('ai-thinking');
+                this.aiTimeoutId = setTimeout(() => {
+                    this.aiTimeoutId = null;
+                    this.triggerAIMove();
+                }, 520);
+            },
+
+            triggerAIMove() {
+                this.elements.boardEl.classList.remove('ai-thinking');
+                if (!this.gameActive || this.currentPlayer !== 2) return;
+
+                const validCols = this.getValidColumns(this.board);
+                if (validCols.length === 0) return;
+
+                let chosenCol = validCols[0];
+
+                if (this.difficulty === 'easy') {
+                    chosenCol = this.getEasyMove(validCols);
+                } else if (this.difficulty === 'medium') {
+                    chosenCol = this.getMediumMove(validCols);
+                } else {
+                    chosenCol = this.getHardMove(validCols);
+                }
+
+                const targetRow = this.getLowestEmptyRow(this.board, chosenCol);
+                if (targetRow !== -1) {
+                    this.makeMove(targetRow, chosenCol);
+                }
+            },
+
+            getEasyMove(validCols) {
+                // 40% chance to take an immediate winning move if one exists, otherwise random
+                if (Math.random() < 0.4) {
+                    for (const col of validCols) {
+                        const row = this.getLowestEmptyRow(this.board, col);
+                        this.board[row][col] = 2;
+                        const wins = this.findWinningCells(this.board, 2) !== null;
+                        this.board[row][col] = 0;
+                        if (wins) return col;
+                    }
+                }
+                return validCols[Math.floor(Math.random() * validCols.length)];
+            },
+
+            getMediumMove(validCols) {
+                // 1. Immediate win for AI (2)
+                for (const col of validCols) {
+                    const row = this.getLowestEmptyRow(this.board, col);
+                    this.board[row][col] = 2;
+                    const wins = this.findWinningCells(this.board, 2) !== null;
+                    this.board[row][col] = 0;
+                    if (wins) return col;
+                }
+
+                // 2. Immediate block for Player (1)
+                for (const col of validCols) {
+                    const row = this.getLowestEmptyRow(this.board, col);
+                    this.board[row][col] = 1;
+                    const wins = this.findWinningCells(this.board, 1) !== null;
+                    this.board[row][col] = 0;
+                    if (wins) return col;
+                }
+
+                // 3. Depth-3 Minimax search
+                return this.getMinimaxRootMove(validCols, 3);
+            },
+
+            getHardMove(validCols) {
+                // 1. Immediate win check
+                for (const col of validCols) {
+                    const row = this.getLowestEmptyRow(this.board, col);
+                    this.board[row][col] = 2;
+                    const wins = this.findWinningCells(this.board, 2) !== null;
+                    this.board[row][col] = 0;
+                    if (wins) return col;
+                }
+
+                // 2. Immediate block check
+                for (const col of validCols) {
+                    const row = this.getLowestEmptyRow(this.board, col);
+                    this.board[row][col] = 1;
+                    const wins = this.findWinningCells(this.board, 1) !== null;
+                    this.board[row][col] = 0;
+                    if (wins) return col;
+                }
+
+                // 3. Depth-6 Minimax with Alpha-Beta pruning & window scoring
+                return this.getMinimaxRootMove(validCols, 6);
+            },
+
+            getMinimaxRootMove(validCols, maxDepth) {
+                let bestScore = -Infinity;
+                let bestCols = [validCols[0]];
+
+                for (const col of validCols) {
+                    const row = this.getLowestEmptyRow(this.board, col);
+                    this.board[row][col] = 2;
+                    const score = this.minimax(this.board, maxDepth - 1, -Infinity, Infinity, false);
+                    this.board[row][col] = 0;
+
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestCols = [col];
+                    } else if (score === bestScore) {
+                        bestCols.push(col);
+                    }
+                }
+
+                return bestCols[Math.floor(Math.random() * bestCols.length)];
+            },
+
+            minimax(board, depth, alpha, beta, isMax) {
+                if (this.findWinningCells(board, 2)) {
+                    return 100000 + depth * 100;
+                }
+                if (this.findWinningCells(board, 1)) {
+                    return -100000 - depth * 100;
+                }
+
+                const validCols = this.getValidColumns(board);
+                if (validCols.length === 0) {
+                    return 0;
+                }
+                if (depth === 0) {
+                    return this.evaluateBoard(board);
+                }
+
+                if (isMax) {
+                    let maxEval = -Infinity;
+                    for (const col of validCols) {
+                        const row = this.getLowestEmptyRow(board, col);
+                        board[row][col] = 2;
+                        const ev = this.minimax(board, depth - 1, alpha, beta, false);
+                        board[row][col] = 0;
+
+                        if (ev > maxEval) maxEval = ev;
+                        if (ev > alpha) alpha = ev;
+                        if (beta <= alpha) break;
+                    }
+                    return maxEval;
+                } else {
+                    let minEval = Infinity;
+                    for (const col of validCols) {
+                        const row = this.getLowestEmptyRow(board, col);
+                        board[row][col] = 1;
+                        const ev = this.minimax(board, depth - 1, alpha, beta, true);
+                        board[row][col] = 0;
+
+                        if (ev < minEval) minEval = ev;
+                        if (ev < beta) beta = ev;
+                        if (beta <= alpha) break;
+                    }
+                    return minEval;
+                }
+            },
+
+            scoreWindow(w0, w1, w2, w3) {
+                let aiCount = 0;
+                let humanCount = 0;
+                let emptyCount = 0;
+
+                const arr = [w0, w1, w2, w3];
+                for (let i = 0; i < 4; i++) {
+                    if (arr[i] === 2) aiCount++;
+                    else if (arr[i] === 1) humanCount++;
+                    else emptyCount++;
+                }
+
+                let score = 0;
+                if (aiCount === 4) score += 1000;
+                else if (aiCount === 3 && emptyCount === 1) score += 12;
+                else if (aiCount === 2 && emptyCount === 2) score += 3;
+
+                if (humanCount === 3 && emptyCount === 1) score -= 16;
+                else if (humanCount === 2 && emptyCount === 2) score -= 3;
+
+                return score;
+            },
+
+            evaluateBoard(board) {
+                let score = 0;
+
+                // Center column preference
+                const centerCol = 3;
+                for (let r = 0; r < ROWS; r++) {
+                    if (board[r][centerCol] === 2) score += 4;
+                    else if (board[r][centerCol] === 1) score -= 4;
+                }
+
+                // Horizontal windows
+                for (let r = 0; r < ROWS; r++) {
+                    for (let c = 0; c <= COLS - 4; c++) {
+                        score += this.scoreWindow(board[r][c], board[r][c + 1], board[r][c + 2], board[r][c + 3]);
+                    }
+                }
+
+                // Vertical windows
+                for (let c = 0; c < COLS; c++) {
+                    for (let r = 0; r <= ROWS - 4; r++) {
+                        score += this.scoreWindow(board[r][c], board[r + 1][c], board[r + 2][c], board[r + 3][c]);
+                    }
+                }
+
+                // Diagonal down-right windows
+                for (let r = 0; r <= ROWS - 4; r++) {
+                    for (let c = 0; c <= COLS - 4; c++) {
+                        score += this.scoreWindow(
+                            board[r][c],
+                            board[r + 1][c + 1],
+                            board[r + 2][c + 2],
+                            board[r + 3][c + 3]
+                        );
+                    }
+                }
+
+                // Diagonal up-right windows
+                for (let r = 3; r < ROWS; r++) {
+                    for (let c = 0; c <= COLS - 4; c++) {
+                        score += this.scoreWindow(
+                            board[r][c],
+                            board[r - 1][c + 1],
+                            board[r - 2][c + 2],
+                            board[r - 3][c + 3]
+                        );
+                    }
+                }
+
+                return score;
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Game.init();
+        });
+    </script>
+</body>
+</html>

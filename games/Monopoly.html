@@ -1,0 +1,2718 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>大富翁世界 Richman World ‧ 經典分岐地圖</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --sky-blue: #38bdf8;
+            --grass-green: #4ade80;
+            --grass-dark: #16a34a;
+            --gold: #f59e0b;
+            --gold-bright: #fbbf24;
+            --card-glass: rgba(15, 23, 42, 0.90);
+            --border-glass: rgba(255, 255, 255, 0.18);
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --salonbus: #10b981;
+            --xiaomei: #f43f5e;
+            --uncle-tu: #f59e0b;
+            --madam: #8b5cf6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background: #090d16;
+            font-family: 'Noto Sans TC', 'Outfit', sans-serif;
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header Navigation */
+        .top-navbar {
+            height: 52px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-glass);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .nav-left, .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-back-hub {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-back-hub:hover {
+            background: rgba(56, 189, 248, 0.25);
+            border-color: var(--sky-blue);
+            color: #fff;
+        }
+
+        .game-brand {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: 1.25rem;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #fbbf24, #f43f5e, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .price-badge, .round-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .price-badge {
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            color: #fde68a;
+        }
+
+        .round-badge {
+            background: rgba(56, 189, 248, 0.18);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            color: #bae6fd;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-customize-skin {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(139, 92, 246, 0.25));
+            border-color: rgba(236, 72, 153, 0.5);
+            color: #fbcfe8;
+        }
+
+        .btn-customize-skin:hover {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.4), rgba(139, 92, 246, 0.4));
+            border-color: #ec4899;
+            color: #fff;
+        }
+
+        /* Game Main Canvas & Stage */
+        .game-stage-wrapper {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #1e293b 0%, #090d16 100%);
+            overflow: hidden;
+            padding: 8px;
+        }
+
+        .board-container {
+            position: relative;
+            width: 1000px;
+            height: 640px;
+            border-radius: 24px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), inset 0 0 100px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            background: #4d7c0f;
+            flex-shrink: 0;
+            border: 3px solid rgba(255, 255, 255, 0.18);
+            transition: transform 0.15s ease-out;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* SVG Board Canvas Background */
+        #boardSvg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Tiles on the board */
+        .tile-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .map-tile {
+            position: absolute;
+            width: 58px;
+            height: 58px;
+            transform: translate(-50%, -50%);
+            border-radius: 14px;
+            background: #ffffff;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.32), 0 2px 4px rgba(0,0,0,0.18);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            pointer-events: auto;
+            border: 2px solid #cbd5e1;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            font-size: 0.72rem;
+            color: #1e293b;
+            text-align: center;
+            padding: 2px;
+        }
+
+        .map-tile:hover {
+            transform: translate(-50%, -54%) scale(1.1);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+            z-index: 15;
+        }
+
+        /* Tile types & themes */
+        .tile-start {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: #fff;
+            border-color: #fde68a;
+            font-weight: 900;
+        }
+
+        .tile-prop {
+            background: #ffffff;
+        }
+
+        .tile-prop .color-strip {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 10px;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .tile-chest {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: #fff;
+            border-color: #93c5fd;
+        }
+
+        .tile-card {
+            background: linear-gradient(135deg, #a855f7, #6b21a8);
+            color: #fff;
+            border-color: #d8b4fe;
+        }
+
+        .tile-points {
+            background: linear-gradient(135deg, #10b981, #047857);
+            color: #fff;
+            border-color: #6ee7b7;
+        }
+
+        .tile-magic {
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            color: #fff;
+            border-color: #fbcfe8;
+        }
+
+        .tile-jail {
+            background: #334155;
+            color: #f8fafc;
+            border-color: #94a3b8;
+        }
+
+        .tile-hospital {
+            background: #ffffff;
+            color: #dc2626;
+            border-color: #f87171;
+        }
+
+        .tile-bank {
+            background: linear-gradient(135deg, #facc15, #ca8a04);
+            color: #713f12;
+            border-color: #fef08a;
+        }
+
+        /* 3D Isometric Buildings on Tiles */
+        .tile-building-box {
+            position: absolute;
+            top: -20px;
+            right: -8px;
+            width: 32px;
+            height: 32px;
+            pointer-events: none;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.4));
+            z-index: 12;
+        }
+
+        .tile-owner-badge {
+            position: absolute;
+            bottom: 2px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 1px 4px;
+            border-radius: 4px;
+            color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* Roadblock placed on tile */
+        .roadblock-marker {
+            position: absolute;
+            top: -16px;
+            background: #dc2626;
+            color: #ffffff;
+            font-size: 0.68rem;
+            font-weight: 900;
+            padding: 1px 5px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+            animation: bounceMarker 0.8s infinite alternate ease-in-out;
+            z-index: 18;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        @keyframes bounceMarker {
+            from { transform: translateY(0); }
+            to { transform: translateY(-4px); }
+        }
+
+        /* Branching Highlight Indicators */
+        .map-tile.branch-choice {
+            animation: pulseBranch 0.7s infinite alternate ease-in-out;
+            border: 3px solid #fbbf24 !important;
+            box-shadow: 0 0 25px #fbbf24 !important;
+            z-index: 25;
+            cursor: pointer !important;
+        }
+
+        @keyframes pulseBranch {
+            from { transform: translate(-50%, -50%) scale(1.06); }
+            to { transform: translate(-50%, -50%) scale(1.22); }
+        }
+
+        .branch-arrow-badge {
+            position: absolute;
+            top: -26px;
+            background: linear-gradient(135deg, #fbbf24, #ea580c);
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 0.72rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+            white-space: nowrap;
+            animation: bounceArrow 0.6s infinite alternate;
+            z-index: 30;
+        }
+
+        @keyframes bounceArrow {
+            from { transform: translateY(0); }
+            to { transform: translateY(-5px); }
+        }
+
+        /* Characters / Tokens Layer */
+        .character-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .character-sprite {
+            position: absolute;
+            width: 60px;
+            height: 72px;
+            transform: translate(-50%, -85%);
+            transition: left 0.28s ease, top 0.28s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            filter: drop-shadow(0 8px 6px rgba(0, 0, 0, 0.5));
+            pointer-events: none;
+        }
+
+        .character-sprite.hopping {
+            animation: charHop 0.28s ease-in-out;
+        }
+
+        @keyframes charHop {
+            0% { transform: translate(-50%, -85%); }
+            50% { transform: translate(-50%, -120%) scale(1.08); }
+            100% { transform: translate(-50%, -85%); }
+        }
+
+        .char-deity {
+            position: absolute;
+            top: -26px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 14px gold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            animation: floatDeity 1.5s infinite alternate ease-in-out;
+            z-index: 15;
+        }
+
+        .char-deity svg {
+            width: 85%;
+            height: 85%;
+        }
+
+        @keyframes floatDeity {
+            from { transform: translateY(0); }
+            to { transform: translateY(-6px); }
+        }
+
+        .char-body {
+            width: 58px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .char-body img.char-custom-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+        }
+
+        .char-shadow {
+            width: 38px;
+            height: 10px;
+            background: rgba(0, 0, 0, 0.45);
+            border-radius: 50%;
+            margin-top: -6px;
+        }
+
+        /* Floating Speech Bubble */
+        .speech-bubble {
+            position: absolute;
+            top: -46px;
+            background: rgba(15, 23, 42, 0.96);
+            color: #fde68a;
+            border: 1.5px solid rgba(251, 191, 36, 0.7);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            animation: popBubble 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 35;
+        }
+
+        @keyframes popBubble {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Bottom HUD Bar (Richman 4/8 style) */
+        .bottom-hud {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 84px;
+            background: linear-gradient(to top, rgba(10, 16, 29, 0.98) 65%, rgba(10, 16, 29, 0.8));
+            border-top: 1px solid var(--border-glass);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 40;
+        }
+
+        /* Current Player Status Card */
+        .hud-player-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hud-avatar {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 0 16px rgba(56, 189, 248, 0.5);
+            background: #fff;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .hud-avatar img, .hud-avatar svg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hud-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .hud-name {
+            font-weight: 900;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hud-stats-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .stat-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-cash { color: #38bdf8; }
+        .stat-bank { color: #4ade80; }
+        .stat-points { color: #fbbf24; }
+
+        /* Other Players mini avatars in HUD */
+        .hud-other-players {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mini-player-card {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-glass);
+            font-size: 0.76rem;
+            transition: all 0.2s;
+        }
+
+        .mini-player-card.active-turn {
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+            background: rgba(56, 189, 248, 0.15);
+        }
+
+        .mini-avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1.5px solid #fff;
+            overflow: hidden;
+            background: #fff;
+            flex-shrink: 0;
+        }
+
+        .mini-avatar img, .mini-avatar svg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Right Control: Cards Button & Giant Dice Controller */
+        .hud-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-card-bag {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            border: 2px solid #38bdf8;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .btn-card-bag:hover {
+            transform: scale(1.06);
+        }
+
+        .card-count-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #f43f5e;
+            color: #fff;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.68rem;
+            font-weight: 900;
+        }
+
+        /* Big Round Dice Controller */
+        .dice-controller {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.22);
+            border-radius: 40px;
+            padding: 4px;
+            gap: 6px;
+        }
+
+        .dice-display-box {
+            width: 48px;
+            height: 48px;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 2px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.85rem;
+            color: #ef4444;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .dice-display-box.rolling {
+            animation: rollShake 0.25s infinite;
+        }
+
+        @keyframes rollShake {
+            0% { transform: rotate(0deg) scale(1.1); }
+            25% { transform: rotate(-15deg) scale(1.15); }
+            50% { transform: rotate(15deg) scale(1.15); }
+            75% { transform: rotate(-10deg) scale(1.1); }
+            100% { transform: rotate(0deg) scale(1.1); }
+        }
+
+        .btn-go {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: 1.15rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            transition: all 0.2s;
+        }
+
+        .btn-go:hover:not(:disabled) {
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.7);
+        }
+
+        .btn-go:active:not(:disabled) {
+            transform: scale(0.96);
+        }
+
+        .btn-go:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(0.5);
+        }
+
+        .btn-go small {
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        /* L / R Branch Buttons */
+        .branch-controls {
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-branch {
+            padding: 8px 14px;
+            border-radius: 20px;
+            border: none;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #78350f;
+            font-family: 'Noto Sans TC', 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: 0.85rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.5);
+            animation: pulseGo 0.6s infinite alternate;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        @keyframes pulseGo {
+            from { transform: scale(1); }
+            to { transform: scale(1.06); }
+        }
+
+        /* Modals & Overlays */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 16, 29, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-window {
+            background: #1e293b;
+            border: 2px solid var(--border-glass);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 520px;
+            padding: 24px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);
+            text-align: center;
+            animation: zoomModal 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes zoomModal {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-window h3 {
+            font-family: 'Outfit', 'Noto Sans TC', sans-serif;
+            font-size: 1.35rem;
+            color: #fbbf24;
+            margin-bottom: 12px;
+        }
+
+        .modal-desc {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-btn-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .m-btn {
+            padding: 10px 24px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .m-btn.confirm {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+        }
+
+        .m-btn.cancel {
+            background: rgba(255, 255, 255, 0.12);
+            color: #94a3b8;
+        }
+
+        .m-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Card Inventory Grid in Modal */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .card-item {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 12px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .card-item:hover {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: #38bdf8;
+            transform: translateY(-3px);
+        }
+
+        .card-item .c-icon {
+            font-size: 1.6rem;
+            color: #38bdf8;
+        }
+
+        .card-item .c-name {
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .card-item .c-cost {
+            font-size: 0.72rem;
+            color: #fbbf24;
+        }
+
+        /* Skin Customizer Modal Styles */
+        .skin-tabs {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+        }
+
+        .skin-tab-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .skin-tab-btn.active {
+            background: rgba(236, 72, 153, 0.25);
+            color: #f472b6;
+        }
+
+        .skin-char-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            max-height: 380px;
+            overflow-y: auto;
+            text-align: left;
+            margin-bottom: 16px;
+            padding: 4px;
+        }
+
+        .skin-char-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .skin-char-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+
+        .skin-preview-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+            flex-shrink: 0;
+        }
+
+        .skin-preview-box img, .skin-preview-box svg {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .skin-input-group {
+            display: flex;
+            gap: 6px;
+        }
+
+        .skin-input {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 5px 8px;
+            color: #fff;
+            font-size: 0.76rem;
+            outline: none;
+        }
+
+        .skin-input:focus {
+            border-color: #38bdf8;
+        }
+
+        .skin-btn-apply {
+            background: #0284c7;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.76rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .skin-file-btn {
+            background: rgba(255,255,255,0.1);
+            color: #cbd5e1;
+            border: 1px dashed rgba(255,255,255,0.3);
+            border-radius: 8px;
+            padding: 4px;
+            font-size: 0.72rem;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .skin-file-btn:hover {
+            background: rgba(255,255,255,0.16);
+            color: #fff;
+        }
+
+        /* Event Toast at Center Top of Board */
+        .board-toast {
+            position: absolute;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.94);
+            border: 1.5px solid #fbbf24;
+            color: #f8fafc;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .board-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(8px);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header class="top-navbar">
+        <div class="nav-left">
+            <a href="../index.html?zone=games" class="btn-back-hub">
+                <i class="fa-solid fa-arrow-left"></i> 返回遊戲大廳
+            </a>
+            <div class="game-brand">
+                <i class="fa-solid fa-gem"></i> 大富翁世界 ‧ 分歧大地圖
+            </div>
+            <span class="round-badge" id="roundBadge">第 1 回合</span>
+            <span class="price-badge" id="priceIndexBadge">物價指數: 1.0x</span>
+        </div>
+
+        <div class="nav-right">
+            <button id="btnSkinCustomizer" class="nav-btn btn-customize-skin" title="自訂更換角色與地圖圖片">
+                <i class="fa-solid fa-palette"></i> 更換外觀/圖片
+            </button>
+            <button id="soundToggleBtn" class="nav-btn" title="切換音效">
+                <i class="fa-solid fa-volume-high"></i> 音效
+            </button>
+            <button id="rulesBtn" class="nav-btn" title="規則說明">
+                <i class="fa-solid fa-circle-question"></i> 遊戲規則
+            </button>
+            <button id="resetGameBtn" class="nav-btn" style="color:#f87171;" title="重新開局">
+                <i class="fa-solid fa-rotate-left"></i> 重開局
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Game Stage -->
+    <div class="game-stage-wrapper">
+        <div class="board-container" id="boardContainer">
+            <!-- SVG Paths for Roads & Natural 3D Scenery -->
+            <svg id="boardSvg"></svg>
+
+            <!-- Tiles Container -->
+            <div class="tile-layer" id="tileLayer"></div>
+
+            <!-- Characters Sprites Layer -->
+            <div class="character-layer" id="characterLayer"></div>
+
+            <!-- Toast Announcement -->
+            <div class="board-toast" id="boardToast">
+                <i class="fa-solid fa-bullhorn" style="color:#fbbf24;"></i>
+                <span id="toastText">歡迎來到大富翁世界！</span>
+            </div>
+
+            <!-- Bottom HUD (Richman 4/8 style) -->
+            <footer class="bottom-hud">
+                <!-- Current Player Profile -->
+                <div class="hud-player-profile">
+                    <div class="hud-avatar" id="hudAvatar"></div>
+                    <div class="hud-info">
+                        <div class="hud-name" id="hudName">
+                            沙隆巴斯 <span id="hudTurnTag" style="font-size:0.75rem; color:#38bdf8;">[ 你的回合 ]</span>
+                        </div>
+                        <div class="hud-stats-row">
+                            <span class="stat-item stat-cash"><i class="fa-solid fa-money-bill-wave"></i> $<span id="hudCash">25,000</span></span>
+                            <span class="stat-item stat-bank"><i class="fa-solid fa-piggy-bank"></i> $<span id="hudBank">40,000</span></span>
+                            <span class="stat-item stat-points"><i class="fa-solid fa-ticket"></i> <span id="hudPoints">120</span> 點</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Players overview -->
+                <div class="hud-other-players" id="hudOtherPlayers"></div>
+
+                <!-- Right Action Bar: Cards & Dice Controller -->
+                <div class="hud-actions">
+                    <button class="btn-card-bag" id="btnCardBag" title="查看持有道具卡">
+                        <i class="fa-solid fa-id-card"></i>
+                        <span>道具卡</span>
+                        <div class="card-count-badge" id="cardCountBadge">3</div>
+                    </button>
+
+                    <!-- Branching Direction Selector Buttons (Appears at Forks!) -->
+                    <div class="branch-controls" id="branchControls">
+                        <button class="btn-branch" id="btnBranchLeft">
+                            <i class="fa-solid fa-arrow-turn-up fa-rotate-270"></i> <span id="btnBranchLeftText">路線 A</span>
+                        </button>
+                        <button class="btn-branch" id="btnBranchRight">
+                            <span id="btnBranchRightText">路線 B</span> <i class="fa-solid fa-arrow-turn-up fa-rotate-90"></i>
+                        </button>
+                    </div>
+
+                    <!-- Dice Wheel -->
+                    <div class="dice-controller">
+                        <div class="dice-display-box" id="diceBox">
+                            <i class="fa-solid fa-dice-one"></i>
+                        </div>
+                        <button class="btn-go" id="btnGo">
+                            <span>GO</span>
+                            <small>擲骰</small>
+                        </button>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Modal for Land Buying / Upgrading -->
+    <div class="modal-overlay" id="propModal">
+        <div class="modal-window">
+            <h3 id="propModalTitle">購買房地產</h3>
+            <p class="modal-desc" id="propModalDesc">空地價格 $2,000，是否購買並插上所有權標記？</p>
+            <div class="modal-btn-row">
+                <button class="m-btn cancel" id="propModalCancel">放棄</button>
+                <button class="m-btn confirm" id="propModalConfirm">確定購買</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Card Bag / Items -->
+    <div class="modal-overlay" id="cardsModal">
+        <div class="modal-window" style="max-width:540px;">
+            <h3><i class="fa-solid fa-wand-magic-sparkles"></i> 道具卡片包</h3>
+            <p class="modal-desc">點選卡片可對自己或地圖施展神奇法術！</p>
+            <div class="card-grid" id="cardGrid"></div>
+            <div class="modal-btn-row">
+                <button class="m-btn cancel" id="cardsModalClose">關閉卡包</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Customizing Graphics & Skins -->
+    <div class="modal-overlay" id="skinModal">
+        <div class="modal-window" style="max-width:620px;">
+            <h3><i class="fa-solid fa-palette"></i> 自訂外觀與圖片更換</h3>
+            <p class="modal-desc" style="margin-bottom:12px;">您可以自訂角色公仔與地圖圖片！支援輸入網路圖片網址或從電腦上傳本機圖片檔。</p>
+            
+            <div class="skin-tabs">
+                <button class="skin-tab-btn active" id="tabBtnChars">角色外觀自訂</button>
+                <button class="skin-tab-btn" id="tabBtnMap">地圖背景與建築</button>
+            </div>
+
+            <!-- Tab 1: Characters Skin Customization -->
+            <div id="tabContentChars" class="skin-tab-content">
+                <div class="skin-char-grid" id="skinCharList"></div>
+            </div>
+
+            <!-- Tab 2: Map Background Customization -->
+            <div id="tabContentMap" class="skin-tab-content" style="display:none; text-align:left; padding:8px 0;">
+                <div style="margin-bottom:14px;">
+                    <label style="font-size:0.85rem; font-weight:700; color:#cbd5e1; display:block; margin-bottom:6px;">
+                        地圖背景圖片（輸入網址或上傳本機圖）：
+                    </label>
+                    <div class="skin-input-group" style="margin-bottom:6px;">
+                        <input type="text" id="mapBgUrlInput" class="skin-input" placeholder="請輸入背景圖片網址 (https://...jpg/png)">
+                        <button class="skin-btn-apply" id="btnApplyMapBg">套用網址</button>
+                    </div>
+                    <label class="skin-file-btn" style="display:block;">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> 從本機上傳背景圖片
+                        <input type="file" id="mapBgFileInput" accept="image/*" style="display:none;">
+                    </label>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05); padding:10px 14px; border-radius:12px;">
+                    <span style="font-size:0.85rem; color:#94a3b8;">預設風格外觀：</span>
+                    <button class="m-btn cancel" id="btnResetAllSkins" style="padding:6px 14px; font-size:0.8rem; color:#f87171;">
+                        <i class="fa-solid fa-rotate-left"></i> 恢復全部預設外觀
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-btn-row" style="margin-top:16px;">
+                <button class="m-btn confirm" id="skinModalClose">完成並關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Rules -->
+    <div class="modal-overlay" id="rulesModal">
+        <div class="modal-window" style="max-width:600px; text-align:left;">
+            <h3 style="text-align:center;"><i class="fa-solid fa-book-open"></i> 大富翁世界 ‧ 遊戲規則</h3>
+            <div class="modal-desc" style="max-height:360px; overflow-y:auto; font-size:0.88rem; line-height:1.6;">
+                <p><strong>1. 分歧路線自由前進：</strong>棋盤共有多條交錯路線（外圍繁華大街、中央綠意捷徑公園、神秘魔法傳送環）。遇到岔路時可自主選擇前進路線！</p>
+                <br>
+                <p><strong>2. 實體角色公仔：</strong>包含沙隆巴斯（騎小綿羊機車）、孫小美（可愛包子頭）、阿土伯（斗笠農夫）與錢夫人（貴婦名媛）。具備專屬精緻外觀與自訂圖片功能！</p>
+                <br>
+                <p><strong>3. 買地蓋樓與收租：</strong>路過空地可花費買地插牌，再次路過自己土地可蓋平房、別墅與摩天樓，對手路過需繳交高額過路費！</p>
+                <br>
+                <p><strong>4. 神仙附身護體：</strong>土地公（佔領對手土地）、財神（免過路費）、福神（免費加蓋）、衰神與窮神（害你破財折損）！</p>
+                <br>
+                <p><strong>5. 道具卡片：</strong>遙控骰子（精準選步數）、路障（攔截前進）、機車卡（狂奔8步）、均富卡（現金平分），善用卡片反敗為勝！</p>
+            </div>
+            <div class="modal-btn-row">
+                <button class="m-btn confirm" id="rulesModalClose">我明白了</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Web Audio & Game Engine Logic -->
+    <script>
+        /* ========================================================
+           Audio Synthesizer (Web Audio API with Safe Fallback)
+           ======================================================== */
+        const SoundFX = {
+            ctx: null,
+            enabled: true,
+
+            init() {
+                if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            },
+
+            toggle() {
+                this.enabled = !this.enabled;
+                return this.enabled;
+            },
+
+            tone(freq, dur, type = 'sine', slide = 0) {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                const now = this.ctx.currentTime;
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, now);
+                if (slide !== 0) {
+                    osc.frequency.exponentialRampToValueAtTime(Math.max(10, freq + slide), now + dur);
+                }
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + dur);
+            },
+
+            hop() { this.tone(480, 0.08, 'triangle', 160); },
+            dice() {
+                for (let i = 0; i < 4; i++) {
+                    setTimeout(() => this.tone(300 + Math.random() * 400, 0.04, 'square'), i * 60);
+                }
+            },
+            cash() {
+                this.tone(523.25, 0.08, 'triangle');
+                setTimeout(() => this.tone(659.25, 0.12, 'triangle'), 80);
+                setTimeout(() => this.tone(783.99, 0.22, 'sine'), 160);
+            },
+            cheer() {
+                [523, 659, 783, 1046].forEach((f, i) => {
+                    setTimeout(() => this.tone(f, 0.14, 'triangle'), i * 70);
+                });
+            },
+            bad() {
+                this.tone(260, 0.15, 'sawtooth', -120);
+                setTimeout(() => this.tone(180, 0.25, 'sawtooth', -80), 120);
+            }
+        };
+
+        /* ========================================================
+           Redesigned Rich 3D Characters & Sprites (High-Fidelity)
+           ======================================================== */
+        const CHARACTERS = [
+            {
+                id: 'salonbus',
+                name: '沙隆巴斯',
+                color: '#10b981',
+                catchphrase: '阿拉真主保佑！這塊地是我的了！',
+                svg: `
+                    <svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="scooterBody" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#34d399"/>
+                                <stop offset="50%" stop-color="#10b981"/>
+                                <stop offset="100%" stop-color="#047857"/>
+                            </linearGradient>
+                            <radialGradient id="headlightBeam" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#fef08a" stop-opacity="1"/>
+                                <stop offset="60%" stop-color="#fef08a" stop-opacity="0.8"/>
+                                <stop offset="100%" stop-color="#ca8a04" stop-opacity="0"/>
+                            </radialGradient>
+                            <linearGradient id="robeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#059669"/>
+                                <stop offset="100%" stop-color="#064e3b"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Ground Shadow -->
+                        <ellipse cx="60" cy="130" rx="42" ry="8" fill="rgba(0,0,0,0.35)"/>
+                        <!-- Scooter Rear Wheel -->
+                        <circle cx="28" cy="116" r="14" fill="#1e293b" stroke="#94a3b8" stroke-width="4"/>
+                        <circle cx="28" cy="116" r="6" fill="#cbd5e1"/>
+                        <!-- Scooter Front Wheel -->
+                        <circle cx="92" cy="116" r="14" fill="#1e293b" stroke="#94a3b8" stroke-width="4"/>
+                        <circle cx="92" cy="116" r="6" fill="#cbd5e1"/>
+                        <!-- Scooter Body Frame -->
+                        <path d="M 28 106 Q 48 94 65 96 L 90 106 L 82 118 L 36 118 Z" fill="url(#scooterBody)" stroke="#065f46" stroke-width="2"/>
+                        <!-- Scooter Front Shield / Cowling -->
+                        <path d="M 72 96 L 88 78 L 98 84 L 86 108 Z" fill="url(#scooterBody)" stroke="#065f46" stroke-width="2"/>
+                        <!-- Chrome Handlebars -->
+                        <path d="M 80 78 L 74 68 M 84 76 L 90 66" stroke="#e2e8f0" stroke-width="3.5" stroke-linecap="round"/>
+                        <!-- Scooter Big Round Headlight -->
+                        <circle cx="94" cy="80" r="8" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+                        <circle cx="94" cy="80" r="6" fill="url(#headlightBeam)"/>
+                        <!-- Light Beam Cone -->
+                        <polygon points="98,78 120,68 120,92 98,82" fill="#fef08a" opacity="0.3"/>
+                        <!-- Salonbus Character Body -->
+                        <path d="M 44 68 Q 62 62 76 68 L 78 98 Q 60 102 42 98 Z" fill="url(#robeGrad)"/>
+                        <!-- Gold Robe Trim & Sash -->
+                        <path d="M 58 68 L 58 98" stroke="#fbbf24" stroke-width="3"/>
+                        <rect x="42" y="88" width="36" height="5" rx="2" fill="#f59e0b" stroke="#78350f" stroke-width="1"/>
+                        <!-- Head & Turban -->
+                        <ellipse cx="60" cy="46" rx="22" ry="19" fill="#fde68a"/>
+                        <!-- White Keffiyeh Scarf with 3D folds -->
+                        <path d="M 38 42 C 38 18, 82 18, 82 42 C 88 58, 80 74, 78 78 L 70 65 L 50 65 L 42 78 C 40 74, 32 58, 38 42 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                        <!-- Golden Agal Headband (Double Ring) -->
+                        <ellipse cx="60" cy="32" rx="20" ry="5" fill="#f59e0b" stroke="#78350f" stroke-width="2"/>
+                        <ellipse cx="60" cy="35" rx="21" ry="5" fill="none" stroke="#b45309" stroke-width="1.5"/>
+                        <circle cx="60" cy="30" r="3.5" fill="#ef4444" stroke="#7f1d1d"/>
+                        <!-- Face details -->
+                        <circle cx="53" cy="46" r="3" fill="#0f172a"/>
+                        <circle cx="67" cy="46" r="3" fill="#0f172a"/>
+                        <circle cx="54" cy="44" r="1" fill="#ffffff"/>
+                        <circle cx="68" cy="44" r="1" fill="#ffffff"/>
+                        <ellipse cx="48" cy="51" rx="4" ry="2" fill="#fda4af" opacity="0.7"/>
+                        <ellipse cx="72" cy="51" rx="4" ry="2" fill="#fda4af" opacity="0.7"/>
+                        <!-- Magnificent Black Mustache -->
+                        <path d="M 44 54 C 54 49, 60 56, 60 56 C 60 56, 66 49, 76 54 C 74 60, 62 62, 60 62 C 58 62, 46 60, 44 54 Z" fill="#0f172a"/>
+                    </svg>
+                `
+            },
+            {
+                id: 'xiaomei',
+                name: '孫小美',
+                color: '#f43f5e',
+                catchphrase: '好的開始是成功的一半！',
+                svg: `
+                    <svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="qipaoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#f43f5e"/>
+                                <stop offset="100%" stop-color="#be123c"/>
+                            </linearGradient>
+                            <radialGradient id="hairGrad" cx="50%" cy="30%" r="70%">
+                                <stop offset="0%" stop-color="#5a2e17"/>
+                                <stop offset="100%" stop-color="#271006"/>
+                            </radialGradient>
+                        </defs>
+                        <!-- Ground Shadow -->
+                        <ellipse cx="60" cy="130" rx="34" ry="7" fill="rgba(0,0,0,0.35)"/>
+                        <!-- Red Shoes -->
+                        <ellipse cx="48" cy="124" rx="8" ry="5" fill="#e11d48" stroke="#881337" stroke-width="1.5"/>
+                        <ellipse cx="72" cy="124" rx="8" ry="5" fill="#e11d48" stroke="#881337" stroke-width="1.5"/>
+                        <circle cx="48" cy="123" r="2" fill="#fbbf24"/>
+                        <circle cx="72" cy="123" r="2" fill="#fbbf24"/>
+                        <!-- White socks & Legs -->
+                        <rect x="44" y="112" width="8" height="12" rx="3" fill="#ffffff"/>
+                        <rect x="68" y="112" width="8" height="12" rx="3" fill="#ffffff"/>
+                        <!-- Red Festive Qipao Dress with Golden Waves -->
+                        <path d="M 42 74 Q 60 68 78 74 L 84 112 Q 60 118 36 112 Z" fill="url(#qipaoGrad)" stroke="#9f1239" stroke-width="2"/>
+                        <!-- Gold Frog Buttons & Center Seam -->
+                        <path d="M 60 74 L 60 114" stroke="#fbbf24" stroke-width="2.5"/>
+                        <ellipse cx="60" cy="80" rx="4" ry="2" fill="#facc15"/>
+                        <ellipse cx="60" cy="88" rx="4" ry="2" fill="#facc15"/>
+                        <ellipse cx="60" cy="96" rx="4" ry="2" fill="#facc15"/>
+                        <!-- Cute Hands / Sleeves -->
+                        <circle cx="34" cy="84" r="6" fill="#fed7aa"/>
+                        <circle cx="86" cy="84" r="6" fill="#fed7aa"/>
+                        <!-- Head -->
+                        <ellipse cx="60" cy="50" rx="21" ry="19" fill="#fed7aa"/>
+                        <!-- Hair Double Buns -->
+                        <circle cx="36" cy="30" r="14" fill="url(#hairGrad)"/>
+                        <circle cx="84" cy="30" r="14" fill="url(#hairGrad)"/>
+                        <!-- Crimson Silk Ribbons with Fluttering Tassels -->
+                        <path d="M 34 40 L 26 54 M 40 40 L 44 54" stroke="#e11d48" stroke-width="3.5" stroke-linecap="round"/>
+                        <path d="M 86 40 L 94 54 M 80 40 L 76 54" stroke="#e11d48" stroke-width="3.5" stroke-linecap="round"/>
+                        <circle cx="35" cy="40" r="4" fill="#fbbf24"/>
+                        <circle cx="85" cy="40" r="4" fill="#fbbf24"/>
+                        <!-- Bangs -->
+                        <path d="M 40 42 C 50 48, 70 48, 80 42 C 78 35, 42 35, 40 42 Z" fill="url(#hairGrad)"/>
+                        <!-- Big Anime Eyes with Highlights -->
+                        <ellipse cx="51" cy="50" rx="4" ry="5.5" fill="#0f172a"/>
+                        <ellipse cx="69" cy="50" rx="4" ry="5.5" fill="#0f172a"/>
+                        <circle cx="50" cy="48" r="1.8" fill="#ffffff"/>
+                        <circle cx="68" cy="48" r="1.8" fill="#ffffff"/>
+                        <!-- Pink Cheeks & Smile -->
+                        <circle cx="45" cy="55" r="3.5" fill="#fda4af" opacity="0.8"/>
+                        <circle cx="75" cy="55" r="3.5" fill="#fda4af" opacity="0.8"/>
+                        <path d="M 55 57 Q 60 62 65 57" stroke="#e11d48" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    </svg>
+                `
+            },
+            {
+                id: 'uncle-tu',
+                name: '阿土伯',
+                color: '#f59e0b',
+                catchphrase: '天公疼憨人～走走走！',
+                svg: `
+                    <svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="hatGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#f59e0b"/>
+                                <stop offset="60%" stop-color="#d97706"/>
+                                <stop offset="100%" stop-color="#92400e"/>
+                            </linearGradient>
+                            <linearGradient id="pantsGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#1e3a8a"/>
+                                <stop offset="100%" stop-color="#172554"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Ground Shadow -->
+                        <ellipse cx="60" cy="130" rx="34" ry="7" fill="rgba(0,0,0,0.35)"/>
+                        <!-- Straw Sandals -->
+                        <ellipse cx="48" cy="124" rx="8" ry="4.5" fill="#a16207" stroke="#78350f" stroke-width="1.5"/>
+                        <ellipse cx="72" cy="124" rx="8" ry="4.5" fill="#a16207" stroke="#78350f" stroke-width="1.5"/>
+                        <!-- Rolled-up Blue Pants -->
+                        <rect x="42" y="100" width="12" height="20" rx="3" fill="url(#pantsGrad)"/>
+                        <rect x="66" y="100" width="12" height="20" rx="3" fill="url(#pantsGrad)"/>
+                        <rect x="40" y="116" width="16" height="4" rx="2" fill="#cbd5e1"/>
+                        <rect x="64" y="116" width="16" height="4" rx="2" fill="#cbd5e1"/>
+                        <!-- White Tank Top & Towel -->
+                        <path d="M 42 74 L 78 74 L 76 102 L 44 102 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                        <!-- Rolled Checkered Towel on Shoulder -->
+                        <path d="M 40 74 Q 34 88 42 94" stroke="#93c5fd" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        <path d="M 40 74 Q 34 88 42 94" stroke="#2563eb" stroke-width="5" stroke-dasharray="3 3" fill="none" stroke-linecap="round"/>
+                        <!-- Head -->
+                        <ellipse cx="60" cy="50" rx="21" ry="19" fill="#fde68a"/>
+                        <!-- Conical Bamboo Hat (斗笠) with Ribs -->
+                        <polygon points="60,10 16,44 104,44" fill="url(#hatGrad)" stroke="#78350f" stroke-width="2"/>
+                        <line x1="60" y1="10" x2="38" y2="44" stroke="#78350f" stroke-width="1.2" opacity="0.6"/>
+                        <line x1="60" y1="10" x2="60" y2="44" stroke="#78350f" stroke-width="1.2" opacity="0.6"/>
+                        <line x1="60" y1="10" x2="82" y2="44" stroke="#78350f" stroke-width="1.2" opacity="0.6"/>
+                        <circle cx="60" cy="10" r="3.5" fill="#78350f"/>
+                        <!-- Smiling Kind Face -->
+                        <path d="M 49 46 Q 54 43 57 46" stroke="#78350f" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        <path d="M 63 46 Q 66 43 71 46" stroke="#78350f" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        <circle cx="45" cy="52" r="3" fill="#f59e0b" opacity="0.6"/>
+                        <circle cx="75" cy="52" r="3" fill="#f59e0b" opacity="0.6"/>
+                        <path d="M 52 56 Q 60 64 68 56" stroke="#b45309" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    </svg>
+                `
+            },
+            {
+                id: 'madam',
+                name: '錢夫人',
+                color: '#8b5cf6',
+                catchphrase: '今夜做夢也會笑！吼吼吼～',
+                svg: `
+                    <svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="gownGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#8b5cf6"/>
+                                <stop offset="100%" stop-color="#581c87"/>
+                            </linearGradient>
+                            <linearGradient id="minkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#e9d5ff"/>
+                                <stop offset="50%" stop-color="#d8b4fe"/>
+                                <stop offset="100%" stop-color="#c084fc"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Ground Shadow -->
+                        <ellipse cx="60" cy="130" rx="36" ry="7" fill="rgba(0,0,0,0.35)"/>
+                        <!-- Purple Stiletto Pumps -->
+                        <ellipse cx="48" cy="124" rx="6" ry="4" fill="#7c3aed" stroke="#4c1d95" stroke-width="1.5"/>
+                        <ellipse cx="72" cy="124" rx="6" ry="4" fill="#7c3aed" stroke="#4c1d95" stroke-width="1.5"/>
+                        <!-- Velvet Evening Gown -->
+                        <path d="M 44 74 Q 60 68 76 74 L 84 122 Q 60 126 36 122 Z" fill="url(#gownGrad)" stroke="#4c1d95" stroke-width="2"/>
+                        <!-- Fluffy Mink Fur Boa -->
+                        <path d="M 34 74 Q 60 66 86 74 Q 82 86 60 84 Q 38 86 34 74 Z" fill="url(#minkGrad)" stroke="#9333ea" stroke-width="1.5"/>
+                        <circle cx="60" cy="80" r="3" fill="#fbbf24"/>
+                        <!-- Golden Fan in Hand -->
+                        <g transform="translate(82, 76) rotate(-15)">
+                            <path d="M 0 0 L 18 -12 L 24 6 Z" fill="#fbbf24" stroke="#d97706" stroke-width="1.5"/>
+                            <circle cx="12" cy="-4" r="1.5" fill="#ef4444"/>
+                            <circle cx="16" cy="0" r="1.5" fill="#3b82f6"/>
+                        </g>
+                        <!-- Head -->
+                        <ellipse cx="60" cy="48" rx="20" ry="18" fill="#fed7aa"/>
+                        <!-- Aristocratic Purple Hair -->
+                        <path d="M 36 48 C 30 26, 90 26, 84 48 C 92 64, 82 72, 80 72 L 72 58 L 48 58 L 40 72 Z" fill="#4c1d95"/>
+                        <!-- Chic Sunglasses -->
+                        <rect x="44" y="44" width="14" height="10" rx="3" fill="#0f172a" stroke="#fbbf24" stroke-width="1.5"/>
+                        <rect x="62" y="44" width="14" height="10" rx="3" fill="#0f172a" stroke="#fbbf24" stroke-width="1.5"/>
+                        <line x1="58" y1="49" x2="62" y2="49" stroke="#fbbf24" stroke-width="2"/>
+                        <line x1="47" y1="46" x2="52" y2="52" stroke="#ffffff" stroke-width="1.2" opacity="0.8"/>
+                        <line x1="65" y1="46" x2="70" y2="52" stroke="#ffffff" stroke-width="1.2" opacity="0.8"/>
+                        <!-- Red Lipstick & Beauty Mark -->
+                        <ellipse cx="60" cy="60" rx="4.5" ry="2.2" fill="#dc2626"/>
+                        <circle cx="67" cy="58" r="1" fill="#451a03"/>
+                    </svg>
+                `
+            }
+        ];
+
+        /* ========================================================
+           Branching Map Graph Specification (30 Tiles: 0~29)
+           ======================================================== */
+        const MAP_TILES = [
+            // Outer Ring Bottom Row (Left to Right)
+            { id: 0, x: 100, y: 560, name: '起點 GO', type: 'start', next: [1] },
+            { id: 1, x: 220, y: 560, name: '忠孝東路', type: 'prop', price: 2000, rent: [400, 1000, 2200, 4500], color: '#38bdf8', next: [2] },
+            { id: 2, x: 340, y: 560, name: '寶箱福利', type: 'chest', next: [3] },
+            { id: 3, x: 460, y: 560, name: '仁愛路', type: 'prop', price: 2400, rent: [480, 1200, 2600, 5200], color: '#38bdf8', next: [4] },
+            { id: 4, x: 580, y: 560, name: '點券格+20', type: 'points', val: 20, next: [5] },
+            // FORK 1: Node 5 branch to outer ring (6) OR Garden Shortcut (22)!
+            { id: 5, x: 700, y: 560, name: '市民大道', type: 'prop', price: 2800, rent: [560, 1400, 3000, 6000], color: '#38bdf8', next: [6, 22], isFork: true },
+            { id: 6, x: 820, y: 560, name: '信義路', type: 'prop', price: 3200, rent: [640, 1600, 3500, 7000], color: '#38bdf8', next: [7] },
+            { id: 7, x: 920, y: 540, name: '台北醫院', type: 'hospital', next: [8] },
+
+            // Outer Ring Right Column (Bottom to Top)
+            { id: 8, x: 920, y: 430, name: '金融銀行', type: 'bank', next: [9] },
+            { id: 9, x: 920, y: 320, name: '南京東路', type: 'prop', price: 3500, rent: [700, 1750, 3800, 7800], color: '#f43f5e', next: [10] },
+            { id: 10, x: 920, y: 210, name: '命運輪盤', type: 'card', next: [11] },
+            { id: 11, x: 920, y: 100, name: '敦化南路', type: 'prop', price: 4000, rent: [800, 2000, 4400, 9000], color: '#f43f5e', next: [12] },
+
+            // Outer Ring Top Row (Right to Left)
+            // FORK 2: Node 12 branch to outer ring (13) OR Magic Inner Shortcut (27)!
+            { id: 12, x: 800, y: 80, name: '星光大道', type: 'prop', price: 4200, rent: [840, 2100, 4600, 9500], color: '#f59e0b', next: [13, 27], isFork: true },
+            { id: 13, x: 680, y: 80, name: '寶箱福利', type: 'chest', next: [14] },
+            { id: 14, x: 560, y: 80, name: '中山北路', type: 'prop', price: 4500, rent: [900, 2250, 5000, 10000], color: '#f59e0b', next: [15] },
+            { id: 15, x: 440, y: 80, name: '點券格+30', type: 'points', val: 30, next: [16] },
+            { id: 16, x: 320, y: 80, name: '和平東路', type: 'prop', price: 4800, rent: [960, 2400, 5300, 11000], color: '#f59e0b', next: [17] },
+            { id: 17, x: 200, y: 80, name: '魔法神殿', type: 'magic', next: [18] },
+            { id: 18, x: 80, y: 100, name: '拘留監獄', type: 'jail', next: [19] },
+
+            // Outer Ring Left Column (Top to Bottom)
+            { id: 19, x: 80, y: 210, name: '重慶南路', type: 'prop', price: 3000, rent: [600, 1500, 3300, 6800], color: '#10b981', next: [20] },
+            { id: 20, x: 80, y: 320, name: '命運輪盤', type: 'card', next: [21] },
+            { id: 21, x: 80, y: 430, name: '羅斯福路', type: 'prop', price: 2600, rent: [520, 1300, 2900, 5800], color: '#10b981', next: [0] },
+
+            // Branch 1: Garden Park Shortcut (5 -> 22 -> 23 -> 24 -> 25 -> 26 -> 15)
+            { id: 22, x: 680, y: 450, name: '森林步道', type: 'prop', price: 2500, rent: [500, 1250, 2800, 5600], color: '#a855f7', next: [23] },
+            { id: 23, x: 640, y: 340, name: '神仙聖壇', type: 'magic', next: [24] },
+            { id: 24, x: 580, y: 250, name: '中央噴泉', type: 'chest', next: [25] },
+            { id: 25, x: 520, y: 180, name: '點券寶鑽', type: 'points', val: 50, next: [26] },
+            { id: 26, x: 480, y: 110, name: '林蔭出口', type: 'prop', price: 3800, rent: [760, 1900, 4200, 8500], color: '#a855f7', next: [15] },
+
+            // Branch 2: Magic Inner Shortcut (12 -> 27 -> 28 -> 29 -> 3)
+            { id: 27, x: 740, y: 180, name: '秘境入口', type: 'points', val: 25, next: [28] },
+            { id: 28, x: 680, y: 270, name: '巨蛋園區', type: 'prop', price: 5000, rent: [1000, 2500, 5500, 12000], color: '#8b5cf6', next: [29] },
+            { id: 29, x: 580, y: 420, name: '時空傳送', type: 'magic', next: [3] }
+        ];
+
+        /* ========================================================
+           Game Controller State
+           ======================================================== */
+        const Game = {
+            players: [],
+            currentTurnIdx: 0,
+            priceIndex: 1.0,
+            roundCount: 1,
+            isMoving: false,
+            waitingBranchChoice: false,
+            tilesOwnership: {}, // tileId -> { ownerIdx, level: 0~3 }
+            roadblocks: {},     // tileId -> boolean
+            skins: {},          // charId -> customImgUrl, mapBg -> customBgUrl
+
+            deities: ['財神', '福神', '衰神', '窮神', '土地公'],
+
+            getTile(id) {
+                return MAP_TILES[id] || MAP_TILES[0];
+            },
+
+            init() {
+                this.loadSkins();
+                this.setupPlayers();
+                this.tilesOwnership = {};
+                this.roadblocks = {};
+                this.priceIndex = 1.0;
+                this.roundCount = 1;
+                this.currentTurnIdx = 0;
+                this.isMoving = false;
+                this.waitingBranchChoice = false;
+
+                this.drawBoardGraphics();
+                this.renderTiles();
+                this.renderCharacters();
+                this.bindUIEvents();
+                this.updateHUD();
+                this.applyCustomMapBg();
+                this.autoScale();
+                this.showToast('🚀 歡迎來到大富翁世界！請點擊 GO 擲骰出發！');
+            },
+
+            loadSkins() {
+                try {
+                    const saved = localStorage.getItem('richman_custom_skins');
+                    this.skins = saved ? JSON.parse(saved) : {};
+                } catch(e) {
+                    this.skins = {};
+                }
+            },
+
+            saveSkins() {
+                try {
+                    localStorage.setItem('richman_custom_skins', JSON.stringify(this.skins));
+                } catch(e) {}
+            },
+
+            setupPlayers() {
+                this.players = [
+                    {
+                        idx: 0,
+                        char: CHARACTERS[0], // 沙隆巴斯 (Human Player)
+                        isAI: false,
+                        cash: 25000,
+                        bank: 40000,
+                        points: 120,
+                        tileId: 0,
+                        deity: '財神',
+                        deityDays: 5,
+                        items: ['遙控骰子', '路障', '機車卡'],
+                        bankrupt: false
+                    },
+                    {
+                        idx: 1,
+                        char: CHARACTERS[1], // 孫小美 (AI)
+                        isAI: true,
+                        cash: 25000,
+                        bank: 40000,
+                        points: 100,
+                        tileId: 0,
+                        deity: null,
+                        deityDays: 0,
+                        items: ['遙控骰子'],
+                        bankrupt: false
+                    },
+                    {
+                        idx: 2,
+                        char: CHARACTERS[2], // 阿土伯 (AI)
+                        isAI: true,
+                        cash: 25000,
+                        bank: 40000,
+                        points: 100,
+                        tileId: 0,
+                        deity: null,
+                        deityDays: 0,
+                        items: ['路障'],
+                        bankrupt: false
+                    },
+                    {
+                        idx: 3,
+                        char: CHARACTERS[3], // 錢夫人 (AI)
+                        isAI: true,
+                        cash: 25000,
+                        bank: 40000,
+                        points: 100,
+                        tileId: 0,
+                        deity: null,
+                        deityDays: 0,
+                        items: ['機車卡'],
+                        bankrupt: false
+                    }
+                ];
+            },
+
+            /* Render 3D SVG Road network & Natural Scenery */
+            drawBoardGraphics() {
+                const svg = document.getElementById('boardSvg');
+                svg.innerHTML = `
+                    <defs>
+                        <radialGradient id="lakeGrad" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#38bdf8"/>
+                            <stop offset="100%" stop-color="#0284c7"/>
+                        </radialGradient>
+                        <linearGradient id="magicPathGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ec4899"/>
+                            <stop offset="100%" stop-color="#8b5cf6"/>
+                        </linearGradient>
+                        <linearGradient id="domeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#a3e635"/>
+                            <stop offset="50%" stop-color="#84cc16"/>
+                            <stop offset="100%" stop-color="#4d7c0f"/>
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Natural Green Grass Surface with Pattern -->
+                    <rect x="0" y="0" width="1000" height="640" fill="#528416" />
+
+                    <!-- Decorative Shimmering Lake with Water Lily -->
+                    <ellipse cx="320" cy="310" rx="95" ry="65" fill="url(#lakeGrad)" opacity="0.88"/>
+                    <circle cx="295" cy="295" r="14" fill="#22c55e" opacity="0.75"/>
+                    <circle cx="345" cy="325" r="9" fill="#fda4af" opacity="0.85"/>
+                    <!-- Lotus Flowers -->
+                    <circle cx="345" cy="325" r="4" fill="#fbbf24"/>
+                    <ellipse cx="305" cy="310" rx="12" ry="7" fill="#22c55e" opacity="0.75"/>
+
+                    <!-- Big Grand Dome Building in background (Richman Landmark) -->
+                    <g transform="translate(420, 210)">
+                        <rect x="0" y="30" width="140" height="65" rx="8" fill="#e2e8f0" stroke="#94a3b8" stroke-width="3"/>
+                        <path d="M 20 95 A 15 15 0 0 1 50 95 Z" fill="#334155"/>
+                        <path d="M 60 95 A 15 15 0 0 1 90 95 Z" fill="#334155"/>
+                        <path d="M 100 95 A 15 15 0 0 1 130 95 Z" fill="#334155"/>
+                        <ellipse cx="70" cy="30" rx="60" ry="42" fill="url(#domeGrad)" stroke="#3f6212" stroke-width="4"/>
+                        <circle cx="70" cy="-12" r="7" fill="#fbbf24" stroke="#d97706" stroke-width="2"/>
+                    </g>
+
+                    <!-- Isometric Trees Clusters -->
+                    <g transform="translate(170, 180)">
+                        <ellipse cx="35" cy="46" rx="28" ry="10" fill="rgba(0,0,0,0.2)"/>
+                        <circle cx="20" cy="20" r="26" fill="#15803d" opacity="0.95"/>
+                        <circle cx="45" cy="15" r="22" fill="#16a34a" opacity="0.95"/>
+                        <circle cx="35" cy="35" r="24" fill="#14532d" opacity="0.95"/>
+                    </g>
+                    <g transform="translate(790, 360)">
+                        <ellipse cx="35" cy="42" rx="26" ry="9" fill="rgba(0,0,0,0.2)"/>
+                        <circle cx="20" cy="20" r="28" fill="#15803d" opacity="0.95"/>
+                        <circle cx="45" cy="25" r="24" fill="#16a34a" opacity="0.95"/>
+                    </g>
+
+                    <!-- Road Network Lines connecting nodes -->
+                    <!-- Outer Loop Track -->
+                    <path d="M 100 560 L 220 560 L 340 560 L 460 560 L 580 560 L 700 560 L 820 560 L 920 540 L 920 430 L 920 320 L 920 210 L 920 100 L 800 80 L 680 80 L 560 80 L 440 80 L 320 80 L 200 80 L 80 100 L 80 210 L 80 320 L 80 430 Z"
+                          fill="none" stroke="#cbd5e1" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+                    <path d="M 100 560 L 220 560 L 340 560 L 460 560 L 580 560 L 700 560 L 820 560 L 920 540 L 920 430 L 920 320 L 920 210 L 920 100 L 800 80 L 680 80 L 560 80 L 440 80 L 320 80 L 200 80 L 80 100 L 80 210 L 80 320 L 80 430 Z"
+                          fill="none" stroke="#f59e0b" stroke-width="3" stroke-dasharray="8 8" stroke-linecap="round" stroke-linejoin="round"/>
+
+                    <!-- Central Garden Shortcut Track -->
+                    <path d="M 700 560 L 680 450 L 640 340 L 580 250 L 520 180 L 480 110 L 440 80"
+                          fill="none" stroke="#e0e7ff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+                    <path d="M 700 560 L 680 450 L 640 340 L 580 250 L 520 180 L 480 110 L 440 80"
+                          fill="none" stroke="#6366f1" stroke-width="3" stroke-dasharray="6 6" stroke-linecap="round" stroke-linejoin="round"/>
+
+                    <!-- Magic Shortcut Track -->
+                    <path d="M 800 80 L 740 180 L 680 270 L 580 420 L 460 560"
+                          fill="none" stroke="url(#magicPathGrad)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+                    <path d="M 800 80 L 740 180 L 680 270 L 580 420 L 460 560"
+                          fill="none" stroke="#fde047" stroke-width="3" stroke-dasharray="6 6" stroke-linecap="round" stroke-linejoin="round"/>
+                `;
+            },
+
+            applyCustomMapBg() {
+                const board = document.getElementById('boardContainer');
+                if (this.skins && this.skins.mapBg) {
+                    board.style.backgroundImage = `url("${this.skins.mapBg}")`;
+                } else {
+                    board.style.backgroundImage = 'none';
+                }
+            },
+
+            renderTiles() {
+                const layer = document.getElementById('tileLayer');
+                layer.innerHTML = '';
+
+                MAP_TILES.forEach(tile => {
+                    const el = document.createElement('div');
+                    el.className = `map-tile tile-${tile.type}`;
+                    el.id = `tile-${tile.id}`;
+                    el.style.left = `${tile.x}px`;
+                    el.style.top = `${tile.y}px`;
+
+                    let iconHTML = '';
+                    if (tile.type === 'start') iconHTML = '<i class="fa-solid fa-flag-checkered fa-lg"></i>';
+                    else if (tile.type === 'chest') iconHTML = '<i class="fa-solid fa-box-open fa-lg"></i>';
+                    else if (tile.type === 'points') iconHTML = '<i class="fa-solid fa-ticket fa-lg"></i>';
+                    else if (tile.type === 'magic') iconHTML = '<i class="fa-solid fa-hat-wizard fa-lg"></i>';
+                    else if (tile.type === 'jail') iconHTML = '<i class="fa-solid fa-lock fa-lg"></i>';
+                    else if (tile.type === 'hospital') iconHTML = '<i class="fa-solid fa-house-medical fa-lg"></i>';
+                    else if (tile.type === 'bank') iconHTML = '<i class="fa-solid fa-building-columns fa-lg"></i>';
+                    else if (tile.type === 'prop') {
+                        iconHTML = `<div class="color-strip" style="background:${tile.color}"></div><i class="fa-solid fa-building" style="color:${tile.color}; margin-top:6px;"></i>`;
+                    }
+
+                    el.innerHTML = `
+                        ${iconHTML}
+                        <div style="font-weight:700; margin-top:2px;">${tile.name}</div>
+                        ${tile.price ? `<div style="font-size:0.62rem; color:#64748b;">$${tile.price}</div>` : ''}
+                        <div class="tile-building-box" id="tileBuilding-${tile.id}"></div>
+                        <span class="tile-owner-badge" id="tileOwner-${tile.id}"></span>
+                        <div id="tileRoadblock-${tile.id}"></div>
+                    `;
+
+                    el.onclick = () => this.inspectTile(tile.id);
+                    layer.appendChild(el);
+                });
+            },
+
+            /* Generate 3D Building Models for Tile Levels */
+            getBuildingSVG(level) {
+                if (level === 0) {
+                    // Level 0: Wooden For-Sale Signboard & Owner Flag
+                    return `
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="18" y="16" width="4" height="20" rx="1" fill="#78350f"/>
+                            <rect x="6" y="8" width="28" height="15" rx="3" fill="#f59e0b" stroke="#b45309" stroke-width="1.5"/>
+                            <text x="20" y="19" font-size="9" font-weight="900" fill="#78350f" text-anchor="middle">★地</text>
+                        </svg>
+                    `;
+                } else if (level === 1) {
+                    // Level 1: Red-Gabled Wooden Cottage Villa
+                    return `
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="25" y="6" width="5" height="10" fill="#94a3b8"/>
+                            <polygon points="20,8 4,22 36,22" fill="#ef4444" stroke="#991b1b" stroke-width="1.5"/>
+                            <rect x="8" y="20" width="24" height="16" fill="#fde68a" stroke="#ca8a04" stroke-width="1.5"/>
+                            <rect x="16" y="24" width="8" height="12" fill="#b45309"/>
+                            <rect x="10" y="23" width="5" height="5" fill="#38bdf8"/>
+                            <rect x="25" y="23" width="5" height="5" fill="#38bdf8"/>
+                        </svg>
+                    `;
+                } else if (level === 2) {
+                    // Level 2: Modern 2-Story Luxury Townhouse
+                    return `
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <polygon points="20,4 2,16 38,16" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.5"/>
+                            <rect x="6" y="16" width="28" height="20" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+                            <rect x="10" y="18" width="8" height="6" fill="#60a5fa"/>
+                            <rect x="22" y="18" width="8" height="6" fill="#60a5fa"/>
+                            <rect x="15" y="27" width="10" height="9" fill="#1e293b"/>
+                        </svg>
+                    `;
+                } else if (level === 3) {
+                    // Level 3: Glowing Glass Skyscraper with Crown
+                    return `
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <text x="20" y="8" font-size="9" text-anchor="middle">👑</text>
+                            <rect x="10" y="9" width="20" height="28" rx="2" fill="#0284c7" stroke="#38bdf8" stroke-width="1.5"/>
+                            <line x1="10" y1="16" x2="30" y2="16" stroke="#bae6fd" stroke-width="1"/>
+                            <line x1="10" y1="23" x2="30" y2="23" stroke="#bae6fd" stroke-width="1"/>
+                            <line x1="10" y1="30" x2="30" y2="30" stroke="#bae6fd" stroke-width="1"/>
+                            <line x1="20" y1="9" x2="20" y2="37" stroke="#bae6fd" stroke-width="1"/>
+                        </svg>
+                    `;
+                }
+                return '';
+            },
+
+            renderCharacters() {
+                const layer = document.getElementById('characterLayer');
+                layer.innerHTML = '';
+
+                this.players.forEach(p => {
+                    const charEl = document.createElement('div');
+                    charEl.className = 'character-sprite';
+                    charEl.id = `charSprite-${p.idx}`;
+
+                    charEl.innerHTML = `
+                        <div class="char-deity" id="charDeity-${p.idx}" style="display:${p.deity ? 'flex' : 'none'};">
+                            ${this.getDeityIconSVG(p.deity)}
+                        </div>
+                        <div class="speech-bubble" id="charBubble-${p.idx}" style="display:none;"></div>
+                        <div class="char-body" id="charBody-${p.idx}">
+                            ${this.getCharacterVisualHTML(p)}
+                        </div>
+                        <div class="char-shadow"></div>
+                    `;
+
+                    layer.appendChild(charEl);
+                });
+
+                this.updateCharacterPositions();
+            },
+
+            /* Returns custom image <img> or fallback SVG */
+            getCharacterVisualHTML(player) {
+                const customImg = this.skins && this.skins[player.char.id];
+                if (customImg) {
+                    return `
+                        <img src="${customImg}" class="char-custom-img" alt="${player.char.name}"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="char-svg-fallback" style="display:none; width:100%; height:100%;">
+                            ${player.char.svg}
+                        </div>
+                    `;
+                }
+                return player.char.svg;
+            },
+
+            /* Position characters with neat offsets if multiple share the same tile */
+            updateCharacterPositions() {
+                const tileGroups = {};
+                this.players.forEach(p => {
+                    if (!tileGroups[p.tileId]) tileGroups[p.tileId] = [];
+                    tileGroups[p.tileId].push(p);
+                });
+
+                const multiOffsets = [
+                    [{ dx: 0, dy: 0 }],
+                    [{ dx: -12, dy: -4 }, { dx: 12, dy: 4 }],
+                    [{ dx: -14, dy: -8 }, { dx: 14, dy: -8 }, { dx: 0, dy: 8 }],
+                    [{ dx: -14, dy: -10 }, { dx: 14, dy: -10 }, { dx: -14, dy: 8 }, { dx: 14, dy: 8 }]
+                ];
+
+                this.players.forEach(p => {
+                    const group = tileGroups[p.tileId];
+                    const groupIndex = group.indexOf(p);
+                    const offsets = multiOffsets[Math.min(group.length - 1, 3)];
+                    const off = offsets[groupIndex] || { dx: 0, dy: 0 };
+
+                    const tile = this.getTile(p.tileId);
+                    const charEl = document.getElementById(`charSprite-${p.idx}`);
+                    if (charEl && tile) {
+                        charEl.style.left = `${tile.x + off.dx}px`;
+                        charEl.style.top = `${tile.y + off.dy}px`;
+                        charEl.style.zIndex = 10 + groupIndex;
+                    }
+
+                    // Deity indicator
+                    const deityEl = document.getElementById(`charDeity-${p.idx}`);
+                    if (deityEl) {
+                        deityEl.style.display = p.deity ? 'flex' : 'none';
+                        deityEl.innerHTML = this.getDeityIconSVG(p.deity);
+                    }
+                });
+            },
+
+            /* Illustrated 3D Deity Spirits */
+            getDeityIconSVG(deity) {
+                if (deity === '財神') {
+                    // God of Wealth: Golden Ingots & Cloud
+                    return `
+                        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                            <ellipse cx="16" cy="27" rx="12" ry="4" fill="#fbbf24" opacity="0.6"/>
+                            <ellipse cx="16" cy="18" rx="10" ry="8" fill="#ef4444"/>
+                            <circle cx="16" cy="11" rx="6" ry="6" fill="#fde68a"/>
+                            <path d="M 10 7 Q 16 2 22 7" stroke="#b45309" stroke-width="2" fill="#f59e0b"/>
+                            <circle cx="16" cy="19" r="4.5" fill="#facc15" stroke="#ca8a04"/>
+                        </svg>
+                    `;
+                }
+                if (deity === '福神') {
+                    // God of Fortune: Four Leaf Clover
+                    return `
+                        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="16" cy="16" r="14" fill="#dcfce7"/>
+                            <path d="M 16 16 C 12 8, 8 12, 16 16 C 24 8, 20 12, 16 16 C 24 24, 20 20, 16 16 C 8 24, 12 20, 16 16 Z" fill="#22c55e" stroke="#15803d"/>
+                        </svg>
+                    `;
+                }
+                if (deity === '土地公') {
+                    // Earth God: Shrine Flag & Beard
+                    return `
+                        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="16" cy="12" r="7" fill="#fed7aa"/>
+                            <path d="M 11 14 Q 16 22 21 14" fill="#ffffff" stroke="#cbd5e1"/>
+                            <rect x="8" y="19" width="16" height="10" rx="3" fill="#dc2626"/>
+                        </svg>
+                    `;
+                }
+                if (deity === '窮神') {
+                    // God of Poverty: Distressed ghost with flying coin
+                    return `
+                        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="16" cy="15" r="10" fill="#94a3b8"/>
+                            <circle cx="13" cy="14" r="2" fill="#0f172a"/>
+                            <circle cx="19" cy="14" r="2" fill="#0f172a"/>
+                            <path d="M 13 20 Q 16 16 19 20" stroke="#0f172a" stroke-width="1.5" fill="none"/>
+                        </svg>
+                    `;
+                }
+                if (deity === '衰神') {
+                    // God of Misfortune: Raincloud & teardrop
+                    return `
+                        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                            <ellipse cx="16" cy="14" rx="11" ry="7" fill="#64748b"/>
+                            <circle cx="11" cy="12" r="5" fill="#64748b"/>
+                            <circle cx="20" cy="11" r="6" fill="#64748b"/>
+                            <line x1="12" y1="22" x2="10" y2="28" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="18" y1="22" x2="16" y2="28" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    `;
+                }
+                return '✨';
+            },
+
+            sayBubble(playerIdx, text) {
+                const b = document.getElementById(`charBubble-${playerIdx}`);
+                if (!b) return;
+                b.textContent = text;
+                b.style.display = 'block';
+                setTimeout(() => { b.style.display = 'none'; }, 2600);
+            },
+
+            bindUIEvents() {
+                // GO button
+                document.getElementById('btnGo').onclick = () => this.handlePlayerGo();
+
+                // Sound toggle
+                document.getElementById('soundToggleBtn').onclick = () => {
+                    const enabled = SoundFX.toggle();
+                    document.getElementById('soundToggleBtn').innerHTML = enabled
+                        ? '<i class="fa-solid fa-volume-high"></i> 音效'
+                        : '<i class="fa-solid fa-volume-xmark"></i> 靜音';
+                };
+
+                // Rules
+                document.getElementById('rulesBtn').onclick = () => {
+                    document.getElementById('rulesModal').classList.add('active');
+                };
+                document.getElementById('rulesModalClose').onclick = () => {
+                    document.getElementById('rulesModal').classList.remove('active');
+                };
+
+                // Skin Customizer Modal
+                document.getElementById('btnSkinCustomizer').onclick = () => this.openSkinCustomizer();
+                document.getElementById('skinModalClose').onclick = () => {
+                    document.getElementById('skinModal').classList.remove('active');
+                };
+
+                // Skin Tabs
+                document.getElementById('tabBtnChars').onclick = () => {
+                    document.getElementById('tabBtnChars').classList.add('active');
+                    document.getElementById('tabBtnMap').classList.remove('active');
+                    document.getElementById('tabContentChars').style.display = 'block';
+                    document.getElementById('tabContentMap').style.display = 'none';
+                };
+                document.getElementById('tabBtnMap').onclick = () => {
+                    document.getElementById('tabBtnMap').classList.add('active');
+                    document.getElementById('tabBtnChars').classList.remove('active');
+                    document.getElementById('tabContentChars').style.display = 'none';
+                    document.getElementById('tabContentMap').style.display = 'block';
+                };
+
+                // Map Bg URL Apply
+                document.getElementById('btnApplyMapBg').onclick = () => {
+                    const url = document.getElementById('mapBgUrlInput').value.trim();
+                    if (url) {
+                        this.skins.mapBg = url;
+                        this.saveSkins();
+                        this.applyCustomMapBg();
+                        this.showToast('🎨 地圖背景圖片已成功套用！');
+                    }
+                };
+
+                // Map Bg File Upload
+                document.getElementById('mapBgFileInput').onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (evt) => {
+                            this.skins.mapBg = evt.target.result;
+                            this.saveSkins();
+                            this.applyCustomMapBg();
+                            this.showToast('🎨 本機地圖背景圖片已成功上傳套用！');
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+
+                // Reset All Skins
+                document.getElementById('btnResetAllSkins').onclick = () => {
+                    if (confirm('確定要清除所有自訂圖片，恢復官方預設高品質3D手繪風嗎？')) {
+                        this.skins = {};
+                        this.saveSkins();
+                        this.applyCustomMapBg();
+                        this.renderCharacters();
+                        this.updateHUD();
+                        this.renderSkinCharList();
+                        this.showToast('已恢復所有官方預設角色與地圖圖片！');
+                    }
+                };
+
+                // Card Bag
+                document.getElementById('btnCardBag').onclick = () => this.openCardBag();
+                document.getElementById('cardsModalClose').onclick = () => {
+                    document.getElementById('cardsModal').classList.remove('active');
+                };
+
+                // Restart
+                document.getElementById('resetGameBtn').onclick = () => {
+                    if (confirm('確定要重新開始一局大富翁嗎？')) {
+                        this.init();
+                    }
+                };
+
+                // Auto responsive scale
+                window.addEventListener('resize', () => this.autoScale());
+            },
+
+            openSkinCustomizer() {
+                this.renderSkinCharList();
+                document.getElementById('mapBgUrlInput').value = this.skins.mapBg || '';
+                document.getElementById('skinModal').classList.add('active');
+            },
+
+            renderSkinCharList() {
+                const list = document.getElementById('skinCharList');
+                list.innerHTML = '';
+
+                CHARACTERS.forEach(char => {
+                    const card = document.createElement('div');
+                    card.className = 'skin-char-card';
+
+                    const customImg = this.skins && this.skins[char.id];
+                    const previewContent = customImg
+                        ? `<img src="${customImg}" alt="${char.name}">`
+                        : char.svg;
+
+                    card.innerHTML = `
+                        <div class="skin-char-header">
+                            <div class="skin-preview-box" id="skinPrev-${char.id}">${previewContent}</div>
+                            <div>
+                                <span style="color:${char.color};">${char.name}</span>
+                                <div style="font-size:0.72rem; color:#94a3b8; font-weight:normal;">${customImg ? '自訂圖片中' : '預設3D手繪風'}</div>
+                            </div>
+                        </div>
+                        <div class="skin-input-group">
+                            <input type="text" id="skinInput-${char.id}" class="skin-input" placeholder="輸入圖片網址 (URL)" value="${customImg && !customImg.startsWith('data:') ? customImg : ''}">
+                            <button class="skin-btn-apply" id="skinApply-${char.id}">套用</button>
+                        </div>
+                        <label class="skin-file-btn">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> 上傳本機圖片
+                            <input type="file" id="skinFile-${char.id}" accept="image/*" style="display:none;">
+                        </label>
+                    `;
+
+                    list.appendChild(card);
+
+                    // Apply URL handler
+                    document.getElementById(`skinApply-${char.id}`).onclick = () => {
+                        const url = document.getElementById(`skinInput-${char.id}`).value.trim();
+                        if (url) {
+                            this.skins[char.id] = url;
+                            this.saveSkins();
+                            this.renderCharacters();
+                            this.updateHUD();
+                            this.renderSkinCharList();
+                            this.showToast(`🎨【${char.name}】圖片網址已成功更換！`);
+                        }
+                    };
+
+                    // File upload handler
+                    document.getElementById(`skinFile-${char.id}`).onchange = (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (evt) => {
+                                this.skins[char.id] = evt.target.result;
+                                this.saveSkins();
+                                this.renderCharacters();
+                                this.updateHUD();
+                                this.renderSkinCharList();
+                                this.showToast(`🎨【${char.name}】本機圖片已上傳更換成功！`);
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    };
+                });
+            },
+
+            autoScale() {
+                const stage = document.querySelector('.game-stage-wrapper');
+                const board = document.getElementById('boardContainer');
+                if (!stage || !board) return;
+
+                const availableWidth = stage.clientWidth - 16;
+                const availableHeight = stage.clientHeight - 16;
+                const scale = Math.min(1, availableWidth / 1000, availableHeight / 640);
+                board.style.transform = `scale(${Math.max(0.38, scale)})`;
+                board.style.transformOrigin = 'center center';
+            },
+
+            updateHUD() {
+                const p = this.players[this.currentTurnIdx];
+
+                // Main Player Profile in HUD
+                const hudAvatar = document.getElementById('hudAvatar');
+                hudAvatar.innerHTML = this.getCharacterVisualHTML(p);
+                hudAvatar.style.borderColor = p.char.color;
+
+                document.getElementById('hudName').innerHTML = `
+                    ${p.char.name}
+                    <span id="hudTurnTag" style="font-size:0.75rem; color:${p.char.color};">
+                        [ ${p.isAI ? '電腦思考中' : '你的回合'} ]
+                    </span>
+                `;
+
+                document.getElementById('hudCash').textContent = p.cash.toLocaleString();
+                document.getElementById('hudBank').textContent = p.bank.toLocaleString();
+                document.getElementById('hudPoints').textContent = p.points;
+                document.getElementById('cardCountBadge').textContent = p.items.length;
+
+                // Price index badge & Round badge
+                document.getElementById('priceIndexBadge').textContent = `物價指數: ${this.priceIndex.toFixed(1)}x`;
+                document.getElementById('roundBadge').textContent = `第 ${this.roundCount} 回合`;
+
+                // Other mini player status
+                const otherDiv = document.getElementById('hudOtherPlayers');
+                otherDiv.innerHTML = '';
+                this.players.forEach(op => {
+                    if (op.idx === p.idx) return;
+                    const c = document.createElement('div');
+                    c.className = `mini-player-card ${op.bankrupt ? 'opacity-40' : ''} ${op.idx === this.currentTurnIdx ? 'active-turn' : ''}`;
+                    c.innerHTML = `
+                        <div class="mini-avatar">${this.getCharacterVisualHTML(op)}</div>
+                        <span><strong>${op.char.name}</strong> $${(op.cash + op.bank).toLocaleString()}</span>
+                    `;
+                    otherDiv.appendChild(c);
+                });
+
+                // Update ownership 3D building models & badges on tiles
+                MAP_TILES.forEach(t => {
+                    const buildingEl = document.getElementById(`tileBuilding-${t.id}`);
+                    const ownerEl = document.getElementById(`tileOwner-${t.id}`);
+                    const roadblockEl = document.getElementById(`tileRoadblock-${t.id}`);
+                    const info = this.tilesOwnership[t.id];
+
+                    if (info) {
+                        const owner = this.players[info.ownerIdx];
+                        buildingEl.innerHTML = this.getBuildingSVG(info.level);
+                        ownerEl.textContent = owner.char.name.slice(0, 1);
+                        ownerEl.style.background = owner.char.color;
+                    } else {
+                        if (buildingEl) buildingEl.innerHTML = '';
+                        if (ownerEl) ownerEl.textContent = '';
+                    }
+
+                    if (roadblockEl) {
+                        roadblockEl.innerHTML = this.roadblocks[t.id]
+                            ? '<div class="roadblock-marker"><i class="fa-solid fa-road-barrier"></i> 路障</div>'
+                            : '';
+                    }
+                });
+
+                // GO Button Enable/Disable
+                const goBtn = document.getElementById('btnGo');
+                goBtn.disabled = this.isMoving || p.isAI || this.waitingBranchChoice;
+            },
+
+            showToast(msg) {
+                const toast = document.getElementById('boardToast');
+                document.getElementById('toastText').innerHTML = msg;
+                toast.classList.add('show');
+                clearTimeout(this.toastTimer);
+                this.toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            },
+
+            /* ========================================================
+               Movement & Branch Selection Core Logic
+               ======================================================== */
+            handlePlayerGo() {
+                if (this.isMoving || this.waitingBranchChoice) return;
+                const p = this.players[this.currentTurnIdx];
+                this.rollDiceAndMove(p);
+            },
+
+            rollDiceAndMove(player, forcedSteps = 0) {
+                this.isMoving = true;
+                const goBtn = document.getElementById('btnGo');
+                goBtn.disabled = true;
+
+                const diceBox = document.getElementById('diceBox');
+                diceBox.classList.add('rolling');
+                SoundFX.dice();
+
+                const steps = forcedSteps > 0 ? forcedSteps : (Math.floor(Math.random() * 6) + 1);
+                const diceIcons = ['fa-dice-one', 'fa-dice-two', 'fa-dice-three', 'fa-dice-four', 'fa-dice-five', 'fa-dice-six'];
+
+                setTimeout(() => {
+                    diceBox.classList.remove('rolling');
+                    const iconName = diceIcons[Math.min(steps - 1, 5)] || 'fa-dice-six';
+                    diceBox.innerHTML = `<i class="fa-solid ${iconName}"></i>`;
+                    this.showToast(`🎲 <strong>${player.char.name}</strong> 擲出 <strong>${steps}</strong> 點！`);
+                    this.stepMove(player, steps);
+                }, 400);
+            },
+
+            stepMove(player, remainingSteps) {
+                if (remainingSteps <= 0) {
+                    this.isMoving = false;
+                    this.updateCharacterPositions();
+                    this.onLandTile(player);
+                    return;
+                }
+
+                const currentTile = this.getTile(player.tileId);
+
+                // Check for Branch / Fork in the road!
+                if (currentTile.next && currentTile.next.length > 1) {
+                    // Fork encountered with steps still remaining!
+                    this.handleForkIntersection(player, currentTile.next, (selectedNextId) => {
+                        this.executeOneStep(player, selectedNextId, remainingSteps);
+                    });
+                    return;
+                }
+
+                // Default linear next tile
+                const nextTileId = currentTile.next[0];
+                this.executeOneStep(player, nextTileId, remainingSteps);
+            },
+
+            executeOneStep(player, nextTileId, remainingSteps) {
+                player.tileId = nextTileId;
+                const targetTile = this.getTile(nextTileId);
+
+                // Check for Roadblock hit!
+                if (this.roadblocks[nextTileId]) {
+                    delete this.roadblocks[nextTileId];
+                    SoundFX.bad();
+                    this.sayBubble(player.idx, '哎呀！撞上路障了！');
+                    this.showToast(`🚧 <strong>${player.char.name}</strong> 撞上路障，被迫在此停步！`);
+                    this.updateCharacterPositions();
+                    this.isMoving = false;
+                    setTimeout(() => { this.onLandTile(player); }, 300);
+                    return;
+                }
+
+                // Visual sprite movement with hop
+                const charEl = document.getElementById(`charSprite-${player.idx}`);
+                if (charEl) {
+                    charEl.style.left = `${targetTile.x}px`;
+                    charEl.style.top = `${targetTile.y}px`;
+                    charEl.classList.add('hopping');
+                }
+                SoundFX.hop();
+
+                setTimeout(() => {
+                    if (charEl) charEl.classList.remove('hopping');
+
+                    // Passing GO reward
+                    if (targetTile.id === 0) {
+                        const salary = Math.round(5000 * this.priceIndex);
+                        player.cash += salary;
+                        SoundFX.cash();
+                        this.showToast(`🎉 經過起點，領取薪資 +$${salary.toLocaleString()}！`);
+                    }
+
+                    this.stepMove(player, remainingSteps - 1);
+                }, 260);
+            },
+
+            /* Handle Branching Choice (L / R) with Clickable Buttons & Board Highlights */
+            handleForkIntersection(player, nextOptions, onChoiceMade) {
+                const optA = this.getTile(nextOptions[0]);
+                const optB = this.getTile(nextOptions[1]);
+
+                if (!player.isAI) {
+                    this.waitingBranchChoice = true;
+                    this.showToast(`🧭 遇到岔路！請選擇前進路線：【${optA.name}】或【${optB.name}】！`);
+
+                    const branchDiv = document.getElementById('branchControls');
+                    branchDiv.style.display = 'flex';
+                    document.getElementById('btnBranchLeftText').textContent = `← ${optA.name}`;
+                    document.getElementById('btnBranchRightText').textContent = `${optB.name} →`;
+
+                    // Highlight the choices on map
+                    const tileHandlers = [];
+                    nextOptions.forEach((optId, idx) => {
+                        const tileEl = document.getElementById(`tile-${optId}`);
+                        if (tileEl) {
+                            tileEl.classList.add('branch-choice');
+                            const badge = document.createElement('div');
+                            badge.className = 'branch-arrow-badge';
+                            badge.textContent = idx === 0 ? `← ${optA.name}` : `${optB.name} →`;
+                            tileEl.appendChild(badge);
+
+                            // Enable direct tile clicking
+                            const handler = () => {
+                                cleanBranchUI();
+                                onChoiceMade(optId);
+                            };
+                            tileEl.addEventListener('click', handler);
+                            tileHandlers.push({ el: tileEl, handler });
+                        }
+                    });
+
+                    const cleanBranchUI = () => {
+                        this.waitingBranchChoice = false;
+                        branchDiv.style.display = 'none';
+                        document.querySelectorAll('.branch-choice').forEach(el => el.classList.remove('branch-choice'));
+                        document.querySelectorAll('.branch-arrow-badge').forEach(el => el.remove());
+                        tileHandlers.forEach(th => th.el.removeEventListener('click', th.handler));
+                    };
+
+                    document.getElementById('btnBranchLeft').onclick = () => {
+                        cleanBranchUI();
+                        onChoiceMade(nextOptions[0]);
+                    };
+                    document.getElementById('btnBranchRight').onclick = () => {
+                        cleanBranchUI();
+                        onChoiceMade(nextOptions[1]);
+                    };
+                } else {
+                    // AI route choice
+                    setTimeout(() => {
+                        const choice = Math.random() < 0.5 ? nextOptions[0] : nextOptions[1];
+                        const chosenTile = this.getTile(choice);
+                        this.sayBubble(player.idx, `往【${chosenTile.name}】前進！`);
+                        onChoiceMade(choice);
+                    }, 500);
+                }
+            },
+
+            /* ========================================================
+               Tile Landing Events
+               ======================================================== */
+            onLandTile(player) {
+                const tile = this.getTile(player.tileId);
+                this.updateHUD();
+
+                if (tile.type === 'prop') {
+                    this.handlePropertyLanding(player, tile);
+                } else if (tile.type === 'chest') {
+                    this.handleChestLanding(player);
+                } else if (tile.type === 'points') {
+                    player.points += tile.val;
+                    SoundFX.cash();
+                    this.showToast(`🎁 獲得點券 <strong>+${tile.val}</strong> 點！`);
+                    this.endTurn();
+                } else if (tile.type === 'magic') {
+                    this.handleMagicLanding(player);
+                } else if (tile.type === 'jail') {
+                    this.showToast(`🚔 經過監獄探監，平安無事。`);
+                    this.endTurn();
+                } else if (tile.type === 'hospital') {
+                    this.showToast(`🏥 經過台北醫院，身體健康！`);
+                    this.endTurn();
+                } else if (tile.type === 'bank') {
+                    const interest = Math.round(player.bank * 0.1);
+                    player.cash += interest;
+                    SoundFX.cash();
+                    this.showToast(`🏦 經過銀行，領取存款利息 +$${interest.toLocaleString()}！`);
+                    this.endTurn();
+                } else {
+                    this.endTurn();
+                }
+            },
+
+            handlePropertyLanding(player, tile) {
+                const info = this.tilesOwnership[tile.id];
+
+                if (!info) {
+                    // Unowned property: buy?
+                    const price = Math.round(tile.price * this.priceIndex);
+                    if (!player.isAI) {
+                        this.promptBuyModal(
+                            `購買土地: ${tile.name}`,
+                            `地價為 <strong>$${price.toLocaleString()}</strong>（物價指數 ${this.priceIndex.toFixed(1)}x）。是否購買並佔領此地？`,
+                            () => {
+                                if (player.cash >= price) {
+                                    player.cash -= price;
+                                    this.tilesOwnership[tile.id] = { ownerIdx: player.idx, level: 0 };
+                                    SoundFX.cash();
+                                    this.sayBubble(player.idx, '這塊地是我的了！');
+                                    this.showToast(`🎉 成功購入【${tile.name}】！`);
+                                    this.updateHUD();
+                                } else {
+                                    this.showToast('現金不足，無法購入土地。');
+                                }
+                                this.endTurn();
+                            },
+                            () => { this.endTurn(); }
+                        );
+                    } else {
+                        // AI buys if affordable
+                        if (player.cash >= price * 1.3) {
+                            player.cash -= price;
+                            this.tilesOwnership[tile.id] = { ownerIdx: player.idx, level: 0 };
+                            SoundFX.cash();
+                            this.sayBubble(player.idx, '哼哼，買下來！');
+                        }
+                        this.endTurn();
+                    }
+                } else if (info.ownerIdx === player.idx) {
+                    // Own property: upgrade?
+                    if (info.level < 3) {
+                        const upCost = Math.round(tile.price * 0.6 * this.priceIndex);
+                        const names = ['別墅', '花園大廈', '頂級摩天大樓'];
+                        if (!player.isAI) {
+                            this.promptBuyModal(
+                                `加蓋升級: ${tile.name}`,
+                                `加蓋 ${names[info.level]} 需花費 <strong>$${upCost.toLocaleString()}</strong>，可大幅提升過路費！是否加蓋？`,
+                                () => {
+                                    if (player.deity === '福神' || player.cash >= upCost) {
+                                        if (player.deity !== '福神') player.cash -= upCost;
+                                        info.level++;
+                                        SoundFX.cheer();
+                                        this.sayBubble(player.idx, '大樓越蓋越高囉！');
+                                        this.showToast(`🏗️【${tile.name}】升級為 ${names[info.level - 1]}！`);
+                                        this.updateHUD();
+                                    } else {
+                                        this.showToast('現金不足，無法升級加蓋。');
+                                    }
+                                    this.endTurn();
+                                },
+                                () => { this.endTurn(); }
+                            );
+                        } else {
+                            if (player.cash >= upCost * 1.5) {
+                                player.cash -= upCost;
+                                info.level++;
+                                SoundFX.cheer();
+                            }
+                            this.endTurn();
+                        }
+                    } else {
+                        this.showToast(`🏢 已達最高等級摩天樓！`);
+                        this.endTurn();
+                    }
+                } else {
+                    // Opponent property: check land god takeover or pay rent!
+                    const owner = this.players[info.ownerIdx];
+
+                    // Land God (土地公) Takeover power!
+                    if (player.deity === '土地公') {
+                        info.ownerIdx = player.idx;
+                        SoundFX.cheer();
+                        this.sayBubble(player.idx, '土地公顯靈！土地強制過戶！');
+                        this.showToast(`🚩 土地公顯靈！【${tile.name}】強制歸【${player.char.name}】所有！`);
+                        this.updateHUD();
+                        this.endTurn();
+                        return;
+                    }
+
+                    let rent = Math.round(tile.rent[info.level] * this.priceIndex);
+
+                    if (player.deity === '財神') {
+                        this.sayBubble(player.idx, '財神保佑，免付過路費！');
+                        this.showToast(`🌟 財神顯靈！免付過路費！`);
+                    } else {
+                        if (player.deity === '窮神') {
+                            rent *= 2;
+                            this.sayBubble(player.idx, '窮神害慘我了！付雙倍過路費！');
+                        }
+                        player.cash -= rent;
+                        owner.cash += rent;
+                        SoundFX.bad();
+                        this.sayBubble(player.idx, player.char.catchphrase);
+                        this.showToast(`💸 踩到【${owner.char.name}】的地盤，支付過路費 $${rent.toLocaleString()}！`);
+                        if (player.cash < 0) {
+                            this.handleBankruptcy(player);
+                        }
+                    }
+                    this.endTurn();
+                }
+            },
+
+            promptBuyModal(title, desc, onConfirm, onCancel) {
+                const modal = document.getElementById('propModal');
+                document.getElementById('propModalTitle').innerHTML = title;
+                document.getElementById('propModalDesc').innerHTML = desc;
+                modal.classList.add('active');
+
+                document.getElementById('propModalConfirm').onclick = () => {
+                    modal.classList.remove('active');
+                    onConfirm();
+                };
+                document.getElementById('propModalCancel').onclick = () => {
+                    modal.classList.remove('active');
+                    onCancel();
+                };
+            },
+
+            handleChestLanding(player) {
+                const events = [
+                    { msg: '中發票二獎！獲得現金 +$3,000！', action: () => { player.cash += 3000; SoundFX.cash(); } },
+                    { msg: '股票大漲分紅！獲得現金 +$4,500！', action: () => { player.cash += 4500; SoundFX.cash(); } },
+                    { msg: '撿到神奇卡片！獲得【遙控骰子】一張！', action: () => { player.items.push('遙控骰子'); SoundFX.cash(); } },
+                    { msg: '請所有富豪喝下午茶，支付 -$1,500！', action: () => { player.cash -= 1500; SoundFX.bad(); } },
+                    { msg: '隨機獲得【幸運福神】附身 3 回合！', action: () => { player.deity = '福神'; player.deityDays = 3; SoundFX.cheer(); } }
+                ];
+                const evt = events[Math.floor(Math.random() * events.length)];
+                evt.action();
+                this.showToast(`🎁 寶箱事件：${evt.msg}`);
+                this.endTurn();
+            },
+
+            handleMagicLanding(player) {
+                const deity = this.deities[Math.floor(Math.random() * this.deities.length)];
+                player.deity = deity;
+                player.deityDays = 4;
+                SoundFX.cheer();
+                this.sayBubble(player.idx, `有請【${deity}】大仙附身！`);
+                this.showToast(`🧙 神壇賜福：【${player.char.name}】獲得【${deity}】附身 4 回合！`);
+                this.endTurn();
+            },
+
+            handleBankruptcy(player) {
+                player.bankrupt = true;
+                this.showToast(`☠️ <strong>${player.char.name}</strong> 資金耗盡，宣告破產！`);
+                // Release all properties
+                Object.keys(this.tilesOwnership).forEach(tid => {
+                    if (this.tilesOwnership[tid].ownerIdx === player.idx) {
+                        delete this.tilesOwnership[tid];
+                    }
+                });
+            },
+
+            /* End of Turn & Next Player Turn Loop */
+            endTurn() {
+                this.updateHUD();
+
+                // Advance deity countdown
+                const curP = this.players[this.currentTurnIdx];
+                if (curP.deity && curP.deityDays > 0) {
+                    curP.deityDays--;
+                    if (curP.deityDays === 0) {
+                        this.showToast(`✨ ${curP.char.name} 的【${curP.deity}】離開了。`);
+                        curP.deity = null;
+                    }
+                }
+
+                // Switch to next player
+                setTimeout(() => {
+                    do {
+                        this.currentTurnIdx = (this.currentTurnIdx + 1) % this.players.length;
+                    } while (this.players[this.currentTurnIdx].bankrupt);
+
+                    // Round completed check
+                    if (this.currentTurnIdx === 0) {
+                        this.roundCount++;
+                        this.priceIndex += 0.15; // Inflation!
+                        this.showToast(`🌅 新回合開始！物價指數上漲至 ${this.priceIndex.toFixed(1)}x！`);
+                    }
+
+                    this.updateHUD();
+                    const nextP = this.players[this.currentTurnIdx];
+
+                    if (nextP.isAI) {
+                        // AI Auto Play
+                        setTimeout(() => {
+                            this.sayBubble(nextP.idx, '輪到我看招！');
+                            this.rollDiceAndMove(nextP);
+                        }, 1200);
+                    } else {
+                        this.showToast(`輪到 <strong>${nextP.char.name}</strong>，請點擊 GO 擲骰！`);
+                    }
+                }, 1000);
+            },
+
+            /* Card Bag System */
+            openCardBag() {
+                const modal = document.getElementById('cardsModal');
+                const grid = document.getElementById('cardGrid');
+                grid.innerHTML = '';
+
+                const p = this.players[0]; // Human
+                if (p.items.length === 0) {
+                    grid.innerHTML = '<div style="grid-column:1/-1; color:#94a3b8; padding:20px;">目前背包內沒有道具卡，路過點券格或寶箱可取得！</div>';
+                } else {
+                    p.items.forEach((item, idx) => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'card-item';
+                        let icon = 'fa-dice';
+                        if (item === '遙控骰子') icon = 'fa-gamepad';
+                        else if (item === '路障') icon = 'fa-road-barrier';
+                        else if (item === '機車卡') icon = 'fa-motorcycle';
+                        else if (item === '均富卡') icon = 'fa-scale-balanced';
+
+                        itemDiv.innerHTML = `
+                            <div class="c-icon"><i class="fa-solid ${icon}"></i></div>
+                            <div class="c-name">${item}</div>
+                            <div class="c-cost">點擊使用</div>
+                        `;
+                        itemDiv.onclick = () => {
+                            modal.classList.remove('active');
+                            this.useCard(p, item, idx);
+                        };
+                        grid.appendChild(itemDiv);
+                    });
+                }
+                modal.classList.add('active');
+            },
+
+            useCard(player, item, idx) {
+                if (this.isMoving) return;
+                player.items.splice(idx, 1);
+
+                if (item === '遙控骰子') {
+                    const steps = prompt('請輸入欲前往的步數 (1 ~ 6)：', '4');
+                    const num = parseInt(steps, 10);
+                    if (num >= 1 && num <= 6) {
+                        this.showToast(`🎮 使用【遙控骰子】，鎖定走 ${num} 步！`);
+                        this.rollDiceAndMove(player, num);
+                    } else {
+                        this.rollDiceAndMove(player, 6);
+                    }
+                } else if (item === '機車卡') {
+                    this.showToast('🛵 發動小綿羊機車！本次狂奔 8 步！');
+                    this.rollDiceAndMove(player, 8);
+                } else if (item === '路障') {
+                    // Place roadblock 3 steps ahead
+                    let cur = player.tileId;
+                    for (let s = 0; s < 3; s++) {
+                        const t = this.getTile(cur);
+                        cur = t.next[0];
+                    }
+                    this.roadblocks[cur] = true;
+                    SoundFX.cash();
+                    const targetTile = this.getTile(cur);
+                    this.showToast(`🚧 在前方【${targetTile.name}】設置了路障！`);
+                } else if (item === '均富卡') {
+                    let totalCash = 0;
+                    const activePlayers = this.players.filter(p => !p.bankrupt);
+                    activePlayers.forEach(p => totalCash += p.cash);
+                    const avgCash = Math.round(totalCash / activePlayers.length);
+                    activePlayers.forEach(p => p.cash = avgCash);
+                    SoundFX.cash();
+                    this.sayBubble(player.idx, '大家有錢一起賺！');
+                    this.showToast(`⚖️ 使用【均富卡】！所有玩家現金平分，每人獲得 $${avgCash.toLocaleString()}！`);
+                }
+                this.updateHUD();
+            },
+
+            inspectTile(tileId) {
+                const tile = this.getTile(tileId);
+                const info = this.tilesOwnership[tileId];
+                if (tile.type === 'prop') {
+                    const ownerStr = info ? `${this.players[info.ownerIdx].char.name} (★${info.level + 1})` : '尚無所有人';
+                    this.showToast(`📍【${tile.name}】地價 $${tile.price}｜狀態: ${ownerStr}`);
+                } else {
+                    this.showToast(`📍【${tile.name}】：特殊事件格`);
+                }
+            }
+        };
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => Game.init());
+    </script>
+</body>
+</html>

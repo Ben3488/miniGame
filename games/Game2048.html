@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="2048 霓虹方塊 (Neon 2048) — 流光玻璃擬態數字益智遊戲，支援鍵盤、觸控滑動與方向鍵控制，內建悔棋功能與合成音效。">
+    <title>2048 霓虹方塊 | Neon 2048</title>
+
+    <!-- Google Fonts: Outfit for display, Inter for UI text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome 6.4.0 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --card-bg: rgba(15, 23, 42, 0.65);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --cyan-neon: #00f2fe;
+            --cyan-glow: rgba(0, 242, 254, 0.4);
+            --pink-neon: #ff007f;
+            --pink-glow: rgba(255, 0, 127, 0.4);
+            --purple-neon: #a855f7;
+            --amber-neon: #f59e0b;
+            --emerald-neon: #10b981;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --transition-speed: 0.25s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Background Ambient Glows */
+        .ambient-glow {
+            position: fixed;
+            width: 360px;
+            height: 360px;
+            border-radius: 50%;
+            filter: blur(110px);
+            z-index: 0;
+            opacity: 0.4;
+            pointer-events: none;
+            animation: pulse-glow 8s infinite alternate ease-in-out;
+        }
+
+        .cyan-glow {
+            background-color: var(--cyan-neon);
+            top: 8%;
+            left: 8%;
+        }
+
+        .pink-glow {
+            background-color: var(--pink-neon);
+            bottom: 8%;
+            right: 8%;
+            animation-delay: 4s;
+        }
+
+        @keyframes pulse-glow {
+            0% { transform: scale(1) translate(0, 0); opacity: 0.3; }
+            100% { transform: scale(1.25) translate(25px, 20px); opacity: 0.5; }
+        }
+
+        /* Particle Canvas Overlay */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .card-glass {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        /* Top Navigation Bar */
+        .game-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            width: 100%;
+            gap: 10px;
+        }
+
+        .btn {
+            border: none;
+            outline: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 14px;
+            transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .btn-lobby {
+            padding: 10px 14px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            border-radius: 12px;
+        }
+
+        .btn-lobby:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            border-color: rgba(0, 242, 254, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            transform: scale(1.05);
+        }
+
+        .nav-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            background: linear-gradient(135deg, var(--cyan-neon), var(--pink-neon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-sub {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+        }
+
+        /* Scoreboard Row */
+        .scoreboard-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 14px;
+        }
+
+        .score-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-box.highlight-box {
+            border-color: rgba(0, 242, 254, 0.25);
+        }
+
+        .score-label {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        .score-val {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .score-val.cyan { color: var(--cyan-neon); }
+        .score-val.pink { color: var(--pink-neon); }
+        .score-val.amber { color: var(--amber-neon); }
+
+        .score-delta {
+            position: absolute;
+            top: 4px;
+            right: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--cyan-neon);
+            animation: float-up 0.7s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes float-up {
+            0% { opacity: 1; transform: translateY(6px); }
+            100% { opacity: 0; transform: translateY(-14px); }
+        }
+
+        /* Action Toolbar */
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .hint-text {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            padding: 9px 14px;
+            font-size: 0.85rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(0, 242, 254, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .btn-action:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .undo-badge {
+            background: rgba(0, 242, 254, 0.15);
+            color: var(--cyan-neon);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.75rem;
+            padding: 1px 6px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 242, 254, 0.3);
+        }
+
+        /* 2048 Board Container */
+        .board-wrapper {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            position: relative;
+            margin-bottom: 16px;
+            touch-action: none;
+        }
+
+        .board {
+            width: 100%;
+            height: 100%;
+            padding: 14px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 12px;
+            position: relative;
+        }
+
+        .grid-cell {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tile {
+            width: 100%;
+            height: 100%;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 2rem;
+            letter-spacing: 0.5px;
+            transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .tile.tile-new {
+            animation: tile-pop 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .tile.tile-merged {
+            animation: tile-merge 0.26s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes tile-pop {
+            0% { opacity: 0; transform: scale(0.3); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes tile-merge {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.18); }
+            100% { transform: scale(1); }
+        }
+
+        /* Neon Tile Themes */
+        .tile-2 {
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            color: #e2e8f0;
+        }
+        .tile-4 {
+            background: rgba(15, 118, 110, 0.35);
+            border: 1px solid rgba(45, 212, 191, 0.45);
+            color: #5eead4;
+            box-shadow: 0 0 12px rgba(45, 212, 191, 0.15);
+        }
+        .tile-8 {
+            background: rgba(0, 242, 254, 0.18);
+            border: 1px solid rgba(0, 242, 254, 0.6);
+            color: #00f2fe;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
+        }
+        .tile-16 {
+            background: rgba(59, 130, 246, 0.25);
+            border: 1px solid rgba(96, 165, 250, 0.65);
+            color: #93c5fd;
+            box-shadow: 0 0 16px rgba(59, 130, 246, 0.3);
+        }
+        .tile-32 {
+            background: rgba(139, 92, 246, 0.25);
+            border: 1px solid rgba(167, 139, 250, 0.65);
+            color: #c4b5fd;
+            box-shadow: 0 0 18px rgba(139, 92, 246, 0.35);
+        }
+        .tile-64 {
+            background: rgba(217, 70, 239, 0.25);
+            border: 1px solid rgba(232, 121, 249, 0.7);
+            color: #f0abfc;
+            box-shadow: 0 0 20px rgba(217, 70, 239, 0.4);
+        }
+        .tile-128 {
+            background: rgba(255, 0, 127, 0.24);
+            border: 1px solid rgba(255, 0, 127, 0.75);
+            color: #ff66b2;
+            font-size: 1.7rem;
+            box-shadow: 0 0 22px rgba(255, 0, 127, 0.45);
+        }
+        .tile-256 {
+            background: rgba(244, 63, 94, 0.28);
+            border: 1px solid rgba(251, 113, 133, 0.8);
+            color: #fda4af;
+            font-size: 1.7rem;
+            box-shadow: 0 0 24px rgba(244, 63, 94, 0.5);
+        }
+        .tile-512 {
+            background: rgba(249, 115, 22, 0.28);
+            border: 1px solid rgba(251, 146, 60, 0.85);
+            color: #fdba74;
+            font-size: 1.7rem;
+            box-shadow: 0 0 26px rgba(249, 115, 22, 0.55);
+        }
+        .tile-1024 {
+            background: rgba(234, 179, 8, 0.3);
+            border: 1px solid rgba(250, 204, 21, 0.9);
+            color: #fef08a;
+            font-size: 1.45rem;
+            box-shadow: 0 0 28px rgba(234, 179, 8, 0.6);
+        }
+        .tile-2048 {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.35), rgba(255, 0, 127, 0.35));
+            border: 1.5px solid #00f2fe;
+            color: #ffffff;
+            font-size: 1.45rem;
+            text-shadow: 0 0 12px rgba(0, 242, 254, 0.8);
+            box-shadow: 0 0 32px rgba(0, 242, 254, 0.7), inset 0 0 15px rgba(255, 0, 127, 0.4);
+        }
+        .tile-super {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.45), rgba(245, 158, 11, 0.45));
+            border: 1.5px solid #f59e0b;
+            color: #ffffff;
+            font-size: 1.35rem;
+            box-shadow: 0 0 35px rgba(245, 158, 11, 0.75);
+        }
+
+        /* Modal Overlay (Win / Game Over) */
+        .board-overlay {
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            background: rgba(9, 13, 22, 0.86);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+            z-index: 20;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .board-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .overlay-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+
+        .overlay-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .overlay-desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 22px;
+        }
+
+        .overlay-actions {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: linear-gradient(135deg, var(--cyan-neon), #00d2ff);
+            color: #030712;
+            padding: 13px 16px;
+            font-weight: 700;
+            box-shadow: 0 4px 18px rgba(0, 242, 254, 0.35);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 22px rgba(0, 242, 254, 0.55);
+        }
+
+        .btn-secondary {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 13px 16px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.14);
+            transform: translateY(-2px);
+        }
+
+        /* On-Screen Directional Pad & Controls */
+        .dpad-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .dpad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 56px);
+            grid-template-rows: repeat(2, 46px);
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-dpad {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .btn-dpad:hover {
+            background: rgba(0, 242, 254, 0.1);
+            border-color: rgba(0, 242, 254, 0.4);
+            color: var(--cyan-neon);
+        }
+
+        .btn-dpad:active {
+            transform: scale(0.92);
+            background: rgba(0, 242, 254, 0.2);
+        }
+
+        .controls-tip {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 420px) {
+            .app-container { padding: 14px; }
+            .board { padding: 10px; gap: 8px; }
+            .tile { font-size: 1.65rem; }
+            .tile-128, .tile-256, .tile-512 { font-size: 1.4rem; }
+            .tile-1024, .tile-2048, .tile-super { font-size: 1.15rem; }
+            .logo-title { font-size: 1.35rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="ambient-glow cyan-glow"></div>
+    <div class="ambient-glow pink-glow"></div>
+
+    <div class="app-container">
+        <!-- Top Navigation -->
+        <nav class="game-nav">
+            <a href="../index.html?zone=games" class="btn btn-lobby" title="返回遊戲大廳">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>返回遊戲大廳</span>
+            </a>
+            <div class="nav-title">
+                <span class="logo-title">NEON 2048</span>
+                <span class="logo-sub">2048 霓虹方塊</span>
+            </div>
+            <button id="btn-sound-toggle" class="btn btn-icon" title="切換音效">
+                <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+            </button>
+        </nav>
+
+        <!-- Scoreboard -->
+        <div class="scoreboard-row">
+            <div class="score-box highlight-box" id="score-box-current">
+                <span class="score-label">目前分數</span>
+                <span class="score-val cyan" id="current-score">0</span>
+            </div>
+            <div class="score-box">
+                <span class="score-label">最高紀錄</span>
+                <span class="score-val pink" id="best-score">0</span>
+            </div>
+            <div class="score-box">
+                <span class="score-label">最大方塊</span>
+                <span class="score-val amber" id="max-tile">2</span>
+            </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <div class="hint-text">
+                <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--cyan-neon);"></i>
+                <span>合併相同數字，挑戰 <strong>2048</strong>！</span>
+            </div>
+            <div class="action-buttons">
+                <button id="btn-undo" class="btn btn-action" disabled title="返回上一步">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>上一步</span>
+                    <span id="undo-count" class="undo-badge">3</span>
+                </button>
+                <button id="btn-restart" class="btn btn-action" title="重新開始新局">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    <span>新局</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 4x4 Game Board -->
+        <div class="board-wrapper" id="board-wrapper">
+            <div class="board card-glass" id="board">
+                <!-- 16 cells rendered by JS -->
+            </div>
+
+            <!-- Win / Game Over Overlay -->
+            <div class="board-overlay" id="board-overlay">
+                <div class="overlay-icon" id="overlay-icon">🏆</div>
+                <h2 class="overlay-title" id="overlay-title">達成 2048！</h2>
+                <p class="overlay-desc" id="overlay-desc">恭喜合成 2048 霓虹核心！要繼續挑戰更高分嗎？</p>
+                <div class="overlay-actions">
+                    <button id="btn-keep-going" class="btn btn-secondary">
+                        <i class="fa-solid fa-forward"></i>
+                        <span>繼續挑戰</span>
+                    </button>
+                    <button id="btn-overlay-restart" class="btn btn-primary">
+                        <i class="fa-solid fa-play"></i>
+                        <span>再玩一局</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- On-Screen Directional Controls -->
+        <div class="dpad-section">
+            <div class="dpad-grid">
+                <div></div>
+                <button class="btn btn-dpad" data-dir="up" aria-label="向上滑動">
+                    <i class="fa-solid fa-chevron-up"></i>
+                </button>
+                <div></div>
+                <button class="btn btn-dpad" data-dir="left" aria-label="向左滑動">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <button class="btn btn-dpad" data-dir="down" aria-label="向下滑動">
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <button class="btn btn-dpad" data-dir="right" aria-label="向右滑動">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+            <p class="controls-tip">支援鍵盤方向鍵 / WASD、螢幕滑動手勢或點擊上方方向鍵</p>
+        </div>
+    </div>
+
+    <script>
+        // Web Audio API Sound Synthesizer
+        const SoundManager = {
+            ctx: null,
+            enabled: true,
+
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            },
+
+            toggle() {
+                this.enabled = !this.enabled;
+                localStorage.setItem('neon_2048_sound', this.enabled);
+                return this.enabled;
+            },
+
+            playSlide() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.exponentialRampToValueAtTime(330, now + 0.065);
+
+                gain.gain.setValueAtTime(0.08, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.065);
+            },
+
+            playMerge(maxMergedVal) {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const power = Math.min(Math.log2(maxMergedVal || 4), 12);
+                const baseFreq = 260 + power * 42;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(baseFreq, now);
+                osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.45, now + 0.13);
+
+                gain.gain.setValueAtTime(0.16, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.13);
+            },
+
+            playWin() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const notes = [523.25, 659.25, 783.99, 1046.5];
+                const now = this.ctx.currentTime;
+                notes.forEach((freq, i) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + i * 0.1);
+                    gain.gain.setValueAtTime(0.16, now + i * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.25);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now + i * 0.1);
+                    osc.stop(now + i * 0.1 + 0.25);
+                });
+            },
+
+            playGameOver() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const notes = [349.23, 311.13, 277.18, 220.0];
+                const now = this.ctx.currentTime;
+                notes.forEach((freq, i) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(freq, now + i * 0.11);
+                    gain.gain.setValueAtTime(0.1, now + i * 0.11);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.11 + 0.22);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now + i * 0.11);
+                    osc.stop(now + i * 0.11 + 0.22);
+                });
+            }
+        };
+
+        // Particle System for high merges & 2048 celebration
+        const ParticleSystem = {
+            canvas: null,
+            ctx: null,
+            particles: [],
+            animId: null,
+
+            init() {
+                this.canvas = document.getElementById('particle-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+            },
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            },
+
+            burst(x, y, color = '#00f2fe', count = 28) {
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 6 + 2;
+                    this.particles.push({
+                        x, y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed - 1.5,
+                        size: Math.random() * 4 + 2,
+                        color,
+                        alpha: 1,
+                        decay: Math.random() * 0.02 + 0.015,
+                        gravity: 0.12
+                    });
+                }
+                if (!this.animId) this.loop();
+            },
+
+            loop() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const p = this.particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += p.gravity;
+                    p.alpha -= p.decay;
+                    if (p.alpha <= 0) {
+                        this.particles.splice(i, 1);
+                        continue;
+                    }
+                    this.ctx.save();
+                    this.ctx.globalAlpha = p.alpha;
+                    this.ctx.shadowBlur = 10;
+                    this.ctx.shadowColor = p.color;
+                    this.ctx.fillStyle = p.color;
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    this.ctx.restore();
+                }
+                if (this.particles.length > 0) {
+                    this.animId = requestAnimationFrame(() => this.loop());
+                } else {
+                    this.animId = null;
+                }
+            }
+        };
+
+        // Main 2048 Game Controller
+        const Game2048 = {
+            size: 4,
+            grid: [],
+            score: 0,
+            bestScore: 0,
+            history: [],
+            maxUndos: 3,
+            undosRemaining: 3,
+            won2048: false,
+            keepPlaying: false,
+            isGameOver: false,
+
+            init() {
+                this.cacheDOM();
+                this.loadStorage();
+                this.createBoardCells();
+                this.bindEvents();
+                ParticleSystem.init();
+                this.startNewGame();
+            },
+
+            cacheDOM() {
+                this.boardEl = document.getElementById('board');
+                this.boardWrapperEl = document.getElementById('board-wrapper');
+                this.currentScoreEl = document.getElementById('current-score');
+                this.bestScoreEl = document.getElementById('best-score');
+                this.maxTileEl = document.getElementById('max-tile');
+                this.scoreBoxCurrentEl = document.getElementById('score-box-current');
+                this.btnUndo = document.getElementById('btn-undo');
+                this.undoCountEl = document.getElementById('undo-count');
+                this.btnRestart = document.getElementById('btn-restart');
+                this.btnSoundToggle = document.getElementById('btn-sound-toggle');
+                this.soundIcon = document.getElementById('sound-icon');
+                this.overlayEl = document.getElementById('board-overlay');
+                this.overlayIconEl = document.getElementById('overlay-icon');
+                this.overlayTitleEl = document.getElementById('overlay-title');
+                this.overlayDescEl = document.getElementById('overlay-desc');
+                this.btnKeepGoing = document.getElementById('btn-keep-going');
+                this.btnOverlayRestart = document.getElementById('btn-overlay-restart');
+            },
+
+            loadStorage() {
+                const savedSound = localStorage.getItem('neon_2048_sound');
+                if (savedSound !== null) {
+                    SoundManager.enabled = savedSound === 'true';
+                }
+                this.updateSoundIcon();
+
+                const savedBest = parseInt(localStorage.getItem('neon_2048_best'), 10);
+                this.bestScore = Number.isFinite(savedBest) ? savedBest : 0;
+                this.bestScoreEl.textContent = this.bestScore;
+            },
+
+            updateSoundIcon() {
+                this.soundIcon.className = SoundManager.enabled
+                    ? 'fa-solid fa-volume-high'
+                    : 'fa-solid fa-volume-xmark';
+            },
+
+            createBoardCells() {
+                this.boardEl.innerHTML = '';
+                this.cellElements = [];
+                for (let r = 0; r < this.size; r++) {
+                    for (let c = 0; c < this.size; c++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'grid-cell';
+                        this.boardEl.appendChild(cell);
+                        this.cellElements.push(cell);
+                    }
+                }
+            },
+
+            bindEvents() {
+                // Keyboard Arrows & WASD
+                window.addEventListener('keydown', (e) => {
+                    if (this.overlayEl.classList.contains('active')) return;
+                    const keyMap = {
+                        ArrowUp: 'up', KeyW: 'up', w: 'up', W: 'up',
+                        ArrowDown: 'down', KeyS: 'down', s: 'down', S: 'down',
+                        ArrowLeft: 'left', KeyA: 'left', a: 'left', A: 'left',
+                        ArrowRight: 'right', KeyD: 'right', d: 'right', D: 'right'
+                    };
+                    const dir = keyMap[e.code] || keyMap[e.key];
+                    if (dir) {
+                        e.preventDefault();
+                        this.move(dir);
+                    }
+                });
+
+                // On-Screen Directional Buttons
+                document.querySelectorAll('.btn-dpad').forEach((btn) => {
+                    btn.addEventListener('click', () => {
+                        if (this.overlayEl.classList.contains('active')) return;
+                        this.move(btn.dataset.dir);
+                    });
+                });
+
+                // Touch Swipe Gestures on Board
+                let touchStartX = 0;
+                let touchStartY = 0;
+                this.boardWrapperEl.addEventListener('touchstart', (e) => {
+                    if (e.touches.length !== 1) return;
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                }, { passive: true });
+
+                this.boardWrapperEl.addEventListener('touchend', (e) => {
+                    if (this.overlayEl.classList.contains('active')) return;
+                    if (e.changedTouches.length !== 1) return;
+                    const dx = e.changedTouches[0].clientX - touchStartX;
+                    const dy = e.changedTouches[0].clientY - touchStartY;
+                    const absDx = Math.abs(dx);
+                    const absDy = Math.abs(dy);
+                    if (Math.max(absDx, absDy) < 26) return;
+                    if (absDx > absDy) {
+                        this.move(dx > 0 ? 'right' : 'left');
+                    } else {
+                        this.move(dy > 0 ? 'down' : 'up');
+                    }
+                }, { passive: true });
+
+                // Buttons
+                this.btnRestart.addEventListener('click', () => {
+                    SoundManager.playSlide();
+                    this.startNewGame();
+                });
+
+                this.btnOverlayRestart.addEventListener('click', () => {
+                    SoundManager.playSlide();
+                    this.startNewGame();
+                });
+
+                this.btnKeepGoing.addEventListener('click', () => {
+                    SoundManager.playSlide();
+                    this.keepPlaying = true;
+                    this.hideOverlay();
+                });
+
+                this.btnUndo.addEventListener('click', () => {
+                    this.undoMove();
+                });
+
+                this.btnSoundToggle.addEventListener('click', () => {
+                    SoundManager.toggle();
+                    this.updateSoundIcon();
+                    if (SoundManager.enabled) SoundManager.playSlide();
+                });
+            },
+
+            startNewGame() {
+                this.grid = Array.from({ length: this.size }, () => Array(this.size).fill(0));
+                this.score = 0;
+                this.history = [];
+                this.undosRemaining = this.maxUndos;
+                this.won2048 = false;
+                this.keepPlaying = false;
+                this.isGameOver = false;
+                this.hideOverlay();
+
+                const first = this.spawnRandomTile();
+                const second = this.spawnRandomTile();
+                const newCoords = new Set();
+                if (first) newCoords.add(`${first.r},${first.c}`);
+                if (second) newCoords.add(`${second.r},${second.c}`);
+
+                this.render(newCoords, new Set());
+                this.updateUI();
+            },
+
+            spawnRandomTile() {
+                const emptyCells = [];
+                for (let r = 0; r < this.size; r++) {
+                    for (let c = 0; c < this.size; c++) {
+                        if (this.grid[r][c] === 0) {
+                            emptyCells.push({ r, c });
+                        }
+                    }
+                }
+                if (emptyCells.length === 0) return null;
+                const chosen = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                this.grid[chosen.r][chosen.c] = Math.random() < 0.9 ? 2 : 4;
+                return chosen;
+            },
+
+            /**
+             * Slide and merge a single 1D line of 4 numbers toward index 0.
+             * Enforces single-merge-per-turn-per-tile rule:
+             * e.g. [2, 2, 2, 2] -> [4, 4, 0, 0], [4, 2, 2, 0] -> [4, 4, 0, 0]
+             */
+            processLine(line) {
+                const nonZero = line.filter((v) => v !== 0);
+                const result = [];
+                const mergedIndices = [];
+                let gainedScore = 0;
+                let maxMergedVal = 0;
+
+                let i = 0;
+                while (i < nonZero.length) {
+                    if (i + 1 < nonZero.length && nonZero[i] === nonZero[i + 1]) {
+                        const mergedVal = nonZero[i] * 2;
+                        result.push(mergedVal);
+                        mergedIndices.push(result.length - 1);
+                        gainedScore += mergedVal;
+                        if (mergedVal > maxMergedVal) maxMergedVal = mergedVal;
+                        i += 2; // Skip both merged tiles so neither merges again this turn
+                    } else {
+                        result.push(nonZero[i]);
+                        i += 1;
+                    }
+                }
+
+                while (result.length < this.size) {
+                    result.push(0);
+                }
+
+                const moved = result.some((val, idx) => val !== line[idx]);
+                return { result, mergedIndices, gainedScore, maxMergedVal, moved };
+            },
+
+            move(direction) {
+                if (this.isGameOver) return;
+
+                const prevGrid = this.grid.map((row) => [...row]);
+                const prevScore = this.score;
+
+                let anyMoved = false;
+                let totalGained = 0;
+                let highestMerged = 0;
+                const mergedCoords = new Set();
+
+                for (let idx = 0; idx < this.size; idx++) {
+                    let line = [];
+                    if (direction === 'left') {
+                        line = [...this.grid[idx]];
+                    } else if (direction === 'right') {
+                        line = [...this.grid[idx]].reverse();
+                    } else if (direction === 'up') {
+                        for (let r = 0; r < this.size; r++) line.push(this.grid[r][idx]);
+                    } else if (direction === 'down') {
+                        for (let r = this.size - 1; r >= 0; r--) line.push(this.grid[r][idx]);
+                    }
+
+                    const { result, mergedIndices, gainedScore, maxMergedVal, moved } = this.processLine(line);
+                    if (moved) anyMoved = true;
+                    totalGained += gainedScore;
+                    if (maxMergedVal > highestMerged) highestMerged = maxMergedVal;
+
+                    // Write back to grid and record merged coordinates
+                    if (direction === 'left') {
+                        this.grid[idx] = result;
+                        mergedIndices.forEach((c) => mergedCoords.add(`${idx},${c}`));
+                    } else if (direction === 'right') {
+                        this.grid[idx] = [...result].reverse();
+                        mergedIndices.forEach((revC) => mergedCoords.add(`${idx},${this.size - 1 - revC}`));
+                    } else if (direction === 'up') {
+                        for (let r = 0; r < this.size; r++) this.grid[r][idx] = result[r];
+                        mergedIndices.forEach((r) => mergedCoords.add(`${r},${idx}`));
+                    } else if (direction === 'down') {
+                        for (let i = 0; i < this.size; i++) {
+                            this.grid[this.size - 1 - i][idx] = result[i];
+                        }
+                        mergedIndices.forEach((revR) => mergedCoords.add(`${this.size - 1 - revR},${idx}`));
+                    }
+                }
+
+                // Only spawn a new tile if at least one tile moved or merged
+                if (!anyMoved) return;
+
+                // Save undo state
+                if (this.undosRemaining > 0) {
+                    this.history.push({
+                        grid: prevGrid,
+                        score: prevScore
+                    });
+                    if (this.history.length > this.maxUndos) {
+                        this.history.shift();
+                    }
+                }
+
+                this.score += totalGained;
+                if (this.score > this.bestScore) {
+                    this.bestScore = this.score;
+                    localStorage.setItem('neon_2048_best', this.bestScore);
+                }
+
+                const spawned = this.spawnRandomTile();
+                const newCoords = new Set();
+                if (spawned) newCoords.add(`${spawned.r},${spawned.c}`);
+
+                this.render(newCoords, mergedCoords);
+                this.updateUI(totalGained);
+
+                if (highestMerged > 0) {
+                    SoundManager.playMerge(highestMerged);
+                    if (highestMerged >= 128) {
+                        const rect = this.boardEl.getBoundingClientRect();
+                        ParticleSystem.burst(
+                            rect.left + rect.width / 2,
+                            rect.top + rect.height / 2,
+                            highestMerged >= 512 ? '#ff007f' : '#00f2fe',
+                            24
+                        );
+                    }
+                } else {
+                    SoundManager.playSlide();
+                }
+
+                // Check 2048 Win Condition
+                const maxTile = this.getMaxTile();
+                if (maxTile >= 2048 && !this.won2048 && !this.keepPlaying) {
+                    this.won2048 = true;
+                    SoundManager.playWin();
+                    const rect = this.boardEl.getBoundingClientRect();
+                    ParticleSystem.burst(rect.left + rect.width / 2, rect.top + rect.height / 2, '#00f2fe', 45);
+                    this.showOverlay('win');
+                    return;
+                }
+
+                // Check Game Over
+                if (this.checkGameOver()) {
+                    this.isGameOver = true;
+                    SoundManager.playGameOver();
+                    this.showOverlay('gameover');
+                }
+            },
+
+            undoMove() {
+                if (this.history.length === 0 || this.undosRemaining <= 0) return;
+                const lastState = this.history.pop();
+                this.grid = lastState.grid.map((row) => [...row]);
+                this.score = lastState.score;
+                this.undosRemaining--;
+                this.isGameOver = false;
+                this.hideOverlay();
+                SoundManager.playSlide();
+                this.render(new Set(), new Set());
+                this.updateUI();
+            },
+
+            getMaxTile() {
+                let max = 2;
+                for (let r = 0; r < this.size; r++) {
+                    for (let c = 0; c < this.size; c++) {
+                        if (this.grid[r][c] > max) max = this.grid[r][c];
+                    }
+                }
+                return max;
+            },
+
+            checkGameOver() {
+                // 1. Any empty cell?
+                for (let r = 0; r < this.size; r++) {
+                    for (let c = 0; c < this.size; c++) {
+                        if (this.grid[r][c] === 0) return false;
+                    }
+                }
+                // 2. Any horizontal or vertical adjacent equals?
+                for (let r = 0; r < this.size; r++) {
+                    for (let c = 0; c < this.size; c++) {
+                        const val = this.grid[r][c];
+                        if (r + 1 < this.size && this.grid[r + 1][c] === val) return false;
+                        if (c + 1 < this.size && this.grid[r][c + 1] === val) return false;
+                    }
+                }
+                return true;
+            },
+
+            render(newCoords, mergedCoords) {
+                for (let r = 0; r < this.size; r++) {
+                    for (let c = 0; c < this.size; c++) {
+                        const idx = r * this.size + c;
+                        const cellEl = this.cellElements[idx];
+                        const val = this.grid[r][c];
+                        cellEl.innerHTML = '';
+
+                        if (val > 0) {
+                            const tile = document.createElement('div');
+                            const colorClass = val <= 2048 ? `tile-${val}` : 'tile-super';
+                            const key = `${r},${c}`;
+                            let animClass = '';
+                            if (newCoords.has(key)) animClass = 'tile-new';
+                            else if (mergedCoords.has(key)) animClass = 'tile-merged';
+
+                            tile.className = `tile ${colorClass} ${animClass}`.trim();
+                            tile.textContent = val;
+                            cellEl.appendChild(tile);
+                        }
+                    }
+                }
+            },
+
+            updateUI(gainedScore = 0) {
+                this.currentScoreEl.textContent = this.score;
+                this.bestScoreEl.textContent = this.bestScore;
+                this.maxTileEl.textContent = this.getMaxTile();
+
+                this.undoCountEl.textContent = this.undosRemaining;
+                this.btnUndo.disabled = this.history.length === 0 || this.undosRemaining <= 0;
+
+                if (gainedScore > 0) {
+                    const deltaEl = document.createElement('span');
+                    deltaEl.className = 'score-delta';
+                    deltaEl.textContent = `+${gainedScore}`;
+                    this.scoreBoxCurrentEl.appendChild(deltaEl);
+                    setTimeout(() => deltaEl.remove(), 700);
+                }
+            },
+
+            showOverlay(type) {
+                if (type === 'win') {
+                    this.overlayIconEl.textContent = '🏆';
+                    this.overlayTitleEl.textContent = '達成 2048！';
+                    this.overlayDescEl.textContent = `目前分數 ${this.score} 分！要繼續挑戰更高階的霓虹方塊嗎？`;
+                    this.btnKeepGoing.style.display = 'inline-flex';
+                } else {
+                    this.overlayIconEl.textContent = '⚡';
+                    this.overlayTitleEl.textContent = '無法再移動！';
+                    this.overlayDescEl.textContent = `最終得分：${this.score} 分（最大方塊：${this.getMaxTile()}）`;
+                    this.btnKeepGoing.style.display = 'none';
+                }
+                this.overlayEl.classList.add('active');
+            },
+
+            hideOverlay() {
+                this.overlayEl.classList.remove('active');
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Game2048.init();
+        });
+    </script>
+</body>
+</html>

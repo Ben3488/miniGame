@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>花磚物語 Azul - 葡萄牙皇宮花磚藝術桌遊</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-panel: rgba(15, 23, 42, 0.80);
+            --border-glass: rgba(255, 255, 255, 0.10);
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --accent-amber: #f59e0b;
+            --accent-cyan: #38bdf8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(circle at 15% 18%, rgba(56, 189, 248, 0.13), transparent 32%),
+                radial-gradient(circle at 85% 22%, rgba(245, 158, 11, 0.12), transparent 32%),
+                radial-gradient(circle at 50% 85%, rgba(236, 72, 153, 0.10), transparent 35%);
+            color: var(--text-main);
+            font-family: 'Inter', 'Outfit', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .top-bar {
+            height: 62px;
+            padding: 0 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(9, 13, 22, 0.88);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border-glass);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #0284c7, #f59e0b, #ef4444);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #fff;
+            box-shadow: 0 0 16px rgba(56, 189, 248, 0.45);
+        }
+
+        .brand-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #38bdf8, #fde047, #fb7185);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-sub {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            margin-left: 0.25rem;
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-wrap: wrap;
+        }
+
+        .ctrl-select, .ctrl-btn {
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+            padding: 0.45rem 0.85rem;
+            border-radius: 9px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .ctrl-select:hover, .ctrl-btn:hover {
+            background: rgba(51, 65, 85, 0.92);
+            border-color: rgba(255, 255, 255, 0.28);
+            transform: translateY(-1px);
+        }
+
+        .ctrl-btn.primary {
+            background: linear-gradient(135deg, #38bdf8, #0284c7);
+            color: #fff;
+            border: none;
+            font-weight: 700;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            max-width: 1520px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .glass-panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            backdrop-filter: blur(16px);
+            padding: 1rem 1.15rem;
+            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.38);
+        }
+
+        /* Status Bar */
+        .status-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding: 0.75rem 1.1rem;
+            border-radius: 14px;
+            background: linear-gradient(90deg, rgba(56, 189, 248, 0.16), rgba(245, 158, 11, 0.14));
+            border: 1px solid rgba(56, 189, 248, 0.35);
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .bag-stats {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.82rem;
+            color: #cbd5e1;
+        }
+
+        /* Factories & Center Market Area */
+        .market-zone {
+            display: grid;
+            grid-template-columns: 1.35fr 1fr;
+            gap: 1rem;
+            align-items: stretch;
+        }
+
+        @media (max-width: 1024px) {
+            .market-zone {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .factories-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.85rem;
+            padding: 0.5rem 0;
+        }
+
+        .factory-disc {
+            width: 118px;
+            height: 118px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(51, 65, 85, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border: 2px solid rgba(251, 191, 36, 0.42);
+            box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.6), 0 8px 20px rgba(0, 0, 0, 0.4);
+            display: grid;
+            grid-template-columns: repeat(2, 38px);
+            grid-template-rows: repeat(2, 38px);
+            gap: 7px;
+            align-content: center;
+            justify-content: center;
+            position: relative;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .factory-disc:hover {
+            border-color: rgba(251, 191, 36, 0.75);
+        }
+
+        .factory-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            white-space: nowrap;
+        }
+
+        .center-pool {
+            min-height: 122px;
+            border-radius: 14px;
+            background: rgba(9, 13, 22, 0.65);
+            border: 1.5px dashed rgba(56, 189, 248, 0.4);
+            padding: 0.75rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            align-content: center;
+        }
+
+        /* Azulejo Tiles */
+        .azul-tile {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.16s ease;
+            border: 2px solid rgba(255, 255, 255, 0.55);
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.4), 0 4px 8px rgba(0, 0, 0, 0.45);
+        }
+
+        .azul-tile:hover {
+            transform: scale(1.09);
+        }
+
+        .azul-tile.selected-tile {
+            transform: scale(1.14);
+            border-color: #fde047;
+            box-shadow: 0 0 15px #fde047, inset 0 2px 4px rgba(255, 255, 255, 0.6);
+            z-index: 5;
+        }
+
+        .tile-blue {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: #e0f2fe;
+        }
+        .tile-yellow {
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            color: #451a03;
+        }
+        .tile-red {
+            background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
+            color: #ffe4e6;
+        }
+        .tile-black {
+            background: linear-gradient(135deg, #475569 0%, #0f172a 100%);
+            color: #f8fafc;
+        }
+        .tile-teal {
+            background: linear-gradient(135deg, #2dd4bf 0%, #0f766e 100%);
+            color: #f0fdfa;
+        }
+        .tile-first {
+            background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
+            color: #0f172a;
+            border-color: #f59e0b;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            cursor: default;
+        }
+
+        /* Two Player Boards Side by Side */
+        .boards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.15rem;
+        }
+
+        @media (max-width: 1120px) {
+            .boards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .player-board {
+            border-radius: 16px;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-glass);
+            padding: 1.1rem;
+            transition: all 0.25s;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .player-board.active-board {
+            border-color: #38bdf8;
+            box-shadow: 0 0 24px rgba(56, 189, 248, 0.22);
+        }
+
+        .board-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .board-player-name {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        .board-score-pill {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.35));
+            border: 1px solid rgba(251, 191, 36, 0.55);
+            padding: 0.3rem 0.85rem;
+            border-radius: 999px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #fde047;
+        }
+
+        /* Pattern Lines + Wall Grid */
+        .board-work-area {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            overflow-x: auto;
+            padding: 0.25rem 0;
+        }
+
+        .pattern-lines-col {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .pattern-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 10px;
+            border: 1.5px solid transparent;
+            transition: all 0.18s;
+        }
+
+        .pattern-row.valid-target {
+            border-color: #fde047;
+            background: rgba(250, 204, 21, 0.14);
+            cursor: pointer;
+        }
+
+        .pattern-row.valid-target:hover {
+            background: rgba(250, 204, 21, 0.26);
+            transform: translateX(-2px);
+        }
+
+        .row-arrow {
+            color: #64748b;
+            font-size: 0.8rem;
+            margin-left: 4px;
+        }
+
+        .slot-cell {
+            width: 36px;
+            height: 36px;
+            border-radius: 7px;
+            background: rgba(9, 13, 22, 0.65);
+            border: 1.5px dashed rgba(255, 255, 255, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 5x5 Wall */
+        .wall-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 36px);
+            grid-template-rows: repeat(5, 36px);
+            gap: 6px;
+            padding: 6px;
+            border-radius: 12px;
+            background: rgba(9, 13, 22, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .wall-cell {
+            width: 36px;
+            height: 36px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            position: relative;
+            transition: all 0.25s;
+        }
+
+        .wall-cell.ghost {
+            opacity: 0.22;
+            border: 1px dashed rgba(255, 255, 255, 0.4);
+            box-shadow: none;
+            cursor: default;
+        }
+
+        .wall-cell.filled {
+            opacity: 1;
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.28);
+            cursor: default;
+        }
+
+        /* Floor Line */
+        .floor-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            padding: 0.55rem 0.75rem;
+            border-radius: 12px;
+            background: rgba(9, 13, 22, 0.6);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.18s;
+        }
+
+        .floor-bar.valid-target {
+            border-color: #f87171;
+            background: rgba(239, 68, 68, 0.15);
+            cursor: pointer;
+        }
+
+        .floor-slots {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .floor-slot-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .floor-penalty-tag {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: #f87171;
+        }
+
+        /* Modals */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 8, 15, 0.82);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 1rem;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 18px;
+            max-width: 560px;
+            width: 100%;
+            padding: 1.5rem;
+            box-shadow: 0 24px 50px rgba(0, 0, 0, 0.65);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.65rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #38bdf8;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+
+        .rules-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            font-size: 0.88rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        .rules-list h4 {
+            color: #fde047;
+            margin-bottom: 0.2rem;
+        }
+
+        .modal-btn {
+            width: 100%;
+            margin-top: 1.1rem;
+            padding: 0.75rem;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #38bdf8, #0284c7);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.92rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <header class="top-bar">
+        <div class="brand">
+            <div class="brand-icon"><i class="fa-solid fa-border-all"></i></div>
+            <div>
+                <span class="brand-title">花磚物語 AZUL</span>
+                <span class="brand-sub">葡萄牙埃武拉皇宮花磚美學對決</span>
+            </div>
+        </div>
+
+        <div class="nav-controls">
+            <select id="modeSelect" class="ctrl-select" title="選擇對戰模式">
+                <option value="pve">挑戰 AI (單人對決)</option>
+                <option value="pvp">雙人同機對決 (PvP)</option>
+            </select>
+
+            <select id="diffSelect" class="ctrl-select" title="選擇 AI 難度">
+                <option value="easy">AI: 輕鬆工匠</option>
+                <option value="normal" selected>AI: 聰明建築師</option>
+                <option value="hard">AI: 皇家大宗師</option>
+            </select>
+
+            <button class="ctrl-btn primary" onclick="startNewGame()">
+                <i class="fa-solid fa-rotate-right"></i> 新局開始
+            </button>
+
+            <button class="ctrl-btn" onclick="openRulesModal()">
+                <i class="fa-solid fa-book-open"></i> 規則說明
+            </button>
+
+            <button class="ctrl-btn" id="muteBtn" onclick="toggleMute()">
+                <i class="fa-solid fa-volume-high" id="muteIcon"></i>
+            </button>
+
+            <a href="../index.html?zone=games" class="ctrl-btn">
+                <i class="fa-solid fa-house"></i> 返回遊戲大廳
+            </a>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Status Banner -->
+        <div class="status-strip">
+            <div class="status-left" id="turnPrompt">
+                <i class="fa-solid fa-Sparkles" style="color: #fde047;"></i>
+                <span>載入中...</span>
+            </div>
+            <div class="bag-stats">
+                <span><i class="fa-solid fa-sack-xmark" style="color:#38bdf8;"></i> 布袋剩餘：<strong id="bagCount">0</strong> 塊</span>
+                <span><i class="fa-solid fa-box-archive" style="color:#94a3b8;"></i> 棄磚盒：<strong id="discardCount">0</strong> 塊</span>
+                <span><i class="fa-solid fa-flag" style="color:#fde047;"></i> 第 <strong id="roundNum">1</strong> 回合</span>
+            </div>
+        </div>
+
+        <!-- Factories & Center Table -->
+        <section class="market-zone">
+            <div class="glass-panel">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.65rem;">
+                    <span style="font-family:'Outfit',sans-serif;font-weight:700;font-size:0.95rem;">
+                        <i class="fa-solid fa-industry" style="color:#fbbf24;"></i> 皇家工坊展示盤 (點擊花磚選取同色，剩餘自動推入中央)
+                    </span>
+                </div>
+                <div class="factories-row" id="factoriesRow"></div>
+            </div>
+
+            <div class="glass-panel" style="display:flex;flex-direction:column;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.65rem;">
+                    <span style="font-family:'Outfit',sans-serif;font-weight:700;font-size:0.95rem;">
+                        <i class="fa-solid fa-circle-nodes" style="color:#38bdf8;"></i> 中央桌面供應區 (首位從此拿磚者一併拿取 -1 先手標記)
+                    </span>
+                </div>
+                <div class="center-pool" id="centerPool"></div>
+            </div>
+        </section>
+
+        <!-- Two Player Boards -->
+        <section class="boards-grid" id="boardsGrid"></section>
+    </main>
+
+    <!-- Rules Modal -->
+    <div class="modal-backdrop" id="rulesModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fa-solid fa-border-all"></i> 花磚物語 (Azul) 規則說明</div>
+                <button class="close-btn" onclick="closeRulesModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="rules-list">
+                <div>
+                    <h4>1. 階段一：挑選花磚 (Factory Offer)</h4>
+                    <p>• 輪到你時，點選<strong>任一工坊</strong>或<strong>中央供應區</strong>中的一種花磚顏色（系統會自動全選該處所有同色花磚）。<br>
+                    • 接著點選你個人版圖左側的<strong>第 1～5 列圖案線 (Pattern Lines)</strong> 放置花磚：<br>
+                    &nbsp;&nbsp;- 同一列圖案線只能放相同顏色，且<strong>右側對應的牆面橫列尚未拼過該顏色</strong>才可放置。<br>
+                    &nbsp;&nbsp;- 超出該列容量的多餘花磚（或直接點選下方地板線），會掉入<strong>地板扣分線 (-1, -1, -2, -2, -2, -3, -3)</strong>。<br>
+                    • 當回合第一位從「中央供應區」拿磚的玩家，會一併拿取 <strong>「-1 先手標記」</strong> 放入地板線，並成為下一回合的起始玩家。</p>
+                </div>
+                <div>
+                    <h4>2. 階段二：牆面拼貼與連鎖計分 (Wall-Tiling)</h4>
+                    <p>• 當所有工坊與中央區的花磚都被拿光時，自動進行牆面拼貼：<br>
+                    • 由第 1 列至第 5 列檢查：<strong>已填滿的圖案線</strong>會將最右側 1 塊花磚移到右側 5x5 牆面對應色格並立即計分！<br>
+                    • <strong>連鎖計分規則</strong>：新拼上的花磚若無相鄰花磚得 1 分；若有水平相連得「水平連磚數」分，若有垂直相連得「垂直連磚數」分（十字相連則水平＋垂直雙重計分！）。<br>
+                    • 未填滿的圖案線保留至下一回合；最後扣除地板線罰分（最低扣至 0 分）。</p>
+                </div>
+                <div>
+                    <h4>3. 遊戲結束與終局獎勵分</h4>
+                    <p>• 當任一玩家在牆面拼貼階段結束時，完成至少 <strong>1 條完整的水平橫列 (5塊)</strong>，遊戲結束並結算終局加分：<br>
+                    &nbsp;&nbsp;- 每完成 1 條完整<strong>水平橫列</strong>：<strong>+2 分</strong><br>
+                    &nbsp;&nbsp;- 每完成 1 條完整<strong>垂直直行</strong>：<strong>+7 分</strong><br>
+                    &nbsp;&nbsp;- 每集齊 1 種顏色的全部 <strong>5 塊花磚</strong>：<strong>+10 分</strong></p>
+                </div>
+            </div>
+            <button class="modal-btn" onclick="closeRulesModal()">開始拼貼皇宮花磚</button>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div class="modal-backdrop" id="gameOverModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title" id="gameOverTitle"><i class="fa-solid fa-trophy"></i> 皇宮花磚終局結算</div>
+                <button class="close-btn" onclick="closeGameOverModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="gameOverContent" style="display:flex;flex-direction:column;gap:0.8rem;"></div>
+            <button class="modal-btn" onclick="closeGameOverModal(); startNewGame();">
+                <i class="fa-solid fa-rotate-right"></i> 再來一局
+            </button>
+        </div>
+    </div>
+
+    <script>
+        /* ==================== Web Audio Sound Synthesizer ==================== */
+        let audioCtx = null;
+        let isMuted = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioCtx = new AudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (isMuted) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'pick') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(580, now);
+                osc.frequency.exponentialRampToValueAtTime(840, now + 0.08);
+                gain.gain.setValueAtTime(0.14, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+                osc.start(now);
+                osc.stop(now + 0.09);
+            } else if (type === 'place') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(420, now);
+                osc.frequency.exponentialRampToValueAtTime(620, now + 0.12);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
+                osc.start(now);
+                osc.stop(now + 0.13);
+            } else if (type === 'score') {
+                osc.type = 'triangle';
+                [523.25, 659.25, 783.99, 1046.5].forEach((f, idx) => {
+                    osc.frequency.setValueAtTime(f, now + idx * 0.09);
+                });
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                osc.start(now);
+                osc.stop(now + 0.45);
+            }
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('muteIcon').className = isMuted
+                ? 'fa-solid fa-volume-xmark'
+                : 'fa-solid fa-volume-high';
+        }
+
+        /* ==================== Constants & Standard Azul Wall Pattern ==================== */
+        const TILE_COLORS = ['blue', 'yellow', 'red', 'black', 'teal'];
+        const TILE_META = {
+            blue:   { name: '皇家藍', icon: 'fa-solid fa-diamond', css: 'tile-blue' },
+            yellow: { name: '琥珀黃', icon: 'fa-solid fa-sun', css: 'tile-yellow' },
+            red:    { name: '珊瑚紅', icon: 'fa-solid fa-crown', css: 'tile-red' },
+            black:  { name: '曜石黑', icon: 'fa-solid fa-star', css: 'tile-black' },
+            teal:   { name: '青松石', icon: 'fa-solid fa-clover', css: 'tile-teal' }
+        };
+
+        // Official 5x5 shifted Latin square wall layout
+        const WALL_TEMPLATE = [
+            ['blue', 'yellow', 'red', 'black', 'teal'],
+            ['teal', 'blue', 'yellow', 'red', 'black'],
+            ['black', 'teal', 'blue', 'yellow', 'red'],
+            ['red', 'black', 'teal', 'blue', 'yellow'],
+            ['yellow', 'red', 'black', 'teal', 'blue']
+        ];
+
+        const FLOOR_PENALTIES = [-1, -1, -2, -2, -2, -3, -3];
+
+        /* ==================== Game State ==================== */
+        let state = {
+            mode: 'pve',
+            difficulty: 'normal',
+            bag: [],
+            discard: [],
+            factories: [[], [], [], [], []],
+            center: [],
+            centerHasFirstMarker: true,
+            nextRoundStarter: 0,
+            currentPlayer: 0,
+            round: 1,
+            players: [],
+            selectedPick: null, // { sourceType: 'factory'|'center', factoryIdx: 0..4, color: 'blue' }
+            gameOver: false
+        };
+
+        let aiTimer = null;
+
+        function clearPendingTimer() {
+            if (aiTimer) {
+                clearTimeout(aiTimer);
+                aiTimer = null;
+            }
+        }
+
+        function shuffle(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function createPlayerBoard(id, name, isAI) {
+            return {
+                id,
+                name,
+                isAI,
+                score: 0,
+                patternLines: [
+                    { color: null, count: 0, capacity: 1 },
+                    { color: null, count: 0, capacity: 2 },
+                    { color: null, count: 0, capacity: 3 },
+                    { color: null, count: 0, capacity: 4 },
+                    { color: null, count: 0, capacity: 5 }
+                ],
+                wall: Array.from({ length: 5 }, () => Array(5).fill(false)),
+                floor: [],
+                lastRoundDelta: ''
+            };
+        }
+
+        function drawTileFromBag() {
+            if (state.bag.length === 0) {
+                if (state.discard.length === 0) return null;
+                state.bag = shuffle(state.discard);
+                state.discard = [];
+            }
+            return state.bag.pop();
+        }
+
+        /* ==================== Start / Round Setup ==================== */
+        function startNewGame() {
+            clearPendingTimer();
+            closeGameOverModal();
+
+            const mode = document.getElementById('modeSelect').value;
+            const diff = document.getElementById('diffSelect').value;
+
+            const initialBag = [];
+            TILE_COLORS.forEach(c => {
+                for (let i = 0; i < 20; i++) initialBag.push(c);
+            });
+
+            state = {
+                mode,
+                difficulty: diff,
+                bag: shuffle(initialBag),
+                discard: [],
+                factories: [[], [], [], [], []],
+                center: [],
+                centerHasFirstMarker: true,
+                nextRoundStarter: 0,
+                currentPlayer: 0,
+                round: 1,
+                players: [
+                    createPlayerBoard(0, mode === 'pve' ? '玩家 1 (你)' : '玩家 1 (藍方)', false),
+                    createPlayerBoard(1, mode === 'pve' ? '皇家花磚 AI' : '玩家 2 (金方)', mode === 'pve')
+                ],
+                selectedPick: null,
+                gameOver: false
+            };
+
+            refillFactoriesForRound();
+            renderAll();
+        }
+
+        function refillFactoriesForRound() {
+            state.factories = [[], [], [], [], []];
+            for (let f = 0; f < 5; f++) {
+                for (let k = 0; k < 4; k++) {
+                    const t = drawTileFromBag();
+                    if (t) state.factories[f].push(t);
+                }
+            }
+            state.center = [];
+            state.centerHasFirstMarker = true;
+            state.selectedPick = null;
+        }
+
+        /* ==================== Move Legality & Execution ==================== */
+        function canPlaceColorOnRow(player, rowIdx, color) {
+            // 1. Check if Wall row already has this color filled
+            const wallColIdx = WALL_TEMPLATE[rowIdx].indexOf(color);
+            if (player.wall[rowIdx][wallColIdx]) return false;
+
+            // 2. Check Pattern Line state
+            const line = player.patternLines[rowIdx];
+            if (line.count >= line.capacity) return false;
+            if (line.color !== null && line.color !== color) return false;
+
+            return true;
+        }
+
+        function isMarketEmpty() {
+            const factoriesEmpty = state.factories.every(f => f.length === 0);
+            return factoriesEmpty && state.center.length === 0;
+        }
+
+        function selectSourceTile(sourceType, factoryIdx, color) {
+            const p = state.players[state.currentPlayer];
+            if (p.isAI || state.gameOver) return;
+
+            state.selectedPick = { sourceType, factoryIdx, color };
+            playSound('pick');
+            renderAll();
+        }
+
+        function placeSelectedTilesOnRow(targetRowIdx) {
+            // targetRowIdx: 0..4 for Pattern Line, or -1 for direct Floor Line
+            const p = state.players[state.currentPlayer];
+            if (p.isAI || state.gameOver || !state.selectedPick) return;
+
+            const { sourceType, factoryIdx, color } = state.selectedPick;
+            if (targetRowIdx >= 0 && !canPlaceColorOnRow(p, targetRowIdx, color)) return;
+
+            applyDraftMove(p, sourceType, factoryIdx, color, targetRowIdx);
+        }
+
+        function applyDraftMove(player, sourceType, factoryIdx, color, targetRowIdx) {
+            let pickedCount = 0;
+
+            if (sourceType === 'factory') {
+                const factory = state.factories[factoryIdx];
+                const matching = factory.filter(c => c === color);
+                const remaining = factory.filter(c => c !== color);
+                pickedCount = matching.length;
+                // Push remaining tiles to Center
+                state.center.push(...remaining);
+                state.factories[factoryIdx] = [];
+            } else {
+                const matching = state.center.filter(c => c === color);
+                state.center = state.center.filter(c => c !== color);
+                pickedCount = matching.length;
+
+                // First player to take from center gets the -1 starter marker
+                if (state.centerHasFirstMarker) {
+                    state.centerHasFirstMarker = false;
+                    state.nextRoundStarter = player.id;
+                    player.floor.push('first');
+                }
+            }
+
+            // Place onto Pattern Line or Floor
+            if (targetRowIdx >= 0) {
+                const line = player.patternLines[targetRowIdx];
+                line.color = color;
+                const spaceLeft = line.capacity - line.count;
+                const placed = Math.min(spaceLeft, pickedCount);
+                const overflow = pickedCount - placed;
+                line.count += placed;
+
+                for (let i = 0; i < overflow; i++) {
+                    if (player.floor.length < 7) {
+                        player.floor.push(color);
+                    } else {
+                        state.discard.push(color);
+                    }
+                }
+            } else {
+                // Directly to Floor Line
+                for (let i = 0; i < pickedCount; i++) {
+                    if (player.floor.length < 7) {
+                        player.floor.push(color);
+                    } else {
+                        state.discard.push(color);
+                    }
+                }
+            }
+
+            state.selectedPick = null;
+            playSound('place');
+
+            // Check if Phase 1 is complete
+            if (isMarketEmpty()) {
+                runWallTilingAndScoringPhase();
+            } else {
+                state.currentPlayer = (state.currentPlayer + 1) % 2;
+                renderAll();
+                const nextP = state.players[state.currentPlayer];
+                if (nextP.isAI && !state.gameOver) {
+                    clearPendingTimer();
+                    aiTimer = setTimeout(() => executeAIMove(nextP), 680);
+                }
+            }
+        }
+
+        /* ==================== Phase 2: Wall-Tiling & Chain Scoring ==================== */
+        function scoreWallPlacement(wall, r, c) {
+            // Horizontal chain length
+            let hCount = 1;
+            for (let left = c - 1; left >= 0 && wall[r][left]; left--) hCount++;
+            for (let right = c + 1; right < 5 && wall[r][right]; right++) hCount++;
+
+            // Vertical chain length
+            let vCount = 1;
+            for (let up = r - 1; up >= 0 && wall[up][c]; up--) vCount++;
+            for (let down = r + 1; down < 5 && wall[down][c]; down++) vCount++;
+
+            if (hCount === 1 && vCount === 1) return 1;
+            let pts = 0;
+            if (hCount > 1) pts += hCount;
+            if (vCount > 1) pts += vCount;
+            return pts;
+        }
+
+        function runWallTilingAndScoringPhase() {
+            playSound('score');
+
+            state.players.forEach(p => {
+                let gained = 0;
+                for (let r = 0; r < 5; r++) {
+                    const line = p.patternLines[r];
+                    if (line.count === line.capacity && line.color) {
+                        const c = WALL_TEMPLATE[r].indexOf(line.color);
+                        p.wall[r][c] = true;
+                        const tilePts = scoreWallPlacement(p.wall, r, c);
+                        gained += tilePts;
+
+                        // Move remaining (capacity - 1) tiles to discard box
+                        for (let d = 0; d < line.capacity - 1; d++) {
+                            state.discard.push(line.color);
+                        }
+                        line.color = null;
+                        line.count = 0;
+                    }
+                }
+
+                // Deduct Floor Line penalties
+                let penalty = 0;
+                p.floor.forEach((tile, idx) => {
+                    if (idx < FLOOR_PENALTIES.length) {
+                        penalty += FLOOR_PENALTIES[idx]; // negative number
+                    }
+                    if (tile !== 'first') {
+                        state.discard.push(tile);
+                    }
+                });
+                p.floor = [];
+
+                p.score = Math.max(0, p.score + gained + penalty);
+                p.lastRoundDelta = `上回合牆面 +${gained} / 地板 ${penalty}`;
+            });
+
+            // Check End of Game trigger: any player completed at least 1 horizontal row of 5
+            const anyCompleteRow = state.players.some(p =>
+                p.wall.some(row => row.every(filled => filled))
+            );
+
+            if (anyCompleteRow) {
+                finalizeEndGameBonuses();
+                return;
+            }
+
+            // Prepare next round
+            state.round++;
+            state.currentPlayer = state.nextRoundStarter;
+            refillFactoriesForRound();
+
+            // Edge case: if both bag and discard had 0 tiles
+            if (isMarketEmpty()) {
+                finalizeEndGameBonuses();
+                return;
+            }
+
+            renderAll();
+
+            const starter = state.players[state.currentPlayer];
+            if (starter.isAI && !state.gameOver) {
+                clearPendingTimer();
+                aiTimer = setTimeout(() => executeAIMove(starter), 750);
+            }
+        }
+
+        function finalizeEndGameBonuses() {
+            state.gameOver = true;
+            clearPendingTimer();
+
+            const summaries = state.players.map(p => {
+                let fullRows = 0;
+                let fullCols = 0;
+                let fullColors = 0;
+
+                // Count complete horizontal rows (+2 each)
+                for (let r = 0; r < 5; r++) {
+                    if (p.wall[r].every(Boolean)) fullRows++;
+                }
+
+                // Count complete vertical columns (+7 each)
+                for (let c = 0; c < 5; c++) {
+                    let colOk = true;
+                    for (let r = 0; r < 5; r++) {
+                        if (!p.wall[r][c]) colOk = false;
+                    }
+                    if (colOk) fullCols++;
+                }
+
+                // Count complete sets of 5 of the same color (+10 each)
+                TILE_COLORS.forEach(color => {
+                    let countColor = 0;
+                    for (let r = 0; r < 5; r++) {
+                        const c = WALL_TEMPLATE[r].indexOf(color);
+                        if (p.wall[r][c]) countColor++;
+                    }
+                    if (countColor === 5) fullColors++;
+                });
+
+                const bonusPts = (fullRows * 2) + (fullCols * 7) + (fullColors * 10);
+                const baseScore = p.score;
+                p.score += bonusPts;
+
+                return {
+                    player: p,
+                    baseScore,
+                    fullRows,
+                    fullCols,
+                    fullColors,
+                    bonusPts,
+                    total: p.score
+                };
+            });
+
+            summaries.sort((a, b) => {
+                if (b.total !== a.total) return b.total - a.total;
+                return b.fullRows - a.fullRows;
+            });
+
+            renderAll();
+
+            const winner = summaries[0].player;
+            document.getElementById('gameOverTitle').innerHTML =
+                `<i class="fa-solid fa-trophy"></i> 恭喜 ${winner.name} 榮獲皇宮花磚大師！`;
+
+            document.getElementById('gameOverContent').innerHTML = summaries.map((s, idx) => `
+                <div style="padding:0.9rem 1rem;border-radius:12px;background:${idx === 0 ? 'rgba(56, 189, 248, 0.18)' : 'rgba(30, 41, 59, 0.7)'};border:1px solid ${idx === 0 ? '#38bdf8' : 'rgba(255,255,255,0.1)'};">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-weight:800;font-size:1.05rem;color:${idx === 0 ? '#fde047' : '#f8fafc'};">
+                            #${idx + 1} ${s.player.name}
+                        </span>
+                        <span style="font-family:'Outfit',sans-serif;font-size:1.45rem;font-weight:800;color:#fde047;">
+                            ${s.total} 分
+                        </span>
+                    </div>
+                    <div style="font-size:0.8rem;color:#cbd5e1;margin-top:0.4rem;line-height:1.5;">
+                        基礎牆面得分：<strong>${s.baseScore}</strong> 分<br>
+                        橫列完成 (${s.fullRows}×2)：+${s.fullRows * 2} ｜ 直行完成 (${s.fullCols}×7)：+${s.fullCols * 7} ｜ 五色集齊 (${s.fullColors}×10)：+${s.fullColors * 10}
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('gameOverModal').classList.add('show');
+        }
+
+        /* ==================== AI Decision Engine ==================== */
+        function executeAIMove(ai) {
+            if (state.gameOver) return;
+
+            const legalMoves = [];
+            // Gather all available (sourceType, factoryIdx, color, count)
+            state.factories.forEach((f, fIdx) => {
+                if (f.length === 0) return;
+                const counts = {};
+                f.forEach(c => counts[c] = (counts[c] || 0) + 1);
+                Object.keys(counts).forEach(color => {
+                    addTargetRowsForSource(ai, 'factory', fIdx, color, counts[color], false, legalMoves);
+                });
+            });
+
+            if (state.center.length > 0) {
+                const counts = {};
+                state.center.forEach(c => counts[c] = (counts[c] || 0) + 1);
+                Object.keys(counts).forEach(color => {
+                    addTargetRowsForSource(ai, 'center', -1, color, counts[color], state.centerHasFirstMarker, legalMoves);
+                });
+            }
+
+            if (legalMoves.length === 0) return;
+
+            legalMoves.sort((a, b) => b.evalScore - a.evalScore);
+            const chosen = state.difficulty === 'easy'
+                ? legalMoves[Math.floor(Math.random() * Math.min(3, legalMoves.length))]
+                : legalMoves[0];
+
+            applyDraftMove(ai, chosen.sourceType, chosen.factoryIdx, chosen.color, chosen.targetRow);
+        }
+
+        function addTargetRowsForSource(ai, sourceType, factoryIdx, color, count, takesFirstPenalty, list) {
+            for (let r = 0; r < 5; r++) {
+                if (canPlaceColorOnRow(ai, r, color)) {
+                    const evalScore = evaluateAIMove(ai, r, color, count, takesFirstPenalty);
+                    list.push({ sourceType, factoryIdx, color, targetRow: r, evalScore });
+                }
+            }
+            // Floor fallback option
+            const floorScore = evaluateAIMove(ai, -1, color, count, takesFirstPenalty);
+            list.push({ sourceType, factoryIdx, color, targetRow: -1, evalScore: floorScore });
+        }
+
+        function evaluateAIMove(ai, targetRow, color, count, takesFirstPenalty) {
+            let score = 0;
+            const currentFloorLen = ai.floor.length;
+            let extraFloor = takesFirstPenalty ? 1 : 0;
+
+            if (targetRow >= 0) {
+                const line = ai.patternLines[targetRow];
+                const space = line.capacity - line.count;
+                const placed = Math.min(space, count);
+                const overflow = count - placed;
+                extraFloor += overflow;
+
+                // Reward filling a line completely
+                if (line.count + placed === line.capacity) {
+                    const col = WALL_TEMPLATE[targetRow].indexOf(color);
+                    // Simulate placing on wall to measure immediate chain score
+                    ai.wall[targetRow][col] = true;
+                    const chainPts = scoreWallPlacement(ai.wall, targetRow, col);
+                    ai.wall[targetRow][col] = false;
+                    score += chainPts * 5 + 8;
+                } else {
+                    score += placed * 2.5;
+                }
+
+                // Prefer central columns on hard difficulty
+                if (state.difficulty === 'hard') {
+                    const col = WALL_TEMPLATE[targetRow].indexOf(color);
+                    if (col >= 1 && col <= 3) score += 1.5;
+                }
+            } else {
+                extraFloor += count;
+            }
+
+            // Calculate floor penalty
+            for (let i = 0; i < extraFloor; i++) {
+                const idx = currentFloorLen + i;
+                if (idx < FLOOR_PENALTIES.length) {
+                    score += FLOOR_PENALTIES[idx] * 4.2;
+                }
+            }
+
+            if (state.difficulty === 'easy') {
+                score += (Math.random() * 8 - 4);
+            }
+            return score;
+        }
+
+        /* ==================== Rendering ==================== */
+        function renderAll() {
+            renderHeaderStatus();
+            renderFactoriesAndCenter();
+            renderPlayerBoards();
+        }
+
+        function renderHeaderStatus() {
+            document.getElementById('bagCount').textContent = state.bag.length;
+            document.getElementById('discardCount').textContent = state.discard.length;
+            document.getElementById('roundNum').textContent = state.round;
+
+            const prompt = document.getElementById('turnPrompt');
+            const p = state.players[state.currentPlayer];
+
+            if (state.gameOver) {
+                prompt.innerHTML = `<i class="fa-solid fa-flag-checkered" style="color:#fde047;"></i> <span>對局已結束！點擊「新局開始」再次挑戰</span>`;
+            } else if (p.isAI) {
+                prompt.innerHTML = `<i class="fa-solid fa-robot" style="color:#38bdf8;"></i> <span>當前行動：<strong style="color:#fde047;">${p.name}</strong> 正在思考花磚配置...</span>`;
+            } else if (state.selectedPick) {
+                const cName = TILE_META[state.selectedPick.color].name;
+                prompt.innerHTML = `<i class="fa-solid fa-hand-pointer" style="color:#fde047;"></i> <span>已選取 <strong style="color:#fde047;">${cName}</strong> 花磚 — 請點擊下方你的「高亮圖案線」或「地板線」放置！</span>`;
+            } else {
+                prompt.innerHTML = `<i class="fa-solid fa-user-check" style="color:#38bdf8;"></i> <span>當前行動：<strong style="color:#fde047;">${p.name}</strong> — 請先點選上方「工坊」或「中央區」的任一花磚</span>`;
+            }
+        }
+
+        function renderFactoriesAndCenter() {
+            const fRow = document.getElementById('factoriesRow');
+            fRow.innerHTML = '';
+
+            state.factories.forEach((f, fIdx) => {
+                const disc = document.createElement('div');
+                disc.className = 'factory-disc';
+
+                f.forEach(color => {
+                    const isSelected = state.selectedPick &&
+                        state.selectedPick.sourceType === 'factory' &&
+                        state.selectedPick.factoryIdx === fIdx &&
+                        state.selectedPick.color === color;
+
+                    const tile = document.createElement('div');
+                    tile.className = `azul-tile ${TILE_META[color].css} ${isSelected ? 'selected-tile' : ''}`;
+                    tile.title = `選取此工坊的所有${TILE_META[color].name}`;
+                    tile.innerHTML = `<i class="${TILE_META[color].icon}"></i>`;
+                    tile.onclick = () => selectSourceTile('factory', fIdx, color);
+                    disc.appendChild(tile);
+                });
+
+                const lbl = document.createElement('span');
+                lbl.className = 'factory-label';
+                lbl.textContent = `工坊 #${fIdx + 1}`;
+                disc.appendChild(lbl);
+                fRow.appendChild(disc);
+            });
+
+            const cPool = document.getElementById('centerPool');
+            cPool.innerHTML = '';
+
+            if (state.centerHasFirstMarker) {
+                const firstTile = document.createElement('div');
+                firstTile.className = 'azul-tile tile-first';
+                firstTile.title = '先手標記 (-1分，下回合先手)';
+                firstTile.textContent = '-1';
+                cPool.appendChild(firstTile);
+            }
+
+            if (state.center.length === 0 && !state.centerHasFirstMarker) {
+                cPool.innerHTML = `<span style="font-size:0.8rem;color:#64748b;margin:auto;">中央區目前已空</span>`;
+            } else {
+                state.center.forEach(color => {
+                    const isSelected = state.selectedPick &&
+                        state.selectedPick.sourceType === 'center' &&
+                        state.selectedPick.color === color;
+
+                    const tile = document.createElement('div');
+                    tile.className = `azul-tile ${TILE_META[color].css} ${isSelected ? 'selected-tile' : ''}`;
+                    tile.title = `選取中央區的所有${TILE_META[color].name}`;
+                    tile.innerHTML = `<i class="${TILE_META[color].icon}"></i>`;
+                    tile.onclick = () => selectSourceTile('center', -1, color);
+                    cPool.appendChild(tile);
+                });
+            }
+        }
+
+        function renderPlayerBoards() {
+            const grid = document.getElementById('boardsGrid');
+            grid.innerHTML = '';
+
+            state.players.forEach((p, pIdx) => {
+                const isTurn = (pIdx === state.currentPlayer && !state.gameOver);
+                const canPlaceHere = isTurn && !p.isAI && state.selectedPick !== null;
+
+                const board = document.createElement('div');
+                board.className = `player-board ${isTurn ? 'active-board' : ''}`;
+
+                // Pattern Lines HTML
+                let patternRowsHtml = '';
+                for (let r = 0; r < 5; r++) {
+                    const line = p.patternLines[r];
+                    const isLegal = canPlaceHere && canPlaceColorOnRow(p, r, state.selectedPick.color);
+
+                    let slotsHtml = '';
+                    // Render right-to-left slots of length (r + 1)
+                    for (let s = 0; s < line.capacity; s++) {
+                        const isFilled = s >= (line.capacity - line.count);
+                        if (isFilled && line.color) {
+                            slotsHtml += `
+                                <div class="azul-tile ${TILE_META[line.color].css}" style="width:36px;height:36px;cursor:default;">
+                                    <i class="${TILE_META[line.color].icon}"></i>
+                                </div>
+                            `;
+                        } else {
+                            slotsHtml += `<div class="slot-cell"></div>`;
+                        }
+                    }
+
+                    patternRowsHtml += `
+                        <div class="pattern-row ${isLegal ? 'valid-target' : ''}"
+                             onclick="${isLegal ? `placeSelectedTilesOnRow(${r})` : ''}"
+                             title="${isLegal ? `點擊將花磚放入第 ${r + 1} 列圖案線` : `第 ${r + 1} 列圖案線 (容量 ${r + 1})`}">
+                            <span style="font-size:0.72rem;color:#64748b;margin-right:4px;">L${r + 1}</span>
+                            ${slotsHtml}
+                            <i class="fa-solid fa-caret-right row-arrow"></i>
+                        </div>
+                    `;
+                }
+
+                // 5x5 Wall HTML
+                let wallCellsHtml = '';
+                for (let r = 0; r < 5; r++) {
+                    for (let c = 0; c < 5; c++) {
+                        const color = WALL_TEMPLATE[r][c];
+                        const filled = p.wall[r][c];
+                        wallCellsHtml += `
+                            <div class="wall-cell ${TILE_META[color].css} ${filled ? 'filled' : 'ghost'}"
+                                 title="${TILE_META[color].name} (${filled ? '已鑲嵌' : '未鑲嵌'})">
+                                <i class="${TILE_META[color].icon}"></i>
+                            </div>
+                        `;
+                    }
+                }
+
+                // Floor Line HTML
+                let floorSlotsHtml = '';
+                for (let i = 0; i < 7; i++) {
+                    const item = p.floor[i];
+                    let cellContent = `<div class="slot-cell"></div>`;
+                    if (item === 'first') {
+                        cellContent = `<div class="azul-tile tile-first" style="width:36px;height:36px;">-1</div>`;
+                    } else if (item) {
+                        cellContent = `
+                            <div class="azul-tile ${TILE_META[item].css}" style="width:36px;height:36px;cursor:default;">
+                                <i class="${TILE_META[item].icon}"></i>
+                            </div>
+                        `;
+                    }
+                    floorSlotsHtml += `
+                        <div class="floor-slot-wrap">
+                            <span class="floor-penalty-tag">${FLOOR_PENALTIES[i]}</span>
+                            ${cellContent}
+                        </div>
+                    `;
+                }
+
+                board.innerHTML = `
+                    <div class="board-header">
+                        <div class="board-player-name">
+                            <i class="fa-solid ${p.isAI ? 'fa-robot' : 'fa-user'}" style="color:${isTurn ? '#38bdf8' : '#94a3b8'};"></i>
+                            <span>${p.name}</span>
+                            ${state.nextRoundStarter === p.id ? '<span style="font-size:0.7rem;background:rgba(245,158,11,0.2);color:#fde047;padding:2px 7px;border-radius:6px;">下輪先手</span>' : ''}
+                        </div>
+                        <div style="display:flex;align-items:center;gap:0.65rem;">
+                            <span style="font-size:0.75rem;color:#94a3b8;">${p.lastRoundDelta}</span>
+                            <div class="board-score-pill">
+                                <i class="fa-solid fa-star"></i> ${p.score} 分
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="board-work-area">
+                        <div class="pattern-lines-col">${patternRowsHtml}</div>
+                        <div class="wall-grid">${wallCellsHtml}</div>
+                    </div>
+
+                    <div class="floor-bar ${canPlaceHere ? 'valid-target' : ''}"
+                         onclick="${canPlaceHere ? 'placeSelectedTilesOnRow(-1)' : ''}"
+                         title="${canPlaceHere ? '點擊將所選花磚直接放入地板扣分線' : '地板扣分線'}">
+                        <div>
+                            <div style="font-size:0.8rem;font-weight:700;color:#f87171;">
+                                <i class="fa-solid fa-triangle-exclamation"></i> 地板扣分線
+                            </div>
+                            <div style="font-size:0.68rem;color:#94a3b8;">
+                                ${canPlaceHere ? '點擊此處可直接棄置於地板' : '超額或無法放置的花磚將落入此處'}
+                            </div>
+                        </div>
+                        <div class="floor-slots">${floorSlotsHtml}</div>
+                    </div>
+                `;
+
+                grid.appendChild(board);
+            });
+        }
+
+        function openRulesModal() {
+            document.getElementById('rulesModal').classList.add('show');
+        }
+        function closeRulesModal() {
+            document.getElementById('rulesModal').classList.remove('show');
+        }
+        function closeGameOverModal() {
+            document.getElementById('gameOverModal').classList.remove('show');
+        }
+
+        document.getElementById('modeSelect').addEventListener('change', startNewGame);
+        document.getElementById('diffSelect').addEventListener('change', () => {
+            state.difficulty = document.getElementById('diffSelect').value;
+        });
+
+        window.addEventListener('DOMContentLoaded', startNewGame);
+    </script>
+</body>
+</html>

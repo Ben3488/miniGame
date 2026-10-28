@@ -256,7 +256,7 @@
 
         /* Difficulty Options (Collapsible) */
         .difficulty-section {
-            max-height: 200px;
+            max-height: 280px;
             opacity: 1;
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -276,7 +276,8 @@
             gap: 10px;
         }
 
-        .btn-diff {
+        .btn-diff,
+        .btn-order {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.05);
             color: var(--text-secondary);
@@ -285,7 +286,8 @@
             border-radius: 12px;
         }
 
-        .btn-diff:hover {
+        .btn-diff:hover,
+        .btn-order:hover {
             background: rgba(255, 255, 255, 0.06);
             color: var(--text-primary);
         }
@@ -295,6 +297,13 @@
             border-color: var(--pink-neon);
             color: var(--pink-neon);
             box-shadow: 0 0 15px rgba(255, 0, 127, 0.25);
+        }
+
+        .btn-order.active {
+            background: rgba(0, 242, 254, 0.1);
+            border-color: var(--cyan-neon);
+            color: var(--cyan-neon);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
         }
 
         /* Primary Glow Button */
@@ -728,6 +737,12 @@
                         <button class="btn btn-diff active" data-diff="medium">聰明</button>
                         <button class="btn btn-diff" data-diff="impossible">地獄</button>
                     </div>
+                    <h3 class="subsection-title" style="margin-top: 16px;">先後手設定</h3>
+                    <div class="difficulty-options">
+                        <button class="btn btn-order active" data-order="player">玩家先手</button>
+                        <button class="btn btn-order" data-order="ai">AI 先手</button>
+                        <button class="btn btn-order" data-order="alternate">輪流先手</button>
+                    </div>
                 </div>
 
                 <button id="btn-start" class="btn btn-primary glow-btn">
@@ -735,7 +750,7 @@
                     <i class="fa-solid fa-play"></i>
                 </button>
                 
-                <a href="../index.html" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; margin-top: 8px;">
+                <a href="../index.html?zone=games" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; margin-top: 8px;">
                     <i class="fa-solid fa-arrow-left"></i>
                     <span>返回遊戲大廳</span>
                 </a>
@@ -1023,7 +1038,8 @@
         const Game = {
             boardState: Array(9).fill(null),
             gameActive: false,
-            startingPlayer: 'X', // Alternates each completed round
+            firstTurnSetting: 'player', // 'player' (X first), 'ai' (O first), 'alternate'
+            startingPlayer: 'X',
             currentPlayer: 'X',
             gameMode: 'pvp', // 'pvp' or 'pve'
             difficulty: 'medium', // 'easy', 'medium', 'impossible'
@@ -1170,6 +1186,17 @@
                     });
                 });
 
+                // First-turn order selection
+                document.querySelectorAll('.btn-order').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        SoundManager.playClick();
+                        const targetBtn = e.currentTarget;
+                        document.querySelectorAll('.btn-order').forEach(b => b.classList.remove('active'));
+                        targetBtn.classList.add('active');
+                        this.firstTurnSetting = targetBtn.dataset.order;
+                    });
+                });
+
                 // Start Game
                 this.elements.btnStart.addEventListener('click', () => {
                     SoundManager.playClick();
@@ -1230,6 +1257,20 @@
                 }
             },
 
+            getInitialStartingPlayer() {
+                if (this.gameMode === 'pvp') return 'X';
+                if (this.firstTurnSetting === 'ai') return 'O';
+                return 'X';
+            },
+
+            advanceStartingPlayerForNextRound() {
+                if (this.gameMode === 'pve' && this.firstTurnSetting === 'alternate') {
+                    this.startingPlayer = this.startingPlayer === 'X' ? 'O' : 'X';
+                } else {
+                    this.startingPlayer = this.getInitialStartingPlayer();
+                }
+            },
+
             startGame() {
                 // Transition screens
                 this.elements.menuScreen.classList.remove('active');
@@ -1252,7 +1293,7 @@
                     this.elements.gameDiffDisplay.textContent = diffMap[this.difficulty];
                 }
 
-                this.startingPlayer = 'X';
+                this.startingPlayer = this.getInitialStartingPlayer();
                 this.updateScoreboardUI();
                 this.resetRound();
             },
@@ -1267,6 +1308,9 @@
             resetRound() {
                 this.clearAITimeout();
                 this.boardState.fill(null);
+                if (this.gameMode === 'pvp' || this.firstTurnSetting !== 'alternate') {
+                    this.startingPlayer = this.getInitialStartingPlayer();
+                }
                 this.currentPlayer = this.startingPlayer;
                 this.gameActive = true;
 
@@ -1286,7 +1330,7 @@
 
             resetScores() {
                 this.allScores[this.getCurrentScoreKey()] = { X: 0, O: 0, ties: 0 };
-                this.startingPlayer = 'X';
+                this.startingPlayer = this.getInitialStartingPlayer();
                 this.saveScores();
                 this.updateScoreboardUI();
             },
@@ -1391,7 +1435,7 @@
 
             handleGameWin() {
                 this.gameActive = false;
-                this.startingPlayer = this.startingPlayer === 'X' ? 'O' : 'X';
+                this.advanceStartingPlayerForNextRound();
                 
                 // Highlighting Winning Cells
                 const winningComb = this.getWinningCombination();
@@ -1425,7 +1469,7 @@
 
             handleGameDraw() {
                 this.gameActive = false;
-                this.startingPlayer = this.startingPlayer === 'X' ? 'O' : 'X';
+                this.advanceStartingPlayerForNextRound();
                 this.scores.ties++;
                 this.saveScores();
                 this.updateScoreboardUI();

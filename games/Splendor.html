@@ -1,0 +1,2285 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>璀璨寶石 Splendor - 皇家珠寶商對決</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-panel: rgba(15, 23, 42, 0.78);
+            --bg-card: rgba(30, 41, 59, 0.85);
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --accent-gold: #f59e0b;
+
+            /* Gem Colors */
+            --gem-white: #f1f5f9;
+            --gem-white-bg: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
+            --gem-blue: #3b82f6;
+            --gem-blue-bg: linear-gradient(135deg, #60a5fa 0%, #1d4ed8 100%);
+            --gem-green: #10b981;
+            --gem-green-bg: linear-gradient(135deg, #34d399 0%, #047857 100%);
+            --gem-red: #ef4444;
+            --gem-red-bg: linear-gradient(135deg, #f87171 0%, #b91c1c 100%);
+            --gem-black: #64748b;
+            --gem-black-bg: linear-gradient(135deg, #475569 0%, #0f172a 100%);
+            --gem-gold: #fbbf24;
+            --gem-gold-bg: linear-gradient(135deg, #fde047 0%, #d97706 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(circle at 12% 20%, rgba(59, 130, 246, 0.12), transparent 30%),
+                radial-gradient(circle at 88% 25%, rgba(245, 158, 11, 0.10), transparent 30%),
+                radial-gradient(circle at 50% 85%, rgba(16, 185, 129, 0.10), transparent 35%);
+            color: var(--text-main);
+            font-family: 'Inter', 'Outfit', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .top-bar {
+            height: 62px;
+            padding: 0 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(9, 13, 22, 0.88);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border-glass);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #f59e0b, #ec4899, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #fff;
+            box-shadow: 0 0 16px rgba(245, 158, 11, 0.45);
+        }
+
+        .brand-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #fde047, #f472b6, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-sub {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            margin-left: 0.25rem;
+        }
+
+        .nav-Controls {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-wrap: wrap;
+        }
+
+        .ctrl-select, .ctrl-btn {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+            padding: 0.45rem 0.85rem;
+            border-radius: 9px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .ctrl-select:hover, .ctrl-btn:hover {
+            background: rgba(51, 65, 85, 0.9);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .ctrl-btn.primary {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #090d16;
+            border: none;
+            font-weight: 700;
+        }
+
+        .ctrl-btn.primary:hover {
+            box-shadow: 0 0 14px rgba(245, 158, 11, 0.5);
+        }
+
+        /* Layout */
+        .game-layout {
+            flex: 1;
+            max-width: 1560px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1rem 1.25rem;
+            display: grid;
+            grid-template-columns: 300px 1fr 330px;
+            gap: 1.1rem;
+            align-items: start;
+        }
+
+        @media (max-width: 1240px) {
+            .game-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .glass-panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            backdrop-filter: blur(16px);
+            padding: 1rem;
+            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.38);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.85rem;
+            padding-bottom: 0.55rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .panel-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Status Banner */
+        .turn-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.7rem 1rem;
+            border-radius: 12px;
+            background: linear-gradient(90deg, rgba(245, 158, 11, 0.16), rgba(59, 130, 246, 0.14));
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            margin-bottom: 0.9rem;
+        }
+
+        .turn-info {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            font-weight: 600;
+            font-size: 0.92rem;
+        }
+
+        .final-round-badge {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.22rem 0.65rem;
+            border-radius: 999px;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+            animation: pulseBadge 1.5s infinite;
+            display: none;
+        }
+
+        @keyframes pulseBadge {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+        }
+
+        /* Nobles Row */
+        .nobles-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .noble-tile {
+            width: 112px;
+            height: 102px;
+            border-radius: 12px;
+            background: linear-gradient(145deg, rgba(88, 28, 135, 0.65), rgba(30, 27, 75, 0.9));
+            border: 1.5px solid rgba(251, 191, 36, 0.45);
+            padding: 0.5rem 0.6rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .noble-tile:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 22px rgba(251, 191, 36, 0.25);
+        }
+
+        .noble-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .noble-pts {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #fde047;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+        }
+
+        .noble-name {
+            font-size: 0.7rem;
+            color: #e9d5ff;
+            font-weight: 600;
+        }
+
+        .noble-reqs {
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+
+        .noble-req-badge {
+            width: 24px;
+            height: 28px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            font-weight: 800;
+            border: 1px solid rgba(255,255,255,0.4);
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.3);
+        }
+
+        /* Development Card Tiers */
+        .tiers-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .tier-row {
+            display: grid;
+            grid-template-columns: 112px repeat(4, 1fr);
+            gap: 0.75rem;
+            align-items: stretch;
+        }
+
+        @media (max-width: 780px) {
+            .tier-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .deck-card {
+            border-radius: 13px;
+            padding: 0.65rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            border: 1.5px solid rgba(255, 255, 255, 0.16);
+            transition: all 0.2s ease;
+            position: relative;
+            min-height: 148px;
+        }
+
+        .deck-card.tier-3 {
+            background: linear-gradient(145deg, #1e3a8a, #0f172a);
+            border-color: rgba(96, 165, 250, 0.45);
+        }
+        .deck-card.tier-2 {
+            background: linear-gradient(145deg, #78350f, #1e1b4b);
+            border-color: rgba(251, 191, 36, 0.45);
+        }
+        .deck-card.tier-1 {
+            background: linear-gradient(145deg, #064e3b, #0f172a);
+            border-color: rgba(52, 211, 153, 0.45);
+        }
+
+        .deck-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+        }
+
+        .deck-dots {
+            display: flex;
+            gap: 5px;
+            margin-top: 4px;
+        }
+
+        .deck-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #fde047;
+            box-shadow: 0 0 6px #fde047;
+        }
+
+        .deck-count {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .deck-hint {
+            font-size: 0.68rem;
+            color: #cbd5e1;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.35);
+            padding: 3px 7px;
+            border-radius: 6px;
+        }
+
+        /* Development Card */
+        .dev-card {
+            border-radius: 13px;
+            padding: 0.65rem 0.7rem;
+            min-height: 148px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            cursor: pointer;
+            border: 1.5px solid rgba(255, 255, 255, 0.14);
+            transition: all 0.2s ease;
+            overflow: hidden;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+        }
+
+        .dev-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .dev-card.affordable {
+            border-color: #fde047;
+            box-shadow: 0 0 16px rgba(250, 204, 21, 0.32);
+        }
+
+        .dev-card.affordable::after {
+            content: '可購買';
+            position: absolute;
+            top: 42px;
+            right: 8px;
+            font-size: 0.64rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 99px;
+            background: rgba(250, 204, 21, 0.92);
+            color: #090d16;
+        }
+
+        .dev-card.theme-white { background: linear-gradient(155deg, rgba(241, 245, 249, 0.24) 0%, rgba(15, 23, 42, 0.92) 65%); }
+        .dev-card.theme-blue  { background: linear-gradient(155deg, rgba(59, 130, 246, 0.30) 0%, rgba(15, 23, 42, 0.92) 65%); }
+        .dev-card.theme-green { background: linear-gradient(155deg, rgba(16, 185, 129, 0.30) 0%, rgba(15, 23, 42, 0.92) 65%); }
+        .dev-card.theme-red   { background: linear-gradient(155deg, rgba(239, 68, 68, 0.30) 0%, rgba(15, 23, 42, 0.92) 65%); }
+        .dev-card.theme-black { background: linear-gradient(155deg, rgba(100, 116, 139, 0.34) 0%, rgba(15, 23, 42, 0.94) 65%); }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .card-points {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.55rem;
+            font-weight: 800;
+            line-height: 1;
+            color: #fff;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
+        }
+
+        .card-gem-bonus {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.45);
+            border: 1.5px solid rgba(255,255,255,0.55);
+        }
+
+        .card-costs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.32rem;
+            margin-top: auto;
+        }
+
+        .cost-circle {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 800;
+            border: 1.5px solid rgba(255,255,255,0.55);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        /* Gem Color Utilities */
+        .gem-bg-white { background: var(--gem-white-bg); color: #0f172a; }
+        .gem-bg-blue  { background: var(--gem-blue-bg); color: #fff; }
+        .gem-bg-green { background: var(--gem-green-bg); color: #fff; }
+        .gem-bg-red   { background: var(--gem-red-bg); color: #fff; }
+        .gem-bg-black { background: var(--gem-black-bg); color: #f8fafc; }
+        .gem-bg-gold  { background: var(--gem-gold-bg); color: #0f172a; }
+
+        /* Bank & Token Drafting Panel */
+        .bank-tokens-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .bank-token-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.55rem 0.75rem;
+            border-radius: 12px;
+            background: rgba(30, 41, 59, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .bank-token-row:hover:not(.disabled) {
+            background: rgba(51, 65, 85, 0.82);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateX(3px);
+        }
+
+        .bank-token-row.disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .token-Left {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .token-disc {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 800;
+            border: 2px solid rgba(255, 255, 255, 0.65);
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.35), 0 4px 10px rgba(0,0,0,0.45);
+        }
+
+        .token-label-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .token-name {
+            font-weight: 700;
+            font-size: 0.88rem;
+        }
+
+        .token-rule-sub {
+            font-size: 0.7rem;
+            color: var(--text-sub);
+        }
+
+        .token-count-pill {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            padding: 0.2rem 0.65rem;
+            border-radius: 8px;
+            background: rgba(9, 13, 22, 0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Draft Basket */
+        .draft-box {
+            margin-top: 0.9rem;
+            padding: 0.8rem;
+            border-radius: 12px;
+            background: rgba(9, 13, 22, 0.68);
+            border: 1px dashed rgba(245, 158, 11, 0.45);
+        }
+
+        .draft-title {
+            font-size: 0.8rem;
+            color: #cbd5e1;
+            font-weight: 600;
+            margin-bottom: 0.55rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .draft-chips {
+            display: flex;
+            gap: 0.45rem;
+            min-height: 38px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 0.65rem;
+        }
+
+        .draft-chip {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            border: 2px solid #fff;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+        }
+
+        .draft-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .draft-actions button {
+            flex: 1;
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-confirm-draft {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+        }
+        .btn-confirm-draft:disabled {
+            background: #334155;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        .btn-clear-draft {
+            background: rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+        }
+
+        /* Players Dashboard */
+        .players-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .player-card {
+            padding: 0.85rem;
+            border-radius: 14px;
+            background: rgba(30, 41, 59, 0.72);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.25s;
+        }
+
+        .player-card.active-turn {
+            border-color: #f59e0b;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.22);
+            background: rgba(30, 41, 59, 0.95);
+        }
+
+        .player-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.65rem;
+        }
+
+        .player-identity {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .player-score-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.35));
+            border: 1px solid rgba(251, 191, 36, 0.5);
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            color: #fde047;
+            font-size: 1rem;
+        }
+
+        .player-gems-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.35rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .p-gem-cell {
+            border-radius: 8px;
+            padding: 0.3rem 0.2rem;
+            background: rgba(9, 13, 22, 0.55);
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .p-gem-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 0.62rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .p-gem-nums {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .p-gem-bonus {
+            color: #fde047;
+            font-weight: 800;
+        }
+
+        .player-meta-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            margin-bottom: 0.45rem;
+        }
+
+        .reserved-strip {
+            display: flex;
+            gap: 0.45rem;
+            margin-top: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .reserved-mini-card {
+            flex: 1;
+            min-width: 78px;
+            padding: 0.38rem 0.45rem;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            cursor: pointer;
+            font-size: 0.72rem;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            transition: transform 0.15s;
+        }
+
+        .reserved-mini-card:hover {
+            transform: translateY(-2px);
+            border-color: #fde047;
+        }
+
+        /* Action Log */
+        .log-box {
+            margin-top: 0.85rem;
+            max-height: 135px;
+            overflow-y: auto;
+            font-size: 0.78rem;
+            color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            padding-right: 4px;
+        }
+
+        .log-entry {
+            padding: 0.3rem 0.5rem;
+            border-radius: 6px;
+            background: rgba(9, 13, 22, 0.45);
+            border-left: 3px solid #3b82f6;
+        }
+
+        /* Modals */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 8, 15, 0.82);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 1rem;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 18px;
+            max-width: 560px;
+            width: 100%;
+            padding: 1.5rem;
+            box-shadow: 0 24px 50px rgba(0, 0, 0, 0.65);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.65rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #fde047;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.2rem;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 0.7rem 1rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.buy {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+        }
+        .modal-btn.reserve {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #090d16;
+        }
+        .modal-btn.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+        .modal-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .rules-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            font-size: 0.88rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        .rules-list h4 {
+            color: #fde047;
+            margin-bottom: 0.2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <header class="top-bar">
+        <div class="brand">
+            <div class="brand-icon"><i class="fa-solid fa-gem"></i></div>
+            <div>
+                <span class="brand-title">璀璨寶石 SPLENDOR</span>
+                <span class="brand-sub">文藝復興皇家珠寶商策略桌遊</span>
+            </div>
+        </div>
+
+        <div class="nav-Controls">
+            <select id="modeSelect" class="ctrl-select" title="選擇對戰模式">
+                <option value="1v1">1v1 挑戰 AI</option>
+                <option value="3p">3人局 (1玩家 + 2AI)</option>
+                <option value="pvp">雙人同機對決 (PvP)</option>
+            </select>
+
+            <select id="diffSelect" class="ctrl-select" title="選擇 AI 難度">
+                <option value="easy">AI: 初學商人</option>
+                <option value="normal" selected>AI: 精明珠寶商</option>
+                <option value="hard">AI: 皇家大宗師</option>
+            </select>
+
+            <button class="ctrl-btn primary" onclick="startNewGame()">
+                <i class="fa-solid fa-rotate-right"></i> 新局開始
+            </button>
+
+            <button class="ctrl-btn" onclick="openRulesModal()">
+                <i class="fa-solid fa-book-open"></i> 規則說明
+            </button>
+
+            <button class="ctrl-btn" id="muteBtn" onclick="toggleMute()">
+                <i class="fa-solid fa-volume-high" id="muteIcon"></i>
+            </button>
+
+            <a href="../index.html?zone=games" class="ctrl-btn">
+                <i class="fa-solid fa-house"></i> 返回遊戲大廳
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Game Content -->
+    <main class="game-layout">
+        <!-- Left Column: Bank Tokens & Drafting -->
+        <section class="glass-panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <i class="fa-solid fa-coins" style="color: #fbbf24;"></i> 銀行寶石供應區
+                </div>
+                <span style="font-size: 0.72rem; color: var(--text-sub);">上限 10 枚籌碼</span>
+            </div>
+
+            <div class="bank-tokens-list" id="bankTokensList"></div>
+
+            <!-- Token Draft Tray -->
+            <div class="draft-box">
+                <div class="draft-title">
+                    <span><i class="fa-solid fa-hand-sparkles"></i> 本回合預選寶石</span>
+                    <span id="draftRuleHint" style="color: #fde047;">可拿3異色或2同色(需存量≥4)</span>
+                </div>
+                <div class="draft-chips" id="draftChips"></div>
+                <div class="draft-actions">
+                    <button class="btn-confirm-draft" id="confirmDraftBtn" onclick="confirmTakeTokens()" disabled>
+                        <i class="fa-solid fa-check"></i> 確認拿取
+                    </button>
+                    <button class="btn-clear-draft" onclick="clearDraftTokens()">
+                        <i class="fa-solid fa-xmark"></i> 重選
+                    </button>
+                </div>
+            </div>
+
+            <!-- Action Log -->
+            <div class="panel-header" style="margin-top: 1rem; margin-bottom: 0.4rem;">
+                <div class="panel-title" style="font-size: 0.85rem;">
+                    <i class="fa-solid fa-scroll" style="color: #60a5fa;"></i> 對局紀錄
+                </div>
+            </div>
+            <div class="log-box" id="gameLog"></div>
+        </section>
+
+        <!-- Center Column: Nobles & 3 Tiers of Development Cards -->
+        <section class="glass-panel">
+            <div class="turn-banner">
+                <div class="turn-info" id="turnStatusText">
+                    <i class="fa-solid fa-crown" style="color: #fde047;"></i>
+                    <span>載入中...</span>
+                </div>
+                <div class="final-round-badge" id="finalRoundBadge">
+                    <i class="fa-solid fa-bell"></i> 最終回合 (15分達成)
+                </div>
+            </div>
+
+            <!-- Nobles Section -->
+            <div class="panel-header" style="margin-bottom: 0.55rem;">
+                <div class="panel-title">
+                    <i class="fa-solid fa-chess-king" style="color: #c084fc;"></i> 皇家貴族卡 (集齊對應永久寶石加成自動造訪 +3 分)
+                </div>
+            </div>
+            <div class="nobles-bar" id="noblesBar"></div>
+
+            <!-- Development Cards Market -->
+            <div class="panel-header" style="margin-bottom: 0.65rem;">
+                <div class="panel-title">
+                    <i class="fa-solid fa-layer-group" style="color: #38bdf8;"></i> 發展卡市場 (點擊卡牌可購買或保留)
+                </div>
+                <span style="font-size: 0.75rem; color: #fde047;"><i class="fa-solid fa-sparkles"></i> 金框代表當前買得起</span>
+            </div>
+
+            <div class="tiers-wrapper" id="tiersWrapper"></div>
+        </section>
+
+        <!-- Right Column: Players Status & Reserved Cards -->
+        <section class="glass-panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <i class="fa-solid fa-users" style="color: #34d399;"></i> 珠寶商資產面板
+                </div>
+                <span style="font-size: 0.72rem; color: var(--text-sub);">目標 15 聲望分</span>
+            </div>
+            <div class="players-stack" id="playersStack"></div>
+        </section>
+    </main>
+
+    <!-- Card Action Modal -->
+    <div class="modal-backdrop" id="cardActionModal">
+        <div class="modal-box" style="max-width: 430px;">
+            <div class="modal-header">
+                <div class="modal-title" id="cardModalTitle">發展卡操作</div>
+                <button class="close-btn" onclick="closeCardModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="cardModalBody"></div>
+            <div class="modal-actions" id="cardModalActions"></div>
+        </div>
+    </div>
+
+    <!-- Excess Tokens Return Modal -->
+    <div class="modal-backdrop" id="discardModal">
+        <div class="modal-box" style="max-width: 440px;">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fa-solid fa-scale-unbalanced"></i> 籌碼超過上限 (最多 10 枚)</div>
+            </div>
+            <p style="font-size: 0.88rem; color: #cbd5e1; margin-bottom: 0.9rem;" id="discardPromptText">
+                請點擊要歸還給銀行的寶石籌碼：
+            </p>
+            <div id="discardTokensGrid" style="display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center;"></div>
+        </div>
+    </div>
+
+    <!-- Rules Modal -->
+    <div class="modal-backdrop" id="rulesModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fa-solid fa-gem"></i> 璀璨寶石 (Splendor) 規則說明</div>
+                <button class="close-btn" onclick="closeRulesModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="rules-list">
+                <div>
+                    <h4>1. 遊戲目標</h4>
+                    <p>扮演文藝復興時期的富商，收購礦脈、聘請工匠並吸引貴族造訪。當有玩家達到或超過 <strong>15 點聲望分數</strong> 時觸發「最終回合」，所有玩家完成相同回合數後，分數最高者獲勝（平手則比較已購買發展卡張數，較少者勝）。</p>
+                </div>
+                <div>
+                    <h4>2. 回合四選一行動</h4>
+                    <p>每回合你只能執行以下 <strong>4 種行動之一</strong>：<br>
+                    • <strong>拿取 3 枚不同顏色的寶石籌碼</strong>（點選左側銀行寶石後按「確認拿取」）。<br>
+                    • <strong>拿取 2 枚相同顏色的寶石籌碼</strong>（該顏色在銀行中必須至少有 4 枚才可拿 2 枚）。<br>
+                    • <strong>保留 1 張發展卡</strong>（可選場上明牌或點擊牌庫頂盲抽保留），並獲得 <strong>1 枚黃金萬用籌碼</strong>（手中保留上限為 3 張）。<br>
+                    • <strong>購買 1 張場上或手中保留的發展卡</strong>，支付對應寶石（黃金可代替任意顏色），購得後提供永久寶石折扣與聲望分。</p>
+                </div>
+                <div>
+                    <h4>3. 籌碼上限與貴族造訪</h4>
+                    <p>• 回合結束時手中寶石＋黃金籌碼合計不可超過 <strong>10 枚</strong>，超過需歸還。<br>
+                    • 回合結束時，若你的<strong>永久寶石加成（發展卡紅利）</strong>達到場上貴族卡的要求，該貴族自動造訪並給予 <strong>+3 聲望分</strong>（不消耗寶石）。</p>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn buy" onclick="closeRulesModal()">開始成為皇家珠寶商</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div class="modal-backdrop" id="gameOverModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title" id="winnerTitle"><i class="fa-solid fa-trophy"></i> 對局結算</div>
+                <button class="close-btn" onclick="closeGameOverModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="gameOverBody" style="display: flex; flex-direction: column; gap: 0.7rem;"></div>
+            <div class="modal-actions">
+                <button class="modal-btn buy" onclick="closeGameOverModal(); startNewGame();">
+                    <i class="fa-solid fa-rotate-right"></i> 再來一局
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ==================== Web Audio Sound Synthesizer ==================== */
+        let audioCtx = null;
+        let isMuted = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioCtx = new AudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (isMuted) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'token') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(520, now);
+                osc.frequency.exponentialRampToValueAtTime(780, now + 0.09);
+                gain.gain.setValueAtTime(0.14, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'buy') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(554.37, now + 0.07);
+                osc.frequency.setValueAtTime(659.25, now + 0.14);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+                osc.start(now);
+                osc.stop(now + 0.28);
+            } else if (type === 'reserve') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(380, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.16);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+                osc.start(now);
+                osc.stop(now + 0.18);
+            } else if (type === 'noble') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.1);
+                osc.frequency.setValueAtTime(783.99, now + 0.2);
+                osc.frequency.setValueAtTime(1046.5, now + 0.3);
+                gain.gain.setValueAtTime(0.22, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'win') {
+                osc.type = 'triangle';
+                [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.11);
+                });
+                gain.gain.setValueAtTime(0.24, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+                osc.start(now);
+                osc.stop(now + 0.65);
+            }
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const icon = document.getElementById('muteIcon');
+            icon.className = isMuted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+        }
+
+        /* ==================== Game Constants & Authentic Cards ==================== */
+        const GEM_COLORS = ['white', 'blue', 'green', 'red', 'black'];
+        const ALL_TOKENS = ['white', 'blue', 'green', 'red', 'black', 'gold'];
+
+        const GEM_META = {
+            white: { name: '鑽石', icon: 'fa-regular fa-gem', css: 'gem-bg-white' },
+            blue:  { name: '藍寶石', icon: 'fa-solid fa-droplet', css: 'gem-bg-blue' },
+            green: { name: '祖母綠', icon: 'fa-solid fa-leaf', css: 'gem-bg-green' },
+            red:   { name: '紅寶石', icon: 'fa-solid fa-fire', css: 'gem-bg-red' },
+            black: { name: '瑪瑙', icon: 'fa-solid fa-cube', css: 'gem-bg-black' },
+            gold:  { name: '黃金萬用', icon: 'fa-solid fa-coins', css: 'gem-bg-gold' }
+        };
+
+        // Authentic Splendor Development Cards (Level 1, 2, 3)
+        const RAW_CARDS = {
+            1: [
+                // White bonus
+                { bonus: 'white', points: 0, cost: { blue: 3 } },
+                { bonus: 'white', points: 0, cost: { red: 2, black: 1 } },
+                { bonus: 'white', points: 0, cost: { blue: 2, black: 2 } },
+                { bonus: 'white', points: 0, cost: { white: 3, blue: 1, black: 1 } },
+                { bonus: 'white', points: 0, cost: { green: 2, red: 1, black: 1 } },
+                { bonus: 'white', points: 0, cost: { blue: 1, green: 2, red: 1, black: 1 } },
+                { bonus: 'white', points: 0, cost: { blue: 1, green: 1, red: 1, black: 1 } },
+                { bonus: 'white', points: 1, cost: { green: 4 } },
+                // Blue bonus
+                { bonus: 'blue', points: 0, cost: { black: 3 } },
+                { bonus: 'blue', points: 0, cost: { white: 1, black: 2 } },
+                { bonus: 'blue', points: 0, cost: { green: 2, black: 2 } },
+                { bonus: 'blue', points: 0, cost: { blue: 1, green: 3, red: 1 } },
+                { bonus: 'blue', points: 0, cost: { white: 1, green: 2, red: 2 } },
+                { bonus: 'blue', points: 0, cost: { white: 1, green: 1, red: 2, black: 1 } },
+                { bonus: 'blue', points: 0, cost: { white: 1, green: 1, red: 1, black: 1 } },
+                { bonus: 'blue', points: 1, cost: { red: 4 } },
+                // Green bonus
+                { bonus: 'green', points: 0, cost: { red: 3 } },
+                { bonus: 'green', points: 0, cost: { white: 2, blue: 1 } },
+                { bonus: 'green', points: 0, cost: { blue: 2, red: 2 } },
+                { bonus: 'green', points: 0, cost: { white: 1, blue: 3, green: 1 } },
+                { bonus: 'green', points: 0, cost: { blue: 1, red: 2, black: 2 } },
+                { bonus: 'green', points: 0, cost: { white: 1, blue: 1, red: 1, black: 2 } },
+                { bonus: 'green', points: 0, cost: { white: 1, blue: 1, red: 1, black: 1 } },
+                { bonus: 'green', points: 1, cost: { black: 4 } },
+                // Red bonus
+                { bonus: 'red', points: 0, cost: { white: 3 } },
+                { bonus: 'red', points: 0, cost: { blue: 2, green: 1 } },
+                { bonus: 'red', points: 0, cost: { white: 2, red: 2 } },
+                { bonus: 'red', points: 0, cost: { white: 1, red: 1, black: 3 } },
+                { bonus: 'red', points: 0, cost: { white: 2, green: 1, black: 2 } },
+                { bonus: 'red', points: 0, cost: { white: 2, blue: 1, green: 1, black: 1 } },
+                { bonus: 'red', points: 0, cost: { white: 1, blue: 1, green: 1, black: 1 } },
+                { bonus: 'red', points: 1, cost: { white: 4 } },
+                // Black bonus
+                { bonus: 'black', points: 0, cost: { green: 3 } },
+                { bonus: 'black', points: 0, cost: { green: 2, red: 1 } },
+                { bonus: 'black', points: 0, cost: { white: 2, green: 2 } },
+                { bonus: 'black', points: 0, cost: { green: 1, red: 3, black: 1 } },
+                { bonus: 'black', points: 0, cost: { white: 2, blue: 2, red: 1 } },
+                { bonus: 'black', points: 0, cost: { white: 1, blue: 2, green: 1, red: 1 } },
+                { bonus: 'black', points: 0, cost: { white: 1, blue: 1, green: 1, red: 1 } },
+                { bonus: 'black', points: 1, cost: { blue: 4 } }
+            ],
+            2: [
+                // White
+                { bonus: 'white', points: 1, cost: { green: 3, red: 2, black: 2 } },
+                { bonus: 'white', points: 1, cost: { white: 2, blue: 3, red: 3 } },
+                { bonus: 'white', points: 2, cost: { red: 5 } },
+                { bonus: 'white', points: 2, cost: { red: 5, black: 3 } },
+                { bonus: 'white', points: 2, cost: { green: 1, red: 4, black: 2 } },
+                { bonus: 'white', points: 3, cost: { white: 6 } },
+                // Blue
+                { bonus: 'blue', points: 1, cost: { blue: 2, green: 2, red: 3 } },
+                { bonus: 'blue', points: 1, cost: { blue: 2, green: 3, black: 3 } },
+                { bonus: 'blue', points: 2, cost: { blue: 5 } },
+                { bonus: 'blue', points: 2, cost: { white: 5, blue: 3 } },
+                { bonus: 'blue', points: 2, cost: { white: 2, red: 1, black: 4 } },
+                { bonus: 'blue', points: 3, cost: { blue: 6 } },
+                // Green
+                { bonus: 'green', points: 1, cost: { white: 2, blue: 3, black: 2 } },
+                { bonus: 'green', points: 1, cost: { white: 3, green: 2, red: 3 } },
+                { bonus: 'green', points: 2, cost: { green: 5 } },
+                { bonus: 'green', points: 2, cost: { blue: 5, green: 3 } },
+                { bonus: 'green', points: 2, cost: { white: 4, blue: 2, black: 1 } },
+                { bonus: 'green', points: 3, cost: { green: 6 } },
+                // Red
+                { bonus: 'red', points: 1, cost: { white: 2, red: 2, black: 3 } },
+                { bonus: 'red', points: 1, cost: { blue: 3, red: 2, black: 3 } },
+                { bonus: 'red', points: 2, cost: { black: 5 } },
+                { bonus: 'red', points: 2, cost: { white: 3, black: 5 } },
+                { bonus: 'red', points: 2, cost: { white: 1, blue: 4, green: 2 } },
+                { bonus: 'red', points: 3, cost: { red: 6 } },
+                // Black
+                { bonus: 'black', points: 1, cost: { white: 3, blue: 2, green: 2 } },
+                { bonus: 'black', points: 1, cost: { white: 3, green: 3, black: 2 } },
+                { bonus: 'black', points: 2, cost: { white: 5 } },
+                { bonus: 'black', points: 2, cost: { green: 5, red: 3 } },
+                { bonus: 'black', points: 2, cost: { blue: 1, green: 4, red: 2 } },
+                { bonus: 'black', points: 3, cost: { black: 6 } }
+            ],
+            3: [
+                // White
+                { bonus: 'white', points: 3, cost: { blue: 3, green: 3, red: 5, black: 3 } },
+                { bonus: 'white', points: 4, cost: { black: 7 } },
+                { bonus: 'white', points: 4, cost: { white: 3, red: 3, black: 6 } },
+                { bonus: 'white', points: 5, cost: { white: 3, black: 7 } },
+                // Blue
+                { bonus: 'blue', points: 3, cost: { white: 3, green: 3, red: 3, black: 5 } },
+                { bonus: 'blue', points: 4, cost: { white: 7 } },
+                { bonus: 'blue', points: 4, cost: { white: 6, blue: 3, black: 3 } },
+                { bonus: 'blue', points: 5, cost: { white: 7, blue: 3 } },
+                // Green
+                { bonus: 'green', points: 3, cost: { white: 5, blue: 3, red: 3, black: 3 } },
+                { bonus: 'green', points: 4, cost: { blue: 7 } },
+                { bonus: 'green', points: 4, cost: { white: 3, blue: 6, green: 3 } },
+                { bonus: 'green', points: 5, cost: { blue: 7, green: 3 } },
+                // Red
+                { bonus: 'red', points: 3, cost: { white: 3, blue: 5, green: 3, black: 3 } },
+                { bonus: 'red', points: 4, cost: { green: 7 } },
+                { bonus: 'red', points: 4, cost: { blue: 3, green: 6, red: 3 } },
+                { bonus: 'red', points: 5, cost: { green: 7, red: 3 } },
+                // Black
+                { bonus: 'black', points: 3, cost: { white: 3, blue: 3, green: 5, red: 3 } },
+                { bonus: 'black', points: 4, cost: { red: 7 } },
+                { bonus: 'black', points: 4, cost: { green: 3, red: 6, black: 3 } },
+                { bonus: 'black', points: 5, cost: { red: 7, black: 3 } }
+            ]
+        };
+
+        const RAW_NOBLES = [
+            { name: '伊莉莎白一世', points: 3, req: { white: 3, blue: 3, black: 3 } },
+            { name: '查理五世', points: 3, req: { white: 3, red: 3, black: 3 } },
+            { name: '法蘭索瓦一世', points: 3, req: { green: 3, red: 3, black: 3 } },
+            { name: '凱薩琳·梅迪奇', points: 3, req: { blue: 3, green: 3, red: 3 } },
+            { name: '蘇萊曼一世', points: 3, req: { white: 3, blue: 3, green: 3 } },
+            { name: '伊莎貝拉一世', points: 3, req: { white: 4, black: 4 } },
+            { name: '瑪麗·斯圖亞特', points: 3, req: { green: 4, red: 4 } },
+            { name: '亨利八世', points: 3, req: { red: 4, black: 4 } },
+            { name: '馬基維利', points: 3, req: { white: 4, blue: 4 } },
+            { name: '安妮·布列塔尼', points: 3, req: { blue: 4, green: 4 } }
+        ];
+
+        /* ==================== Game State ==================== */
+        let state = {
+            mode: '1v1',
+            difficulty: 'normal',
+            bank: { white: 4, blue: 4, green: 4, red: 4, black: 4, gold: 5 },
+            decks: { 1: [], 2: [], 3: [] },
+            market: { 1: [], 2: [], 3: [] },
+            nobles: [],
+            players: [],
+            currentPlayerIdx: 0,
+            roundNumber: 1,
+            finalRoundTriggered: false,
+            gameOver: false,
+            draftTokens: [],
+            selectedCardCtx: null
+        };
+
+        let aiTimer = null;
+
+        function clearPendingAITimer() {
+            if (aiTimer) {
+                clearTimeout(aiTimer);
+                aiTimer = null;
+            }
+        }
+
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        /* ==================== Initialization ==================== */
+        function startNewGame() {
+            clearPendingAITimer();
+            closeCardModal();
+            closeGameOverModal();
+            document.getElementById('discardModal').classList.remove('show');
+
+            const mode = document.getElementById('modeSelect').value;
+            const diff = document.getElementById('diffSelect').value;
+
+            const is3P = (mode === '3p');
+            const gemSupplyCount = is3P ? 5 : 4;
+            const nobleCount = is3P ? 4 : 3;
+
+            let cardUid = 1;
+            const decks = { 1: [], 2: [], 3: [] };
+            [1, 2, 3].forEach(tier => {
+                decks[tier] = shuffleArray(RAW_CARDS[tier]).map(c => ({
+                    id: cardUid++,
+                    tier,
+                    bonus: c.bonus,
+                    points: c.points,
+                    cost: { ...c.cost }
+                }));
+            });
+
+            const market = { 1: [], 2: [], 3: [] };
+            [1, 2, 3].forEach(tier => {
+                for (let i = 0; i < 4; i++) {
+                    market[tier].push(decks[tier].pop());
+                }
+            });
+
+            const nobles = shuffleArray(RAW_NOBLES).slice(0, nobleCount).map((n, idx) => ({
+                id: 'noble_' + idx,
+                name: n.name,
+                points: n.points,
+                req: { ...n.req }
+            }));
+
+            let players = [];
+            if (mode === '1v1') {
+                players = [
+                    createPlayer(0, '玩家 1 (你)', false),
+                    createPlayer(1, '皇家 AI 對手', true)
+                ];
+            } else if (mode === '3p') {
+                players = [
+                    createPlayer(0, '玩家 1 (你)', false),
+                    createPlayer(1, '威尼斯 AI 富商', true),
+                    createPlayer(2, '佛羅倫斯 AI 宗師', true)
+                ];
+            } else {
+                players = [
+                    createPlayer(0, '玩家 1 (藍方)', false),
+                    createPlayer(1, '玩家 2 (紅方)', false)
+                ];
+            }
+
+            state = {
+                mode,
+                difficulty: diff,
+                bank: {
+                    white: gemSupplyCount,
+                    blue: gemSupplyCount,
+                    green: gemSupplyCount,
+                    red: gemSupplyCount,
+                    black: gemSupplyCount,
+                    gold: 5
+                },
+                decks,
+                market,
+                nobles,
+                players,
+                currentPlayerIdx: 0,
+                roundNumber: 1,
+                finalRoundTriggered: false,
+                gameOver: false,
+                draftTokens: [],
+                selectedCardCtx: null
+            };
+
+            document.getElementById('gameLog').innerHTML = '';
+            addLog(`新局開始！模式：${mode === '1v1' ? '1v1 挑戰 AI' : mode === '3p' ? '3人混戰' : '雙人同機對決'}，銀行各色寶石 ${gemSupplyCount} 枚。`);
+            renderAll();
+        }
+
+        function createPlayer(id, name, isAI) {
+            return {
+                id,
+                name,
+                isAI,
+                tokens: { white: 0, blue: 0, green: 0, red: 0, black: 0, gold: 0 },
+                bonuses: { white: 0, blue: 0, green: 0, red: 0, black: 0 },
+                reserved: [],
+                purchasedCount: 0,
+                nobles: [],
+                points: 0
+            };
+        }
+
+        function addLog(msg) {
+            const logEl = document.getElementById('gameLog');
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.textContent = `[R${state.roundNumber}] ${msg}`;
+            logEl.prepend(div);
+        }
+
+        /* ==================== Core Rule Helpers ==================== */
+        function getPlayerTotalTokens(player) {
+            return ALL_TOKENS.reduce((sum, color) => sum + player.tokens[color], 0);
+        }
+
+        function getPaymentPlan(player, card) {
+            let goldNeeded = 0;
+            const spend = { white: 0, blue: 0, green: 0, red: 0, black: 0, gold: 0 };
+
+            for (const color of GEM_COLORS) {
+                const rawCost = card.cost[color] || 0;
+                const afterBonus = Math.max(0, rawCost - player.bonuses[color]);
+                const payWithColor = Math.min(player.tokens[color], afterBonus);
+                spend[color] = payWithColor;
+                goldNeeded += (afterBonus - payWithColor);
+            }
+
+            if (goldNeeded > player.tokens.gold) {
+                return { affordable: false, spend, goldNeeded, shortage: goldNeeded - player.tokens.gold };
+            }
+            spend.gold = goldNeeded;
+            return { affordable: true, spend, goldNeeded, shortage: 0 };
+        }
+
+        function isDraftValid(draft) {
+            if (draft.length === 0) return { valid: false, reason: '請點選銀行寶石' };
+            const counts = {};
+            draft.forEach(c => counts[c] = (counts[c] || 0) + 1);
+            const uniqueColors = Object.keys(counts);
+
+            // Case A: 2 of the same color
+            if (uniqueColors.length === 1 && draft.length === 2) {
+                const color = uniqueColors[0];
+                if (state.bank[color] >= 4) {
+                    return { valid: true, reason: `拿取 2 枚${GEM_META[color].name}` };
+                } else {
+                    return { valid: false, reason: `銀行${GEM_META[color].name}不足 4 枚，不可拿 2 枚同色` };
+                }
+            }
+
+            // Case B: Up to 3 different colors
+            if (uniqueColors.length === draft.length && draft.length <= 3) {
+                const availableColorsInBank = GEM_COLORS.filter(c => state.bank[c] > 0).length;
+                const maxDiff = Math.min(3, availableColorsInBank);
+                if (draft.length === maxDiff || (draft.length < maxDiff && draft.length >= 1)) {
+                    return { valid: true, reason: `拿取 ${draft.length} 枚不同色寶石` };
+                }
+            }
+
+            return { valid: false, reason: '不符合規則：請選 3 枚異色或 2 枚同色(存量≥4)' };
+        }
+
+        function canAddTokenToDraft(color) {
+            if (color === 'gold') return false;
+            const currentP = state.players[state.currentPlayerIdx];
+            if (!currentP || currentP.isAI || state.gameOver) return false;
+
+            const inDraft = state.draftTokens.filter(c => c === color).length;
+            if (state.bank[color] - inDraft <= 0) return false;
+
+            if (state.draftTokens.length === 0) return true;
+
+            if (state.draftTokens.length === 1) {
+                const first = state.draftTokens[0];
+                if (first === color) {
+                    // Trying to take 2 of the same color: bank must have >= 4
+                    return state.bank[color] >= 4;
+                }
+                return true;
+            }
+
+            if (state.draftTokens.length === 2) {
+                // If already 2 same color, cannot add 3rd
+                if (state.draftTokens[0] === state.draftTokens[1]) return false;
+                // Must be a 3rd distinct color
+                return !state.draftTokens.includes(color);
+            }
+
+            return false;
+        }
+
+        /* ==================== Player Actions ==================== */
+        function onBankTokenClick(color) {
+            if (color === 'gold') return;
+            const currentP = state.players[state.currentPlayerIdx];
+            if (currentP.isAI || state.gameOver) return;
+
+            if (canAddTokenToDraft(color)) {
+                state.draftTokens.push(color);
+                playSound('token');
+                renderBankAndDraft();
+            } else if (state.draftTokens.includes(color)) {
+                // Clicking again removes one instance from draft
+                const idx = state.draftTokens.indexOf(color);
+                if (idx !== -1) {
+                    state.draftTokens.splice(idx, 1);
+                    playSound('token');
+                    renderBankAndDraft();
+                }
+            }
+        }
+
+        function removeDraftAtIndex(idx) {
+            state.draftTokens.splice(idx, 1);
+            playSound('token');
+            renderBankAndDraft();
+        }
+
+        function clearDraftTokens() {
+            state.draftTokens = [];
+            renderBankAndDraft();
+        }
+
+        function confirmTakeTokens() {
+            const currentP = state.players[state.currentPlayerIdx];
+            if (currentP.isAI || state.gameOver) return;
+            const check = isDraftValid(state.draftTokens);
+            if (!check.valid) return;
+
+            const takenNames = state.draftTokens.map(c => GEM_META[c].name).join('、');
+            state.draftTokens.forEach(c => {
+                state.bank[c]--;
+                currentP.tokens[c]++;
+            });
+            state.draftTokens = [];
+            playSound('token');
+            addLog(`${currentP.name} 拿取了籌碼：${takenNames}`);
+            finishPlayerAction();
+        }
+
+        function openCardActionModal(source, tier, indexOrId) {
+            const currentP = state.players[state.currentPlayerIdx];
+            if (currentP.isAI || state.gameOver) return;
+
+            let card = null;
+            if (source === 'market') {
+                card = state.market[tier][indexOrId];
+                if (!card) return;
+            } else if (source === 'reserved') {
+                card = currentP.reserved[indexOrId];
+                if (!card) return;
+            } else if (source === 'deck') {
+                if (state.decks[tier].length === 0) return;
+            }
+
+            state.selectedCardCtx = { source, tier, indexOrId, card };
+            const modal = document.getElementById('cardActionModal');
+            const title = document.getElementById('cardModalTitle');
+            const body = document.getElementById('cardModalBody');
+            const actions = document.getElementById('cardModalActions');
+
+            if (source === 'deck') {
+                title.innerHTML = `<i class="fa-solid fa-layer-group"></i> 盲抽保留 Level ${tier} 牌庫頂`;
+                const canReserve = currentP.reserved.length < 3;
+                body.innerHTML = `
+                    <p style="font-size:0.9rem;color:#cbd5e1;line-height:1.6;">
+                        牌庫剩餘 <strong>${state.decks[tier].length}</strong> 張。<br>
+                        保留牌庫頂卡牌將直接放入你的保留區，並獲得 <strong>${state.bank.gold > 0 ? '1 枚黃金萬用籌碼' : '0 枚黃金 (銀行已無黃金)'}</strong>。
+                    </p>
+                `;
+                actions.innerHTML = `
+                    <button class="modal-btn reserve" ${canReserve ? '' : 'disabled'} onclick="executeReserveCard()">
+                        <i class="fa-solid fa-bookmark"></i> ${canReserve ? '盲抽保留 (+黃金)' : '保留已達3張上限'}
+                    </button>
+                    <button class="modal-btn cancel" onclick="closeCardModal()">取消</button>
+                `;
+            } else {
+                const plan = getPaymentPlan(currentP, card);
+                const canReserve = (source === 'market' && currentP.reserved.length < 3);
+                title.innerHTML = `<i class="fa-solid fa-gem"></i> 發展卡 (${GEM_META[card.bonus].name}紅利 · +${card.points}分)`;
+
+                const costHtml = GEM_COLORS.filter(c => card.cost[c] > 0).map(c => {
+                    const raw = card.cost[c];
+                    const bonus = currentP.bonuses[c];
+                    const net = Math.max(0, raw - bonus);
+                    return `<div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);padding:4px 9px;border-radius:8px;font-size:0.82rem;">
+                        <span class="p-gem-dot ${GEM_META[c].css}">${raw}</span>
+                        <span>${GEM_META[c].name} (折扣後需 <strong>${net}</strong>)</span>
+                    </div>`;
+                }).join('');
+
+                body.innerHTML = `
+                    <div style="display:flex;flex-direction:column;gap:0.65rem;">
+                        <div style="display:flex;gap:0.45rem;flex-wrap:wrap;">${costHtml}</div>
+                        <div style="font-size:0.85rem;color:${plan.affordable ? '#34d399' : '#f87171'};font-weight:600;">
+                            ${plan.affordable
+                                ? `<i class="fa-solid fa-circle-check"></i> 可購買！${plan.goldNeeded > 0 ? `(將自動使用 ${plan.goldNeeded} 枚黃金籌碼)` : '(無需消耗黃金)'}`
+                                : `<i class="fa-solid fa-circle-xmark"></i> 寶石不足，還差 ${plan.shortage} 枚寶石/黃金`}
+                        </div>
+                    </div>
+                `;
+
+                actions.innerHTML = `
+                    <button class="modal-btn buy" ${plan.affordable ? '' : 'disabled'} onclick="executeBuyCard()">
+                        <i class="fa-solid fa-cart-shopping"></i> 購買卡牌
+                    </button>
+                    ${source === 'market' ? `
+                    <button class="modal-btn reserve" ${canReserve ? '' : 'disabled'} onclick="executeReserveCard()">
+                        <i class="fa-solid fa-bookmark"></i> ${canReserve ? '保留 (+黃金)' : '保留已滿'}
+                    </button>` : ''}
+                    <button class="modal-btn cancel" onclick="closeCardModal()">取消</button>
+                `;
+            }
+
+            modal.classList.add('show');
+        }
+
+        function closeCardModal() {
+            document.getElementById('cardActionModal').classList.remove('show');
+            state.selectedCardCtx = null;
+        }
+
+        function executeBuyCard() {
+            const ctx = state.selectedCardCtx;
+            if (!ctx) return;
+            const currentP = state.players[state.currentPlayerIdx];
+            const card = ctx.card;
+            const plan = getPaymentPlan(currentP, card);
+            if (!plan.affordable) return;
+
+            // Pay tokens back to bank
+            ALL_TOKENS.forEach(c => {
+                if (plan.spend[c] > 0) {
+                    currentP.tokens[c] -= plan.spend[c];
+                    state.bank[c] += plan.spend[c];
+                }
+            });
+
+            // Remove card from market or reserved
+            if (ctx.source === 'market') {
+                const replacement = state.decks[ctx.tier].length > 0 ? state.decks[ctx.tier].pop() : null;
+                state.market[ctx.tier][ctx.indexOrId] = replacement;
+            } else if (ctx.source === 'reserved') {
+                currentP.reserved.splice(ctx.indexOrId, 1);
+            }
+
+            // Grant card benefits
+            currentP.bonuses[card.bonus]++;
+            currentP.points += card.points;
+            currentP.purchasedCount++;
+            state.draftTokens = [];
+
+            closeCardModal();
+            playSound('buy');
+            addLog(`${currentP.name} 購買了 L${card.tier} 發展卡（+${GEM_META[card.bonus].name}紅利${card.points > 0 ? `，+${card.points}分` : ''}）`);
+            finishPlayerAction();
+        }
+
+        function executeReserveCard() {
+            const ctx = state.selectedCardCtx;
+            if (!ctx) return;
+            const currentP = state.players[state.currentPlayerIdx];
+            if (currentP.reserved.length >= 3) return;
+
+            let reservedCard = null;
+            if (ctx.source === 'market') {
+                reservedCard = state.market[ctx.tier][ctx.indexOrId];
+                const replacement = state.decks[ctx.tier].length > 0 ? state.decks[ctx.tier].pop() : null;
+                state.market[ctx.tier][ctx.indexOrId] = replacement;
+            } else if (ctx.source === 'deck') {
+                reservedCard = state.decks[ctx.tier].pop();
+            }
+
+            if (!reservedCard) return;
+            currentP.reserved.push(reservedCard);
+
+            let gotGold = false;
+            if (state.bank.gold > 0) {
+                state.bank.gold--;
+                currentP.tokens.gold++;
+                gotGold = true;
+            }
+
+            state.draftTokens = [];
+            closeCardModal();
+            playSound('reserve');
+            addLog(`${currentP.name} 保留了一張 L${ctx.tier} 發展卡${gotGold ? ' 並獲得 1 枚黃金籌碼' : ''}`);
+            finishPlayerAction();
+        }
+
+        /* ==================== Post-Action: 10-Token Cap, Noble Check & Next Turn ==================== */
+        function finishPlayerAction() {
+            const currentP = state.players[state.currentPlayerIdx];
+            const totalTokens = getPlayerTotalTokens(currentP);
+
+            if (totalTokens > 10) {
+                if (currentP.isAI) {
+                    aiReturnExcessTokens(currentP);
+                } else {
+                    openDiscardTokensModal(currentP);
+                    renderAll();
+                    return;
+                }
+            }
+
+            checkNobleVisits(currentP);
+
+            if (currentP.points >= 15 && !state.finalRoundTriggered) {
+                state.finalRoundTriggered = true;
+                addLog(`🔥 ${currentP.name} 達到 ${currentP.points} 分！觸發最終回合！`);
+            }
+
+            advanceTurn();
+        }
+
+        function openDiscardTokensModal(player) {
+            const modal = document.getElementById('discardModal');
+            const excess = getPlayerTotalTokens(player) - 10;
+            document.getElementById('discardPromptText').innerHTML =
+                `你目前持有 <strong>${getPlayerTotalTokens(player)}</strong> 枚籌碼，請點選歸還 <strong>${excess}</strong> 枚籌碼至銀行：`;
+
+            const grid = document.getElementById('discardTokensGrid');
+            grid.innerHTML = '';
+
+            ALL_TOKENS.forEach(color => {
+                for (let i = 0; i < player.tokens[color]; i++) {
+                    const btn = document.createElement('div');
+                    btn.className = `token-disc ${GEM_META[color].css}`;
+                    btn.style.cursor = 'pointer';
+                    btn.title = `歸還 1 枚${GEM_META[color].name}`;
+                    btn.innerHTML = `<i class="${GEM_META[color].icon}"></i>`;
+                    btn.onclick = () => {
+                        player.tokens[color]--;
+                        state.bank[color]++;
+                        playSound('token');
+                        if (getPlayerTotalTokens(player) > 10) {
+                            openDiscardTokensModal(player);
+                            renderAll();
+                        } else {
+                            modal.classList.remove('show');
+                            finishPlayerAction();
+                        }
+                    };
+                    grid.appendChild(btn);
+                }
+            });
+
+            modal.classList.add('show');
+        }
+
+        function aiReturnExcessTokens(aiPlayer) {
+            while (getPlayerTotalTokens(aiPlayer) > 10) {
+                // Return non-gold token with highest count or least needed
+                const candidates = GEM_COLORS.filter(c => aiPlayer.tokens[c] > 0);
+                const pick = candidates.length > 0
+                    ? candidates.sort((a, b) => aiPlayer.tokens[b] - aiPlayer.tokens[a])[0]
+                    : 'gold';
+                aiPlayer.tokens[pick]--;
+                state.bank[pick]++;
+                addLog(`${aiPlayer.name} 歸還了 1 枚超額的${GEM_META[pick].name}籌碼`);
+            }
+        }
+
+        function checkNobleVisits(player) {
+            for (let i = 0; i < state.nobles.length; i++) {
+                const noble = state.nobles[i];
+                const qualifies = GEM_COLORS.every(c => (player.bonuses[c] || 0) >= (noble.req[c] || 0));
+                if (qualifies) {
+                    state.nobles.splice(i, 1);
+                    player.nobles.push(noble);
+                    player.points += noble.points;
+                    playSound('noble');
+                    addLog(`👑 貴族【${noble.name}】造訪了 ${player.name}！獲得 +${noble.points} 聲望分！`);
+                    break; // Max 1 noble per turn per official rules
+                }
+            }
+        }
+
+        function advanceTurn() {
+            const nextIdx = (state.currentPlayerIdx + 1) % state.players.length;
+            if (nextIdx === 0) {
+                // Completed a full round where all players had equal turns
+                if (state.finalRoundTriggered) {
+                    endGame();
+                    return;
+                }
+                state.roundNumber++;
+            }
+
+            state.currentPlayerIdx = nextIdx;
+            renderAll();
+
+            const nextPlayer = state.players[state.currentPlayerIdx];
+            if (nextPlayer.isAI && !state.gameOver) {
+                clearPendingAITimer();
+                aiTimer = setTimeout(() => executeAITurn(nextPlayer), 750);
+            }
+        }
+
+        /* ==================== Smart AI Decision Engine ==================== */
+        function executeAITurn(ai) {
+            if (state.gameOver) return;
+
+            const diff = state.difficulty;
+            // 1. Collect all affordable cards from market + AI's reserved hand
+            const buyOptions = [];
+            [1, 2, 3].forEach(tier => {
+                state.market[tier].forEach((card, idx) => {
+                    if (!card) return;
+                    const plan = getPaymentPlan(ai, card);
+                    if (plan.affordable) {
+                        buyOptions.push({ source: 'market', tier, index: idx, card, plan });
+                    }
+                });
+            });
+            ai.reserved.forEach((card, idx) => {
+                const plan = getPaymentPlan(ai, card);
+                if (plan.affordable) {
+                    buyOptions.push({ source: 'reserved', tier: card.tier, index: idx, card, plan });
+                }
+            });
+
+            if (buyOptions.length > 0) {
+                // Score each affordable card
+                buyOptions.sort((a, b) => scoreCardForAI(ai, b.card, diff) - scoreCardForAI(ai, a.card, diff));
+                const best = buyOptions[0];
+                ALL_TOKENS.forEach(c => {
+                    if (best.plan.spend[c] > 0) {
+                        ai.tokens[c] -= best.plan.spend[c];
+                        state.bank[c] += best.plan.spend[c];
+                    }
+                });
+
+                if (best.source === 'market') {
+                    state.market[best.tier][best.index] = state.decks[best.tier].length > 0 ? state.decks[best.tier].pop() : null;
+                } else {
+                    ai.reserved.splice(best.index, 1);
+                }
+
+                ai.bonuses[best.card.bonus]++;
+                ai.points += best.card.points;
+                ai.purchasedCount++;
+                playSound('buy');
+                addLog(`${ai.name} 購買了 L${best.card.tier} 發展卡（+${GEM_META[best.card.bonus].name}紅利${best.card.points > 0 ? `，+${best.card.points}分` : ''}）`);
+                finishPlayerAction();
+                return;
+            }
+
+            // 2. Identify target card to work toward
+            const targetCards = [];
+            [1, 2, 3].forEach(tier => {
+                state.market[tier].forEach((card, idx) => {
+                    if (!card) return;
+                    const plan = getPaymentPlan(ai, card);
+                    targetCards.push({ source: 'market', tier, index: idx, card, shortage: plan.shortage });
+                });
+            });
+
+            // Hard/Normal AI may reserve a high-point card if shortage is small and bank has gold
+            if (diff !== 'easy' && ai.reserved.length < 3 && state.bank.gold > 0) {
+                const highValueTarget = targetCards
+                    .filter(t => t.card.points >= 2 && t.shortage <= 3)
+                    .sort((a, b) => b.card.points - a.card.points)[0];
+
+                if (highValueTarget && Math.random() < (diff === 'hard' ? 0.65 : 0.35)) {
+                    const rCard = highValueTarget.card;
+                    state.market[highValueTarget.tier][highValueTarget.index] =
+                        state.decks[highValueTarget.tier].length > 0 ? state.decks[highValueTarget.tier].pop() : null;
+                    ai.reserved.push(rCard);
+                    state.bank.gold--;
+                    ai.tokens.gold++;
+                    playSound('reserve');
+                    addLog(`${ai.name} 保留了一張 L${rCard.tier} 高價值發展卡並獲得 1 枚黃金籌碼`);
+                    finishPlayerAction();
+                    return;
+                }
+            }
+
+            // 3. Calculate most needed gem colors
+            const colorDesire = { white: 1, blue: 1, green: 1, red: 1, black: 1 };
+            const allTargets = [...ai.reserved.map(c => ({ card: c, shortage: getPaymentPlan(ai, c).shortage })), ...targetCards];
+            allTargets.sort((a, b) => a.shortage - b.shortage);
+
+            allTargets.slice(0, 4).forEach((t, rank) => {
+                const weight = 4 - rank;
+                GEM_COLORS.forEach(c => {
+                    const needed = Math.max(0, (t.card.cost[c] || 0) - ai.bonuses[c] - ai.tokens[c]);
+                    if (needed > 0) colorDesire[c] += needed * weight;
+                });
+            });
+
+            const availableColors = GEM_COLORS.filter(c => state.bank[c] > 0)
+                .sort((a, b) => colorDesire[b] - colorDesire[a]);
+
+            if (availableColors.length >= 3) {
+                const picked = availableColors.slice(0, 3);
+                picked.forEach(c => {
+                    state.bank[c]--;
+                    ai.tokens[c]++;
+                });
+                playSound('token');
+                addLog(`${ai.name} 拿取了 3 枚籌碼：${picked.map(c => GEM_META[c].name).join('、')}`);
+                finishPlayerAction();
+                return;
+            }
+
+            // Check if can take 2 of same color
+            const doubleColor = GEM_COLORS.filter(c => state.bank[c] >= 4)
+                .sort((a, b) => colorDesire[b] - colorDesire[a])[0];
+            if (doubleColor) {
+                state.bank[doubleColor] -= 2;
+                ai.tokens[doubleColor] += 2;
+                playSound('token');
+                addLog(`${ai.name} 拿取了 2 枚${GEM_META[doubleColor].name}籌碼`);
+                finishPlayerAction();
+                return;
+            }
+
+            if (availableColors.length > 0) {
+                const picked = availableColors.slice(0, Math.min(3, availableColors.length));
+                picked.forEach(c => {
+                    state.bank[c]--;
+                    ai.tokens[c]++;
+                });
+                playSound('token');
+                addLog(`${ai.name} 拿取了籌碼：${picked.map(c => GEM_META[c].name).join('、')}`);
+                finishPlayerAction();
+                return;
+            }
+
+            // Fallback: reserve any available market card if possible
+            if (ai.reserved.length < 3 && targetCards.length > 0) {
+                const pick = targetCards[0];
+                state.market[pick.tier][pick.index] =
+                    state.decks[pick.tier].length > 0 ? state.decks[pick.tier].pop() : null;
+                ai.reserved.push(pick.card);
+                if (state.bank.gold > 0) {
+                    state.bank.gold--;
+                    ai.tokens.gold++;
+                }
+                playSound('reserve');
+                addLog(`${ai.name} 保留了一張 L${pick.tier} 發展卡`);
+            } else {
+                addLog(`${ai.name} 本回合無可執行行動，跳過回合`);
+            }
+            finishPlayerAction();
+        }
+
+        function scoreCardForAI(ai, card, diff) {
+            let score = card.points * 12;
+            // Bonus value for nobles
+            state.nobles.forEach(noble => {
+                const req = noble.req[card.bonus] || 0;
+                if (req > 0 && ai.bonuses[card.bonus] < req) {
+                    score += 6;
+                }
+            });
+            // Early game discount engine value
+            if (ai.purchasedCount < 6) {
+                score += 5;
+            }
+            if (diff === 'easy') {
+                score += (Math.random() * 10 - 5);
+            }
+            return score;
+        }
+
+        function endGame() {
+            state.gameOver = true;
+            clearPendingAITimer();
+            playSound('win');
+
+            const ranked = [...state.players].sort((a, b) => {
+                if (b.points !== a.points) return b.points - a.points;
+                return a.purchasedCount - b.purchasedCount; // Official tiebreaker: fewer cards wins
+            });
+
+            const winner = ranked[0];
+            addLog(`🏆 遊戲結束！由 ${winner.name} 以 ${winner.points} 點聲望獲勝！`);
+            renderAll();
+
+            document.getElementById('winnerTitle').innerHTML = `<i class="fa-solid fa-trophy"></i> 恭喜 ${winner.name} 奪得皇家桂冠！`;
+            const body = document.getElementById('gameOverBody');
+            body.innerHTML = ranked.map((p, idx) => `
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:0.85rem 1rem;border-radius:12px;background:${idx === 0 ? 'rgba(245, 158, 11, 0.2)' : 'rgba(30, 41, 59, 0.7)'};border:1px solid ${idx === 0 ? '#fde047' : 'rgba(255,255,255,0.1)'};">
+                    <div>
+                        <div style="font-weight:800;font-size:1rem;color:${idx === 0 ? '#fde047' : '#f8fafc'};">
+                            #${idx + 1} ${p.name}
+                        </div>
+                        <div style="font-size:0.78rem;color:#94a3b8;margin-top:3px;">
+                            已購發展卡：${p.purchasedCount} 張 ｜ 貴族造訪：${p.nobles.length} 位
+                        </div>
+                    </div>
+                    <div style="font-family:'Outfit',sans-serif;font-size:1.5rem;font-weight:800;color:#fde047;">
+                        ${p.points} 分
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('gameOverModal').classList.add('show');
+        }
+
+        /* ==================== UI Rendering ==================== */
+        function renderAll() {
+            renderStatusBanner();
+            renderBankAndDraft();
+            renderNobles();
+            renderMarketTiers();
+            renderPlayers();
+        }
+
+        function renderStatusBanner() {
+            const currentP = state.players[state.currentPlayerIdx];
+            const statusEl = document.getElementById('turnStatusText');
+            if (state.gameOver) {
+                statusEl.innerHTML = `<i class="fa-solid fa-flag-checkered" style="color:#fde047;"></i> <span>對局已結束 — 點擊「新局開始」再次挑戰</span>`;
+            } else {
+                statusEl.innerHTML = `
+                    <i class="fa-solid ${currentP.isAI ? 'fa-robot' : 'fa-user-crown'}" style="color:#fde047;"></i>
+                    <span>第 ${state.roundNumber} 回合 ｜ 當前行動：<strong style="color:#fde047;">${currentP.name}</strong> ${currentP.isAI ? '(AI 思考中...)' : '(請選擇拿取寶石或點擊發展卡)'}</span>
+                `;
+            }
+            document.getElementById('finalRoundBadge').style.display = state.finalRoundTriggered ? 'inline-block' : 'none';
+        }
+
+        function renderBankAndDraft() {
+            const listEl = document.getElementById('bankTokensList');
+            listEl.innerHTML = '';
+
+            ALL_TOKENS.forEach(color => {
+                const inDraft = state.draftTokens.filter(c => c === color).length;
+                const remaining = state.bank[color] - inDraft;
+                const canClick = color !== 'gold' && (canAddTokenToDraft(color) || inDraft > 0);
+
+                const row = document.createElement('div');
+                row.className = `bank-token-row ${!canClick ? 'disabled' : ''}`;
+                row.onclick = () => onBankTokenClick(color);
+
+                const ruleSub = color === 'gold'
+                    ? '保留發展卡時自動獲得'
+                    : (state.bank[color] >= 4 ? '可拿1枚異色 或 2枚同色' : '存量<4，僅可拿1枚異色');
+
+                row.innerHTML = `
+                    <div class="token-Left">
+                        <div class="token-disc ${GEM_META[color].css}">
+                            <i class="${GEM_META[color].icon}"></i>
+                        </div>
+                        <div class="token-label-group">
+                            <span class="token-name">${GEM_META[color].name}</span>
+                            <span class="token-rule-sub">${ruleSub}</span>
+                        </div>
+                    </div>
+                    <div class="token-count-pill">${remaining}</div>
+                `;
+                listEl.appendChild(row);
+            });
+
+            // Render draft basket
+            const chipsEl = document.getElementById('draftChips');
+            chipsEl.innerHTML = '';
+            if (state.draftTokens.length === 0) {
+                chipsEl.innerHTML = `<span style="font-size:0.78rem;color:#64748b;">點擊上方五色寶石加入預選籃...</span>`;
+            } else {
+                state.draftTokens.forEach((c, idx) => {
+                    const chip = document.createElement('div');
+                    chip.className = `draft-chip ${GEM_META[c].css}`;
+                    chip.title = '點擊移除';
+                    chip.innerHTML = `<i class="${GEM_META[c].icon}"></i>`;
+                    chip.onclick = () => removeDraftAtIndex(idx);
+                    chipsEl.appendChild(chip);
+                });
+            }
+
+            const check = isDraftValid(state.draftTokens);
+            document.getElementById('draftRuleHint').textContent = check.reason;
+            document.getElementById('confirmDraftBtn').disabled = !check.valid;
+        }
+
+        function renderNobles() {
+            const bar = document.getElementById('noblesBar');
+            bar.innerHTML = '';
+            if (state.nobles.length === 0) {
+                bar.innerHTML = `<span style="font-size:0.82rem;color:#94a3b8;">所有貴族皆已造訪完畢</span>`;
+                return;
+            }
+
+            state.nobles.forEach(noble => {
+                const reqHtml = GEM_COLORS.filter(c => noble.req[c] > 0).map(c => `
+                    <div class="noble-req-badge ${GEM_META[c].css}" title="需要 ${noble.req[c]} 張${GEM_META[c].name}發展卡紅利">
+                        ${noble.req[c]}
+                    </div>
+                `).join('');
+
+                const div = document.createElement('div');
+                div.className = 'noble-tile';
+                div.innerHTML = `
+                    <div class="noble-top">
+                        <span class="noble-pts">+${noble.points}</span>
+                        <i class="fa-solid fa-crown" style="color:#fde047;font-size:0.85rem;"></i>
+                    </div>
+                    <div class="noble-name">${noble.name}</div>
+                    <div class="noble-reqs">${reqHtml}</div>
+                `;
+                bar.appendChild(div);
+            });
+        }
+
+        function renderMarketTiers() {
+            const wrapper = document.getElementById('tiersWrapper');
+            wrapper.innerHTML = '';
+            const currentP = state.players[state.currentPlayerIdx];
+
+            [3, 2, 1].forEach(tier => {
+                const row = document.createElement('div');
+                row.className = 'tier-row';
+
+                // Deck card
+                const deckCount = state.decks[tier].length;
+                const dotsHtml = Array(tier).fill('<span class="deck-dot"></span>').join('');
+                const deckEl = document.createElement('div');
+                deckEl.className = `deck-card tier-${tier}`;
+                deckEl.onclick = () => openCardActionModal('deck', tier, 0);
+                deckEl.innerHTML = `
+                    <div class="deck-dots">${dotsHtml}</div>
+                    <div class="deck-count">${deckCount}</div>
+                    <div class="deck-hint">${deckCount > 0 ? '點擊盲抽保留' : '牌庫已空'}</div>
+                `;
+                row.appendChild(deckEl);
+
+                // 4 Face-up cards
+                state.market[tier].forEach((card, idx) => {
+                    if (!card) {
+                        const empty = document.createElement('div');
+                        empty.className = 'dev-card';
+                        empty.style.opacity = '0.25';
+                        empty.style.cursor = 'default';
+                        empty.innerHTML = `<div style="margin:auto;font-size:0.8rem;color:#94a3b8;">空位</div>`;
+                        row.appendChild(empty);
+                        return;
+                    }
+
+                    const plan = (!currentP.isAI && !state.gameOver) ? getPaymentPlan(currentP, card) : { affordable: false };
+                    const cardEl = document.createElement('div');
+                    cardEl.className = `dev-card theme-${card.bonus} ${plan.affordable ? 'affordable' : ''}`;
+                    cardEl.onclick = () => openCardActionModal('market', tier, idx);
+
+                    const costsHtml = GEM_COLORS.filter(c => card.cost[c] > 0).map(c => `
+                        <div class="cost-circle ${GEM_META[c].css}" title="${GEM_META[c].name}成本 ${card.cost[c]}">
+                            ${card.cost[c]}
+                        </div>
+                    `).join('');
+
+                    cardEl.innerHTML = `
+                        <div class="card-header">
+                            <div class="card-points">${card.points > 0 ? card.points : ''}</div>
+                            <div class="card-gem-bonus ${GEM_META[card.bonus].css}" title="永久提供 +1 ${GEM_META[card.bonus].name}折扣">
+                                <i class="${GEM_META[card.bonus].icon}"></i>
+                            </div>
+                        </div>
+                        <div class="card-costs">${costsHtml}</div>
+                    `;
+                    row.appendChild(cardEl);
+                });
+
+                wrapper.appendChild(row);
+            });
+        }
+
+        function renderPlayers() {
+            const stack = document.getElementById('playersStack');
+            stack.innerHTML = '';
+
+            state.players.forEach((p, idx) => {
+                const isTurn = (idx === state.currentPlayerIdx && !state.gameOver);
+                const card = document.createElement('div');
+                card.className = `player-card ${isTurn ? 'active-turn' : ''}`;
+
+                const gemsGridHtml = ALL_TOKENS.map(color => {
+                    const tCount = p.tokens[color];
+                    const bCount = color === 'gold' ? null : p.bonuses[color];
+                    return `
+                        <div class="p-gem-cell" title="${GEM_META[color].name}：籌碼 ${tCount}${bCount !== null ? ` / 永久紅利 +${bCount}` : ''}">
+                            <div class="p-gem-dot ${GEM_META[color].css}">
+                                <i class="${GEM_META[color].icon}"></i>
+                            </div>
+                            <div class="p-gem-nums">
+                                ${tCount}${bCount !== null ? ` <span class="p-gem-bonus">(+${bCount})</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                let reservedHtml = '';
+                if (p.reserved.length > 0) {
+                    const items = p.reserved.map((rCard, rIdx) => {
+                        const canInteract = (idx === state.currentPlayerIdx && !p.isAI && !state.gameOver);
+                        const plan = canInteract ? getPaymentPlan(p, rCard) : { affordable: false };
+                        const miniCosts = GEM_COLORS.filter(c => rCard.cost[c] > 0)
+                            .map(c => `${GEM_META[c].name[0]}${rCard.cost[c]}`).join(' ');
+                        return `
+                            <div class="reserved-mini-card"
+                                 style="${plan.affordable ? 'border-color:#34d399;box-shadow:0 0 8px rgba(52,211,153,0.35);' : ''}"
+                                 onclick="${canInteract ? `openCardActionModal('reserved', ${rCard.tier}, ${rIdx})` : ''}">
+                                <div style="display:flex;justify-content:space-between;font-weight:800;">
+                                    <span>L${rCard.tier} ${GEM_META[rCard.bonus].name}</span>
+                                    <span style="color:#fde047;">${rCard.points > 0 ? `+${rCard.points}分` : ''}</span>
+                                </div>
+                                <div style="font-size:0.66rem;color:#94a3b8;">需: ${miniCosts}</div>
+                            </div>
+                        `;
+                    }).join('');
+                    reservedHtml = `<div class="reserved-strip">${items}</div>`;
+                }
+
+                card.innerHTML = `
+                    <div class="player-top">
+                        <div class="player-identity">
+                            <i class="fa-solid ${p.isAI ? 'fa-robot' : 'fa-user'}" style="color:${isTurn ? '#fde047' : '#60a5fa'};"></i>
+                            <span>${p.name}</span>
+                        </div>
+                        <div class="player-score-badge">
+                            <i class="fa-solid fa-star"></i> ${p.points} 分
+                        </div>
+                    </div>
+                    <div class="player-gems-grid">${gemsGridHtml}</div>
+                    <div class="player-meta-row">
+                        <span>籌碼合計: <strong>${getPlayerTotalTokens(p)}/10</strong></span>
+                        <span>已購卡: <strong>${p.purchasedCount}</strong> ｜ 貴族: <strong>${p.nobles.length}</strong> ｜ 保留: <strong>${p.reserved.length}/3</strong></span>
+                    </div>
+                    ${reservedHtml}
+                `;
+                stack.appendChild(card);
+            });
+        }
+
+        function openRulesModal() {
+            document.getElementById('rulesModal').classList.add('show');
+        }
+        function closeRulesModal() {
+            document.getElementById('rulesModal').classList.remove('show');
+        }
+        function closeGameOverModal() {
+            document.getElementById('gameOverModal').classList.remove('show');
+        }
+
+        document.getElementById('modeSelect').addEventListener('change', startNewGame);
+        document.getElementById('diffSelect').addEventListener('change', () => {
+            state.difficulty = document.getElementById('diffSelect').value;
+        });
+
+        window.addEventListener('DOMContentLoaded', startNewGame);
+    </script>
+</body>
+</html>

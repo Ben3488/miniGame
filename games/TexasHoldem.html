@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>皇家德州撲克 Texas Hold'em</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-panel: rgba(15, 23, 42, 0.82);
+            --border-glass: rgba(148, 163, 184, 0.2);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --gold: #f59e0b;
+            --neon-emerald: #10b981;
+            --neon-blue: #38bdf8;
+            --neon-red: #f43f5e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(circle at 18% 15%, rgba(16, 185, 129, 0.12), transparent 38%),
+                radial-gradient(circle at 82% 85%, rgba(245, 158, 11, 0.1), transparent 38%),
+                radial-gradient(circle at 50% 50%, #0f172a 0%, #090d16 100%);
+            font-family: 'Inter', 'Outfit', sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header Bar */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 22px;
+            background: rgba(9, 13, 22, 0.88);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border-glass);
+            z-index: 40;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(16, 185, 129, 0.18);
+            border-color: var(--neon-emerald);
+            transform: translateX(-2px);
+        }
+
+        .game-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #34d399, #fde047, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .controls-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .ctrl-select, .ctrl-btn {
+            background: rgba(30, 41, 59, 0.88);
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+            padding: 7px 12px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.84rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ctrl-select:hover, .ctrl-btn:hover {
+            border-color: var(--neon-emerald);
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .ctrl-btn.gold-btn {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(217, 119, 6, 0.22));
+            border-color: rgba(245, 158, 11, 0.5);
+            color: #fde68a;
+        }
+
+        /* Main Table Stage */
+        .stage-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px 18px;
+            max-width: 1320px;
+            width: 100%;
+            margin: 0 auto;
+            gap: 12px;
+        }
+
+        .status-strip {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-size: 0.86rem;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .street-pill {
+            background: rgba(16, 185, 129, 0.16);
+            border: 1px solid rgba(16, 185, 129, 0.45);
+            color: #6ee7b7;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            padding: 3px 12px;
+            border-radius: 999px;
+        }
+
+        /* Poker Table Felt */
+        .poker-arena {
+            position: relative;
+            width: 100%;
+            min-height: 490px;
+            background:
+                radial-gradient(ellipse at center, #065f46 0%, #064e3b 52%, #022c22 88%, #0f172a 100%);
+            border: 12px solid #1e293b;
+            box-shadow:
+                0 25px 65px rgba(0, 0, 0, 0.8),
+                inset 0 0 0 2px rgba(245, 158, 11, 0.38),
+                inset 0 0 60px rgba(0, 0, 0, 0.65);
+            border-radius: 210px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        /* Center Community Area */
+        .table-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            z-index: 5;
+        }
+
+        .pot-banner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(9, 13, 22, 0.78);
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            padding: 6px 18px;
+            border-radius: 999px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #fde047;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+        }
+
+        .community-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 98px;
+        }
+
+        .card-slot {
+            width: 68px;
+            height: 96px;
+            border-radius: 10px;
+            border: 1.5px dashed rgba(255, 255, 255, 0.22);
+            background: rgba(0, 0, 0, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Playing Cards */
+        .playing-card {
+            width: 68px;
+            height: 96px;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #ffffff, #f1f5f9);
+            border: 1.5px solid #cbd5e1;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.45);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 6px 7px;
+            font-family: 'Outfit', sans-serif;
+            position: relative;
+            animation: dealPop 0.24s cubic-bezier(0.2, 0.9, 0.3, 1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .playing-card.small-card {
+            width: 56px;
+            height: 80px;
+            padding: 5px 6px;
+        }
+
+        .playing-card.red-suit {
+            color: #e11d48;
+        }
+
+        .playing-card.black-suit {
+            color: #0f172a;
+        }
+
+        .playing-card.highlight-best {
+            border: 2.5px solid #f59e0b;
+            box-shadow: 0 0 18px rgba(245, 158, 11, 0.85);
+            transform: translateY(-6px);
+        }
+
+        .playing-card.card-back {
+            background: repeating-linear-gradient(
+                45deg,
+                #1e3a8a,
+                #1e3a8a 6px,
+                #172554 6px,
+                #172554 12px
+            );
+            border: 2px solid #93c5fd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .playing-card.card-back::after {
+            content: '\f005';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: rgba(147, 197, 253, 0.45);
+            font-size: 1.3rem;
+        }
+
+        @keyframes dealPop {
+            from { opacity: 0; transform: translateY(-16px) scale(0.85); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .card-corner-top {
+            font-size: 0.95rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .playing-card.small-card .card-corner-top {
+            font-size: 0.82rem;
+        }
+
+        .card-center-suit {
+            font-size: 1.7rem;
+            align-self: center;
+            line-height: 1;
+        }
+
+        .playing-card.small-card .card-center-suit {
+            font-size: 1.35rem;
+        }
+
+        .card-corner-bot {
+            font-size: 0.8rem;
+            font-weight: 700;
+            align-self: flex-end;
+            line-height: 1;
+        }
+
+        .table-announcement {
+            font-size: 0.9rem;
+            color: #ecfdf5;
+            background: rgba(9, 13, 22, 0.68);
+            padding: 5px 15px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            text-align: center;
+            max-width: 520px;
+        }
+
+        /* Seats Around the Table */
+        .seat {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.88);
+            border: 1.5px solid rgba(148, 163, 184, 0.28);
+            border-radius: 16px;
+            padding: 10px 14px;
+            min-width: 210px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
+            transition: all 0.25s ease;
+            z-index: 10;
+        }
+
+        .seat.active-seat {
+            border-color: #fde047;
+            box-shadow: 0 0 22px rgba(253, 224, 71, 0.55);
+        }
+
+        .seat.folded-seat {
+            opacity: 0.48;
+            filter: grayscale(0.65);
+        }
+
+        .seat.winner-seat {
+            border-color: #10b981;
+            box-shadow: 0 0 28px rgba(16, 185, 129, 0.8);
+        }
+
+        /* 4 Seat Positions: 0 Bottom (Human), 1 Left AI, 2 Top AI, 3 Right AI */
+        .seat-0 {
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 270px;
+        }
+        .seat-1 {
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .seat-2 {
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .seat-3 {
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .seat-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .seat-name {
+            font-weight: 700;
+            font-size: 0.92rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .role-badges {
+            display: flex;
+            gap: 4px;
+        }
+
+        .role-chip {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 999px;
+        }
+
+        .role-d { background: #fde047; color: #090d16; }
+        .role-sb { background: #38bdf8; color: #090d16; }
+        .role-bb { background: #f43f5e; color: #fff; }
+
+        .seat-body {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .hole-cards {
+            display: flex;
+            gap: 6px;
+        }
+
+        .seat-stats {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 3px;
+        }
+
+        .stack-val {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fde68a;
+        }
+
+        .bet-chip {
+            font-size: 0.76rem;
+            color: #6ee7b7;
+            background: rgba(16, 185, 129, 0.16);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+
+        .action-tag {
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: #38bdf8;
+        }
+
+        .hand-rank-badge {
+            margin-top: 6px;
+            text-align: center;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 8px;
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #bae6fd;
+        }
+
+        /* Bottom Control Deck */
+        .control-deck {
+            width: 100%;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+            backdrop-filter: blur(14px);
+        }
+
+        .action-btn-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .poker-btn {
+            padding: 10px 18px;
+            border-radius: 11px;
+            border: 1px solid transparent;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.18s ease;
+            color: #fff;
+        }
+
+        .poker-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .poker-btn.fold {
+            background: linear-gradient(135deg, #e11d48, #be123c);
+        }
+        .poker-btn.check-call {
+            background: linear-gradient(135deg, #0284c7, #1d4ed8);
+        }
+        .poker-btn.raise {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+        .poker-btn.allin {
+            background: linear-gradient(135deg, #d97706, #b45309);
+        }
+        .poker-btn.next-hand {
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            box-shadow: 0 0 18px rgba(245, 158, 11, 0.45);
+        }
+
+        .poker-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .raise-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .quick-bet-btn {
+            background: rgba(51, 65, 85, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            color: #e2e8f0;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .quick-bet-btn:hover:not(:disabled) {
+            border-color: var(--gold);
+            color: #fde047;
+        }
+
+        .quick-bet-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .raise-slider {
+            width: 140px;
+            accent-color: #10b981;
+            cursor: pointer;
+        }
+
+        .raise-amount-box {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: #6ee7b7;
+            min-width: 85px;
+            font-size: 0.95rem;
+        }
+
+        /* Modal for Hand Ranking Guide */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(9, 13, 22, 0.82);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 20px;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #0f172a;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            border-radius: 18px;
+            max-width: 520px;
+            width: 100%;
+            padding: 22px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        .rank-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 6px;
+            margin: 14px 0;
+            font-size: 0.84rem;
+        }
+
+        .rank-row {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(30, 41, 59, 0.75);
+            padding: 7px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-glass);
+        }
+
+        @media (max-width: 960px) {
+            .poker-arena {
+                border-radius: 36px;
+                min-height: 620px;
+                padding: 16px;
+                justify-content: space-between;
+            }
+            .seat {
+                position: static;
+                transform: none !important;
+                width: 100%;
+                max-width: 320px;
+            }
+            .opponents-mobile-row {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="top-bar">
+        <div class="brand-group">
+            <a href="../index.html?zone=games" class="back-link">
+                <i class="fa-solid fa-arrow-left"></i> 返回遊戲大廳
+            </a>
+            <div class="game-title">
+                <i class="fa-solid fa-spade"></i> 皇家德州撲克 TEXAS HOLD'EM
+            </div>
+        </div>
+
+        <div class="controls-bar">
+            <select id="stakesSelect" class="ctrl-select" title="選擇盲注級別">
+                <option value="20" selected>菁英桌 ($2,000｜盲注 $10/$20)</option>
+                <option value="50">大師桌 ($5,000｜盲注 $25/$50)</option>
+                <option value="100">傳奇豪客桌 ($10,000｜盲注 $50/$100)</option>
+            </select>
+
+            <button id="rebuyBtn" class="ctrl-btn" title="補充籌碼">
+                <i class="fa-solid fa-coins"></i> 免費補碼
+            </button>
+
+            <button id="guideBtn" class="ctrl-btn" title="牌型大小表">
+                <i class="fa-solid fa-list-ol"></i> 牌型表
+            </button>
+
+            <button id="muteBtn" class="ctrl-btn" title="切換音效">
+                <i class="fa-solid fa-volume-high"></i> 音效
+            </button>
+
+            <button id="resetGameBtn" class="ctrl-btn gold-btn">
+                <i class="fa-solid fa-rotate-right"></i> 重新開局
+            </button>
+        </div>
+    </header>
+
+    <main class="stage-wrap">
+        <div class="status-strip">
+            <div>
+                <span class="street-pill" id="streetLabel">PRE-FLOP 翻牌前</span>
+                <span style="margin-left:10px;color:#cbd5e1;" id="handCounter">第 1 局</span>
+            </div>
+            <div id="blindsInfo" style="color:#94a3b8;">小盲 $10 ／ 大盲 $20｜無限注 No-Limit</div>
+        </div>
+
+        <section class="poker-arena" id="pokerArena">
+            <!-- AI Seats Wrapper (for responsive layout) -->
+            <div class="opponents-mobile-row" style="display:contents;">
+                <div class="seat seat-1" id="seat-1"></div>
+                <div class="seat seat-2" id="seat-2"></div>
+                <div class="seat seat-3" id="seat-3"></div>
+            </div>
+
+            <!-- Center Felt: Pot & 5 Community Cards -->
+            <div class="table-center">
+                <div class="pot-banner">
+                    <i class="fa-solid fa-sack-dollar"></i>
+                    <span id="potDisplay">底池 Pot: $0</span>
+                </div>
+
+                <div class="community-row" id="communityRow">
+                    <div class="card-slot"></div>
+                    <div class="card-slot"></div>
+                    <div class="card-slot"></div>
+                    <div class="card-slot"></div>
+                    <div class="card-slot"></div>
+                </div>
+
+                <div class="table-announcement" id="tableAnnouncement">
+                    準備發牌...
+                </div>
+            </div>
+
+            <!-- Human Player Seat (Seat 0) -->
+            <div class="seat seat-0" id="seat-0"></div>
+        </section>
+
+        <!-- Bottom Action Bar -->
+        <section class="control-deck">
+            <div class="action-btn-group">
+                <button class="poker-btn fold" id="foldBtn" disabled>
+                    <i class="fa-solid fa-xmark"></i> 棄牌 Fold
+                </button>
+                <button class="poker-btn check-call" id="checkCallBtn" disabled>
+                    <i class="fa-solid fa-check"></i> 過牌 Check
+                </button>
+                <button class="poker-btn raise" id="raiseBtn" disabled>
+                    <i class="fa-solid fa-arrow-up"></i> 加注 Raise
+                </button>
+                <button class="poker-btn allin" id="allinBtn" disabled>
+                    <i class="fa-solid fa-fire"></i> 全下 All-In
+                </button>
+                <button class="poker-btn next-hand" id="nextHandBtn" style="display:none;">
+                    <i class="fa-solid fa-play"></i> 下一局 Next Hand
+                </button>
+            </div>
+
+            <div class="raise-controls">
+                <button class="quick-bet-btn" id="qMinBtn" disabled>最小加注</button>
+                <button class="quick-bet-btn" id="qHalfPotBtn" disabled>1/2 底池</button>
+                <button class="quick-bet-btn" id="qPotBtn" disabled>滿池 Pot</button>
+                <input type="range" id="raiseSlider" class="raise-slider" min="20" max="2000" step="10" value="40" disabled>
+                <span class="raise-amount-box" id="raiseAmountLabel">加注至 $40</span>
+            </div>
+        </section>
+    </main>
+
+    <!-- Hand Ranks Modal -->
+    <div class="modal-backdrop" id="guideModal">
+        <div class="modal-box">
+            <h2 style="font-family:'Outfit',sans-serif;color:#fde047;text-align:center;">德州撲克 10 大牌型大小</h2>
+            <p style="text-align:center;color:#94a3b8;font-size:0.84rem;margin-top:4px;">由 2 張底牌 + 5 張公牌中自動挑選最強 5 張組合</p>
+            <div class="rank-grid">
+                <div class="rank-row"><strong>1. 皇家同花順 Royal Flush</strong><span>同花色 A K Q J 10</span></div>
+                <div class="rank-row"><strong>2. 同花順 Straight Flush</strong><span>同花色連續 5 張牌</span></div>
+                <div class="rank-row"><strong>3. 四條 Four of a Kind</strong><span>4 張同點數 + 1 張踢腳</span></div>
+                <div class="rank-row"><strong>4. 葫蘆 Full House</strong><span>3 張同點數 + 1 對</span></div>
+                <div class="rank-row"><strong>5. 同花 Flush</strong><span>任意 5 張同花色</span></div>
+                <div class="rank-row"><strong>6. 順子 Straight</strong><span>任意花色連續 5 張 (含 A-2-3-4-5)</span></div>
+                <div class="rank-row"><strong>7. 三條 Three of a Kind</strong><span>3 張同點數 + 2 張單牌</span></div>
+                <div class="rank-row"><strong>8. 兩對 Two Pair</strong><span>2 組對子 + 1 張踢腳</span></div>
+                <div class="rank-row"><strong>9. 一對 One Pair</strong><span>1 組對子 + 3 張單牌</span></div>
+                <div class="rank-row"><strong>10. 高牌 High Card</strong><span>比最大單張點數 (A 最大)</span></div>
+            </div>
+            <div style="text-align:center;">
+                <button class="poker-btn check-call" id="closeGuideBtn">我知道了</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================
+           Web Audio Synthesizer
+           ========================================== */
+        class PokerAudio {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+            }
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+            }
+            tone(freq, type = 'sine', dur = 0.1, vol = 0.12, delay = 0) {
+                if (this.muted) return;
+                this.init();
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime + delay;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, now);
+                gain.gain.setValueAtTime(vol, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + dur);
+            }
+            card() { this.tone(680, 'triangle', 0.055, 0.09, 0); }
+            chip() {
+                this.tone(920, 'sine', 0.06, 0.1, 0);
+                this.tone(1240, 'sine', 0.08, 0.1, 0.04);
+            }
+            check() { this.tone(320, 'sine', 0.08, 0.1, 0); }
+            fold() { this.tone(210, 'sawtooth', 0.12, 0.09, 0); }
+            win() {
+                [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+                    this.tone(f, 'triangle', 0.2, 0.14, i * 0.09);
+                });
+            }
+        }
+
+        const sfx = new PokerAudio();
+
+        /* ==========================================
+           Deck & 7-Card Best-5 Evaluator
+           ========================================== */
+        const SUITS = [
+            { code: 's', symbol: '♠', color: 'black-suit' },
+            { code: 'h', symbol: '♥', color: 'red-suit' },
+            { code: 'd', symbol: '♦', color: 'red-suit' },
+            { code: 'c', symbol: '♣', color: 'black-suit' }
+        ];
+
+        const RANKS = [
+            { val: 2, label: '2' }, { val: 3, label: '3' }, { val: 4, label: '4' },
+            { val: 5, label: '5' }, { val: 6, label: '6' }, { val: 7, label: '7' },
+            { val: 8, label: '8' }, { val: 9, label: '9' }, { val: 10, label: '10' },
+            { val: 11, label: 'J' }, { val: 12, label: 'Q' }, { val: 13, label: 'K' },
+            { val: 14, label: 'A' }
+        ];
+
+        const CATEGORY_NAMES = [
+            '高牌 High Card',
+            '一對 One Pair',
+            '兩對 Two Pair',
+            '三條 Three of a Kind',
+            '順子 Straight',
+            '同花 Flush',
+            '葫蘆 Full House',
+            '四條 Four of a Kind',
+            '同花順 Straight Flush',
+            '皇家同花順 Royal Flush'
+        ];
+
+        function createDeck() {
+            const deck = [];
+            for (const s of SUITS) {
+                for (const r of RANKS) {
+                    deck.push({
+                        id: `${r.label}${s.code}`,
+                        rank: r.val,
+                        label: r.label,
+                        suit: s.code,
+                        symbol: s.symbol,
+                        colorClass: s.color
+                    });
+                }
+            }
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+            return deck;
+        }
+
+        // Evaluate exactly 5 cards
+        function evaluate5Cards(five) {
+            const ranks = five.map(c => c.rank).sort((a, b) => b - a);
+            const isFlush = five.every(c => c.suit === five[0].suit);
+
+            // Check Straight (including A-5-4-3-2 wheel)
+            const uniqueRanks = [...new Set(ranks)];
+            let isStraight = false;
+            let straightHigh = 0;
+            if (uniqueRanks.length === 5) {
+                if (uniqueRanks[0] - uniqueRanks[4] === 4) {
+                    isStraight = true;
+                    straightHigh = uniqueRanks[0];
+                } else if (
+                    uniqueRanks[0] === 14 &&
+                    uniqueRanks[1] === 5 &&
+                    uniqueRanks[2] === 4 &&
+                    uniqueRanks[3] === 3 &&
+                    uniqueRanks[4] === 2
+                ) {
+                    isStraight = true;
+                    straightHigh = 5; // 5-high wheel straight
+                }
+            }
+
+            // Count frequencies
+            const counts = {};
+            for (const r of ranks) counts[r] = (counts[r] || 0) + 1;
+            // Sort by (count DESC, rank DESC)
+            const groups = Object.keys(counts)
+                .map(r => ({ rank: Number(r), count: counts[r] }))
+                .sort((a, b) => (b.count - a.count) || (b.rank - a.rank));
+
+            let category = 0;
+            let tiebreakers = [];
+
+            if (isFlush && isStraight) {
+                category = (straightHigh === 14) ? 9 : 8;
+                tiebreakers = [straightHigh];
+            } else if (groups[0].count === 4) {
+                category = 7;
+                tiebreakers = [groups[0].rank, groups[1].rank];
+            } else if (groups[0].count === 3 && groups[1].count === 2) {
+                category = 6;
+                tiebreakers = [groups[0].rank, groups[1].rank];
+            } else if (isFlush) {
+                category = 5;
+                tiebreakers = ranks;
+            } else if (isStraight) {
+                category = 4;
+                tiebreakers = [straightHigh];
+            } else if (groups[0].count === 3) {
+                category = 3;
+                tiebreakers = [groups[0].rank, groups[1].rank, groups[2].rank];
+            } else if (groups[0].count === 2 && groups[1].count === 2) {
+                category = 2;
+                tiebreakers = [groups[0].rank, groups[1].rank, groups[2].rank];
+            } else if (groups[0].count === 2) {
+                category = 1;
+                tiebreakers = [groups[0].rank, groups[1].rank, groups[2].rank, groups[3].rank];
+            } else {
+                category = 0;
+                tiebreakers = ranks;
+            }
+
+            // Encode comparable score in base-15
+            let score = category;
+            for (let i = 0; i < 5; i++) {
+                score = score * 15 + (tiebreakers[i] || 0);
+            }
+
+            return {
+                category,
+                categoryName: CATEGORY_NAMES[category],
+                score,
+                bestIds: five.map(c => c.id)
+            };
+        }
+
+        // Evaluate 2..7 cards
+        function evaluateBestHand(cards) {
+            if (cards.length < 5) {
+                // Pre-flop 2-card quick label
+                if (cards.length === 2) {
+                    const [c1, c2] = cards;
+                    if (c1.rank === c2.rank) {
+                        return { category: 1, categoryName: `底牌對子 (${c1.label}-${c2.label})`, score: c1.rank, bestIds: [] };
+                    }
+                    const hi = c1.rank > c2.rank ? c1 : c2;
+                    const lo = c1.rank > c2.rank ? c2 : c1;
+                    const suited = c1.suit === c2.suit ? '同花' : '';
+                    return { category: 0, categoryName: `${hi.label}-${lo.label} ${suited}高牌`.trim(), score: hi.rank, bestIds: [] };
+                }
+                return { category: 0, categoryName: '等待公牌', score: 0, bestIds: [] };
+            }
+
+            let best = null;
+            const n = cards.length;
+            for (let a = 0; a < n - 4; a++) {
+                for (let b = a + 1; b < n - 3; b++) {
+                    for (let c = b + 1; c < n - 2; c++) {
+                        for (let d = c + 1; d < n - 1; d++) {
+                            for (let e = d + 1; e < n; e++) {
+                                const res = evaluate5Cards([cards[a], cards[b], cards[c], cards[d], cards[e]]);
+                                if (!best || res.score > best.score) {
+                                    best = res;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return best;
+        }
+
+        /* ==========================================
+           Game State & AI Personalities
+           ========================================== */
+        let seats = [];
+        let deck = [];
+        let communityCards = [];
+        let pot = 0;
+        let smallBlind = 10;
+        let bigBlind = 20;
+        let startingStack = 2000;
+        let dealerIdx = 0;
+        let sbIdx = 1;
+        let bbIdx = 2;
+        let currentTurnIdx = 0;
+        let currentHighestBet = 0;
+        let minRaiseSize = 20;
+        let street = 'PREFLOP'; // PREFLOP, FLOP, TURN, RIVER, SHOWDOWN
+        let handNumber = 0;
+        let handInProgress = false;
+        let winningCardIds = new Set();
+        let pendingTimers = [];
+
+        function scheduleTimer(fn, ms) {
+            const id = setTimeout(() => {
+                pendingTimers = pendingTimers.filter(t => t !== id);
+                fn();
+            }, ms);
+            pendingTimers.push(id);
+            return id;
+        }
+
+        function clearAllTimers() {
+            pendingTimers.forEach(id => clearTimeout(id));
+            pendingTimers = [];
+        }
+
+        function initTable() {
+            clearAllTimers();
+            bigBlind = parseInt(document.getElementById('stakesSelect').value, 10);
+            smallBlind = Math.floor(bigBlind / 2);
+            startingStack = bigBlind * 100;
+            handNumber = 0;
+            dealerIdx = 3; // so hand 1 rotates dealer to 0
+
+            seats = [
+                {
+                    idx: 0,
+                    name: '你 (玩家)',
+                    isAI: false,
+                    style: 'HUMAN',
+                    icon: 'fa-user-tie',
+                    stack: startingStack,
+                    hole: [],
+                    streetBet: 0,
+                    totalCommitted: 0,
+                    folded: false,
+                    allIn: false,
+                    acted: false,
+                    lastAction: '',
+                    isWinner: false
+                },
+                {
+                    idx: 1,
+                    name: '狂鯊 雷恩',
+                    isAI: true,
+                    style: 'LAG', // Loose-Aggressive
+                    icon: 'fa-bolt',
+                    stack: startingStack,
+                    hole: [],
+                    streetBet: 0,
+                    totalCommitted: 0,
+                    folded: false,
+                    allIn: false,
+                    acted: false,
+                    lastAction: '',
+                    isWinner: false
+                },
+                {
+                    idx: 2,
+                    name: '冰后 艾琳',
+                    isAI: true,
+                    style: 'TAG', // Tight-Aggressive
+                    icon: 'fa-gem',
+                    stack: startingStack,
+                    hole: [],
+                    streetBet: 0,
+                    totalCommitted: 0,
+                    folded: false,
+                    allIn: false,
+                    acted: false,
+                    lastAction: '',
+                    isWinner: false
+                },
+                {
+                    idx: 3,
+                    name: '算牌師 老K',
+                    isAI: true,
+                    style: 'ROCK', // Solid / Calling station
+                    icon: 'fa-glasses',
+                    stack: startingStack,
+                    hole: [],
+                    streetBet: 0,
+                    totalCommitted: 0,
+                    folded: false,
+                    allIn: false,
+                    acted: false,
+                    lastAction: '',
+                    isWinner: false
+                }
+            ];
+
+            document.getElementById('blindsInfo').textContent = `小盲 $${smallBlind} ／ 大盲 $${bigBlind}｜無限注 No-Limit`;
+            startNewHand();
+        }
+
+        /* ==========================================
+           Hand Lifecycle
+           ========================================== */
+        function nextActiveSeat(fromIdx) {
+            for (let i = 1; i <= seats.length; i++) {
+                const candidate = (fromIdx + i) % seats.length;
+                if (seats[candidate].stack > 0) return candidate;
+            }
+            return fromIdx;
+        }
+
+        function startNewHand() {
+            clearAllTimers();
+            winningCardIds.clear();
+            document.getElementById('nextHandBtn').style.display = 'none';
+
+            // Auto rebuy bankrupt AIs or player if stack == 0
+            seats.forEach(s => {
+                if (s.stack <= 0) {
+                    s.stack = startingStack;
+                }
+            });
+
+            handNumber++;
+            deck = createDeck();
+            communityCards = [];
+            pot = 0;
+            street = 'PREFLOP';
+            handInProgress = true;
+
+            seats.forEach(s => {
+                s.hole = [deck.pop(), deck.pop()];
+                s.streetBet = 0;
+                s.totalCommitted = 0;
+                s.folded = false;
+                s.allIn = false;
+                s.acted = false;
+                s.lastAction = '';
+                s.isWinner = false;
+            });
+
+            dealerIdx = (dealerIdx + 1) % seats.length;
+            sbIdx = (dealerIdx + 1) % seats.length;
+            bbIdx = (dealerIdx + 2) % seats.length;
+
+            // Post Blinds
+            postChip(seats[sbIdx], smallBlind, '小盲 SB');
+            postChip(seats[bbIdx], bigBlind, '大盲 BB');
+
+            currentHighestBet = bigBlind;
+            minRaiseSize = bigBlind;
+            currentTurnIdx = (bbIdx + 1) % seats.length;
+
+            sfx.card();
+            setAnnouncement(`第 ${handNumber} 局開始！${seats[sbIdx].name} 下小盲 $${smallBlind}，${seats[bbIdx].name} 下大盲 $${bigBlind}。`);
+            renderTable();
+            proceedTurn();
+        }
+
+        function postChip(seat, amount, label) {
+            const actual = Math.min(seat.stack, amount);
+            seat.stack -= actual;
+            seat.streetBet += actual;
+            seat.totalCommitted += actual;
+            pot += actual;
+            if (seat.stack === 0) seat.allIn = true;
+            if (label) seat.lastAction = `${label} $${actual}`;
+        }
+
+        /* ==========================================
+           Betting Round Progression
+           ========================================== */
+        function getActiveContenders() {
+            return seats.filter(s => !s.folded);
+        }
+
+        function getActionableSeats() {
+            return seats.filter(s => !s.folded && !s.allIn);
+        }
+
+        function isBettingRoundComplete() {
+            const contenders = getActiveContenders();
+            if (contenders.length <= 1) return true;
+
+            const actionable = getActionableSeats();
+            if (actionable.length === 0) return true;
+
+            // Every actionable player must have acted AND matched currentHighestBet
+            return actionable.every(s => s.acted && s.streetBet === currentHighestBet);
+        }
+
+        function proceedTurn() {
+            if (!handInProgress) return;
+            renderTable();
+
+            const contenders = getActiveContenders();
+            if (contenders.length === 1) {
+                awardUncontestedPot(contenders[0]);
+                return;
+            }
+
+            if (isBettingRoundComplete()) {
+                advanceStreet();
+                return;
+            }
+
+            // Find next actionable seat starting from currentTurnIdx
+            let found = -1;
+            for (let i = 0; i < seats.length; i++) {
+                const idx = (currentTurnIdx + i) % seats.length;
+                const s = seats[idx];
+                if (!s.folded && !s.allIn && (!s.acted || s.streetBet < currentHighestBet)) {
+                    found = idx;
+                    break;
+                }
+            }
+
+            if (found === -1) {
+                advanceStreet();
+                return;
+            }
+
+            currentTurnIdx = found;
+            renderTable();
+
+            const activeSeat = seats[currentTurnIdx];
+            if (!activeSeat.isAI) {
+                enableHumanControls();
+            } else {
+                disableHumanControls();
+                scheduleTimer(() => executeAITurn(activeSeat), 680);
+            }
+        }
+
+        function executePlayerAction(seat, actionType, raiseToAmount = 0) {
+            if (!handInProgress) return;
+            const toCall = Math.max(0, currentHighestBet - seat.streetBet);
+
+            if (actionType === 'FOLD') {
+                seat.folded = true;
+                seat.acted = true;
+                seat.lastAction = '棄牌 Fold';
+                sfx.fold();
+                setAnnouncement(`${seat.name} 選擇棄牌。`);
+            } else if (actionType === 'CHECK') {
+                seat.acted = true;
+                seat.lastAction = '過牌 Check';
+                sfx.check();
+                setAnnouncement(`${seat.name} 選擇過牌。`);
+            } else if (actionType === 'CALL') {
+                const actual = Math.min(seat.stack, toCall);
+                postChip(seat, actual, null);
+                seat.acted = true;
+                seat.lastAction = seat.allIn ? `全下跟注 $${seat.streetBet}` : `跟注 $${actual}`;
+                sfx.chip();
+                setAnnouncement(`${seat.name} 跟注 $${actual}。`);
+            } else if (actionType === 'RAISE') {
+                const totalNeeded = Math.max(raiseToAmount - seat.streetBet, toCall + minRaiseSize);
+                const actualAdd = Math.min(seat.stack, totalNeeded);
+                postChip(seat, actualAdd, null);
+
+                if (seat.streetBet > currentHighestBet) {
+                    const raiseDiff = seat.streetBet - currentHighestBet;
+                    if (raiseDiff >= minRaiseSize) minRaiseSize = raiseDiff;
+                    currentHighestBet = seat.streetBet;
+                    // Re-open action for other non-folded, non-allin players
+                    seats.forEach(other => {
+                        if (other.idx !== seat.idx && !other.folded && !other.allIn) {
+                            other.acted = false;
+                        }
+                    });
+                }
+                seat.acted = true;
+                seat.lastAction = seat.allIn ? `全下 All-In $${seat.streetBet}` : `加注至 $${seat.streetBet}`;
+                sfx.chip();
+                setAnnouncement(`${seat.name} ${seat.lastAction}！`);
+            } else if (actionType === 'ALLIN') {
+                const actualAdd = seat.stack;
+                postChip(seat, actualAdd, null);
+                if (seat.streetBet > currentHighestBet) {
+                    const raiseDiff = seat.streetBet - currentHighestBet;
+                    if (raiseDiff >= minRaiseSize) minRaiseSize = raiseDiff;
+                    currentHighestBet = seat.streetBet;
+                    seats.forEach(other => {
+                        if (other.idx !== seat.idx && !other.folded && !other.allIn) {
+                            other.acted = false;
+                        }
+                    });
+                }
+                seat.acted = true;
+                seat.lastAction = `全下 All-In $${seat.streetBet}`;
+                sfx.chip();
+                setAnnouncement(`🔥 ${seat.name} 霸氣全下 All-In ($${seat.streetBet})！`);
+            }
+
+            disableHumanControls();
+            currentTurnIdx = (seat.idx + 1) % seats.length;
+            proceedTurn();
+        }
+
+        /* ==========================================
+           AI Decision Engine
+           ========================================== */
+        function executeAITurn(ai) {
+            if (!handInProgress || ai.folded || ai.allIn) return;
+            const toCall = Math.max(0, currentHighestBet - ai.streetBet);
+            const evalRes = evaluateBestHand([...ai.hole, ...communityCards]);
+
+            // Compute normalized hand strength 0.0 .. 1.0
+            let strength = 0.35;
+            if (communityCards.length === 0) {
+                const [c1, c2] = ai.hole;
+                const high = Math.max(c1.rank, c2.rank);
+                const low = Math.min(c1.rank, c2.rank);
+                if (c1.rank === c2.rank) {
+                    strength = 0.62 + (high / 45);
+                } else {
+                    strength = (high + low * 0.5) / 26;
+                    if (c1.suit === c2.suit) strength += 0.08;
+                    if (high - low === 1) strength += 0.05;
+                }
+            } else {
+                // Post-flop category 0..9
+                strength = 0.25 + Math.min(0.74, evalRes.category * 0.13);
+            }
+
+            // Personality modifier
+            if (ai.style === 'LAG') strength += 0.1;
+            if (ai.style === 'ROCK') strength -= 0.05;
+
+            const potOdds = toCall / Math.max(1, pot + toCall);
+
+            if (toCall === 0) {
+                // Can check or bet
+                if (strength > 0.66 && ai.stack > bigBlind && Math.random() < 0.72) {
+                    const targetRaise = ai.streetBet + Math.min(ai.stack, Math.max(bigBlind, Math.round(pot * 0.6)));
+                    executePlayerAction(ai, 'RAISE', targetRaise);
+                } else {
+                    executePlayerAction(ai, 'CHECK');
+                }
+                return;
+            }
+
+            // Facing a bet
+            if (toCall >= ai.stack) {
+                // Calling requires All-In
+                if (strength >= 0.62 || (potOdds < 0.32 && strength >= 0.48)) {
+                    executePlayerAction(ai, 'CALL');
+                } else {
+                    executePlayerAction(ai, 'FOLD');
+                }
+                return;
+            }
+
+            if (strength >= 0.78 && ai.stack > toCall + minRaiseSize && Math.random() < 0.65) {
+                const raiseTo = currentHighestBet + Math.max(minRaiseSize, Math.round(pot * 0.65));
+                executePlayerAction(ai, 'RAISE', raiseTo);
+            } else if (strength >= potOdds + 0.12 || toCall <= bigBlind) {
+                executePlayerAction(ai, 'CALL');
+            } else {
+                executePlayerAction(ai, 'FOLD');
+            }
+        }
+
+        /* ==========================================
+           Street Transitions & Showdown
+           ========================================== */
+        function advanceStreet() {
+            seats.forEach(s => {
+                s.streetBet = 0;
+                s.acted = false;
+                if (!s.folded && !s.allIn) s.lastAction = '';
+            });
+            currentHighestBet = 0;
+            minRaiseSize = bigBlind;
+
+            if (street === 'PREFLOP') {
+                street = 'FLOP';
+                communityCards.push(deck.pop(), deck.pop(), deck.pop());
+                sfx.card();
+                setAnnouncement(`翻牌圈 Flop：發出 3 張公牌。`);
+            } else if (street === 'FLOP') {
+                street = 'TURN';
+                communityCards.push(deck.pop());
+                sfx.card();
+                setAnnouncement(`轉牌圈 Turn：發出第 4 張公牌。`);
+            } else if (street === 'TURN') {
+                street = 'RIVER';
+                communityCards.push(deck.pop());
+                sfx.card();
+                setAnnouncement(`河牌圈 River：發出第 5 張最終公牌！`);
+            } else if (street === 'RIVER') {
+                street = 'SHOWDOWN';
+                resolveShowdown();
+                return;
+            }
+
+            currentTurnIdx = (dealerIdx + 1) % seats.length;
+            renderTable();
+
+            // If fewer than 2 players can still make decisions (everyone else is all-in), auto-runout next street
+            if (getActionableSeats().length <= 1) {
+                scheduleTimer(() => advanceStreet(), 950);
+            } else {
+                proceedTurn();
+            }
+        }
+
+        function awardUncontestedPot(winner) {
+            handInProgress = false;
+            street = 'SHOWDOWN';
+            winner.stack += pot;
+            winner.isWinner = true;
+            winner.lastAction = `贏得底池 +$${pot}`;
+            sfx.win();
+            setAnnouncement(`🏆 其他對手全數棄牌，${winner.name} 獨得底池 $${pot.toLocaleString()}！`);
+            pot = 0;
+            disableHumanControls();
+            document.getElementById('nextHandBtn').style.display = 'inline-flex';
+            renderTable();
+        }
+
+        function resolveShowdown() {
+            handInProgress = false;
+            disableHumanControls();
+
+            const contenders = getActiveContenders();
+            contenders.forEach(c => {
+                c.evalResult = evaluateBestHand([...c.hole, ...communityCards]);
+            });
+
+            // Side-pot distribution by unique contribution levels
+            const levels = [...new Set(
+                seats.filter(s => s.totalCommitted > 0).map(s => s.totalCommitted)
+            )].sort((a, b) => a - b);
+
+            let prevLevel = 0;
+            const winningsMap = { 0: 0, 1: 0, 2: 0, 3: 0 };
+
+            for (const lvl of levels) {
+                const sliceDiff = lvl - prevLevel;
+                if (sliceDiff <= 0) continue;
+
+                let subPot = 0;
+                seats.forEach(s => {
+                    const contrib = Math.max(0, Math.min(s.totalCommitted, lvl) - prevLevel);
+                    subPot += contrib;
+                });
+
+                const eligible = contenders.filter(c => c.totalCommitted >= lvl);
+                if (eligible.length > 0 && subPot > 0) {
+                    const maxScore = Math.max(...eligible.map(e => e.evalResult.score));
+                    const sliceWinners = eligible.filter(e => e.evalResult.score === maxScore);
+                    const share = Math.floor(subPot / sliceWinners.length);
+                    let remainder = subPot - share * sliceWinners.length;
+
+                    sliceWinners.forEach(w => {
+                        const extra = remainder > 0 ? 1 : 0;
+                        if (remainder > 0) remainder--;
+                        w.stack += share + extra;
+                        winningsMap[w.idx] += share + extra;
+                        w.isWinner = true;
+                        w.evalResult.bestIds.forEach(id => winningCardIds.add(id));
+                    });
+                }
+                prevLevel = lvl;
+            }
+
+            const overallWinners = contenders.filter(c => c.isWinner);
+            const winSummary = overallWinners
+                .map(w => `${w.name} (${w.evalResult.categoryName}) 贏得 $${winningsMap[w.idx].toLocaleString()}`)
+                .join('、');
+
+            sfx.win();
+            setAnnouncement(`🃏 攤牌結算：${winSummary}！`);
+            pot = 0;
+            document.getElementById('nextHandBtn').style.display = 'inline-flex';
+            renderTable();
+        }
+
+        /* ==========================================
+           Human Controls & Rendering
+           ========================================== */
+        function enableHumanControls() {
+            const human = seats[0];
+            const toCall = Math.max(0, currentHighestBet - human.streetBet);
+
+            const foldBtn = document.getElementById('foldBtn');
+            const checkCallBtn = document.getElementById('checkCallBtn');
+            const raiseBtn = document.getElementById('raiseBtn');
+            const allinBtn = document.getElementById('allinBtn');
+            const slider = document.getElementById('raiseSlider');
+            const qMin = document.getElementById('qMinBtn');
+            const qHalf = document.getElementById('qHalfPotBtn');
+            const qPot = document.getElementById('qPotBtn');
+
+            foldBtn.disabled = false;
+            checkCallBtn.disabled = false;
+            allinBtn.disabled = human.stack <= 0;
+
+            if (toCall === 0) {
+                checkCallBtn.innerHTML = `<i class="fa-solid fa-check"></i> 過牌 Check`;
+                checkCallBtn.onclick = () => executePlayerAction(human, 'CHECK');
+            } else {
+                const callAmt = Math.min(human.stack, toCall);
+                checkCallBtn.innerHTML = `<i class="fa-solid fa-coins"></i> 跟注 Call $${callAmt}`;
+                checkCallBtn.onclick = () => executePlayerAction(human, 'CALL');
+            }
+
+            const minRaiseTo = currentHighestBet + minRaiseSize;
+            const maxRaiseTo = human.streetBet + human.stack;
+
+            if (maxRaiseTo > currentHighestBet && human.stack > toCall) {
+                raiseBtn.disabled = false;
+                slider.disabled = false;
+                qMin.disabled = false;
+                qHalf.disabled = false;
+                qPot.disabled = false;
+
+                const clampedMin = Math.min(minRaiseTo, maxRaiseTo);
+                slider.min = clampedMin;
+                slider.max = maxRaiseTo;
+                slider.step = smallBlind;
+                slider.value = clampedMin;
+                updateRaiseLabel();
+            } else {
+                raiseBtn.disabled = true;
+                slider.disabled = true;
+                qMin.disabled = true;
+                qHalf.disabled = true;
+                qPot.disabled = true;
+            }
+        }
+
+        function disableHumanControls() {
+            ['foldBtn', 'checkCallBtn', 'raiseBtn', 'allinBtn', 'raiseSlider', 'qMinBtn', 'qHalfPotBtn', 'qPotBtn']
+                .forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.disabled = true;
+                });
+        }
+
+        function updateRaiseLabel() {
+            const val = parseInt(document.getElementById('raiseSlider').value, 10);
+            document.getElementById('raiseAmountLabel').textContent = `加注至 $${val}`;
+        }
+
+        function renderCardHTML(card, faceUp = true, isSmall = false) {
+            if (!faceUp) {
+                return `<div class="playing-card ${isSmall ? 'small-card' : ''} card-back"></div>`;
+            }
+            const hi = winningCardIds.has(card.id) ? 'highlight-best' : '';
+            return `
+                <div class="playing-card ${isSmall ? 'small-card' : ''} ${card.colorClass} ${hi}">
+                    <div class="card-corner-top">${card.label}</div>
+                    <div class="card-center-suit">${card.symbol}</div>
+                    <div class="card-corner-bot">${card.symbol}</div>
+                </div>
+            `;
+        }
+
+        function renderTable() {
+            const streetNames = {
+                PREFLOP: 'PRE-FLOP 翻牌前',
+                FLOP: 'FLOP 翻牌圈',
+                TURN: 'TURN 轉牌圈',
+                RIVER: 'RIVER 河牌圈',
+                SHOWDOWN: 'SHOWDOWN 攤牌結算'
+            };
+            document.getElementById('streetLabel').textContent = streetNames[street] || street;
+            document.getElementById('handCounter').textContent = `第 ${handNumber} 局`;
+            document.getElementById('potDisplay').textContent = `底池 Pot: $${pot.toLocaleString()}`;
+
+            // Render 5 community card slots
+            const commRow = document.getElementById('communityRow');
+            commRow.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                if (i < communityCards.length) {
+                    commRow.innerHTML += renderCardHTML(communityCards[i], true, false);
+                } else {
+                    commRow.innerHTML += `<div class="card-slot"></div>`;
+                }
+            }
+
+            // Render 4 Seats
+            seats.forEach(s => {
+                const seatEl = document.getElementById(`seat-${s.idx}`);
+                const isTurn = handInProgress && currentTurnIdx === s.idx && !s.folded && !s.allIn;
+                seatEl.className = `seat seat-${s.idx} ${isTurn ? 'active-seat' : ''} ${s.folded ? 'folded-seat' : ''} ${s.isWinner ? 'winner-seat' : ''}`;
+
+                let badges = '';
+                if (s.idx === dealerIdx) badges += `<span class="role-chip role-d">D</span>`;
+                if (s.idx === sbIdx) badges += `<span class="role-chip role-sb">SB</span>`;
+                if (s.idx === bbIdx) badges += `<span class="role-chip role-bb">BB</span>`;
+
+                const showFace = !s.isAI || (street === 'SHOWDOWN' && !s.folded);
+                const cardsHTML = s.hole
+                    .map(c => renderCardHTML(c, showFace, s.isAI))
+                    .join('');
+
+                let rankBadgeHTML = '';
+                if (showFace && !s.folded && s.hole.length === 2) {
+                    const ev = evaluateBestHand([...s.hole, ...communityCards]);
+                    rankBadgeHTML = `<div class="hand-rank-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> 目前牌型：${ev.categoryName}</div>`;
+                }
+
+                seatEl.innerHTML = `
+                    <div class="seat-top">
+                        <div class="seat-name">
+                            <i class="fa-solid ${s.icon}" style="color:${s.isAI ? '#38bdf8' : '#fde047'}"></i>
+                            <span>${s.name}</span>
+                        </div>
+                        <div class="role-badges">${badges}</div>
+                    </div>
+                    <div class="seat-body">
+                        <div class="hole-cards">${cardsHTML}</div>
+                        <div class="seat-stats">
+                            <div class="stack-val">$${s.stack.toLocaleString()}</div>
+                            ${s.streetBet > 0 ? `<div class="bet-chip">本輪下注 $${s.streetBet}</div>` : ''}
+                            ${s.lastAction ? `<div class="action-tag">${s.lastAction}</div>` : ''}
+                        </div>
+                    </div>
+                    ${rankBadgeHTML}
+                `;
+            });
+        }
+
+        function setAnnouncement(text) {
+            document.getElementById('tableAnnouncement').textContent = text;
+        }
+
+        /* ==========================================
+           UI Event Listeners
+           ========================================== */
+        document.getElementById('foldBtn').addEventListener('click', () => {
+            executePlayerAction(seats[0], 'FOLD');
+        });
+
+        document.getElementById('raiseBtn').addEventListener('click', () => {
+            const val = parseInt(document.getElementById('raiseSlider').value, 10);
+            executePlayerAction(seats[0], 'RAISE', val);
+        });
+
+        document.getElementById('allinBtn').addEventListener('click', () => {
+            executePlayerAction(seats[0], 'ALLIN');
+        });
+
+        document.getElementById('nextHandBtn').addEventListener('click', () => {
+            startNewHand();
+        });
+
+        document.getElementById('raiseSlider').addEventListener('input', updateRaiseLabel);
+
+        document.getElementById('qMinBtn').addEventListener('click', () => {
+            const slider = document.getElementById('raiseSlider');
+            slider.value = slider.min;
+            updateRaiseLabel();
+        });
+
+        document.getElementById('qHalfPotBtn').addEventListener('click', () => {
+            const slider = document.getElementById('raiseSlider');
+            const target = Math.min(Number(slider.max), Math.max(Number(slider.min), currentHighestBet + Math.round(pot * 0.5)));
+            slider.value = target;
+            updateRaiseLabel();
+        });
+
+        document.getElementById('qPotBtn').addEventListener('click', () => {
+            const slider = document.getElementById('raiseSlider');
+            const target = Math.min(Number(slider.max), Math.max(Number(slider.min), currentHighestBet + pot));
+            slider.value = target;
+            updateRaiseLabel();
+        });
+
+        document.getElementById('stakesSelect').addEventListener('change', initTable);
+        document.getElementById('resetGameBtn').addEventListener('click', initTable);
+
+        document.getElementById('rebuyBtn').addEventListener('click', () => {
+            seats[0].stack += startingStack;
+            sfx.chip();
+            setAnnouncement(`💰 已為你補充 $${startingStack.toLocaleString()} 籌碼！`);
+            renderTable();
+        });
+
+        document.getElementById('muteBtn').addEventListener('click', (e) => {
+            sfx.muted = !sfx.muted;
+            e.currentTarget.innerHTML = sfx.muted
+                ? `<i class="fa-solid fa-volume-xmark"></i> 靜音`
+                : `<i class="fa-solid fa-volume-high"></i> 音效`;
+        });
+
+        document.getElementById('guideBtn').addEventListener('click', () => {
+            document.getElementById('guideModal').classList.add('show');
+        });
+
+        document.getElementById('closeGuideBtn').addEventListener('click', () => {
+            document.getElementById('guideModal').classList.remove('show');
+        });
+
+        // Boot Table
+        initTable();
+    </script>
+</body>
+</html>

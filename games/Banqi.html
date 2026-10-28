@@ -1,0 +1,2410 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="台灣標準 4x8 半盤象棋暗棋（Banqi）。具備流光玻璃擬態與現代東方美學、雙人對決與三段智慧 AI（輕鬆、聰明、宗師）、合成音效與粒子特效。">
+    <title>流光象棋暗棋 | Neon Banqi</title>
+
+    <!-- Google Fonts: Outfit, Inter, Noto Serif TC for traditional Chinese chess calligraphy -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Serif+TC:wght@600;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome 6.4.0 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --card-bg: rgba(15, 23, 42, 0.68);
+            --card-border: rgba(255, 255, 255, 0.09);
+            --cyan-neon: #00f2fe;
+            --cyan-glow: rgba(0, 242, 254, 0.4);
+            --crimson-neon: #ff2a5f;
+            --crimson-glow: rgba(255, 42, 95, 0.45);
+            --gold-neon: #fbbf24;
+            --gold-glow: rgba(251, 191, 36, 0.38);
+            --jade-neon: #10b981;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --transition-speed: 0.28s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Ambient Background Glows */
+        .ambient-glow {
+            position: fixed;
+            width: 380px;
+            height: 380px;
+            border-radius: 50%;
+            filter: blur(110px);
+            z-index: 0;
+            opacity: 0.4;
+            pointer-events: none;
+            animation: pulse-glow 9s infinite alternate ease-in-out;
+        }
+
+        .crimson-ambient {
+            background-color: var(--crimson-neon);
+            top: 8%;
+            left: 8%;
+        }
+
+        .cyan-ambient {
+            background-color: var(--cyan-neon);
+            bottom: 8%;
+            right: 8%;
+            animation-delay: 4.5s;
+        }
+
+        @keyframes pulse-glow {
+            0% { transform: scale(1) translate(0, 0); opacity: 0.3; }
+            100% { transform: scale(1.25) translate(25px, 20px); opacity: 0.5; }
+        }
+
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 680px;
+            padding: 20px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .card-glass {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.45);
+        }
+
+        .screen {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            animation: fade-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Menu Screen --- */
+        .game-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .logo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 14px;
+            border-radius: 999px;
+            background: rgba(251, 191, 36, 0.12);
+            border: 1px solid rgba(251, 191, 36, 0.35);
+            color: var(--gold-neon);
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .logo-text {
+            font-family: 'Outfit', 'Noto Serif TC', sans-serif;
+            font-size: 2.9rem;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: 2px;
+            color: var(--text-primary);
+        }
+
+        .logo-text .highlight {
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--crimson-neon), var(--gold-neon), var(--cyan-neon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 42, 95, 0.25);
+        }
+
+        .tagline {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            letter-spacing: 3.5px;
+            margin-top: 10px;
+        }
+
+        .menu-box {
+            padding: 30px;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+        }
+
+        .subsection-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .mode-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn {
+            border: none;
+            outline: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 16px;
+            transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-mode {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--text-secondary);
+            padding: 17px 22px;
+            justify-content: flex-start;
+        }
+
+        .btn-mode i {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-mode:hover {
+            background: rgba(255, 255, 255, 0.07);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .btn-mode.active {
+            background: rgba(0, 242, 254, 0.1);
+            border-color: var(--cyan-neon);
+            color: var(--cyan-neon);
+            box-shadow: 0 0 16px rgba(0, 242, 254, 0.2);
+        }
+
+        .difficulty-section {
+            max-height: 290px;
+            opacity: 1;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .difficulty-section.hidden {
+            max-height: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .difficulty-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .btn-diff, .btn-order {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--text-secondary);
+            padding: 12px 8px;
+            font-size: 0.9rem;
+            border-radius: 12px;
+        }
+
+        .btn-diff:hover, .btn-order:hover {
+            background: rgba(255, 255, 255, 0.07);
+            color: var(--text-primary);
+        }
+
+        .btn-diff.active {
+            background: rgba(255, 42, 95, 0.14);
+            border-color: var(--crimson-neon);
+            color: var(--crimson-neon);
+            box-shadow: 0 0 15px rgba(255, 42, 95, 0.25);
+        }
+
+        .btn-order.active {
+            background: rgba(251, 191, 36, 0.14);
+            border-color: var(--gold-neon);
+            color: var(--gold-neon);
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.22);
+        }
+
+        .rules-summary {
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 12px 15px;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .rules-summary strong {
+            color: var(--gold-neon);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--crimson-neon), #ff6b4a);
+            color: #fff;
+            padding: 17px;
+            font-size: 1.08rem;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(255, 42, 95, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 8px 26px rgba(255, 42, 95, 0.58);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 13px 16px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary-danger {
+            background: rgba(239, 68, 68, 0.06);
+            border: 1px solid rgba(239, 68, 68, 0.24);
+            color: #f87171;
+            padding: 13px 16px;
+        }
+
+        .btn-secondary-danger:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* --- Game Screen --- */
+        .game-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            width: 100%;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+        }
+
+        .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.09);
+            color: var(--text-primary);
+            transform: scale(1.05);
+        }
+
+        .nav-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-title span {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .badge-diff {
+            font-size: 0.72rem !important;
+            background: rgba(255, 42, 95, 0.16);
+            border: 1px solid var(--crimson-neon);
+            color: var(--crimson-neon);
+            padding: 2px 10px;
+            border-radius: 20px;
+            letter-spacing: 1.5px !important;
+        }
+
+        .badge-diff.hidden {
+            display: none;
+        }
+
+        /* Score & Player Cards */
+        .scoreboard-container {
+            display: grid;
+            grid-template-columns: 1.25fr 0.7fr 1.25fr;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 14px;
+        }
+
+        .score-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 11px 13px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .score-card-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .player-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.05rem;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        .player-avatar.color-red {
+            background: radial-gradient(circle at 30% 30%, #4c1122, #1f070e);
+            border-color: var(--crimson-neon);
+            color: var(--crimson-neon);
+            box-shadow: 0 0 10px rgba(255, 42, 95, 0.35);
+        }
+
+        .player-avatar.color-black {
+            background: radial-gradient(circle at 30% 30%, #0d2b3e, #07131e);
+            border-color: var(--cyan-neon);
+            color: var(--cyan-neon);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.35);
+        }
+
+        .player-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .player-name-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .player-name {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .color-tag {
+            font-size: 0.68rem;
+            padding: 1px 6px;
+            border-radius: 6px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.07);
+            color: var(--text-secondary);
+        }
+
+        .color-tag.tag-red {
+            background: rgba(255, 42, 95, 0.18);
+            color: #ff6b8b;
+            border: 1px solid rgba(255, 42, 95, 0.4);
+        }
+
+        .color-tag.tag-black {
+            background: rgba(0, 242, 254, 0.15);
+            color: var(--cyan-neon);
+            border: 1px solid rgba(0, 242, 254, 0.4);
+        }
+
+        .piece-remain {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+        }
+
+        .player-score-num {
+            font-size: 1.3rem;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-primary);
+        }
+
+        .score-card.active-turn-red {
+            border-color: var(--crimson-neon);
+            box-shadow: 0 0 16px rgba(255, 42, 95, 0.3);
+            background: rgba(255, 42, 95, 0.07);
+        }
+
+        .score-card.active-turn-black {
+            border-color: var(--cyan-neon);
+            box-shadow: 0 0 16px rgba(0, 242, 254, 0.28);
+            background: rgba(0, 242, 254, 0.07);
+        }
+
+        .score-card.active-turn-unassigned {
+            border-color: var(--gold-neon);
+            box-shadow: 0 0 16px rgba(251, 191, 36, 0.28);
+            background: rgba(251, 191, 36, 0.06);
+        }
+
+        /* Status Bar */
+        .status-announcement {
+            text-align: center;
+            font-size: 1.02rem;
+            font-weight: 500;
+            margin-bottom: 14px;
+            min-height: 28px;
+            padding: 6px 14px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .red-text { color: #ff4778; }
+        .black-text { color: var(--cyan-neon); }
+        .gold-text { color: var(--gold-neon); }
+        .gray-text { color: var(--text-secondary); }
+        .font-bold { font-weight: 700; }
+
+        /* Banqi 4x8 Board */
+        .board-wrapper {
+            width: 100%;
+            margin-bottom: 14px;
+            position: relative;
+        }
+
+        .banqi-board-frame {
+            padding: 18px;
+            background:
+                radial-gradient(circle at 50% 20%, rgba(251, 191, 36, 0.06), transparent 70%),
+                linear-gradient(145deg, rgba(20, 29, 49, 0.88), rgba(10, 15, 28, 0.94));
+            border: 1px solid rgba(251, 191, 36, 0.22);
+            border-radius: 22px;
+            box-shadow:
+                0 16px 40px rgba(0, 0, 0, 0.55),
+                inset 0 0 24px rgba(251, 191, 36, 0.04);
+            position: relative;
+        }
+
+        .banqi-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 8px;
+            aspect-ratio: 8 / 4;
+            width: 100%;
+            position: relative;
+        }
+
+        .banqi-cell {
+            position: relative;
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(251, 191, 36, 0.16);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.22s ease;
+        }
+
+        /* Subtle palace/grid corner marks inside each cell */
+        .banqi-cell::before {
+            content: '';
+            position: absolute;
+            inset: 5px;
+            border: 1px dashed rgba(251, 191, 36, 0.07);
+            border-radius: 8px;
+            pointer-events: none;
+        }
+
+        .banqi-cell:hover {
+            background: rgba(255, 255, 255, 0.055);
+            border-color: rgba(251, 191, 36, 0.35);
+        }
+
+        .banqi-cell.selected-cell {
+            background: rgba(251, 191, 36, 0.14);
+            border-color: var(--gold-neon);
+            box-shadow: 0 0 18px rgba(251, 191, 36, 0.35);
+        }
+
+        .banqi-cell.last-move-from {
+            border-color: rgba(251, 191, 36, 0.45);
+            background: rgba(251, 191, 36, 0.05);
+        }
+
+        .banqi-cell.last-move-to {
+            border-color: rgba(251, 191, 36, 0.7);
+            background: rgba(251, 191, 36, 0.09);
+        }
+
+        /* Valid move/capture indicators */
+        .banqi-cell.valid-move::after {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--jade-neon);
+            box-shadow: 0 0 12px var(--jade-neon);
+            animation: pulse-dot 1.2s infinite alternate ease-in-out;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .banqi-cell.valid-capture {
+            border-color: #ff2a5f !important;
+            background: rgba(255, 42, 95, 0.16) !important;
+            box-shadow: 0 0 18px rgba(255, 42, 95, 0.45), inset 0 0 10px rgba(255, 42, 95, 0.25);
+        }
+
+        .banqi-cell.valid-capture::after {
+            content: '\f05b';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 3px;
+            right: 4px;
+            font-size: 0.72rem;
+            color: #ff2a5f;
+            text-shadow: 0 0 6px #ff2a5f;
+            z-index: 6;
+            pointer-events: none;
+        }
+
+        @keyframes pulse-dot {
+            from { transform: scale(0.8); opacity: 0.75; }
+            to { transform: scale(1.15); opacity: 1; }
+        }
+
+        /* Chess Pieces */
+        .piece {
+            width: 84%;
+            height: 84%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: transform 0.26s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.26s ease;
+            z-index: 2;
+        }
+
+        .banqi-cell:hover .piece {
+            transform: translateY(-2px) scale(1.03);
+        }
+
+        .banqi-cell.selected-cell .piece {
+            transform: translateY(-4px) scale(1.08);
+        }
+
+        /* Face-down piece */
+        .piece.face-down {
+            background: radial-gradient(circle at 35% 30%, #2a3950, #111927 75%);
+            border: 2px solid rgba(251, 191, 36, 0.48);
+            box-shadow:
+                0 5px 12px rgba(0, 0, 0, 0.6),
+                inset 0 2px 4px rgba(255, 255, 255, 0.15),
+                0 0 10px rgba(251, 191, 36, 0.12);
+        }
+
+        .piece.face-down::before {
+            content: '';
+            position: absolute;
+            inset: 5px;
+            border-radius: 50%;
+            border: 1px dashed rgba(251, 191, 36, 0.35);
+        }
+
+        .piece.face-down::after {
+            content: '暗';
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: rgba(251, 191, 36, 0.55);
+        }
+
+        /* Face-up Red Piece */
+        .piece.face-up.red-piece {
+            background: radial-gradient(circle at 30% 28%, #3b1022, #1b0711 80%);
+            border: 2.5px solid var(--crimson-neon);
+            box-shadow:
+                0 6px 14px rgba(0, 0, 0, 0.65),
+                0 0 14px rgba(255, 42, 95, 0.35),
+                inset 0 2px 5px rgba(255, 130, 160, 0.25);
+            color: #ff4d79;
+            text-shadow: 0 0 10px rgba(255, 42, 95, 0.6);
+        }
+
+        .piece.face-up.red-piece::before {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 42, 95, 0.38);
+            pointer-events: none;
+        }
+
+        /* Face-up Black Piece (Neon Cyan / Jade dark obsidian) */
+        .piece.face-up.black-piece {
+            background: radial-gradient(circle at 30% 28%, #0f2c3f, #07131e 80%);
+            border: 2.5px solid var(--cyan-neon);
+            box-shadow:
+                0 6px 14px rgba(0, 0, 0, 0.65),
+                0 0 14px rgba(0, 242, 254, 0.32),
+                inset 0 2px 5px rgba(140, 248, 255, 0.22);
+            color: var(--cyan-neon);
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.6);
+        }
+
+        .piece.face-up.black-piece::before {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 242, 254, 0.35);
+            pointer-events: none;
+        }
+
+        .piece-char {
+            font-family: 'Noto Serif TC', serif;
+            font-size: clamp(1.1rem, 3.2vw, 1.55rem);
+            font-weight: 900;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .piece-rank-badge {
+            position: absolute;
+            bottom: 2px;
+            right: 4px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.62rem;
+            font-weight: 700;
+            opacity: 0.72;
+        }
+
+        .piece.flip-anim {
+            animation: flip-reveal 0.36s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes flip-reveal {
+            0% { transform: rotateY(90deg) scale(0.8); }
+            60% { transform: rotateY(-10deg) scale(1.08); }
+            100% { transform: rotateY(0deg) scale(1); }
+        }
+
+        .banqi-grid.ai-thinking,
+        .banqi-grid.ai-thinking .banqi-cell {
+            cursor: wait;
+            pointer-events: none;
+        }
+
+        /* Graveyard / Captured Pieces Tray */
+        .graveyard-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .graveyard-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 10px 12px;
+            min-height: 62px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .graveyard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .graveyard-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            min-height: 24px;
+            align-items: center;
+        }
+
+        .mini-piece {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Noto Serif TC', serif;
+            font-size: 0.75rem;
+            font-weight: 900;
+        }
+
+        .mini-piece.red {
+            background: rgba(255, 42, 95, 0.16);
+            border: 1px solid var(--crimson-neon);
+            color: #ff5c86;
+        }
+
+        .mini-piece.black {
+            background: rgba(0, 242, 254, 0.14);
+            border: 1px solid var(--cyan-neon);
+            color: var(--cyan-neon);
+        }
+
+        /* Controls Footer */
+        .game-controls {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .game-controls .btn {
+            flex: 1;
+        }
+
+        /* Rules Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(4, 7, 15, 0.78);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 120;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-card {
+            width: 100%;
+            max-width: 460px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-family: 'Noto Serif TC', serif;
+            color: var(--gold-neon);
+            font-size: 1.2rem;
+        }
+
+        .modal-body {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.65;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .rank-chain {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(251, 191, 36, 0.25);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            font-family: 'Noto Serif TC', serif;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        @media (max-width: 540px) {
+            .app-container {
+                padding: 12px;
+            }
+            .banqi-board-frame {
+                padding: 10px;
+            }
+            .banqi-grid {
+                gap: 5px;
+            }
+            .piece-rank-badge {
+                display: none;
+            }
+            .scoreboard-container {
+                grid-template-columns: 1fr 0.55fr 1fr;
+                gap: 6px;
+            }
+            .score-card {
+                padding: 8px;
+            }
+            .player-avatar {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+            .graveyard-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="app-container">
+        <div class="ambient-glow crimson-ambient"></div>
+        <div class="ambient-glow cyan-ambient"></div>
+
+        <!-- Menu Screen -->
+        <div id="menu-screen" class="screen active">
+            <header class="game-header">
+                <div class="logo-badge">
+                    <i class="fa-solid fa-chess-board"></i>
+                    <span>TAIWANESE 4×8 BANQI</span>
+                </div>
+                <h1 class="logo-text">NEON <span class="highlight">象棋暗棋</span></h1>
+                <p class="tagline">半盤翻子 ‧ 砲打隔山 ‧ 兵卒剋帥將</p>
+            </header>
+
+            <div class="menu-box card-glass">
+                <h2 class="section-title">選擇對弈模式</h2>
+
+                <div class="mode-options">
+                    <button id="btn-pvp" class="btn btn-mode active" data-mode="pvp">
+                        <i class="fa-solid fa-user-group"></i>
+                        <span>雙人對決 (PvP 同機對弈)</span>
+                    </button>
+                    <button id="btn-pve" class="btn btn-mode" data-mode="pve">
+                        <i class="fa-solid fa-robot"></i>
+                        <span>挑戰 AI (PvE 智慧棋手)</span>
+                    </button>
+                </div>
+
+                <div id="difficulty-section" class="difficulty-section hidden">
+                    <h3 class="subsection-title">AI 難度</h3>
+                    <div class="difficulty-options">
+                        <button class="btn btn-diff" data-diff="easy">輕鬆</button>
+                        <button class="btn btn-diff active" data-diff="medium">聰明</button>
+                        <button class="btn btn-diff" data-diff="hard">宗師</button>
+                    </div>
+                    <h3 class="subsection-title" style="margin-top: 14px;">先後手設定</h3>
+                    <div class="difficulty-options">
+                        <button class="btn btn-order active" data-order="player">玩家先手</button>
+                        <button class="btn btn-order" data-order="ai">AI 先手</button>
+                        <button class="btn btn-order" data-order="alternate">輪流先手</button>
+                    </div>
+                </div>
+
+                <div class="rules-summary">
+                    <strong>台灣暗棋規則：</strong>首翻決定雙方陣營顏色！<br>
+                    階級：<strong>帥/將(7) ＞ 仕/士(6) ＞ 相/象(5) ＞ 俥/車(4) ＞ 傌/馬(3) ＞ 包/砲(2) ＞ 兵/卒(1)</strong><br>
+                    特例：<strong>兵/卒可吃帥/將</strong>（帥/將不可吃兵/卒）；<strong>包/砲</strong>走鄰格空白，吃子須隔<strong>恰一子</strong>飛吃任意明子。
+                </div>
+
+                <button id="btn-start" class="btn btn-primary">
+                    <span>開始對弈</span>
+                    <i class="fa-solid fa-play"></i>
+                </button>
+
+                <a href="../index.html?zone=games" class="btn btn-secondary" style="text-decoration: none;">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>返回遊戲大廳</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div class="game-nav">
+                <button id="btn-back-menu" class="btn btn-icon" title="返回選單">
+                    <i class="fa-solid fa-house"></i>
+                </button>
+                <div class="nav-title">
+                    <span id="game-mode-display">雙人對決 (PvP)</span>
+                    <span id="game-diff-display" class="badge-diff hidden">聰明</span>
+                </div>
+                <div class="nav-actions">
+                    <button id="btn-rules" class="btn btn-icon" title="暗棋規則說明">
+                        <i class="fa-solid fa-circle-question"></i>
+                    </button>
+                    <button id="btn-sound-toggle" class="btn btn-icon" title="切換音效">
+                        <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scoreboard -->
+            <div class="scoreboard-container">
+                <div class="score-card" id="score-card-p1">
+                    <div class="score-card-left">
+                        <div class="player-avatar" id="avatar-p1">?</div>
+                        <div class="player-info">
+                            <div class="player-name-row">
+                                <span class="player-name" id="name-p1">玩家 1</span>
+                                <span class="color-tag" id="tag-p1">未定色</span>
+                            </div>
+                            <span class="piece-remain" id="remain-p1">存活: 16</span>
+                        </div>
+                    </div>
+                    <span class="player-score-num" id="score-p1">0</span>
+                </div>
+
+                <div class="score-card" style="justify-content: center; flex-direction: column; gap: 2px;">
+                    <span class="player-name" style="color: var(--text-secondary);">平局</span>
+                    <span class="player-score-num" id="score-ties" style="font-size: 1.15rem;">0</span>
+                    <span class="piece-remain" id="peace-counter" title="連續無翻子無吃子步數">和棋計數: 0/50</span>
+                </div>
+
+                <div class="score-card" id="score-card-p2">
+                    <div class="score-card-left">
+                        <div class="player-avatar" id="avatar-p2">?</div>
+                        <div class="player-info">
+                            <div class="player-name-row">
+                                <span class="player-name" id="name-p2">玩家 2</span>
+                                <span class="color-tag" id="tag-p2">未定色</span>
+                            </div>
+                            <span class="piece-remain" id="remain-p2">存活: 16</span>
+                        </div>
+                    </div>
+                    <span class="player-score-num" id="score-p2">0</span>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-announcement" id="status-text">
+                請翻開第一枚棋子以決定雙方陣營顏色！
+            </div>
+
+            <!-- 4x8 Banqi Board -->
+            <div class="board-wrapper">
+                <div class="banqi-board-frame">
+                    <div class="banqi-grid" id="banqi-grid"></div>
+                </div>
+            </div>
+
+            <!-- Captured Pieces Graveyard -->
+            <div class="graveyard-wrapper">
+                <div class="graveyard-box">
+                    <div class="graveyard-header">
+                        <span><strong class="red-text">紅方</strong> 陣亡棋子</span>
+                        <span id="lost-red-count">0 / 16</span>
+                    </div>
+                    <div class="graveyard-list" id="graveyard-red"></div>
+                </div>
+                <div class="graveyard-box">
+                    <div class="graveyard-header">
+                        <span><strong class="black-text">黑方</strong> 陣亡棋子</span>
+                        <span id="lost-black-count">0 / 16</span>
+                    </div>
+                    <div class="graveyard-list" id="graveyard-black"></div>
+                </div>
+            </div>
+
+            <!-- Footer Controls -->
+            <div class="game-controls">
+                <button id="btn-reset" class="btn btn-secondary">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>重新開局</span>
+                </button>
+                <button id="btn-reset-scores" class="btn btn-secondary-danger">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>重設戰績</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rules Modal -->
+    <div id="rules-modal" class="modal-overlay">
+        <div class="modal-card card-glass">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-scroll"></i> 台灣標準暗棋規則</h3>
+                <button id="btn-close-rules" class="btn btn-icon" style="width:34px;height:34px;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="rank-chain">
+                    帥/將(7) ＞ 仕/士(6) ＞ 相/象(5) ＞ 俥/車(4) ＞ 傌/馬(3) ＞ 包/砲(2) ＞ 兵/卒(1)
+                </div>
+                <p>• <strong>開局定色：</strong>32 枚棋子背面朝上洗勻排於 4×8 棋盤，先手翻開的第一枚棋子顏色即為先手陣營。</p>
+                <p>• <strong>輪流行動：</strong>每回合可選擇「翻開任一枚暗子」或「移動一枚己方明子（走步或吃子）」。</p>
+                <p>• <strong>一般走吃：</strong>除包/砲外，其餘棋子皆沿直橫線走一格。同階或高階可吃低階；唯獨<strong>兵/卒(1) 可吃 帥/將(7)</strong>，且<strong>帥/將(7) 不可吃 兵/卒(1)</strong>。</p>
+                <p>• <strong>包/砲飛吃：</strong>包/砲不吃時僅能直橫走一格至空白格；吃子時必須沿同一行或同一列，中間<strong>恰好隔一枚棋子（明暗皆可）</strong>，即可飛越吃掉任意階級的敵方明子！包/砲不可直接吃相鄰棋子。</p>
+                <p>• <strong>勝負判定：</strong>將敵方 16 枚棋子全數殲滅或令對手無合法步可走即獲勝；連續 50 步無翻子且無吃子則判和局。</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Piece Templates (32 pieces total)
+        const PIECE_TEMPLATES = [
+            // Red (16)
+            { color: 'red', rank: 7, name: '帥', count: 1 },
+            { color: 'red', rank: 6, name: '仕', count: 2 },
+            { color: 'red', rank: 5, name: '相', count: 2 },
+            { color: 'red', rank: 4, name: '俥', count: 2 },
+            { color: 'red', rank: 3, name: '傌', count: 2 },
+            { color: 'red', rank: 2, name: '包', count: 2 },
+            { color: 'red', rank: 1, name: '兵', count: 5 },
+            // Black (16)
+            { color: 'black', rank: 7, name: '將', count: 1 },
+            { color: 'black', rank: 6, name: '士', count: 2 },
+            { color: 'black', rank: 5, name: '象', count: 2 },
+            { color: 'black', rank: 4, name: '車', count: 2 },
+            { color: 'black', rank: 3, name: '馬', count: 2 },
+            { color: 'black', rank: 2, name: '砲', count: 2 },
+            { color: 'black', rank: 1, name: '卒', count: 5 }
+        ];
+
+        // Piece tactical values for AI evaluation
+        const PIECE_VALUES = {
+            7: 115, // 帥/將
+            6: 85,  // 仕/士
+            5: 60,  // 相/象
+            4: 42,  // 俥/車
+            3: 28,  // 傌/馬
+            2: 65,  // 包/砲 (high tactical threat)
+            1: 32   // 兵/卒 (can kill rank 7)
+        };
+
+        // Web Audio API Sound Synthesizer
+        const SoundManager = {
+            ctx: null,
+            enabled: true,
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            },
+
+            toggle() {
+                this.enabled = !this.enabled;
+                localStorage.setItem('neon_banqi_sound', this.enabled);
+                return this.enabled;
+            },
+
+            playTone(freqs, duration, type = 'sine', slide = false, endFreq = 0, gainVal = 0.14) {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gainNode = this.ctx.createGain();
+
+                osc.type = type;
+                osc.connect(gainNode);
+                gainNode.connect(this.ctx.destination);
+
+                if (Array.isArray(freqs)) {
+                    freqs.forEach((f, idx) => {
+                        const t = now + (duration / freqs.length) * idx;
+                        osc.frequency.setValueAtTime(f, t);
+                    });
+                } else {
+                    osc.frequency.setValueAtTime(freqs, now);
+                    if (slide && endFreq > 0) {
+                        osc.frequency.exponentialRampToValueAtTime(endFreq, now + duration);
+                    }
+                }
+
+                gainNode.gain.setValueAtTime(gainVal, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+                osc.start(now);
+                osc.stop(now + duration);
+            },
+
+            playClick() {
+                this.playTone(750, 0.06, 'sine', false, 0, 0.1);
+            },
+
+            playSelect() {
+                this.playTone(540, 0.07, 'triangle', true, 680, 0.12);
+            },
+
+            playFlip() {
+                this.playTone(320, 0.12, 'triangle', true, 660, 0.16);
+            },
+
+            playMove() {
+                this.playTone(420, 0.09, 'sine', true, 300, 0.14);
+            },
+
+            playCapture(isCannon = false) {
+                if (isCannon) {
+                    this.playTone([580, 260, 140], 0.24, 'sawtooth', false, 0, 0.18);
+                } else {
+                    this.playTone(480, 0.16, 'square', true, 160, 0.15);
+                }
+            },
+
+            playWin(isAIWin = false) {
+                const freqs = isAIWin ? [440, 349.23, 293.66, 220] : [261.63, 329.63, 392.00, 523.25, 659.25];
+                this.playTone(freqs, 0.55, isAIWin ? 'sawtooth' : 'triangle', false, 0, 0.16);
+            },
+
+            playTie() {
+                this.playTone([300, 260, 220], 0.38, 'sawtooth', false, 0, 0.12);
+            }
+        };
+
+        // Particle Celebration System
+        const ParticleSystem = {
+            canvas: null,
+            ctx: null,
+            particles: [],
+            animationId: null,
+
+            init() {
+                this.canvas = document.getElementById('particle-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+            },
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            },
+
+            createExplosion(x, y, color, count = 28) {
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 7 + 2;
+                    this.particles.push({
+                        x, y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed - Math.random() * 2,
+                        size: Math.random() * 4 + 2,
+                        color,
+                        alpha: 1,
+                        decay: Math.random() * 0.022 + 0.015,
+                        gravity: 0.14
+                    });
+                }
+                if (!this.animationId) {
+                    this.update();
+                }
+            },
+
+            update() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const p = this.particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += p.gravity;
+                    p.alpha -= p.decay;
+
+                    if (p.alpha <= 0) {
+                        this.particles.splice(i, 1);
+                        continue;
+                    }
+
+                    this.ctx.save();
+                    this.ctx.globalAlpha = p.alpha;
+                    this.ctx.shadowBlur = 8;
+                    this.ctx.shadowColor = p.color;
+                    this.ctx.fillStyle = p.color;
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    this.ctx.restore();
+                }
+
+                if (this.particles.length > 0) {
+                    this.animationId = requestAnimationFrame(() => this.update());
+                } else {
+                    this.animationId = null;
+                }
+            }
+        };
+
+        // Main Banqi Game Engine
+        const BanqiGame = {
+            board: Array(32).fill(null),
+            gameActive: false,
+            gameMode: 'pvp',        // 'pvp' or 'pve'
+            difficulty: 'medium',   // 'easy', 'medium', 'hard'
+            firstTurnSetting: 'player', // 'player', 'ai', 'alternate'
+            startingSlot: 'P1',     // 'P1' (Player 1 / Human) or 'P2' (Player 2 / AI)
+            currentSlot: 'P1',      // 'P1' or 'P2'
+            playerColors: { P1: null, P2: null }, // Assigned on first flip
+            selectedIdx: null,
+            lastMove: null,         // { from, to }
+            peaceMoves: 0,          // Moves without flip or capture (50 => draw)
+            capturedRed: [],
+            capturedBlack: [],
+            aiTimeoutId: null,
+            allScores: {
+                pvp: { P1: 0, P2: 0, ties: 0 },
+                pve_easy: { P1: 0, P2: 0, ties: 0 },
+                pve_medium: { P1: 0, P2: 0, ties: 0 },
+                pve_hard: { P1: 0, P2: 0, ties: 0 }
+            },
+            elements: {},
+
+            init() {
+                this.elements = {
+                    menuScreen: document.getElementById('menu-screen'),
+                    gameScreen: document.getElementById('game-screen'),
+                    btnPvP: document.getElementById('btn-pvp'),
+                    btnPvE: document.getElementById('btn-pve'),
+                    difficultySection: document.getElementById('difficulty-section'),
+                    btnStart: document.getElementById('btn-start'),
+                    btnBackMenu: document.getElementById('btn-back-menu'),
+                    btnRules: document.getElementById('btn-rules'),
+                    btnCloseRules: document.getElementById('btn-close-rules'),
+                    rulesModal: document.getElementById('rules-modal'),
+                    btnSoundToggle: document.getElementById('btn-sound-toggle'),
+                    soundIcon: document.getElementById('sound-icon'),
+                    btnReset: document.getElementById('btn-reset'),
+                    btnResetScores: document.getElementById('btn-reset-scores'),
+                    gameModeDisplay: document.getElementById('game-mode-display'),
+                    gameDiffDisplay: document.getElementById('game-diff-display'),
+                    scoreCardP1: document.getElementById('score-card-p1'),
+                    scoreCardP2: document.getElementById('score-card-p2'),
+                    avatarP1: document.getElementById('avatar-p1'),
+                    avatarP2: document.getElementById('avatar-p2'),
+                    nameP1: document.getElementById('name-p1'),
+                    nameP2: document.getElementById('name-p2'),
+                    tagP1: document.getElementById('tag-p1'),
+                    tagP2: document.getElementById('tag-p2'),
+                    remainP1: document.getElementById('remain-p1'),
+                    remainP2: document.getElementById('remain-p2'),
+                    scoreP1: document.getElementById('score-p1'),
+                    scoreP2: document.getElementById('score-p2'),
+                    scoreTies: document.getElementById('score-ties'),
+                    peaceCounter: document.getElementById('peace-counter'),
+                    statusText: document.getElementById('status-text'),
+                    grid: document.getElementById('banqi-grid'),
+                    graveyardRed: document.getElementById('graveyard-red'),
+                    graveyardBlack: document.getElementById('graveyard-black'),
+                    lostRedCount: document.getElementById('lost-red-count'),
+                    lostBlackCount: document.getElementById('lost-black-count')
+                };
+
+                this.loadSettings();
+                this.bindEvents();
+                ParticleSystem.init();
+            },
+
+            getCurrentScoreKey() {
+                return this.gameMode === 'pvp' ? 'pvp' : `pve_${this.difficulty}`;
+            },
+
+            get scores() {
+                const key = this.getCurrentScoreKey();
+                if (!this.allScores[key]) {
+                    this.allScores[key] = { P1: 0, P2: 0, ties: 0 };
+                }
+                return this.allScores[key];
+            },
+
+            loadSettings() {
+                const savedSound = localStorage.getItem('neon_banqi_sound');
+                if (savedSound !== null) {
+                    SoundManager.enabled = savedSound === 'true';
+                }
+                this.updateSoundIcon();
+
+                const savedScores = localStorage.getItem('neon_banqi_scores_v1');
+                if (savedScores) {
+                    try {
+                        const parsed = JSON.parse(savedScores);
+                        if (parsed && typeof parsed === 'object') {
+                            this.allScores = { ...this.allScores, ...parsed };
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse Banqi scores', e);
+                    }
+                }
+            },
+
+            saveScores() {
+                localStorage.setItem('neon_banqi_scores_v1', JSON.stringify(this.allScores));
+            },
+
+            updateSoundIcon() {
+                this.elements.soundIcon.className = SoundManager.enabled
+                    ? 'fa-solid fa-volume-high'
+                    : 'fa-solid fa-volume-xmark';
+            },
+
+            clearAITimeout() {
+                if (this.aiTimeoutId !== null) {
+                    clearTimeout(this.aiTimeoutId);
+                    this.aiTimeoutId = null;
+                }
+                if (this.elements.grid) {
+                    this.elements.grid.classList.remove('ai-thinking');
+                }
+            },
+
+            scheduleAIMove() {
+                this.clearAITimeout();
+                this.elements.grid.classList.add('ai-thinking');
+                this.aiTimeoutId = setTimeout(() => {
+                    this.aiTimeoutId = null;
+                    this.executeAIMove();
+                }, 520);
+            },
+
+            bindEvents() {
+                this.elements.btnPvP.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.setGameMode('pvp');
+                });
+
+                this.elements.btnPvE.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.setGameMode('pve');
+                });
+
+                document.querySelectorAll('.btn-diff').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        SoundManager.playClick();
+                        document.querySelectorAll('.btn-diff').forEach(b => b.classList.remove('active'));
+                        e.currentTarget.classList.add('active');
+                        this.difficulty = e.currentTarget.dataset.diff;
+                    });
+                });
+
+                document.querySelectorAll('.btn-order').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        SoundManager.playClick();
+                        document.querySelectorAll('.btn-order').forEach(b => b.classList.remove('active'));
+                        e.currentTarget.classList.add('active');
+                        this.firstTurnSetting = e.currentTarget.dataset.order;
+                    });
+                });
+
+                this.elements.btnStart.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.startGame();
+                });
+
+                this.elements.btnBackMenu.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.showMenu();
+                });
+
+                this.elements.btnRules.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.elements.rulesModal.classList.add('active');
+                });
+
+                this.elements.btnCloseRules.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.elements.rulesModal.classList.remove('active');
+                });
+
+                this.elements.rulesModal.addEventListener('click', (e) => {
+                    if (e.target === this.elements.rulesModal) {
+                        this.elements.rulesModal.classList.remove('active');
+                    }
+                });
+
+                this.elements.btnSoundToggle.addEventListener('click', () => {
+                    SoundManager.toggle();
+                    this.updateSoundIcon();
+                    if (SoundManager.enabled) SoundManager.playClick();
+                });
+
+                this.elements.btnReset.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.resetRound();
+                });
+
+                this.elements.btnResetScores.addEventListener('click', () => {
+                    SoundManager.playClick();
+                    this.resetScores();
+                });
+            },
+
+            setGameMode(mode) {
+                this.gameMode = mode;
+                if (mode === 'pvp') {
+                    this.elements.btnPvP.classList.add('active');
+                    this.elements.btnPvE.classList.remove('active');
+                    this.elements.difficultySection.classList.add('hidden');
+                } else {
+                    this.elements.btnPvE.classList.add('active');
+                    this.elements.btnPvP.classList.remove('active');
+                    this.elements.difficultySection.classList.remove('hidden');
+                }
+            },
+
+            getInitialStartingSlot() {
+                if (this.gameMode === 'pvp') return 'P1';
+                return this.firstTurnSetting === 'ai' ? 'P2' : 'P1';
+            },
+
+            advanceStartingSlot() {
+                if (this.gameMode === 'pve' && this.firstTurnSetting === 'alternate') {
+                    this.startingSlot = this.startingSlot === 'P1' ? 'P2' : 'P1';
+                } else {
+                    this.startingSlot = this.getInitialStartingSlot();
+                }
+            },
+
+            startGame() {
+                this.elements.menuScreen.classList.remove('active');
+                this.elements.gameScreen.classList.add('active');
+
+                if (this.gameMode === 'pvp') {
+                    this.elements.nameP1.textContent = '玩家 1';
+                    this.elements.nameP2.textContent = '玩家 2';
+                    this.elements.gameModeDisplay.textContent = '雙人對決 (PvP)';
+                    this.elements.gameDiffDisplay.classList.add('hidden');
+                } else {
+                    this.elements.nameP1.textContent = '玩家';
+                    this.elements.nameP2.textContent = 'AI 棋手';
+                    this.elements.gameModeDisplay.textContent = '挑戰 AI (PvE)';
+                    this.elements.gameDiffDisplay.classList.remove('hidden');
+                    const diffLabels = { easy: '輕鬆', medium: '聰明', hard: '宗師' };
+                    this.elements.gameDiffDisplay.textContent = diffLabels[this.difficulty];
+                }
+
+                this.startingSlot = this.getInitialStartingSlot();
+                this.updateScoreboardUI();
+                this.resetRound();
+            },
+
+            showMenu() {
+                this.clearAITimeout();
+                this.gameActive = false;
+                this.elements.gameScreen.classList.remove('active');
+                this.elements.menuScreen.classList.add('active');
+            },
+
+            createShuffledDeck() {
+                const deck = [];
+                let idCounter = 1;
+                PIECE_TEMPLATES.forEach(tmpl => {
+                    for (let i = 0; i < tmpl.count; i++) {
+                        deck.push({
+                            id: idCounter++,
+                            color: tmpl.color,
+                            rank: tmpl.rank,
+                            name: tmpl.name,
+                            revealed: false
+                        });
+                    }
+                });
+                // Fisher-Yates shuffle
+                for (let i = deck.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [deck[i], deck[j]] = [deck[j], deck[i]];
+                }
+                return deck;
+            },
+
+            resetRound() {
+                this.clearAITimeout();
+                if (this.gameMode === 'pvp' || this.firstTurnSetting !== 'alternate') {
+                    this.startingSlot = this.getInitialStartingSlot();
+                }
+                this.currentSlot = this.startingSlot;
+                this.playerColors = { P1: null, P2: null };
+                this.selectedIdx = null;
+                this.lastMove = null;
+                this.peaceMoves = 0;
+                this.capturedRed = [];
+                this.capturedBlack = [];
+                this.board = this.createShuffledDeck();
+                this.gameActive = true;
+
+                this.renderBoard();
+                this.updatePlayerCardsUI();
+                this.updateGraveyardUI();
+                this.updateStatusUI();
+
+                if (this.gameMode === 'pve' && this.currentSlot === 'P2') {
+                    this.scheduleAIMove();
+                }
+            },
+
+            resetScores() {
+                this.allScores[this.getCurrentScoreKey()] = { P1: 0, P2: 0, ties: 0 };
+                this.startingSlot = this.getInitialStartingSlot();
+                this.saveScores();
+                this.updateScoreboardUI();
+            },
+
+            updateScoreboardUI() {
+                this.elements.scoreP1.textContent = this.scores.P1;
+                this.elements.scoreP2.textContent = this.scores.P2;
+                this.elements.scoreTies.textContent = this.scores.ties;
+            },
+
+            updatePlayerCardsUI() {
+                const p1Color = this.playerColors.P1;
+                const p2Color = this.playerColors.P2;
+
+                // Count remaining pieces on board per color
+                let redAlive = 0;
+                let blackAlive = 0;
+                for (const p of this.board) {
+                    if (!p) continue;
+                    if (p.color === 'red') redAlive++;
+                    else blackAlive++;
+                }
+
+                // Update P1 Avatar & Tag
+                this.elements.avatarP1.className = 'player-avatar';
+                this.elements.tagP1.className = 'color-tag';
+                if (!p1Color) {
+                    this.elements.avatarP1.textContent = '?';
+                    this.elements.tagP1.textContent = '未定色';
+                    this.elements.remainP1.textContent = '待翻牌定色';
+                } else if (p1Color === 'red') {
+                    this.elements.avatarP1.classList.add('color-red');
+                    this.elements.avatarP1.textContent = '帥';
+                    this.elements.tagP1.classList.add('tag-red');
+                    this.elements.tagP1.textContent = '紅方';
+                    this.elements.remainP1.textContent = `存活: ${redAlive} 枚`;
+                } else {
+                    this.elements.avatarP1.classList.add('color-black');
+                    this.elements.avatarP1.textContent = '將';
+                    this.elements.tagP1.classList.add('tag-black');
+                    this.elements.tagP1.textContent = '黑方';
+                    this.elements.remainP1.textContent = `存活: ${blackAlive} 枚`;
+                }
+
+                // Update P2 Avatar & Tag
+                this.elements.avatarP2.className = 'player-avatar';
+                this.elements.tagP2.className = 'color-tag';
+                if (!p2Color) {
+                    this.elements.avatarP2.textContent = '?';
+                    this.elements.tagP2.textContent = '未定色';
+                    this.elements.remainP2.textContent = '待翻牌定色';
+                } else if (p2Color === 'red') {
+                    this.elements.avatarP2.classList.add('color-red');
+                    this.elements.avatarP2.textContent = '帥';
+                    this.elements.tagP2.classList.add('tag-red');
+                    this.elements.tagP2.textContent = '紅方';
+                    this.elements.remainP2.textContent = `存活: ${redAlive} 枚`;
+                } else {
+                    this.elements.avatarP2.classList.add('color-black');
+                    this.elements.avatarP2.textContent = '將';
+                    this.elements.tagP2.classList.add('tag-black');
+                    this.elements.tagP2.textContent = '黑方';
+                    this.elements.remainP2.textContent = `存活: ${blackAlive} 枚`;
+                }
+
+                // Active Turn Card Glow
+                this.elements.scoreCardP1.className = 'score-card';
+                this.elements.scoreCardP2.className = 'score-card';
+                if (this.gameActive) {
+                    const activeCard = this.currentSlot === 'P1' ? this.elements.scoreCardP1 : this.elements.scoreCardP2;
+                    const activeColor = this.playerColors[this.currentSlot];
+                    if (!activeColor) {
+                        activeCard.classList.add('active-turn-unassigned');
+                    } else if (activeColor === 'red') {
+                        activeCard.classList.add('active-turn-red');
+                    } else {
+                        activeCard.classList.add('active-turn-black');
+                    }
+                }
+
+                this.elements.peaceCounter.textContent = `和棋計數: ${this.peaceMoves}/50`;
+            },
+
+            updateGraveyardUI() {
+                this.elements.lostRedCount.textContent = `${this.capturedRed.length} / 16`;
+                this.elements.lostBlackCount.textContent = `${this.capturedBlack.length} / 16`;
+
+                const sortByRank = (a, b) => b.rank - a.rank;
+                this.elements.graveyardRed.innerHTML = [...this.capturedRed]
+                    .sort(sortByRank)
+                    .map(p => `<span class="mini-piece red" title="階級 ${p.rank}">${p.name}</span>`)
+                    .join('');
+
+                this.elements.graveyardBlack.innerHTML = [...this.capturedBlack]
+                    .sort(sortByRank)
+                    .map(p => `<span class="mini-piece black" title="階級 ${p.rank}">${p.name}</span>`)
+                    .join('');
+            },
+
+            updateStatusUI(customHTML) {
+                if (customHTML !== undefined) {
+                    this.elements.statusText.innerHTML = customHTML;
+                    return;
+                }
+
+                const slotName = this.currentSlot === 'P1'
+                    ? this.elements.nameP1.textContent
+                    : this.elements.nameP2.textContent;
+                const slotColor = this.playerColors[this.currentSlot];
+
+                if (!slotColor) {
+                    if (this.gameMode === 'pve' && this.currentSlot === 'P2') {
+                        this.elements.statusText.innerHTML = `<span class="gold-text font-bold">${slotName}</span> 正在翻開第一枚棋子決定陣營...`;
+                    } else {
+                        this.elements.statusText.innerHTML = `輪到 <span class="gold-text font-bold">${slotName}</span>：請翻開任一暗子決定雙方顏色！`;
+                    }
+                    return;
+                }
+
+                const colorClass = slotColor === 'red' ? 'red-text' : 'black-text';
+                const colorLabel = slotColor === 'red' ? '紅方' : '黑方';
+
+                if (this.gameMode === 'pve' && this.currentSlot === 'P2') {
+                    this.elements.statusText.innerHTML = `<span class="${colorClass} font-bold">${slotName} (${colorLabel})</span> 思考中...`;
+                } else {
+                    this.elements.statusText.innerHTML = `輪到 <span class="${colorClass} font-bold">${slotName} (${colorLabel})</span> 行動（翻子或移動明子）`;
+                }
+            },
+
+            renderBoard(flippedIdx = null) {
+                const validTargets = this.selectedIdx !== null
+                    ? this.getValidMovesForIndex(this.board, this.selectedIdx)
+                    : [];
+                const validTargetMap = new Map(validTargets.map(m => [m.to, m.type]));
+
+                this.elements.grid.innerHTML = '';
+
+                for (let idx = 0; idx < 32; idx++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'banqi-cell';
+                    cell.dataset.index = idx;
+
+                    if (this.selectedIdx === idx) {
+                        cell.classList.add('selected-cell');
+                    }
+                    if (this.lastMove) {
+                        if (this.lastMove.from === idx) cell.classList.add('last-move-from');
+                        if (this.lastMove.to === idx) cell.classList.add('last-move-to');
+                    }
+                    if (validTargetMap.has(idx)) {
+                        const moveType = validTargetMap.get(idx);
+                        cell.classList.add(moveType === 'capture' ? 'valid-capture' : 'valid-move');
+                    }
+
+                    const piece = this.board[idx];
+                    if (piece) {
+                        const pieceEl = document.createElement('div');
+                        if (!piece.revealed) {
+                            pieceEl.className = 'piece face-down';
+                        } else {
+                            const cClass = piece.color === 'red' ? 'red-piece' : 'black-piece';
+                            pieceEl.className = `piece face-up ${cClass}`;
+                            if (flippedIdx === idx) {
+                                pieceEl.classList.add('flip-anim');
+                            }
+                            pieceEl.innerHTML = `
+                                <span class="piece-char">${piece.name}</span>
+                                <span class="piece-rank-badge">${piece.rank}</span>
+                            `;
+                        }
+                        cell.appendChild(pieceEl);
+                    }
+
+                    cell.addEventListener('click', () => this.handleCellClick(idx));
+                    this.elements.grid.appendChild(cell);
+                }
+            },
+
+            // --- Core Rules Engine ---
+            canPieceCapture(attacker, defender, isCannonJump = false) {
+                if (!attacker || !defender) return false;
+                if (!attacker.revealed || !defender.revealed) return false;
+                if (attacker.color === defender.color) return false;
+
+                // Cannon (包/砲, rank 2): can ONLY capture via jump over exactly 1 intermediate piece
+                if (attacker.rank === 2) {
+                    return isCannonJump;
+                }
+
+                // Non-cannon cannot jump
+                if (isCannonJump) return false;
+
+                // General (7) vs Soldier (1) special rule
+                if (attacker.rank === 7 && defender.rank === 1) return false;
+                if (attacker.rank === 1 && defender.rank === 7) return true;
+
+                return attacker.rank >= defender.rank;
+            },
+
+            getValidMovesForIndex(board, fromIdx) {
+                const piece = board[fromIdx];
+                if (!piece || !piece.revealed) return [];
+
+                const moves = [];
+                const r = Math.floor(fromIdx / 8);
+                const c = fromIdx % 8;
+                const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+                // 1. Orthogonal adjacent steps (move to empty, or non-cannon capture)
+                for (const [dr, dc] of dirs) {
+                    const nr = r + dr;
+                    const nc = c + dc;
+                    if (nr < 0 || nr >= 4 || nc < 0 || nc >= 8) continue;
+                    const toIdx = nr * 8 + nc;
+                    const target = board[toIdx];
+
+                    if (!target) {
+                        moves.push({ from: fromIdx, to: toIdx, type: 'move' });
+                    } else if (piece.rank !== 2 && this.canPieceCapture(piece, target, false)) {
+                        moves.push({ from: fromIdx, to: toIdx, type: 'capture' });
+                    }
+                }
+
+                // 2. Cannon (包/砲, rank 2) jump captures along row/col
+                if (piece.rank === 2) {
+                    for (const [dr, dc] of dirs) {
+                        let nr = r + dr;
+                        let nc = c + dc;
+                        let screens = 0;
+
+                        while (nr >= 0 && nr < 4 && nc >= 0 && nc < 8) {
+                            const scanIdx = nr * 8 + nc;
+                            const cellPiece = board[scanIdx];
+                            if (cellPiece) {
+                                if (screens === 0) {
+                                    screens = 1; // Found the screen (intermediate piece)
+                                } else if (screens === 1) {
+                                    // Found the first piece after the screen
+                                    if (this.canPieceCapture(piece, cellPiece, true)) {
+                                        moves.push({ from: fromIdx, to: scanIdx, type: 'capture' });
+                                    }
+                                    break; // Cannot jump over 2 pieces
+                                }
+                            }
+                            nr += dr;
+                            nc += dc;
+                        }
+                    }
+                }
+
+                return moves;
+            },
+
+            getAllLegalActionsForColor(board, color) {
+                const actions = [];
+
+                // Flip actions (any face-down piece)
+                for (let i = 0; i < 32; i++) {
+                    if (board[i] && !board[i].revealed) {
+                        actions.push({ action: 'flip', index: i });
+                    }
+                }
+
+                // If color is assigned, include move & capture actions for face-up pieces of that color
+                if (color) {
+                    for (let i = 0; i < 32; i++) {
+                        const p = board[i];
+                        if (p && p.revealed && p.color === color) {
+                            const pieceMoves = this.getValidMovesForIndex(board, i);
+                            for (const m of pieceMoves) {
+                                actions.push({ action: m.type, from: m.from, to: m.to });
+                            }
+                        }
+                    }
+                }
+
+                return actions;
+            },
+
+            handleCellClick(idx) {
+                if (!this.gameActive) return;
+                if (this.gameMode === 'pve' && this.currentSlot === 'P2') return;
+
+                const clickedPiece = this.board[idx];
+                const myColor = this.playerColors[this.currentSlot];
+
+                // If a piece is currently selected, check if clicked cell is a valid destination
+                if (this.selectedIdx !== null) {
+                    if (this.selectedIdx === idx) {
+                        // Deselect
+                        SoundManager.playClick();
+                        this.selectedIdx = null;
+                        this.renderBoard();
+                        return;
+                    }
+
+                    const validMoves = this.getValidMovesForIndex(this.board, this.selectedIdx);
+                    const chosenMove = validMoves.find(m => m.to === idx);
+                    if (chosenMove) {
+                        this.executeMove(chosenMove.from, chosenMove.to);
+                        return;
+                    }
+
+                    // Clicking another of own face-up pieces switches selection
+                    if (clickedPiece && clickedPiece.revealed && clickedPiece.color === myColor) {
+                        SoundManager.playSelect();
+                        this.selectedIdx = idx;
+                        this.renderBoard();
+                        return;
+                    }
+
+                    // Otherwise deselect
+                    this.selectedIdx = null;
+                    this.renderBoard();
+                    return;
+                }
+
+                // No piece currently selected:
+                if (!clickedPiece) return;
+
+                // 1. Face-down piece -> Flip it!
+                if (!clickedPiece.revealed) {
+                    this.executeFlip(idx);
+                    return;
+                }
+
+                // 2. Face-up piece of own color -> Select it!
+                if (clickedPiece.color === myColor) {
+                    SoundManager.playSelect();
+                    this.selectedIdx = idx;
+                    this.renderBoard();
+                }
+            },
+
+            executeFlip(idx) {
+                const piece = this.board[idx];
+                if (!piece || piece.revealed) return;
+
+                piece.revealed = true;
+                this.selectedIdx = null;
+                this.lastMove = { from: idx, to: idx };
+                this.peaceMoves = 0;
+
+                // Assign colors if this is the very first flip of the game
+                if (!this.playerColors.P1 && !this.playerColors.P2) {
+                    const firstColor = piece.color;
+                    const otherColor = firstColor === 'red' ? 'black' : 'red';
+                    this.playerColors[this.currentSlot] = firstColor;
+                    const otherSlot = this.currentSlot === 'P1' ? 'P2' : 'P1';
+                    this.playerColors[otherSlot] = otherColor;
+                }
+
+                SoundManager.playFlip();
+                this.renderBoard(idx);
+                this.finishTurn();
+            },
+
+            executeMove(fromIdx, toIdx) {
+                const attacker = this.board[fromIdx];
+                const defender = this.board[toIdx];
+                if (!attacker) return;
+
+                this.selectedIdx = null;
+                this.lastMove = { from: fromIdx, to: toIdx };
+
+                if (defender) {
+                    // Capture!
+                    this.peaceMoves = 0;
+                    if (defender.color === 'red') {
+                        this.capturedRed.push(defender);
+                    } else {
+                        this.capturedBlack.push(defender);
+                    }
+
+                    // Particle burst at target cell
+                    const cellEl = this.elements.grid.children[toIdx];
+                    if (cellEl) {
+                        const rect = cellEl.getBoundingClientRect();
+                        const burstColor = attacker.color === 'red' ? '#ff2a5f' : '#00f2fe';
+                        ParticleSystem.createExplosion(
+                            rect.left + rect.width / 2,
+                            rect.top + rect.height / 2,
+                            burstColor,
+                            24
+                        );
+                    }
+
+                    SoundManager.playCapture(attacker.rank === 2);
+                } else {
+                    this.peaceMoves++;
+                    SoundManager.playMove();
+                }
+
+                this.board[toIdx] = attacker;
+                this.board[fromIdx] = null;
+
+                this.renderBoard();
+                this.finishTurn();
+            },
+
+            finishTurn() {
+                this.updatePlayerCardsUI();
+                this.updateGraveyardUI();
+
+                // Check if either color has 0 pieces remaining
+                const redRemaining = this.board.filter(p => p && p.color === 'red').length;
+                const blackRemaining = this.board.filter(p => p && p.color === 'black').length;
+
+                if (redRemaining === 0 || blackRemaining === 0) {
+                    const winningColor = redRemaining === 0 ? 'black' : 'red';
+                    const winnerSlot = this.playerColors.P1 === winningColor ? 'P1' : 'P2';
+                    this.handleGameWin(winnerSlot, '全殲敵軍棋子！');
+                    return;
+                }
+
+                // Check 50-move peace rule
+                if (this.peaceMoves >= 50) {
+                    this.handleGameDraw('雙方連續 50 步無翻子與吃子，握手言和！');
+                    return;
+                }
+
+                // Switch turn
+                this.currentSlot = this.currentSlot === 'P1' ? 'P2' : 'P1';
+                const nextColor = this.playerColors[this.currentSlot];
+
+                // Check if next player has any legal actions (flip or move)
+                const nextActions = this.getAllLegalActionsForColor(this.board, nextColor);
+                if (nextActions.length === 0) {
+                    const winnerSlot = this.currentSlot === 'P1' ? 'P2' : 'P1';
+                    this.handleGameWin(winnerSlot, '對手已無合法棋步可走！');
+                    return;
+                }
+
+                this.updatePlayerCardsUI();
+                this.updateStatusUI();
+
+                if (this.gameMode === 'pve' && this.currentSlot === 'P2') {
+                    this.scheduleAIMove();
+                }
+            },
+
+            handleGameWin(winnerSlot, reasonText) {
+                this.gameActive = false;
+                this.clearAITimeout();
+                this.advanceStartingSlot();
+
+                this.scores[winnerSlot]++;
+                this.saveScores();
+                this.updateScoreboardUI();
+                this.updatePlayerCardsUI();
+
+                const winnerName = winnerSlot === 'P1'
+                    ? this.elements.nameP1.textContent
+                    : this.elements.nameP2.textContent;
+                const winnerColor = this.playerColors[winnerSlot];
+                const colorClass = winnerColor === 'red' ? 'red-text' : 'black-text';
+                const colorName = winnerColor === 'red' ? '紅方' : '黑方';
+
+                const isAIWin = this.gameMode === 'pve' && winnerSlot === 'P2';
+                SoundManager.playWin(isAIWin);
+
+                // Celebratory particles
+                const frameRect = this.elements.grid.getBoundingClientRect();
+                const burstColor = winnerColor === 'red' ? '#ff2a5f' : '#00f2fe';
+                ParticleSystem.createExplosion(
+                    frameRect.left + frameRect.width * 0.3,
+                    frameRect.top + frameRect.height * 0.5,
+                    burstColor,
+                    40
+                );
+                ParticleSystem.createExplosion(
+                    frameRect.left + frameRect.width * 0.7,
+                    frameRect.top + frameRect.height * 0.5,
+                    burstColor,
+                    40
+                );
+
+                this.updateStatusUI(
+                    `<span class="${colorClass} font-bold">${winnerName} (${colorName})</span> 獲勝！${reasonText} 🎉`
+                );
+            },
+
+            handleGameDraw(reasonText) {
+                this.gameActive = false;
+                this.clearAITimeout();
+                this.advanceStartingSlot();
+
+                this.scores.ties++;
+                this.saveScores();
+                this.updateScoreboardUI();
+                this.updatePlayerCardsUI();
+                SoundManager.playTie();
+
+                this.updateStatusUI(`<span class="gold-text font-bold">雙方平局！</span> ${reasonText} 🤝`);
+            },
+
+            // --- AI Engine (Easy / Medium / Hard) ---
+            executeAIMove() {
+                this.elements.grid.classList.remove('ai-thinking');
+                if (!this.gameActive || this.currentSlot !== 'P2') return;
+
+                const aiColor = this.playerColors.P2;
+                const legalActions = this.getAllLegalActionsForColor(this.board, aiColor);
+                if (legalActions.length === 0) return;
+
+                // If colors are not assigned yet (very first move of the game), flip a random inner cell
+                if (!aiColor) {
+                    const preferredFirstFlips = [9, 10, 13, 14, 17, 18, 21, 22];
+                    const choice = preferredFirstFlips[Math.floor(Math.random() * preferredFirstFlips.length)];
+                    this.executeFlip(choice);
+                    return;
+                }
+
+                let chosenAction = null;
+                if (this.difficulty === 'easy') {
+                    chosenAction = this.getEasyAIAction(legalActions);
+                } else if (this.difficulty === 'medium') {
+                    chosenAction = this.getMediumAIAction(legalActions, aiColor);
+                } else {
+                    chosenAction = this.getHardAIAction(legalActions, aiColor);
+                }
+
+                if (!chosenAction) {
+                    chosenAction = legalActions[Math.floor(Math.random() * legalActions.length)];
+                }
+
+                if (chosenAction.action === 'flip') {
+                    this.executeFlip(chosenAction.index);
+                } else {
+                    this.executeMove(chosenAction.from, chosenAction.to);
+                }
+            },
+
+            // Check if a piece at `idx` of `color` is under immediate capture threat by any revealed enemy piece
+            isSquareThreatenedByEnemy(board, idx, myColor) {
+                const myPiece = board[idx];
+                if (!myPiece) return false;
+                const enemyColor = myColor === 'red' ? 'black' : 'red';
+
+                for (let i = 0; i < 32; i++) {
+                    const p = board[i];
+                    if (p && p.revealed && p.color === enemyColor) {
+                        const moves = this.getValidMovesForIndex(board, i);
+                        if (moves.some(m => m.type === 'capture' && m.to === idx)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            },
+
+            simulateBoardMove(board, from, to) {
+                const next = board.map(p => (p ? { ...p } : null));
+                next[to] = next[from];
+                next[from] = null;
+                return next;
+            },
+
+            getEasyAIAction(legalActions) {
+                const captures = legalActions.filter(a => a.action === 'capture');
+                if (captures.length > 0 && Math.random() < 0.55) {
+                    return captures[Math.floor(Math.random() * captures.length)];
+                }
+                return legalActions[Math.floor(Math.random() * legalActions.length)];
+            },
+
+            getMediumAIAction(legalActions, aiColor) {
+                // 1. Look for favorable or safe captures
+                const captures = legalActions.filter(a => a.action === 'capture');
+                if (captures.length > 0) {
+                    captures.sort((a, b) => {
+                        const valA = PIECE_VALUES[this.board[a.to].rank];
+                        const valB = PIECE_VALUES[this.board[b.to].rank];
+                        return valB - valA;
+                    });
+                    return captures[0];
+                }
+
+                // 2. If a high-value AI piece is threatened, try to escape
+                const moves = legalActions.filter(a => a.action === 'move');
+                for (const m of moves) {
+                    const piece = this.board[m.from];
+                    if (PIECE_VALUES[piece.rank] >= 60 && this.isSquareThreatenedByEnemy(this.board, m.from, aiColor)) {
+                        const nextBoard = this.simulateBoardMove(this.board, m.from, m.to);
+                        if (!this.isSquareThreatenedByEnemy(nextBoard, m.to, aiColor)) {
+                            return m;
+                        }
+                    }
+                }
+
+                // 3. Otherwise flip a piece or make a safe move
+                const flips = legalActions.filter(a => a.action === 'flip');
+                if (flips.length > 0 && Math.random() < 0.65) {
+                    return flips[Math.floor(Math.random() * flips.length)];
+                }
+                return legalActions[Math.floor(Math.random() * legalActions.length)];
+            },
+
+            // Grandmaster (宗師) AI with Expectimax + Tactical Lookahead
+            getHardAIAction(legalActions, aiColor) {
+                const enemyColor = aiColor === 'red' ? 'black' : 'red';
+                let bestScore = -Infinity;
+                let bestActions = [];
+
+                const baseScore = this.evaluateBoard(this.board, aiColor);
+
+                for (const act of legalActions) {
+                    let score = 0;
+
+                    if (act.action === 'capture' || act.action === 'move') {
+                        const nextBoard = this.simulateBoardMove(this.board, act.from, act.to);
+                        const attacker = this.board[act.from];
+                        const victim = this.board[act.to];
+
+                        // Depth-2 minimax response from opponent's known pieces
+                        const enemyResponses = this.getAllLegalActionsForColor(nextBoard, enemyColor)
+                            .filter(a => a.action === 'capture' || a.action === 'move');
+
+                        let worstEnemyReplyScore = this.evaluateBoard(nextBoard, aiColor);
+                        for (const reply of enemyResponses) {
+                            const afterReply = this.simulateBoardMove(nextBoard, reply.from, reply.to);
+                            const evalAfter = this.evaluateBoard(afterReply, aiColor);
+                            if (evalAfter < worstEnemyReplyScore) {
+                                worstEnemyReplyScore = evalAfter;
+                            }
+                        }
+
+                        score = worstEnemyReplyScore;
+
+                        // Bonus for capturing high-value target
+                        if (victim) {
+                            score += PIECE_VALUES[victim.rank] * 0.35;
+                        }
+
+                        // Bonus for chasing lower-ranked enemy pieces adjacent to `act.to`
+                        const adjEnemies = this.getAdjacentPieces(nextBoard, act.to)
+                            .filter(p => p.piece && p.piece.revealed && p.piece.color === enemyColor);
+                        for (const adj of adjEnemies) {
+                            if (this.canPieceCapture(attacker, adj.piece, false)) {
+                                score += PIECE_VALUES[adj.piece.rank] * 0.18;
+                            }
+                        }
+                    } else if (act.action === 'flip') {
+                        // Evaluate expected risk/reward of flipping at `act.index`
+                        score = baseScore + this.evaluateFlipSafety(this.board, act.index, aiColor);
+                    }
+
+                    // Small jitter to avoid robotic repetition among identical scores
+                    score += (Math.random() - 0.5) * 1.5;
+
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestActions = [act];
+                    }
+                }
+
+                return bestActions[0];
+            },
+
+            getAdjacentPieces(board, idx) {
+                const r = Math.floor(idx / 8);
+                const c = idx % 8;
+                const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+                const list = [];
+                for (const [dr, dc] of dirs) {
+                    const nr = r + dr;
+                    const nc = c + dc;
+                    if (nr >= 0 && nr < 4 && nc >= 0 && nc < 8) {
+                        const nIdx = nr * 8 + nc;
+                        list.push({ index: nIdx, piece: board[nIdx] });
+                    }
+                }
+                return list;
+            },
+
+            evaluateFlipSafety(board, flipIdx, aiColor) {
+                const enemyColor = aiColor === 'red' ? 'black' : 'red';
+                let delta = 4; // Slight preference for revealing pieces over aimless shuffling
+
+                // Check adjacent revealed pieces around flipIdx
+                const neighbors = this.getAdjacentPieces(board, flipIdx);
+                for (const n of neighbors) {
+                    if (!n.piece || !n.piece.revealed) continue;
+                    if (n.piece.color === enemyColor) {
+                        // Dangerous to flip next to high-rank enemy piece (they get first strike if our piece is flipped)
+                        if (n.piece.rank >= 5) delta -= 16;
+                        else if (n.piece.rank >= 3) delta -= 8;
+                        else if (n.piece.rank === 2) delta += 5; // Enemy cannon can't capture adjacent!
+                    } else if (n.piece.color === aiColor) {
+                        // Good to flip next to our own strong piece if it's not a cannon
+                        if (n.piece.rank >= 5) delta += 6;
+                    }
+                }
+
+                // Check if flipIdx is in the line of fire of a revealed enemy cannon with 1 screen
+                const r = Math.floor(flipIdx / 8);
+                const c = flipIdx % 8;
+                const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+                for (const [dr, dc] of dirs) {
+                    let nr = r + dr;
+                    let nc = c + dc;
+                    let screens = 0;
+                    while (nr >= 0 && nr < 4 && nc >= 0 && nc < 8) {
+                        const p = board[nr * 8 + nc];
+                        if (p) {
+                            if (screens === 0) {
+                                screens = 1;
+                            } else {
+                                if (p.revealed && p.color === enemyColor && p.rank === 2) {
+                                    delta -= 22; // Flipping into an enemy cannon mount!
+                                }
+                                break;
+                            }
+                        }
+                        nr += dr;
+                        nc += dc;
+                    }
+                }
+
+                return delta;
+            },
+
+            evaluateBoard(board, aiColor) {
+                const enemyColor = aiColor === 'red' ? 'black' : 'red';
+                let score = 0;
+
+                for (let i = 0; i < 32; i++) {
+                    const p = board[i];
+                    if (!p) continue;
+
+                    const val = PIECE_VALUES[p.rank];
+                    if (p.color === aiColor) {
+                        score += val;
+                        if (p.revealed) {
+                            // Mobility and threat bonus
+                            const moves = this.getValidMovesForIndex(board, i);
+                            for (const m of moves) {
+                                if (m.type === 'capture') {
+                                    score += PIECE_VALUES[board[m.to].rank] * 0.22;
+                                } else {
+                                    score += 1.5;
+                                }
+                            }
+                        }
+                    } else {
+                        score -= val;
+                        if (p.revealed) {
+                            const moves = this.getValidMovesForIndex(board, i);
+                            for (const m of moves) {
+                                if (m.type === 'capture') {
+                                    score -= PIECE_VALUES[board[m.to].rank] * 0.28;
+                                } else {
+                                    score -= 1.5;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return score;
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            BanqiGame.init();
+        });
+    </script>
+</body>
+</html>
