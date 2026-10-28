@@ -588,6 +588,15 @@
             animation: flash-pink 1.5s infinite alternate ease-in-out;
         }
 
+        .board.ai-thinking,
+        .board.ai-thinking .cell {
+            cursor: wait;
+        }
+
+        .board.ai-thinking .cell {
+            pointer-events: none;
+        }
+
         @keyframes flash-cyan {
             0% {
                 box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
@@ -1014,10 +1023,29 @@
         const Game = {
             boardState: Array(9).fill(null),
             gameActive: false,
-            currentPlayer: 'X', // X always goes first
+            startingPlayer: 'X', // Alternates each completed round
+            currentPlayer: 'X',
             gameMode: 'pvp', // 'pvp' or 'pve'
             difficulty: 'medium', // 'easy', 'medium', 'impossible'
-            scores: { X: 0, O: 0, ties: 0 },
+            aiTimeoutId: null,
+            allScores: {
+                pvp: { X: 0, O: 0, ties: 0 },
+                pve_easy: { X: 0, O: 0, ties: 0 },
+                pve_medium: { X: 0, O: 0, ties: 0 },
+                pve_impossible: { X: 0, O: 0, ties: 0 }
+            },
+
+            get scores() {
+                const key = this.getCurrentScoreKey();
+                if (!this.allScores[key]) {
+                    this.allScores[key] = { X: 0, O: 0, ties: 0 };
+                }
+                return this.allScores[key];
+            },
+
+            getCurrentScoreKey() {
+                return this.gameMode === 'pvp' ? 'pvp' : `pve_${this.difficulty}`;
+            },
 
             // DOM Elements
             elements: {},
@@ -1068,20 +1096,55 @@
                 }
                 this.updateSoundIcon();
 
-                // Load Persistent Scores
-                const savedScores = localStorage.getItem('neon_ttt_scores');
-                if (savedScores) {
+                // Load Persistent Scores (v2 per-mode structure)
+                const savedScoresV2 = localStorage.getItem('neon_ttt_scores_v2');
+                if (savedScoresV2) {
                     try {
-                        this.scores = JSON.parse(savedScores);
-                        this.updateScoreboardUI();
+                        const parsed = JSON.parse(savedScoresV2);
+                        if (parsed && typeof parsed === 'object') {
+                            this.allScores = { ...this.allScores, ...parsed };
+                        }
                     } catch (e) {
                         console.error("Failed to parse scores from localStorage", e);
                     }
+                } else {
+                    // Migrate legacy single-bucket scores if present
+                    const legacyScores = localStorage.getItem('neon_ttt_scores');
+                    if (legacyScores) {
+                        try {
+                            const parsedLegacy = JSON.parse(legacyScores);
+                            if (parsedLegacy && typeof parsedLegacy.X === 'number') {
+                                this.allScores.pvp = parsedLegacy;
+                            }
+                        } catch (e) {
+                            // Ignore malformed legacy scores
+                        }
+                    }
                 }
+                this.updateScoreboardUI();
             },
 
             saveScores() {
-                localStorage.setItem('neon_ttt_scores', JSON.stringify(this.scores));
+                localStorage.setItem('neon_ttt_scores_v2', JSON.stringify(this.allScores));
+            },
+
+            clearAITimeout() {
+                if (this.aiTimeoutId !== null) {
+                    clearTimeout(this.aiTimeoutId);
+                    this.aiTimeoutId = null;
+                }
+                if (this.elements.board) {
+                    this.elements.board.classList.remove('ai-thinking');
+                }
+            },
+
+            scheduleAIMove() {
+                this.clearAITimeout();
+                this.elements.board.classList.add('ai-thinking');
+                this.aiTimeoutId = setTimeout(() => {
+                    this.aiTimeoutId = null;
+                    this.triggerAIMove();
+                }, 600);
             },
 
             bindEvents() {
@@ -1100,9 +1163,10 @@
                 document.querySelectorAll('.btn-diff').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         SoundManager.playClick();
+                        const targetBtn = e.currentTarget;
                         document.querySelectorAll('.btn-diff').forEach(b => b.classList.remove('active'));
-                        e.target.classList.add('active');
-                        this.difficulty = e.target.dataset.diff;
+                        targetBtn.classList.add('active');
+                        this.difficulty = targetBtn.dataset.diff;
                     });
                 });
 
@@ -1188,18 +1252,22 @@
                     this.elements.gameDiffDisplay.textContent = diffMap[this.difficulty];
                 }
 
+                this.startingPlayer = 'X';
+                this.updateScoreboardUI();
                 this.resetRound();
             },
 
             showMenu() {
+                this.clearAITimeout();
                 this.elements.gameScreen.classList.remove('active');
                 this.elements.menuScreen.classList.add('active');
                 this.gameActive = false;
             },
 
             resetRound() {
+                this.clearAITimeout();
                 this.boardState.fill(null);
-                this.currentPlayer = 'X';
+                this.currentPlayer = this.startingPlayer;
                 this.gameActive = true;
 
                 // Reset DOM Cells
@@ -1208,11 +1276,17 @@
                 });
 
                 this.updateTurnIndicator();
-                this.updateStatusText(`輪到 <span class="cyan-text font-bold">X</span> 的回合`);
+                this.updateStatusText();
+
+                // If PvE and AI ('O') starts this round, trigger AI move
+                if (this.gameMode === 'pve' && this.currentPlayer === 'O') {
+                    this.scheduleAIMove();
+                }
             },
 
             resetScores() {
-                this.scores = { X: 0, O: 0, ties: 0 };
+                this.allScores[this.getCurrentScoreKey()] = { X: 0, O: 0, ties: 0 };
+                this.startingPlayer = 'X';
                 this.saveScores();
                 this.updateScoreboardUI();
             },
@@ -1224,7 +1298,21 @@
             },
 
             updateStatusText(htmlContent) {
-                this.elements.statusText.innerHTML = htmlContent;
+                if (htmlContent !== undefined) {
+                    this.elements.statusText.innerHTML = htmlContent;
+                    return;
+                }
+
+                if (this.gameMode === 'pvp') {
+                    const activeColor = this.currentPlayer === 'X' ? 'cyan-text' : 'pink-text';
+                    this.elements.statusText.innerHTML = `輪到 <span class="${activeColor} font-bold">${this.currentPlayer}</span> 的回合`;
+                } else {
+                    if (this.currentPlayer === 'O') {
+                        this.elements.statusText.innerHTML = `<span class="pink-text font-bold">AI</span> 思考中...`;
+                    } else {
+                        this.elements.statusText.innerHTML = `輪到 <span class="cyan-text font-bold">你的</span> 回合`;
+                    }
+                }
             },
 
             updateTurnIndicator() {
@@ -1238,8 +1326,8 @@
             },
 
             handleCellClick(e) {
-                const cell = e.target;
-                const index = parseInt(cell.dataset.index);
+                const cell = e.currentTarget;
+                const index = parseInt(cell.dataset.index, 10);
 
                 // Block clicks if game not active, space occupied, or it's AI's turn
                 if (!this.gameActive || this.boardState[index] !== null) return;
@@ -1248,18 +1336,8 @@
                 this.makeMove(index);
             },
 
-            makeMove(index) {
-                // Record Move
-                this.boardState[index] = this.currentPlayer;
-                
-                // Visual cell update
-                const cell = this.elements.cells[index];
-                cell.classList.add(this.currentPlayer === 'X' ? 'x-marked' : 'o-marked');
-
-                // Play SFX
-                SoundManager.playMove(this.currentPlayer);
-
-                // Check Round Ending
+            processMoveEnd() {
+                // 檢查遊戲是否結束
                 if (this.checkWinCondition()) {
                     this.handleGameWin();
                     return;
@@ -1270,23 +1348,29 @@
                     return;
                 }
 
-                // Switch Turn
+                // 交換玩家
                 this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
                 this.updateTurnIndicator();
+                this.updateStatusText();
 
-                if (this.gameMode === 'pvp') {
-                    const activeColor = this.currentPlayer === 'X' ? 'cyan-text' : 'pink-text';
-                    this.updateStatusText(`輪到 <span class="${activeColor} font-bold">${this.currentPlayer}</span> 的回合`);
-                } else {
-                    // CHALLENGE AI MODE
-                    if (this.currentPlayer === 'O') {
-                        this.updateStatusText(`AI 思考中...`);
-                        // Add brief modern thinking latency for realism
-                        setTimeout(() => this.triggerAIMove(), 600);
-                    } else {
-                        this.updateStatusText(`輪到你的回合`);
-                    }
+                // 如果是 PvE 模式且輪到 AI，觸發 AI 行動
+                if (this.gameMode === 'pve' && this.currentPlayer === 'O') {
+                    this.scheduleAIMove();
                 }
+            },
+
+            makeMove(index) {
+                // Record Move
+                this.boardState[index] = this.currentPlayer;
+
+                // Visual cell update
+                const cell = this.elements.cells[index];
+                cell.classList.add(this.currentPlayer === 'X' ? 'x-marked' : 'o-marked');
+
+                // Play SFX
+                SoundManager.playMove(this.currentPlayer);
+                
+                this.processMoveEnd();
             },
 
             checkWinCondition() {
@@ -1307,6 +1391,7 @@
 
             handleGameWin() {
                 this.gameActive = false;
+                this.startingPlayer = this.startingPlayer === 'X' ? 'O' : 'X';
                 
                 // Highlighting Winning Cells
                 const winningComb = this.getWinningCombination();
@@ -1340,6 +1425,7 @@
 
             handleGameDraw() {
                 this.gameActive = false;
+                this.startingPlayer = this.startingPlayer === 'X' ? 'O' : 'X';
                 this.scores.ties++;
                 this.saveScores();
                 this.updateScoreboardUI();
@@ -1353,7 +1439,8 @@
 
             // --- AI Logic Engine ---
             triggerAIMove() {
-                if (!this.gameActive) return;
+                this.elements.board.classList.remove('ai-thinking');
+                if (!this.gameActive || this.currentPlayer !== 'O') return;
 
                 let selectedMove = -1;
 
@@ -1415,23 +1502,30 @@
                 return this.getRandomMove();
             },
 
-            checkBoardWin(board, player) {
+            checkBoardWin(board, player) { // Helper for minimax
                 return WINNING_COMBINATIONS.some(comb => {
                     return comb.every(idx => board[idx] === player);
                 });
             },
 
             // Unbeatable Minimax Algorithm
-            getMinimaxBestMove() {
+            getMinimaxBestMove() { // Entry point for minimax
+                // Fast opening book when AI moves first on an empty board (corners & center)
+                if (this.boardState.every(cell => cell === null)) {
+                    const openingMoves = [0, 2, 4, 6, 8];
+                    return openingMoves[Math.floor(Math.random() * openingMoves.length)];
+                }
+
                 let bestVal = -Infinity;
                 let bestMoves = [];
 
                 for (let i = 0; i < 9; i++) {
                     if (this.boardState[i] === null) {
-                        // Try move
+                        // Make a move
                         this.boardState[i] = 'O';
-                        let moveVal = this.minimax(this.boardState, 0, false);
-                        // Backtrack
+                        // Compute evaluation for this move
+                        let moveVal = this.minimax(this.boardState, 0, -Infinity, +Infinity, false);
+                        // Undo the move
                         this.boardState[i] = null;
 
                         if (moveVal > bestVal) {
@@ -1443,35 +1537,46 @@
                     }
                 }
 
-                // Select randomly among equally best values for gameplay variation
+                // Select randomly among equally best moves for variation
                 return bestMoves[Math.floor(Math.random() * bestMoves.length)];
             },
 
-            minimax(board, depth, isMax) {
+            minimax(board, depth, alpha, beta, isMax) {
                 const score = this.evaluateBoardState(board);
 
-                // Base cases (Win, Loss, Draw)
-                if (score === 10) return score - depth; // Deduct depth to prefer quick wins
-                if (score === -10) return score + depth; // Add depth to delay losses
+                // Terminal states
+                if (score === 10) return score - depth;
+                if (score === -10) return score + depth;
                 if (!board.includes(null)) return 0;
 
+                // Maximizer's move (AI 'O')
                 if (isMax) {
                     let best = -Infinity;
                     for (let i = 0; i < 9; i++) {
                         if (board[i] === null) {
                             board[i] = 'O';
-                            best = Math.max(best, this.minimax(board, depth + 1, false));
+                            best = Math.max(best, this.minimax(board, depth + 1, alpha, beta, false));
                             board[i] = null;
+                            alpha = Math.max(alpha, best);
+                            if (beta <= alpha) {
+                                break; // Beta cutoff
+                            }
                         }
                     }
                     return best;
-                } else {
+                } 
+                // Minimizer's move (Player 'X')
+                else {
                     let best = Infinity;
                     for (let i = 0; i < 9; i++) {
                         if (board[i] === null) {
                             board[i] = 'X';
-                            best = Math.min(best, this.minimax(board, depth + 1, true));
+                            best = Math.min(best, this.minimax(board, depth + 1, alpha, beta, true));
                             board[i] = null;
+                            beta = Math.min(beta, best);
+                            if (beta <= alpha) {
+                                break; // Alpha cutoff
+                            }
                         }
                     }
                     return best;
