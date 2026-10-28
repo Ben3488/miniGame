@@ -105,6 +105,14 @@ document.addEventListener('DOMContentLoaded', () => {
             '#multiscoreboard': 'nav-btn-multiscoreboard',
             '#remover':    'nav-btn-bgremover',
             '#downloader': 'nav-btn-downloader',
+            '#pomodoro':   'nav-btn-pomodoro',
+            '#ledmarquee': 'nav-btn-ledmarquee',
+            '#formatconverter': 'nav-btn-formatconverter',
+            '#urlshortener': 'nav-btn-urlshortener',
+            '#whitenoise':   'nav-btn-whitenoise',
+            '#deepl':         'nav-btn-deepl',
+            '#chatgpt':       'nav-btn-chatgpt',
+            '#notionai':      'nav-btn-notionai',
         };
         const btn = document.getElementById(idMap[hash]);
         if (btn) switchTool(btn);

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌐 DeepL 翻譯官 - Premium Translator Interface</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="redirect-container glass-panel">
+        <div class="tool-header">
+            <span class="tool-logo">🌐</span>
+            <h1>DeepL 翻譯官</h1>
+            <p class="tool-slogan font-bold text-blue-400 text-sm">網評最自然、語意最精準的跨語言翻譯工具。</p>
+            <p class="tool-desc">由於官方安全政策限制，我們為您設計了極速翻譯傳送門。可在下方輸入文字，直接帶入 DeepL 翻譯頁面！</p>
+        </div>
+
+        <div class="composer-card secondary-panel">
+            <div class="form-group">
+                <label for="translate-text">輸入您要翻譯的文字</label>
+                <textarea id="translate-text" placeholder="在此處預先輸入您的文字，我們將為您自動生成翻譯網址..."></textarea>
+            </div>
+
+            <div class="settings-row">
+                <div class="form-group">
+                    <label for="target-lang">翻譯目標語言</label>
+                    <select id="target-lang">
+                        <option value="zh/en" selected>中文 &rarr; 英文 (English)</option>
+                        <option value="zh/ja">中文 &rarr; 日文 (Japanese)</option>
+                        <option value="zh/ko">中文 &rarr; 韓文 (Korean)</option>
+                        <option value="zh/de">中文 &rarr; 德文 (German)</option>
+                        <option value="zh/fr">中文 &rarr; 法文 (French)</option>
+                        <option value="en/zh">英文 &rarr; 繁體中文 (Chinese)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="btn-redirect">
+                🚀 開啟 DeepL 翻譯
+            </button>
+        </div>
+
+        <div class="info-footer">
+            <p>💡 提示：點選後將在新分頁中直接為您開啟 DeepL Translator，並自動帶入您寫的文字。</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

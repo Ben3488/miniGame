@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💬 LED 手機彈幕跑馬燈 - Premium Marquee Hub</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="marquee-dashboard glass-panel">
+        <!-- Live Preview Box -->
+        <div class="marquee-preview-container" id="marquee-fullscreen-target">
+            <div class="marquee-content" id="marquee-text-node">LED 手機彈幕 🚀</div>
+            <!-- Fullscreen Exit Hint (only visible in fullscreen) -->
+            <div class="fullscreen-exit-hint">輕觸螢幕或按 ESC 退出全螢幕</div>
+        </div>
+
+        <!-- Configurations Form -->
+        <div class="marquee-settings">
+            <h3>⚙️ 彈幕設定面版</h3>
+
+            <!-- Text Input -->
+            <div class="form-group">
+                <label for="input-text">彈幕文字內容</label>
+                <input type="text" id="input-text" value="LED 手機彈幕 🚀" placeholder="請輸入彈幕內容" maxlength="50">
+            </div>
+
+            <!-- Double column inputs -->
+            <div class="settings-grid">
+                <!-- Font Size -->
+                <div class="form-group">
+                    <label for="input-size">文字大小 <span id="val-size">4.5</span>rem</label>
+                    <input type="range" id="input-size" min="2" max="10" step="0.5" value="4.5">
+                </div>
+
+                <!-- Scroll Speed -->
+                <div class="form-group">
+                    <label for="input-speed">滾動速度 (值越大越慢) <span id="val-speed">12</span>s</label>
+                    <input type="range" id="input-speed" min="3" max="25" step="1" value="12">
+                </div>
+
+                <!-- Text Color -->
+                <div class="form-group">
+                    <label for="input-color">文字顏色</label>
+                    <div class="color-picker-wrapper">
+                        <input type="color" id="input-color" value="#00ffcc">
+                        <span class="color-picker-hex">#00ffcc</span>
+                    </div>
+                </div>
+
+                <!-- Glow/Shadow Color -->
+                <div class="form-group">
+                    <label for="input-glow">霓虹光暈顏色</label>
+                    <div class="color-picker-wrapper">
+                        <input type="color" id="input-glow" value="#00ffcc">
+                        <span class="color-picker-hex">#00ffcc</span>
+                    </div>
+                </div>
+
+                <!-- Font Weight -->
+                <div class="form-group">
+                    <label for="select-weight">字體粗細</label>
+                    <select id="select-weight">
+                        <option value="400">標準 (Normal)</option>
+                        <option value="700">粗體 (Bold)</option>
+                        <option value="900" selected>特粗 (Extra Bold)</option>
+                    </select>
+                </div>
+
+                <!-- Animation Styles -->
+                <div class="form-group">
+                    <label for="select-style">特殊特效</label>
+                    <select id="select-style">
+                        <option value="neon" selected>✨ 霓虹呼吸 (Neon Glow)</option>
+                        <option value="rainbow">🌈 七彩漸變 (Rainbow)</option>
+                        <option value="blink">⚡ 閃爍效果 (Blink)</option>
+                        <option value="normal">⚪ 一般無光 (Normal)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="form-actions">
+                <button class="btn btn-primary" id="btn-fullscreen">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-fullscreen" style="margin-right: 6px;"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/></svg>
+                    啟動全螢幕彈幕
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

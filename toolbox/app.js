@@ -101,10 +101,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!hash) return;
 
         const idMap = {
-            '#scoreboard': 'nav-btn-scoreboard',
-            '#multiscoreboard': 'nav-btn-multiscoreboard',
             '#remover':    'nav-btn-bgremover',
             '#downloader': 'nav-btn-downloader',
+            '#pomodoro':   'nav-btn-pomodoro',
+            '#ledmarquee': 'nav-btn-ledmarquee',
+            '#formatconverter': 'nav-btn-formatconverter',
+            '#urlshortener': 'nav-btn-urlshortener',
+            '#whitenoise':   'nav-btn-whitenoise',
+            '#deepl':         'nav-btn-deepl',
+            '#chatgpt':       'nav-btn-chatgpt',
+            '#notionai':      'nav-btn-notionai',
+            '#mediaai':       'nav-btn-mediaai',
         };
         const btn = document.getElementById(idMap[hash]);
         if (btn) switchTool(btn);

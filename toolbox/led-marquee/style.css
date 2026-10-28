@@ -1,0 +1,376 @@
+/* ==========================================================================
+   LED Marquee Premium UI CSS
+   ========================================================================== */
+
+:root {
+    --bg-primary: #05070f;
+    --bg-secondary: #0c0f1d;
+    --panel-bg: rgba(10, 16, 31, 0.72);
+    --panel-border: rgba(146, 177, 255, 0.12);
+    --panel-border-hover: rgba(196, 215, 255, 0.24);
+    --text-primary: #f8fbff;
+    --text-secondary: #aab7d4;
+    --text-muted: #6e7d9b;
+    --transition-smooth: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    --font-primary: 'Outfit', 'Noto Sans TC', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-primary);
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    min-height: 100vh;
+    background: radial-gradient(circle at center, rgba(16, 28, 65, 0.4) 0%, rgba(4, 8, 18, 0.98) 80%),
+                linear-gradient(180deg, #03050c 0%, #060914 100%);
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    overflow-x: hidden;
+}
+
+/* Glassmorphism panel */
+.glass-panel {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
+                var(--panel-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--panel-border);
+    border-radius: 28px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: var(--transition-smooth);
+}
+
+.glass-panel:hover {
+    border-color: var(--panel-border-hover);
+}
+
+.marquee-dashboard {
+    width: min(100%, 720px);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Preview Container */
+.marquee-preview-container {
+    width: 100%;
+    height: 180px;
+    background: #000000;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9), 0 10px 30px rgba(0, 0, 0, 0.5);
+    user-select: none;
+}
+
+/* Marquee Scrolling Text */
+.marquee-content {
+    white-space: nowrap;
+    position: absolute;
+    left: 100%;
+    will-change: transform;
+    animation: scroll-left 12s linear infinite;
+    font-size: 4.5rem;
+    font-weight: 900;
+    color: #00ffcc;
+    text-shadow: 0 0 12px #00ffcc, 0 0 24px #00ffcc;
+}
+
+@keyframes scroll-left {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(-100%, 0, 0);
+    }
+}
+
+/* Special effects styles */
+.marquee-content.effect-neon {
+    animation: scroll-left 12s linear infinite, neon-pulse 1.8s ease-in-out infinite alternate;
+}
+
+.marquee-content.effect-rainbow {
+    background: linear-gradient(90deg, #ff007f, #7f00ff, #00ffcc, #ffdd00, #ff007f);
+    background-size: 400% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: scroll-left 12s linear infinite, rainbow-scroll 6s linear infinite;
+}
+
+.marquee-content.effect-blink {
+    animation: scroll-left 12s linear infinite, blink-anim 0.8s steps(2, start) infinite;
+}
+
+.marquee-content.effect-normal {
+    text-shadow: none !important;
+}
+
+@keyframes neon-pulse {
+    0% {
+        opacity: 0.82;
+        filter: drop-shadow(0 0 4px currentColor);
+    }
+    100% {
+        opacity: 1;
+        filter: drop-shadow(0 0 18px currentColor) drop-shadow(0 0 32px currentColor);
+    }
+}
+
+@keyframes rainbow-scroll {
+    to { background-position: 400% center; }
+}
+
+@keyframes blink-anim {
+    to { visibility: hidden; }
+}
+
+/* Fullscreen Hints */
+.fullscreen-exit-hint {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.82rem;
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 100;
+}
+
+/* Fullscreen Styles (HTML5 API triggers this) */
+.marquee-preview-container:fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #000000 !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.marquee-preview-container:fullscreen .fullscreen-exit-hint {
+    opacity: 1;
+    animation: fade-out-hint 3.5s forwards ease-in-out;
+}
+
+@keyframes fade-out-hint {
+    0%, 70% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Settings Forms */
+.marquee-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.marquee-settings h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.form-group label span {
+    color: #3b82f6;
+    font-weight: 800;
+}
+
+/* Text Input Styling */
+.form-group input[type="text"] {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(7, 13, 25, 0.6);
+    color: #ffffff;
+    font-size: 0.95rem;
+    outline: none;
+    transition: var(--transition-smooth);
+}
+
+.form-group input[type="text"]:focus {
+    border-color: rgba(59, 130, 246, 0.6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+/* Settings Grid (2 Columns) */
+.settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 18px;
+}
+
+/* Range input styling */
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+    outline: none;
+    margin: 10px 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #3b82f6;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+    transition: var(--transition-smooth);
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.18);
+}
+
+/* Select Styling */
+select {
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(7, 13, 25, 0.6);
+    color: #ffffff;
+    font-size: 0.9rem;
+    outline: none;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+select:focus {
+    border-color: rgba(59, 130, 246, 0.6);
+}
+
+select option {
+    background: #0d1223;
+    color: #ffffff;
+}
+
+/* Color Picker */
+.color-picker-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(7, 13, 25, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 6px 12px;
+}
+
+.color-picker-wrapper input[type="color"] {
+    -webkit-appearance: none;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    background: none;
+}
+
+.color-picker-wrapper input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.color-picker-wrapper input[type="color"]::-webkit-color-swatch {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 6px;
+}
+
+.color-picker-hex {
+    font-size: 0.88rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+}
+
+/* Buttons */
+.form-actions {
+    margin-top: 6px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 16px;
+    border: 1px solid transparent;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    user-select: none;
+    touch-action: manipulation;
+}
+
+.btn:active {
+    transform: scale(0.97);
+}
+
+.btn-primary {
+    background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
+    border-color: rgba(96, 165, 250, 0.2);
+    color: #ffffff;
+    box-shadow: 0 10px 24px rgba(59, 130, 246, 0.24);
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 580px) {
+    .settings-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 950px) and (orientation: landscape) {
+    .marquee-dashboard {
+        padding: 14px 18px;
+        gap: 14px;
+    }
+    .marquee-preview-container {
+        height: 100px;
+    }
+    .marquee-settings h3 {
+        padding-bottom: 4px;
+    }
+    .btn {
+        padding: 10px 16px;
+    }
+}

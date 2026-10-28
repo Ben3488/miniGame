@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⏱️ 番茄鐘與秒錶 - Smart Timer Hub</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="timer-container glass-panel">
+        <!-- Tabs to switch between Pomodoro and Stopwatch -->
+        <div class="tabs-header">
+            <button class="tab-btn active" id="tab-pomo">🍅 番茄工作鐘</button>
+            <button class="tab-btn" id="tab-stopwatch">⏱️ 精準秒錶</button>
+        </div>
+
+        <!-- Pomodoro Timer View -->
+        <div class="tab-content active" id="pomo-view">
+            <div class="pomo-status-badge" id="pomo-status">專注學習中</div>
+            
+            <!-- Circular Progress Ring -->
+            <div class="timer-circle-wrapper">
+                <svg class="timer-svg" width="220" height="220" viewBox="0 0 220 220">
+                    <circle class="timer-svg-bg" cx="110" cy="110" r="95"></circle>
+                    <circle class="timer-svg-progress" id="pomo-progress" cx="110" cy="110" r="95"></circle>
+                </svg>
+                <div class="timer-time-display" id="pomo-time">25:00</div>
+            </div>
+
+            <!-- Controls -->
+            <div class="timer-controls">
+                <button class="btn btn-primary btn-large" id="btn-pomo-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="icon-play"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                    <span id="pomo-start-text">開始</span>
+                </button>
+                <button class="btn btn-secondary" id="btn-pomo-reset">重設</button>
+                <button class="btn btn-secondary" id="btn-pomo-skip">跳過</button>
+            </div>
+
+            <!-- Presets -->
+            <div class="timer-presets">
+                <button class="btn-preset active" data-time="1500" data-type="work">💻 專注 (25分)</button>
+                <button class="btn-preset" data-time="300" data-type="break">☕ 短休 (5分)</button>
+                <button class="btn-preset" data-time="900" data-type="longBreak">🌴 長休 (15分)</button>
+            </div>
+        </div>
+
+        <!-- Stopwatch View -->
+        <div class="tab-content" id="stopwatch-view">
+            <!-- Time Display -->
+            <div class="stopwatch-time-display" id="stopwatch-time">00:00.00</div>
+
+            <!-- Controls -->
+            <div class="timer-controls">
+                <button class="btn btn-primary btn-large" id="btn-sw-start">開始</button>
+                <button class="btn btn-secondary" id="btn-sw-lap" disabled>計圈</button>
+                <button class="btn btn-danger" id="btn-sw-reset">重設</button>
+            </div>
+
+            <!-- Lap List Container -->
+            <div class="lap-container">
+                <div class="lap-header">
+                    <span>圈數</span>
+                    <span>分圈時間</span>
+                    <span>累計時間</span>
+                </div>
+                <ul class="lap-list" id="lap-list">
+                    <li class="lap-empty">尚無計圈紀錄</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

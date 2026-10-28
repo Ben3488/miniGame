@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 白噪音專注空間 - Mindful Soundscape Deck</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="mixer-container glass-panel">
+        <div class="deck-header">
+            <div class="title-section">
+                <span class="pulse-indicator inactive" id="pulse-indicator"></span>
+                <h1>白噪音專注空間</h1>
+                <p>調配您的專屬聲音環境，阻絕雜音，進入沉浸工作流。</p>
+            </div>
+            <!-- Master Control -->
+            <button class="btn-master-play" id="btn-master-toggle" title="全域播放 / 暫停">
+                <span class="play-icon">▶</span>
+            </button>
+        </div>
+
+        <div class="mixer-grid">
+            <!-- Left Panel: Pure Noise Synthesizers -->
+            <div class="mixer-column">
+                <h2>🧬 離線聲學合成器</h2>
+                <p class="section-desc">使用 Web Audio API 即時物理建模合成，完全無外部網路流量。</p>
+                
+                <div class="sound-card" data-sound="white">
+                    <div class="sound-info">
+                        <span class="sound-emoji">⚪</span>
+                        <div class="sound-meta">
+                            <h3>專注白噪音</h3>
+                            <span>全頻率均勻分佈，阻絕高頻尖銳噪音</span>
+                        </div>
+                        <button class="btn-sound-toggle">🔇</button>
+                    </div>
+                    <div class="volume-slider-wrapper">
+                        <input type="range" class="volume-slider" min="0" max="100" value="30">
+                        <span class="volume-pct">30%</span>
+                    </div>
+                </div>
+
+                <div class="sound-card" data-sound="brown">
+                    <div class="sound-info">
+                        <span class="sound-emoji">🟤</span>
+                        <div class="sound-meta">
+                            <h3>深沉褐噪音</h3>
+                            <span>低頻共鳴，舒緩溫暖，如遠處雷聲</span>
+                        </div>
+                        <button class="btn-sound-toggle">🔇</button>
+                    </div>
+                    <div class="volume-slider-wrapper">
+                        <input type="range" class="volume-slider" min="0" max="100" value="30">
+                        <span class="volume-pct">30%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Environment Soundscapes -->
+            <div class="mixer-column">
+                <h2>🌲 自然環境聲學</h2>
+                <p class="section-desc">結合多軌低頻振盪濾波器，動態模擬沉浸式自然聲景。</p>
+
+                <div class="sound-card" data-sound="rain">
+                    <div class="sound-info">
+                        <span class="sound-emoji">🌧️</span>
+                        <div class="sound-meta">
+                            <h3>舒緩雨聲</h3>
+                            <span>綿密落雨，點滴窗櫺，白噪聲物理濾波</span>
+                        </div>
+                        <button class="btn-sound-toggle">🔇</button>
+                    </div>
+                    <div class="volume-slider-wrapper">
+                        <input type="range" class="volume-slider" min="0" max="100" value="0">
+                        <span class="volume-pct">0%</span>
+                    </div>
+                </div>
+
+                <div class="sound-card" data-sound="waves">
+                    <div class="sound-info">
+                        <span class="sound-emoji">🌊</span>
+                        <div class="sound-meta">
+                            <h3>海浪潮汐</h3>
+                            <span>LFO 低頻正弦振盪器模擬海浪拍打</span>
+                        </div>
+                        <button class="btn-sound-toggle">🔇</button>
+                    </div>
+                    <div class="volume-slider-wrapper">
+                        <input type="range" class="volume-slider" min="0" max="100" value="0">
+                        <span class="volume-pct">0%</span>
+                    </div>
+                </div>
+
+                <div class="sound-card" data-sound="wind">
+                    <div class="sound-info">
+                        <span class="sound-emoji">🌬️</span>
+                        <div class="sound-meta">
+                            <h3>森林微風</h3>
+                            <span>隨機游走帶通濾波，呈現呼嘯林梢聲</span>
+                        </div>
+                        <button class="btn-sound-toggle">🔇</button>
+                    </div>
+                    <div class="volume-slider-wrapper">
+                        <input type="range" class="volume-slider" min="0" max="100" value="0">
+                        <span class="volume-pct">0%</span>
+                    </div>
+                </div>
+
+                <div class="sound-card" data-sound="campfire">
+                    <div class="sound-info">
+                        <span class="sound-emoji">🔥</span>
+                        <div class="sound-meta">
+                            <h3>營火柴薪</h3>
+                            <span>劈啪爆裂瞬態脈衝，模擬營火溫暖</span>
+                        </div>
+                        <button class="btn-sound-toggle">🔇</button>
+                    </div>
+                    <div class="volume-slider-wrapper">
+                        <input type="range" class="volume-slider" min="0" max="100" value="0">
+                        <span class="volume-pct">0%</span>
+                    </div>
+                </div>
+
+                <div class="sound-card" data-sound="cafe">
+                    <div class="sound-info">
+                        <span class="sound-emoji">☕</span>
+                        <div class="sound-meta">
+                            <h3>復古咖啡廳</h3>
+                            <span>人聲頻段共振 murmur，高頻杯碟敲擊</span>
+                        </div>
+                        <button class="btn-sound-toggle">🔇</button>
+                    </div>
+                    <div class="volume-slider-wrapper">
+                        <input type="range" class="volume-slider" min="0" max="100" value="0">
+                        <span class="volume-pct">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="deck-footer">
+            <p>💡 提示：本空間使用 Web Audio API 本地即時演算發聲，即使斷網或離線也能正常運作。</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
